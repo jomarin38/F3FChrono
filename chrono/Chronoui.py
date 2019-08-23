@@ -1,149 +1,147 @@
 import sys
-from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import QObject, pyqtSignal, pyqtSlot
-from .Qtchronoui import Ui_MainWindow
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import QObject, pyqtSignal
+from chrono.GUI.Qt5chrono import Ui_MainWindow
 
 
-
-class MyForm (QtGui.QMainWindow):
+class MyForm(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__ (self, parent)
+        QtWidgets.QWidget.__init__(self, parent)
         self.init()
-        
+
     def init(self):
-        self.ui = Ui_MainWindow ()
-        self.ui.setupUi (self)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
         self.setGeometry(0, 0, 480, 300)
-        self.uiHome = uiHome (self.ui)
-        self.uiPiCAM = uiPiCAM (self.ui)
-        self.uiChrono = uiChrono (self.ui)
-        self.uiPractice = uiPractice (self.ui)
-        self.connectEvents ()
-        self.BaseEvent= BaseEvent()
+        self.uiHome = uiHome(self.ui)
+        self.uiPiCAM = uiPiCAM(self.ui)
+        self.uiChrono = uiChrono(self.ui)
+        self.uiPractice = uiPractice(self.ui)
+        self.connectEvents()
+        self.BaseEvent = BaseEvent()
 
-    def connectEvents (self):
-        self.uiHome.connectEvents ()
-        self.uiPiCAM.connectEvents ()
-        self.uiChrono.connectEvents ()
-        self.uiPractice.connectEvents ()
+    def connectEvents(self):
+        self.uiHome.connectEvents()
+        self.uiPiCAM.connectEvents()
+        self.uiChrono.connectEvents()
+        self.uiPractice.connectEvents()
 
-    def GetBaseEventID (self):
+    def GetBaseEventID(self):
         return self.BaseEvent
-    
-    def UpdateHMI (self, msg):
-        self.ui.listWidget.insertItem (0, msg)
+
+    def UpdateHMI(self, msg):
+        self.ui.listWidget.insertItem(0, msg)
+
 
 class BaseEvent(QObject):
-    signalID=pyqtSignal(str)
-            
+    signalID = pyqtSignal(str)
+
     def __init__(self):
         QObject.__init__(self)
-  
+
     def Event(self):
-        self.signalID.emit ("")
+        self.signalID.emit("")
 
 
-class uiHome (QtGui.QMainWindow):
+class uiHome(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__ (self, None)
-        self.ui=parent
-        
-    def connectEvents (self):
-        QtCore.QObject.connect(self.ui.Btn_Practice, QtCore.SIGNAL("clicked()"), self.PracticeBtn)
-        QtCore.QObject.connect(self.ui.Btn_Chrono, QtCore.SIGNAL("clicked()"), self.ChronoBtn)
-        QtCore.QObject.connect(self.ui.Btn_CheckPICAM, QtCore.SIGNAL("clicked()"), self.CheckPiCamBtn)       
-      
-    def CheckPiCamBtn (self):
-        print ("CheckBtn")
-        self.ui.stackedWidget.setCurrentIndex (1)
+        QtWidgets.QWidget.__init__(self, None)
+        self.ui = parent
 
-    def PracticeBtn (self):
-        print ("NextBtn")
-        self.ui.stackedWidget.setCurrentIndex (2)
-
-    def ChronoBtn (self):
-        print ("NextBtn")
-        self.ui.stackedWidget.setCurrentIndex (3)
-        
-
-
-
-class uiPractice (QtGui.QMainWindow):
-    def __init__(self, parent=None):
-        QtGui.QWidget.__init__ (self, None)
-        self.ui=parent
-        
-    def connectEvents (self):
-        QtCore.QObject.connect(self.ui.Btn_InStart, QtCore.SIGNAL("clicked()"), self.InStart)
-        QtCore.QObject.connect(self.ui.Btn_ResetChrono, QtCore.SIGNAL("clicked()"), self.ResetChrono)
-        QtCore.QObject.connect(self.ui.Btn_Save, QtCore.SIGNAL("clicked()"), self.Save)
-        QtCore.QObject.connect(self.ui.Btn_Back, QtCore.SIGNAL("clicked()"), self.HomeBtn)
-
-    def HomeBtn (self):
-        print ("HomeBtn")
-        self.ui.stackedWidget.setCurrentIndex (0)
-    
-    def InStart (self):
-        print("InStart")
-        self.ui.listWidget.addItem ("InStart")
-        
-    def ResetChrono (self):
-        print ("RAZ")
-        self.ui.listWidget.clear ()
-        
-    def Save (self):
-        print ("TODO Save")
-        self.ui.listWidget.clear ()
-
-
-class uiPiCAM (QtGui.QMainWindow):
-    def __init__(self, parent=None):
-        QtGui.QWidget.__init__ (self, None)
-        self.ui=parent
-    
     def connectEvents(self):
-        QtCore.QObject.connect(self.ui.Btn_PiCam_Home, QtCore.SIGNAL("clicked()"), self.HomeBtn)
-        QtCore.QObject.connect(self.ui.Btn_PiCam_Refresh, QtCore.SIGNAL("clicked()"), self.RefreshBtn)
-       
-    def HomeBtn (self):
-        print ("HomeBtn")
-        self.ui.stackedWidget.setCurrentIndex (0)
+        self.ui.Btn_Practice.clicked.connect(self.PracticeBtn)
+        self.ui.Btn_Chrono.clicked.connect(self.ChronoBtn)
+        self.ui.Btn_CheckPICAM.clicked.connect(self.CheckPiCamBtn)
 
-    def RefreshBtn (self):
-        print ("RefreshBtn")
-        
-    
+    def CheckPiCamBtn(self):
+        print("CheckBtn")
+        self.ui.stackedWidget.setCurrentIndex(1)
 
-class uiChrono (QtGui.QMainWindow):
+    def PracticeBtn(self):
+        print("NextBtn")
+        self.ui.stackedWidget.setCurrentIndex(2)
+
+    def ChronoBtn(self):
+        print("NextBtn")
+        self.ui.stackedWidget.setCurrentIndex(3)
+
+
+class uiPractice(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__ (self, None)
-        self.ui=parent
-        
-    def connectEvents (self):
-        QtCore.QObject.connect(self.ui.Btn_ChronoInStart, QtCore.SIGNAL("clicked()"), self.InStart)
-        QtCore.QObject.connect(self.ui.Btn_ChronoReset, QtCore.SIGNAL("clicked()"), self.ResetChrono)
-        QtCore.QObject.connect(self.ui.Btn_ChronoSave, QtCore.SIGNAL("clicked()"), self.Save)
-        QtCore.QObject.connect(self.ui.Btn_ChronoBack, QtCore.SIGNAL("clicked()"), self.HomeBtn)
+        QtWidgets.QWidget.__init__(self, None)
+        self.ui = parent
 
-    def HomeBtn (self):
-        print ("HomeBtn")
-        self.ui.stackedWidget.setCurrentIndex (0)
-    
-    def InStart (self):
+    def connectEvents(self):
+        self.ui.Btn_InStart.clicked.connect(self.InStart)
+        self.ui.Btn_ResetChrono.clicked.connect(self.ResetChrono)
+        self.ui.Btn_Save.clicked.connect(self.Save)
+        self.ui.Btn_Back.clicked.connect(self.HomeBtn)
+
+    def HomeBtn(self):
+        print("HomeBtn")
+        self.ui.stackedWidget.setCurrentIndex(0)
+
+    def InStart(self):
+        print("InStart")
+        self.ui.listWidget.addItem("InStart")
+
+    def ResetChrono(self):
+        print("RAZ")
+        self.ui.listWidget.clear()
+
+    def Save(self):
+        print("TODO Save")
+        self.ui.listWidget.clear()
+
+
+class uiPiCAM(QtWidgets.QMainWindow):
+    def __init__(self, parent=None):
+        QtWidgets.QWidget.__init__(self, None)
+        self.ui = parent
+
+    def connectEvents(self):
+        self.ui.Btn_PiCam_Home.clicked.connect(self.HomeBtn)
+        self.ui.Btn_PiCam_Refresh.clicked.connect(self.RefreshBtn)
+
+    def HomeBtn(self):
+        print("HomeBtn")
+        self.ui.stackedWidget.setCurrentIndex(0)
+
+    def RefreshBtn(self):
+        print("RefreshBtn")
+
+
+class uiChrono(QtWidgets.QMainWindow):
+    def __init__(self, parent=None):
+        QtWidgets.QWidget.__init__(self, None)
+        self.ui = parent
+
+    def connectEvents(self):
+        self.ui.Btn_ChronoInStart.clicked.connect(self.InStart)
+        self.ui.Btn_ChronoReset.clicked.connect(self.ResetChrono)
+        self.ui.Btn_ChronoSave.clicked.connect(self.Save)
+        self.ui.Btn_ChronoBack.clicked.connect(self.HomeBtn)
+
+    def HomeBtn(self):
+        print("HomeBtn")
+        self.ui.stackedWidget.setCurrentIndex(0)
+
+    def InStart(self):
         print("TODO InStart")
-        
-    def ResetChrono (self):
-        print ("TODO Reset")
-        
-    def Save (self):
-        print ("TODO Save")
 
-if __name__ == '__main__':
-    app=QtGui.QApplication(sys.argv)
-    myapp = MyForm ()
+    def ResetChrono(self):
+        print("TODO Reset")
+
+    def Save(self):
+        print("TODO Save")
+
+
+if __name__ == "__main__":
+
+    app = QtWidgets.QApplication(sys.argv)
+    myapp = MyForm()
     myapp.show()
-    
-    signal=myapp.GetBaseEventID ()
+
+    signal = myapp.GetBaseEventID()
     signal.Event()
     sys.exit(app.exec_())
-    

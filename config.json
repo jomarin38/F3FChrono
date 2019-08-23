@@ -1,7 +1,7 @@
 {
  "cmdFIFO": "/home/pi/piCAMTracker/www/FIFO", 
  "debug": false,
- "display": false,
+ "display": true,
  "sound": false,
  "vocal": false,
  "greenLEDPort": 17, 

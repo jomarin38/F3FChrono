@@ -9,7 +9,7 @@ import sys
 import logging
 from time import sleep,time
 from argparse import ArgumentParser
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 import chrono
 
 def get_raspi_revision():
@@ -61,7 +61,7 @@ def main():
     print("...start")
     
     if (config.conf['display']):
-        app=QtGui.QApplication(sys.argv)
+        app=QtWidgets.QApplication(sys.argv)
         myapp = chrono.Chronoui.MyForm ()
         myapp.show()
     

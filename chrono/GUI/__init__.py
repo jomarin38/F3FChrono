@@ -32,13 +32,5 @@ from __future__ import (
     absolute_import,
     )
 
-from .GPIOPort import gpioPort
-from .CommandInterface import CommandInterface
-from .ConfigReader import Configuration
-from .UDPBeep import udpBeep
-from .UDPReceive import udpreceive
-from .Chrono import chrono
-from .Chronoui import MyForm
-from .Sound import chronoSound
-from .Sound import chronoVocal
+from .Qt5chrono import Ui_MainWindow
 

@@ -77,7 +77,8 @@ class gpioPort(threading.Thread):
                 GPIO.output(self.port,self.deactivate)
                 self.event.clear()
 
-        GPIO.cleanup(self.port)
+        #GPIO.cleanup(self.port)
+        GPIO.cleanup()
 
 if __name__ == '__main__':
     def pressed(value):
