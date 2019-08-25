@@ -1,14 +1,10 @@
-#-udp fonctionnal test
+#sound.py
 #vim: set et sw=4 sts=4 fileencoding=utf-8:
 
 import threading
-import socket
 import time
-import logging
 import os
-import numpy
-import math
-
+import platform
 
 
 class chronoSound(threading.Thread):
@@ -29,20 +25,24 @@ class chronoSound(threading.Thread):
         while not self.terminated:
             # wait until somebody throws an event
             if self.event.wait(0.5):
-                os.system("play -n -C1 synth 0.2 sine 500")
+                if (platform.platform() == "linux"):
+                    os.system("play -n -C1 synth 0.2 sine 500")
                 self.event.clear()
             #else:
             #    os.system("flite -voice slt -t " + vocal)
             
     def Send (self, msg):
-        os.system("play -n -C1 synth 0.2 sine 500")
+        if (platform.platform() == "linux"):
+            os.system("play -n -C1 synth 0.2 sine 500")
             
 class chronoVocal():
     def Sound (self, string):
-        msg='flite -voice slt -t "' + string +'"'
-        print (msg)
-        os.system(str(msg))
-        print ("todo : Ajouter un message contenant Lap X, In Start, Time : XX.XXX") 
+        if (platform.platform()=="linux"):
+            msg='flite -voice slt -t "' + string +'"'
+            print(msg)
+            os.system(str(msg))
+
+        print ("todo : Ajouter un message contenant Lap X, In Start, Time : XX.XXX")
 
         
 
