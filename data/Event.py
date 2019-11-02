@@ -5,7 +5,6 @@ import requests
 from .Pilot import Pilot
 from .Competitor import Competitor
 from .Round import Round
-from .Run import Run
 
 class Event:
 
@@ -58,25 +57,19 @@ class Event:
         for line in splitted_response:
             splitted_line = line.split(',')
             if len(splitted_line) > 2:
-                if len(splitted_line) > 5:
-                    fai_id = splitted_line[6].strip('\"')
-                else:
-                    fai_id = None
-                if len(splitted_line) > 6:
-                    national_id = splitted_line[7].strip('\"')
-                else:
-                    national_id = None
-
-                pilot = Pilot(splitted_line[3].strip('\"'), splitted_line[2].strip('\"'),
+                pilot = Pilot(name=splitted_line[3].strip('\"'),
+                              first_name=splitted_line[2].strip('\"'),
                               f3x_vault_id=int(splitted_line[0].strip('\"')),
-                              national_id=national_id, fai_id=fai_id)
+                              national_id=splitted_line[7].strip('\"'),
+                              fai_id=splitted_line[6].strip('\"')
+                              )
                 bib_number = int(splitted_line[1].strip('\"'))
-                event._competitors[bib_number] = Competitor.register_pilot(event, bib_number, pilot)
+
+                event.register_pilot(pilot, bib_number)
 
         for round_id in range(1, n_rounds+1):
 
-            f3f_round = Round.new_round(event)
-            event._rounds.append(f3f_round)
+            f3f_round = event.create_new_round()
 
             request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
                           '&password=' + password + \
@@ -86,18 +79,14 @@ class Event:
             df = pd.read_csv(StringIO(response.text), sep=",", header=1)
 
             for index, row in df.iterrows():
+
+                competitor = event.competitor_from_f3x_vault_id(row['Pilot_id'])
                 pilot_flight_time = row['seconds']
                 pilot_penalty = row['penalty']
-                competitor = event.competitor_from_f3x_vault_id(row['Pilot_id'])
+                pilot_flight_valid = (pilot_flight_time > 0.0)
 
                 if competitor is not None:
-                    run = Run()
-                    run.competitor = competitor
-                    run.penalty = pilot_penalty
-                    run.run_time = pilot_flight_time
-                    #Only valid flights are pushed to F3X Vault
-                    run.valid = (pilot_flight_time > 0.0)
-                    f3f_round.add_run(run)
+                    f3f_round.handle_terminated_flight(competitor, pilot_flight_time, pilot_penalty, pilot_flight_valid)
 
             print(f3f_round.to_string())
 
@@ -109,3 +98,10 @@ class Event:
                 return competitor
         return None
 
+    def create_new_round(self):
+        f3f_round = Round.new_round(self)
+        self._rounds.append(f3f_round)
+        return f3f_round
+
+    def register_pilot(self, pilot, bib_number):
+        self._competitors[bib_number] = Competitor.register_pilot(self, bib_number, pilot)

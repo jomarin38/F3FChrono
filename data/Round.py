@@ -1,5 +1,6 @@
 from .RoundGroup import RoundGroup
 import os
+from .Run import Run
 
 class Round:
 
@@ -23,9 +24,17 @@ class Round:
         f3f_round._groups.append(RoundGroup(f3f_round))
         return f3f_round
 
-    def add_run(self, run):
+    def handle_terminated_flight(self, competitor, flight_time, penalty, valid):
+        run = Run()
+        run.competitor = competitor
+        run.penalty = penalty
+        run.run_time = flight_time
+        run.valid = valid
+        self._add_run(run)
+
+    def _add_run(self, run):
         #TODO : search in which group the run has to be added
-        self._groups[0].add_run(run)
+        self._groups[0]._add_run(run)
 
     def to_string(self):
         result = os.linesep + 'Round number ' + str(self._round_number) + os.linesep

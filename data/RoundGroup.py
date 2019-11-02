@@ -9,7 +9,7 @@ class RoundGroup:
         self.end_time = None
         self.runs = {}
 
-    def add_run(self, run):
+    def _add_run(self, run):
         if run.competitor in self.runs:
             self.runs[run.competitor].append(run)
         else:
