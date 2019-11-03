@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
-
+from PyQt5.QtCore import pyqtSignal, QObject
 
 from F3FChrono.uichronotest.WBottom_UI import Ui_WBottom
 from F3FChrono.uichronotest.WTop_UI import Ui_WTop
@@ -43,8 +43,13 @@ class WTopCtrl:
         self.view.pilotName.setText(competitor.display_name())
         self.view.bib.setText(str(competitor.get_bib_number()))
 
-class WChronoCtrl:
+class WChronoCtrl(QObject):
+
+    btn_next_sig = pyqtSignal()
+
     def __init__(self, name, parent):
+        super(QObject, self).__init__(parent)
+
         self.view = Ui_WChrono()
         self.name = name
         self.parent = parent
@@ -53,6 +58,7 @@ class WChronoCtrl:
 
         # Event connect
         self.view.Btn_Home.clicked.connect(self.btn_home)
+        self.view.Btn_Next.clicked.connect(self.btn_next)
 
     def get_widget(self):
         return self.widget
@@ -60,6 +66,8 @@ class WChronoCtrl:
     def btn_home(self):
         print(self.name + "Btn Home")
 
+    def btn_next(self):
+        self.btn_next_sig.emit()
 
 
 class WHomeCtrl:

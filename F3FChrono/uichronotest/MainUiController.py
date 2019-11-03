@@ -11,8 +11,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def __init__(self, event):
         super().__init__()
-        self.initUI()
         self.event = event
+        self.initUI()
 
     def initUI(self):
         self.MainWindow = QtWidgets.QMainWindow()
@@ -33,8 +33,13 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         for key, ctrl in self.controllers.items():
             self.ui.verticalLayout.addWidget(ctrl.get_widget())
 
+        self.controllers['chrono'].btn_next_sig.connect(self.next_pilot)
+
         self.set_page(0)
         self.MainWindow.show()
+
+    def next_pilot(self):
+        self.controllers['competitor'].set_data(self.event.get_current_round().next_pilot())
 
     def set_page(self, page):
         if page==0:
