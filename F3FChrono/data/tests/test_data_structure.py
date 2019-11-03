@@ -1,4 +1,4 @@
-from data.Event import Event
+from F3FChrono.data.Event import Event
 
 login=input('F3X Vault login : ')
 password=input('F3X Vault password : ')

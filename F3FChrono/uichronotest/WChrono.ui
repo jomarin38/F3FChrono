@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WChrono</class>
+ <widget class="QWidget" name="WChrono">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>435</width>
+    <height>291</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="1">
+        <widget class="QListWidget" name="LapsTime_Wdg">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>160</width>
+           <height>190</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <item>
+          <property name="text">
+           <string>Laps time (S)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1 : XX.XXX</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2 : XX.XXX</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>3 : XX.XXX</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>4 : XX.XXX</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>5 : XX.XXX</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>6 : XX.XXX</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>7 : XX.XXX</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>8 : XX.XXX</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>9 : XX.XXX</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>10 : XX.XXX</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="0" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+        <widget class="QLabel" name="Time_label">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>60</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>30.000</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QComboBox" name="comboBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>20</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <item>
+          <property name="text">
+           <string>Wait to launch</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Launch</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>In start</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Started</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>In progress</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Finish</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinAndMaxSize</enum>
+       </property>
+       <item>
+        <widget class="QPushButton" name="Btn_Home">
+         <property name="text">
+          <string>Home</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Btn_InStart">
+         <property name="maximumSize">
+          <size>
+           <width>16777202</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>InStart</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Btn_ResetChrono">
+         <property name="text">
+          <string>Reset Chrono</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Btn_Next">
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>Next</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

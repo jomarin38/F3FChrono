@@ -26,6 +26,9 @@ class Competitor:
     def to_string(self):
         return str(self._bib_number) + '\t' + self._pilot.to_string()
 
+    def display_name(self):
+        return self._pilot.to_string()
+
     def __hash__(self):
         return hash(self._bib_number)
 
