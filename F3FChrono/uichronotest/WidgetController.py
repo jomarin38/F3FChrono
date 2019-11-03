@@ -2,10 +2,10 @@ import sys
 from PyQt5 import QtWidgets, QtCore
 
 
-from WBottom_UI import Ui_WBottom
-from WTop_UI import Ui_WTop
-from WChrono_ui import Ui_WChrono
-from WHome_ui import Ui_WHome
+from F3FChrono.uichronotest.WBottom_UI import Ui_WBottom
+from F3FChrono.uichronotest.WTop_UI import Ui_WTop
+from F3FChrono.uichronotest.WChrono_ui import Ui_WChrono
+from F3FChrono.uichronotest.WHome_ui import Ui_WHome
 
 
 

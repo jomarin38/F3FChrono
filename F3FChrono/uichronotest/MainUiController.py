@@ -2,10 +2,11 @@ import sys
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
 
-from MainUi_UI import *
-from WidgetController import *
+from F3FChrono.uichronotest.MainUi_UI import *
+from F3FChrono.uichronotest.WidgetController import *
 
 global ui
+
 
 class MainUiCtrl (QtWidgets.QMainWindow):
 
