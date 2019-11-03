@@ -4,8 +4,6 @@ from F3FChrono.uichronotest.MainUi_UI import *
 from F3FChrono.uichronotest.WidgetController import *
 from F3FChrono.data.Event import Event
 
-global ui
-
 
 class MainUiCtrl (QtWidgets.QMainWindow):
 
