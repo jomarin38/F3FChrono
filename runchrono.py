@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 # vim: set et sw=4 sts=4 fileencoding=utf-8:
-import numpy as np
-import datetime as dt
 import os
-import io
 import re
 import sys
 import logging
-from time import sleep,time
+from time import sleep
 from argparse import ArgumentParser
-from PyQt5 import QtCore, QtGui, QtWidgets
-import chrono
+from PyQt5 import QtWidgets
+from F3FChrono import chrono
+
 
 def get_raspi_revision():
     rev_file = '/sys/firmware/devicetree/base/model'
@@ -62,17 +60,17 @@ def main():
     
     if (config.conf['display']):
         app=QtWidgets.QApplication(sys.argv)
-        myapp = chrono.Chronoui.MyForm ()
+        myapp = F3FChrono.chrono.Chronoui.MyForm ()
         myapp.show()
     
-    Chrono = chrono.Chrono.chrono (chrono.Chrono.chronoMode.Practice)
-    greenLED = chrono.GPIOPort.gpioPort(config.conf['greenLEDPort'], is_active_low=config.conf['ledActiveLow'], duration=config.conf['signalLength'], start_blinks=3)
+    Chrono = F3FChrono.chrono.Chrono.chrono (F3FChrono.chrono.Chrono.chronoMode.Practice)
+    greenLED = F3FChrono.chrono.GPIOPort.gpioPort(config.conf['greenLEDPort'], is_active_low=config.conf['ledActiveLow'], duration=config.conf['signalLength'], start_blinks=3)
     if (config.conf['sound']):
-        SoundBeep =chrono.Sound.chronoSound ()
+        SoundBeep = F3FChrono.chrono.Sound.chronoSound ()
     else:
         SoundBeep=None
     if (config.conf['vocal']):
-        vocal=chrono.chronoVocal()
+        vocal= chrono.chronoVocal()
     else:
         vocal=None
     #redLED = chrono.GPIOPort.gpioPort(config.conf['redLEDPort'],
@@ -89,12 +87,12 @@ def main():
     if (config.conf['vocal']):
         eventUI.signalID.connect (vocal.Sound)
     
-    udpReceive = chrono.UDPReceive.udpreceive(config.conf['IPUDPPORT'], Chrono, greenLED, eventUI)
-    udpBeep = chrono.UDPBeep.udpBeep(config.conf['IPUDPBEEP'], config.conf['IPUDPPORT'])
+    udpReceive = F3FChrono.chrono.UDPReceive.udpreceive(config.conf['IPUDPPORT'], Chrono, greenLED, eventUI)
+    udpBeep = F3FChrono.chrono.UDPBeep.udpBeep(config.conf['IPUDPBEEP'], config.conf['IPUDPPORT'])
     
     sleep(1.0)
     print("...start")
-    chrono.GPIOPort.statusLED(config.conf['statusLEDPort'], on=True)
+    F3FChrono.chrono.GPIOPort.statusLED(config.conf['statusLEDPort'], on=True)
     
 
 
@@ -112,7 +110,7 @@ def main():
             if (cmdline=='reset\n'):
                 print ('reset ()')
                 Chrono.reset ()
-                Chrono.start (chrono.Chrono.chronoMode.Practice)
+                Chrono.start (F3FChrono.chrono.Chrono.chronoMode.Practice)
             elif (cmdline=='start\n'):
                 print ('Start ()')
                 Chrono.startRace ()
@@ -128,7 +126,7 @@ def main():
         pass
     finally:
         terminateApp (greenLED, udpReceive, udpBeep, SoundBeep)
-        chrono.GPIOPort.statusLED(config.conf['statusLEDPort'], on=False)
+        F3FChrono.chrono.GPIOPort.statusLED(config.conf['statusLEDPort'], on=False)
         
 if __name__ == '__main__':
     parser = ArgumentParser(prog='chrono')

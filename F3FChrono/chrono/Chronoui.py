@@ -1,7 +1,7 @@
 import sys
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import QObject, pyqtSignal
-from chrono.GUI.Qt5chrono import Ui_MainWindow
+from F3FChrono.chrono import Ui_MainWindow
 
 
 class MyForm(QtWidgets.QMainWindow):

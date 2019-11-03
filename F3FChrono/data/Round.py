@@ -1,6 +1,7 @@
-from .RoundGroup import RoundGroup
 import os
-from .Run import Run
+from F3FChrono.data.Run import Run
+from F3FChrono.data.RoundGroup import RoundGroup
+
 
 class Round:
 

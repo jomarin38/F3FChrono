@@ -2,9 +2,10 @@ import pandas as pd
 from io import StringIO
 import requests
 
-from .Pilot import Pilot
-from .Competitor import Competitor
-from .Round import Round
+from F3FChrono.data.Pilot import Pilot
+from F3FChrono.data.Competitor import Competitor
+from F3FChrono.data.Round import Round
+
 
 class Event:
 
