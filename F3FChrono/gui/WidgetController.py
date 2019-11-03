@@ -2,87 +2,139 @@ import sys
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSignal, QObject
 
-from F3FChrono.gui.WBottom_UI import Ui_WBottom
-from F3FChrono.gui.WTop_UI import Ui_WTop
+from F3FChrono.gui.WWind_UI import Ui_WWind
+from F3FChrono.gui.WPilot_UI import Ui_WPilot
 from F3FChrono.gui.WChrono_ui import Ui_WChrono
-from F3FChrono.gui.WHome_ui import Ui_WHome
+from F3FChrono.gui.WChronoBtn_ui import Ui_WChronoBtn
+from F3FChrono.gui.WConfig_ui import Ui_WConfig
 
 
+class WRoundCtrl(QObject):
+    btn_next_sig = pyqtSignal()
+    btn_home_sig = pyqtSignal()
+    widgetList = []
 
-class WBottomCtrl:
     def __init__(self, name, parent):
-        self.view = Ui_WBottom ()
+        super(QObject, self).__init__(parent)
+        self.wPilotCtrl = WPilotCtrl("PilotCtrl", parent)
+        self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent)
+        self.view = Ui_WChronoBtn()
+        self.name = name
+        self.parent = parent
+        self.widget=QtWidgets.QWidget(parent)
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.wPilotCtrl.get_widget())
+        self.widgetList.append(self.wChronoCtrl.get_widget())
+        self.widgetList.append(self.widget)
+        # Event connect
+        self.view.Btn_Home.clicked.connect(self.btn_home)
+        self.view.Btn_Next.clicked.connect(self.btn_next_pilot)
+
+    def get_widget(self):
+        return (self.widgetList)
+
+    def show(self):
+        self.widget.show()
+        self.wPilotCtrl.show()
+        self.wChronoCtrl.show()
+
+    def hide(self):
+        self.widget.hide()
+        self.wPilotCtrl.hide()
+        self.wChronoCtrl.hide()
+
+    def btn_next_pilot(self):
+        self.btn_next_sig.emit()
+
+    def btn_home(self):
+        self.btn_home_sig.emit()
+
+
+class WWindCtrl:
+    widgetList = []
+
+    def __init__(self, name, parent):
+        self.view = Ui_WWind()
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
-
+        self.widgetList.append(self.widget)
     def get_widget(self):
-        return self.widget
+        return(self.widgetList)
 
-    def btnFct(self):
-        print(self.name + "Btn Fct")
+    def show(self):
+        self.widget.show()
 
-    def set_data(self, wind, race_info):
+    def hide(self):
+        self.widget.hide()
+
+    def set_data(self, wind):
         self.view.WindInfo.setText(wind)
-        self.view.RaceInfo.setText(race_info)
 
-
-class WTopCtrl:
+class WPilotCtrl:
     def __init__(self, name, parent):
-        self.view = Ui_WTop()
+        self.view = Ui_WPilot()
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
 
     def get_widget(self):
-        return self.widget
+        return(self.widget)
+
+    def show(self):
+        self.widget.show()
+
+    def hide(self):
+        self.widget.hide()
 
     def set_data(self, competitor):
         self.view.pilotName.setText(competitor.display_name())
         self.view.bib.setText(str(competitor.get_bib_number()))
 
-class WChronoCtrl(QObject):
-
-    btn_next_sig = pyqtSignal()
+class WChronoCtrl():
 
     def __init__(self, name, parent):
-        super(QObject, self).__init__(parent)
-
         self.view = Ui_WChrono()
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
 
-        # Event connect
-        self.view.Btn_Home.clicked.connect(self.btn_home)
-        self.view.Btn_Next.clicked.connect(self.btn_next)
-
     def get_widget(self):
-        return self.widget
+        return (self.widget)
 
-    def btn_home(self):
-        print(self.name + "Btn Home")
+    def show(self):
+        self.widget.show()
 
-    def btn_next(self):
-        self.btn_next_sig.emit()
+    def hide(self):
+        self.widget.hide()
 
+class WConfigCtrl(QObject):
+    btn_next_sig = pyqtSignal()
+    widgetList = []
 
-class WHomeCtrl:
     def __init__(self, name, parent):
-        self.view = Ui_WHome()
+        super(QObject, self).__init__(parent)
+        self.view = Ui_WConfig()
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
 
         # Event connect
-        #self.view.pushButton.clicked.connect(self.btnFct)
+        self.view.StartBtn.clicked.connect(self.btn_next)
 
     def get_widget(self):
-        return self.widget
+        return(self.widgetList)
 
-    def btnFct(self):
-        print(self.name + "Btn Fct")
+    def show(self):
+        self.widget.show()
+
+    def hide(self):
+        self.widget.hide()
+
+    def btn_next(self):
+        self.btn_next_sig.emit()

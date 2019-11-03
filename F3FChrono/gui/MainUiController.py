@@ -21,42 +21,47 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.controllers = collections.OrderedDict()
 
-        self.controllers['competitor'] = WTopCtrl("panel Top", self.ui.centralwidget)
-        self.controllers['chrono'] = WChronoCtrl("panel Chrono", self.ui.centralwidget)
-
-        self.controllers['config'] = WHomeCtrl("panel Home", self.ui.centralwidget)
-
-        self.controllers['bottom'] = WBottomCtrl("panel Bottom", self.ui.centralwidget)
+        self.controllers['config'] = WConfigCtrl("panel Config", self.ui.centralwidget)
+        self.controllers['round'] = WRoundCtrl("panel Chrono", self.ui.centralwidget)
+        self.controllers['wind'] = WWindCtrl("panel Wind", self.ui.centralwidget)
 
         for key, ctrl in self.controllers.items():
-            self.ui.verticalLayout.addWidget(ctrl.get_widget())
+            for x in ctrl.get_widget():
+                self.ui.verticalLayout.addWidget(x)
 
-        self.controllers['chrono'].btn_next_sig.connect(self.next_pilot)
+        self.controllers['config'].btn_next_sig.connect(self.show_chrono)
+        self.controllers['round'].btn_next_sig.connect(self.next_pilot)
+        self.controllers['round'].btn_home_sig.connect(self.show_config)
 
-        self.set_page(0)
+        self.show_config()
         self.MainWindow.show()
 
-    def next_pilot(self):
-        self.controllers['competitor'].set_data(self.event.get_current_round().next_pilot())
+    def show_config(self):
+        self.controllers['round'].hide()
+        self.controllers['config'].show()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
 
-    def set_page(self, page):
-        if page==0:
-            self.controllers['competitor'].widget.show()
-            self.controllers['chrono'].widget.show()
-            self.controllers['config'].widget.hide()
-        if page==1:
-            self.controllers['competitor'].widget.hide()
-            self.controllers['chrono'].widget.hide()
-            self.controllers['config'].widget.show()
+    def show_chrono(self):
+        self.controllers['config'].hide()
+        self.controllers['round'].show()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
+
+    def next_pilot(self):
+        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
+
 
     def set_initial_data(self):
-        self.controllers['competitor'].set_data(self.event.get_current_round().get_current_competitor())
+        print("initial_data method")
+        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor())
 
 def main ():
 
-    login = input('F3X Vault login : ')
-    password = input('F3X Vault password : ')
-
+    #login = input('F3X Vault login : ')
+    #password = input('F3X Vault password : ')
+    login="sylvain.daviet@gmail.com"
+    password="welcome"
     contest_id = 1706
 
     event = Event.from_f3x_vault(login, password, contest_id, max_rounds=1)
