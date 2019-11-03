@@ -21,9 +21,10 @@ class Event:
         self._max_allowed_wind_speed = 25.0
         self._max_wind_dir_dev = 45.0
         self._max_interruption_time = 30 * 60
+        self._current_round = None
 
     @staticmethod
-    def from_f3x_vault(login, password, contest_id):
+    def from_f3x_vault(login, password, contest_id, max_rounds=None):
         """
         TODO: f3x_vault related stuff should be moved in specific class later
         :param login:
@@ -68,7 +69,12 @@ class Event:
 
                 event.register_pilot(pilot, bib_number)
 
-        for round_id in range(1, n_rounds+1):
+        if max_rounds is not None:
+            n_rounds_to_get = min(max_rounds, n_rounds)
+        else:
+            n_rounds_to_get = n_rounds
+
+        for round_id in range(1, n_rounds_to_get+1):
 
             f3f_round = event.create_new_round()
 
@@ -102,7 +108,17 @@ class Event:
     def create_new_round(self):
         f3f_round = Round.new_round(self)
         self._rounds.append(f3f_round)
+        if self._current_round is None:
+            self._current_round = 0
+        else:
+            self._current_round += 1
         return f3f_round
 
     def register_pilot(self, pilot, bib_number):
         self._competitors[bib_number] = Competitor.register_pilot(self, bib_number, pilot)
+
+    def get_current_round(self):
+        return self._rounds[self._current_round]
+
+    def get_competitor(self, bib_number):
+        return self._competitors[bib_number]

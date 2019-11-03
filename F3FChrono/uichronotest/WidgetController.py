@@ -35,14 +35,13 @@ class WTopCtrl:
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
-        self.set_data("Pilot : ___ ____", 'Run : XX')
 
     def get_widget(self):
         return self.widget
 
-    def set_data(self, pilot, run):
-        self.view.PilotName.setText(pilot)
-        self.view.RaceInfo.setText(run)
+    def set_data(self, competitor):
+        self.view.pilotName.setText(competitor.display_name())
+        self.view.bib.setText(str(competitor.get_bib_number()))
 
 class WChronoCtrl:
     def __init__(self, name, parent):

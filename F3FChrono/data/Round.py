@@ -11,6 +11,7 @@ class Round:
         self._event = None
         self._round_number = None
         self._groups = []
+        self._current_competitor_index = 1
 
     @staticmethod
     def new_round(event):
@@ -42,3 +43,11 @@ class Round:
         for g in self._groups:
             result += g.to_string() + os.linesep
         return result
+
+    def get_current_competitor(self):
+        return self._event.get_competitor(self._current_competitor_index)
+
+    def next_pilot(self):
+        #TODO : check is last pilot is reached
+        self._current_competitor_index +=1
+        return self.get_current_competitor()
