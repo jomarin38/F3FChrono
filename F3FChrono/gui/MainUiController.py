@@ -58,10 +58,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
 def main ():
 
-    #login = input('F3X Vault login : ')
-    #password = input('F3X Vault password : ')
-    login="sylvain.daviet@gmail.com"
-    password="welcome"
+    login = input('F3X Vault login : ')
+    password = input('F3X Vault password : ')
+   
     contest_id = 1706
 
     event = Event.from_f3x_vault(login, password, contest_id, max_rounds=1)
