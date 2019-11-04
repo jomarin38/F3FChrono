@@ -49,6 +49,10 @@ class WRoundCtrl(QObject):
     def btn_home(self):
         self.btn_home_sig.emit()
 
+    def set_data(self):
+        """
+            TODO: roundCtrl.set_data
+        """
 
 class WWindCtrl:
     widgetList = []
@@ -69,8 +73,8 @@ class WWindCtrl:
     def hide(self):
         self.widget.hide()
 
-    def set_data(self, wind):
-        self.view.WindInfo.setText(wind)
+    def set_data(self, wind, angle):
+        self.view.WindInfo.setText('Wind : '+str(wind)+'m.s, Angle : '+str(angle)+'°')
 
 class WPilotCtrl:
     def __init__(self, name, parent):
@@ -138,3 +142,12 @@ class WConfigCtrl(QObject):
 
     def btn_next(self):
         self.btn_next_sig.emit()
+
+    def set_data(self, contest, min_speed, max_speed, dir_dev, max_interrupt, revol=5):
+        self.view.ContestList.addItem(contest)
+        self.view.ContestList.setCurrentText(contest)
+        self.view.WindMinValue.setValue(min_speed)
+        self.view.WindMaxValue.setValue(max_speed)
+        self.view.OrientationValue.setValue(dir_dev)
+        self.view.RevolValue.setValue(revol)
+        self.view.MaxInterruptValue.setValue(max_interrupt)
