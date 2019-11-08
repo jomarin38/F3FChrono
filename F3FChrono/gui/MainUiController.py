@@ -1,10 +1,8 @@
 import collections
 
-from F3FChrono.uichronotest.MainUi_UI import *
-from F3FChrono.uichronotest.WidgetController import *
+from F3FChrono.gui.MainUi_UI import *
+from F3FChrono.gui.WidgetController import *
 from F3FChrono.data.Event import Event
-
-global ui
 
 
 class MainUiCtrl (QtWidgets.QMainWindow):
