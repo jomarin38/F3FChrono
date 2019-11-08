@@ -205,9 +205,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="Btn_ResetChrono">
+        <widget class="QPushButton" name="Btn_Refly">
          <property name="text">
-          <string>Reset Chrono</string>
+          <string>Refly</string>
          </property>
          <property name="flat">
           <bool>false</bool>

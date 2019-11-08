@@ -46,6 +46,7 @@ class WTopCtrl:
 class WChronoCtrl(QObject):
 
     btn_next_sig = pyqtSignal()
+    btn_refly_sig = pyqtSignal()
 
     def __init__(self, name, parent):
         super(QObject, self).__init__(parent)
@@ -59,6 +60,7 @@ class WChronoCtrl(QObject):
         # Event connect
         self.view.Btn_Home.clicked.connect(self.btn_home)
         self.view.Btn_Next.clicked.connect(self.btn_next)
+        self.view.Btn_Refly.clicked.connect(self.btn_refly)
 
     def get_widget(self):
         return self.widget
@@ -69,6 +71,8 @@ class WChronoCtrl(QObject):
     def btn_next(self):
         self.btn_next_sig.emit()
 
+    def btn_refly(self):
+        self.btn_refly_sig.emit()
 
 class WHomeCtrl:
     def __init__(self, name, parent):

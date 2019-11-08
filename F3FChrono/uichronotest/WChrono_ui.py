@@ -98,10 +98,10 @@ class Ui_WChrono(object):
         self.Btn_InStart.setFlat(False)
         self.Btn_InStart.setObjectName("Btn_InStart")
         self.horizontalLayout.addWidget(self.Btn_InStart)
-        self.Btn_ResetChrono = QtWidgets.QPushButton(WChrono)
-        self.Btn_ResetChrono.setFlat(False)
-        self.Btn_ResetChrono.setObjectName("Btn_ResetChrono")
-        self.horizontalLayout.addWidget(self.Btn_ResetChrono)
+        self.Btn_Refly = QtWidgets.QPushButton(WChrono)
+        self.Btn_Refly.setFlat(False)
+        self.Btn_Refly.setObjectName("Btn_Refly")
+        self.horizontalLayout.addWidget(self.Btn_Refly)
         self.Btn_Next = QtWidgets.QPushButton(WChrono)
         self.Btn_Next.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.Btn_Next.setFlat(False)
@@ -150,7 +150,7 @@ class Ui_WChrono(object):
         self.comboBox.setItemText(5, _translate("WChrono", "Finish"))
         self.Btn_Home.setText(_translate("WChrono", "Home"))
         self.Btn_InStart.setText(_translate("WChrono", "InStart"))
-        self.Btn_ResetChrono.setText(_translate("WChrono", "Reset Chrono"))
+        self.Btn_Refly.setText(_translate("WChrono", "Refly"))
         self.Btn_Next.setText(_translate("WChrono", "Next"))
 
 

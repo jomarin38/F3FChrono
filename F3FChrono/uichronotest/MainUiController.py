@@ -34,12 +34,18 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.ui.verticalLayout.addWidget(ctrl.get_widget())
 
         self.controllers['chrono'].btn_next_sig.connect(self.next_pilot)
+        self.controllers['chrono'].btn_refly_sig.connect(self.refly)
 
         self.set_page(0)
         self.MainWindow.show()
 
     def next_pilot(self):
         self.controllers['competitor'].set_data(self.event.get_current_round().next_pilot())
+
+    def refly(self):
+        #TODO : get penalty value if any
+        self.event.get_current_round().handle_refly(0)
+        self.next_pilot()
 
     def set_page(self, page):
         if page==0:

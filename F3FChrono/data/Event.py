@@ -22,6 +22,7 @@ class Event:
         self._max_wind_dir_dev = 45.0
         self._max_interruption_time = 30 * 60
         self._current_round = None
+        self._flights_before_refly = 5
 
     @staticmethod
     def from_f3x_vault(login, password, contest_id, max_rounds=None):
@@ -122,3 +123,9 @@ class Event:
 
     def get_competitor(self, bib_number):
         return self._competitors[bib_number]
+
+    def get_competitors(self):
+        return self._competitors
+
+    def get_flights_before_refly(self):
+        return self._flights_before_refly
