@@ -121,6 +121,8 @@ class WChronoCtrl():
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
+
+        self.current_lap=0
         self.view.setupUi(self.widget)
 
     def get_widget(self):
@@ -135,6 +137,16 @@ class WChronoCtrl():
     def set_status(self, status):
         self.view.comboBox.setCurrentIndex(status)
 
+    def set_time(self, time, laptime):
+        self.view.Time_label.setText("{0:.3f}".format(time))
+        #self.lap_list[self.current_lap].setText("{0} : {1:.3f}".format(self.current_lap, laptime))
+        self.current_lap += 1
+
+    def reset_time(self):
+        self.view.Time_label.setText('00.000')
+        #for ctrl in self.lap_list:
+        #    ctrl.setText("")
+        self.current_lap = 0
 
 class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()

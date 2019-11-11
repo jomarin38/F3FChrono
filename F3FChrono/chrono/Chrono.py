@@ -112,7 +112,14 @@ class Chrono():
             return self.chronoLap[self.getLapCount()-1]
         else:
             return 0
-    
+
+    def get_time(self):
+        time=0
+        for i in range(self.getLapCount()):
+            time=time+self.chronoLap[i]
+        return time
+
+
     def getLapCount(self):
         return len(self.chronoLap)
     

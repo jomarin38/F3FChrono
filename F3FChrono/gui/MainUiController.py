@@ -66,18 +66,23 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.show_chrono()
 
     def next_action(self):
-        print ("Fctnext_action begin\tchrono status"+str(self.chrono.get_status())+'\tNb lap : '+str(self.chrono.getLapCount()))
+        print ("Fctnext_action begin\tchrono status : "+str(self.chrono.get_status())+'\tNb lap : '+str(self.chrono.getLapCount()))
         if (self.chrono.get_status()<chronoStatus.Finished):
+            if (self.chrono.get_status()==chronoStatus.InStart):
+                self.chrono.startRace()
+                self.controllers['round'].wChronoCtrl.reset_time()
+
             if (self.chrono.get_status()==chronoStatus.InProgress and self.chrono.getLapCount()<10):
                 self.chrono.declareBase(self.base_test)
                 self.base_test=~self.base_test
+                self.controllers['round'].wChronoCtrl.set_time(self.chrono.get_time(), self.chrono.getLastLapTime())
+                self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
             else:
                 self.chrono.next_status()
         elif(self.chrono.getLapCount()>=10):
             self.chrono.reset()
             self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
-        self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
-        print ("Fctnext_action end\tchrono status"+str(self.chrono.get_status())+'\tNb lap : '+str(self.chrono.getLapCount()))
+        print ("Fctnext_action end\tchrono status : "+str(self.chrono.get_status())+'\tNb lap : '+str(self.chrono.getLapCount()))
 
     def penalty(self):
         "TODO Insert event class penalty function"
