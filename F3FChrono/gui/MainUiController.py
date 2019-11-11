@@ -55,9 +55,13 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
+    def next_pilot(self):
+        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
+
     def refly(self):
         #TODO : get penalty value if any
         self.event.get_current_round().handle_refly(0)
+        self.chrono.reset()
         self.next_pilot()
 
     def start(self):
@@ -86,7 +90,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 self.chrono.next_status()
         elif(self.chrono.getLapCount()>=10):
             self.chrono.reset()
-            self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
+            self.next_pilot()
         print ("Fctnext_action end\tchrono status : "+str(self.chrono.get_status())+'\tNb lap : '+str(self.chrono.getLapCount()))
 
     def penalty(self):
