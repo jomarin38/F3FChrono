@@ -2,30 +2,23 @@ from enum import Enum
 import time
 
 
-class chronoMode (Enum):
-    Test=0
-    Run=1
-    Practice=2
+class chronoType(Enum):
+    wire = 0
+    wireless = 1
+    none = 2
+
+class chronoStatus(Enum):
+    WaitLaunch=0
+    Lunched=1
+    InStart=2
+    InProgress=3
+    Finished=4
 
 class chrono():
-    def __init__ (self, mode):
-        if mode==chronoMode.Test:
-            self.chronoLaunch = -1
-            self.chronoFisrtBase = -1
-            self.chronoRun = -1
-        elif mode==chronoMode.Run:
-            self.chronoLaunch = 30
-            self.chronoFisrtBase = 30
-            self.chronoRun = 0
-        elif mode==chronoMode.Practice:
-            self.chronoLaunch = -1
-            self.chronoFisrtBase = -1
-            self.chronoRun = 0
-        else:
-            self.chronoLaunch = -1
-            self.chronoFisrtBase = -1
-            self.chronoRun = -1
-            
+    def __init__(self):
+        self.chronoLaunch = 30
+        self.chronoFisrtBase = 30
+        self.chronoRun = 0
         self.chronoLap=[]
         self.timelost=[]
         self.lastBaseChangeTime =0
@@ -33,20 +26,23 @@ class chrono():
         self.last10BasesTimeLost = 0.0
         self.lastBase=0
         self.inStart = False
-        
-        print ('F3F Initialisation ', mode)
-        return None;
-    
-    def start (self, mode):
+        self.mode=chronoType.none.value
+
+        print('Chrono F3F Initialisation ')
+
+    def set_mode(self, mode):
+        self.mode=mode
+
+    def start(self):
         self.lastBaseChangeTime = time.time ()
         self.lastDetectionTime = self.lastBaseChangeTime
         return 0
         
-    def reset (self):
+    def reset(self):
         self.last10BasesTime = 0.0
         self.last10BasesTimeLost = 0.0
-        self.chronoLap.clear ()
-        self.timelost.clear ()
+        self.chronoLap.clear()
+        self.timelost.clear()
         
     def startRace(self):
         self.last10BasesTime = 0.0
@@ -128,5 +124,3 @@ if __name__ == '__main__':
     print ('Last Lap : ', Chrono.getLastLapTime ())
     print ('10LastLap : ', Chrono.getLast10BasesTime())
     print ('10LastLapLost : ', Chrono.getLast10BasesLostTime())
-
-    

@@ -7,6 +7,7 @@ from F3FChrono.gui.WPilot_UI import Ui_WPilot
 from F3FChrono.gui.WChrono_ui import Ui_WChrono
 from F3FChrono.gui.WChronoBtn_ui import Ui_WChronoBtn
 from F3FChrono.gui.WConfig_ui import Ui_WConfig
+from F3FChrono.chrono.Chrono import *
 
 
 class WRoundCtrl(QObject):
@@ -146,7 +147,7 @@ class WConfigCtrl(QObject):
 
 
     def chrono_changed(self):
-        if (self.view.ChronoType.currentIndex()==0):
+        if (self.view.ChronoType.currentIndex()==chronoType.wire.value):
             self.view.PICamA_Btn.setDisabled(True)
             self.view.PICamA_Value.setDisabled(True)
             self.view.PICamB_Btn.setDisabled(True)
@@ -180,3 +181,5 @@ class WConfigCtrl(QObject):
         self.view.OrientationValue.setValue(dir_dev)
         self.view.RevolValue.setValue(revol)
         self.view.MaxInterruptValue.setValue(max_interrupt)
+
+

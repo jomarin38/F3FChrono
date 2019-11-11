@@ -25,20 +25,5 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import (
-    unicode_literals,
-    print_function,
-    division,
-    absolute_import,
-    )
 
-from .GPIOPort import gpioPort
-from .CommandInterface import CommandInterface
-from .ConfigReader import Configuration
-from .UDPBeep import udpBeep
-from .UDPReceive import udpreceive
-from .Chrono import chrono
-from .Chronoui import MyForm
-from .Sound import chronoSound
-from .Sound import chronoVocal
 
