@@ -15,7 +15,7 @@ class chronoStatus():
     InProgress=4
     Finished=5
 
-class chrono():
+class Chrono():
     def __init__(self):
         self.chronoLaunch = 30
         self.chronoFisrtBase = 30
@@ -28,11 +28,20 @@ class chrono():
         self.lastBase=0
         self.inStart = False
         self.mode=chronoType.none
+        self.status=chronoStatus.InWait
 
         print('Chrono F3F Initialisation ')
 
     def set_mode(self, mode):
         self.mode=mode
+
+    def get_status(self):
+        return self.status
+
+    def next_status(self):
+        if (self.status<chronoStatus.Finished):
+            self.status=self.status+1
+        return self.status
 
     def start(self):
         self.lastBaseChangeTime = time.time ()
@@ -44,7 +53,8 @@ class chrono():
         self.last10BasesTimeLost = 0.0
         self.chronoLap.clear()
         self.timelost.clear()
-        
+        self.status=chronoStatus.InWait
+
     def startRace(self):
         self.last10BasesTime = 0.0
         self.last10BasesTimelost = 0.0
@@ -111,7 +121,7 @@ if __name__ == '__main__':
     Chrono = chrono(chronoMode.Practice)
     Chrono.reset ()
     Chrono.startRace ()
-    print (Chrono.getLapCount ())
+    print(Chrono.getLapCount ())
     Chrono.declareBase (1)
     time.sleep(0.5)
     Chrono.declareBase (2)

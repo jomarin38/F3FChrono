@@ -160,7 +160,7 @@ class Ui_WChrono(object):
         self.comboBox.setItemText(2, _translate("WChrono", "Launched"))
         self.comboBox.setItemText(3, _translate("WChrono", "In start"))
         self.comboBox.setItemText(4, _translate("WChrono", "In progress"))
-        self.comboBox.setItemText(5, _translate("WChrono", "Finish"))
+        self.comboBox.setItemText(5, _translate("WChrono", "Finished"))
         self.Lap3.setText(_translate("WChrono", "3 : XX.XXX"))
         self.Lap4.setText(_translate("WChrono", "4 : XX.XXX"))
         self.Lap1.setText(_translate("WChrono", "1 : XX.XXX"))

@@ -132,6 +132,10 @@ class WChronoCtrl():
     def hide(self):
         self.widget.hide()
 
+    def set_status(self, status):
+        self.view.comboBox.setCurrentIndex(status)
+
+
 class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()
     widgetList = []

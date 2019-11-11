@@ -86,7 +86,7 @@
          </item>
          <item>
           <property name="text">
-           <string>Finish</string>
+           <string>Finished</string>
           </property>
          </item>
         </widget>
