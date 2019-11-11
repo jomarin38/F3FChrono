@@ -130,6 +130,10 @@ class WConfigCtrl(QObject):
 
         # Event connect
         self.view.StartBtn.clicked.connect(self.btn_next)
+        self.view.PICamA_Btn.clicked.connect(self.btn_piCamA)
+        self.view.PICamB_Btn.clicked.connect(self.btn_piCamB)
+        self.view.ContestList.currentIndexChanged.connect(self.contest_changed)
+        self.view.ChronoType.currentIndexChanged.connect(self.chrono_changed)
 
     def get_widget(self):
         return(self.widgetList)
@@ -140,10 +144,35 @@ class WConfigCtrl(QObject):
     def hide(self):
         self.widget.hide()
 
+
+    def chrono_changed(self):
+        if (self.view.ChronoType.currentIndex()==0):
+            self.view.PICamA_Btn.setDisabled(True)
+            self.view.PICamA_Value.setDisabled(True)
+            self.view.PICamB_Btn.setDisabled(True)
+            self.view.PICamB_Value.setDisabled(True)
+        else:
+            self.view.PICamA_Btn.setDisabled(False)
+            self.view.PICamA_Value.setDisabled(False)
+            self.view.PICamB_Btn.setDisabled(False)
+            self.view.PICamB_Value.setDisabled(False)
+
+
+    def contest_changed(self):
+        print(self.contest_changed)
+
+    def btn_piCamA(self):
+        print(self.btn_piCamA)
+
+    def btn_piCamB(self):
+        print(self.btn_piCamB)
+
     def btn_next(self):
         self.btn_next_sig.emit()
 
     def set_data(self, contest, min_speed, max_speed, dir_dev, max_interrupt, revol=5):
+        self.view.ChronoType.setCurrentIndex(0)
+        self.chrono_changed()
         self.view.ContestList.addItem(contest)
         self.view.ContestList.setCurrentText(contest)
         self.view.WindMinValue.setValue(min_speed)
