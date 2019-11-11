@@ -3,14 +3,18 @@ import collections
 from F3FChrono.gui.MainUi_UI import *
 from F3FChrono.gui.WidgetController import *
 from F3FChrono.data.Event import Event
+from F3FChrono.chrono.Chrono import *
 
 
 class MainUiCtrl (QtWidgets.QMainWindow):
 
-    def __init__(self, event):
+    def __init__(self,event,chrono):
         super().__init__()
         self.event = event
+        self.chrono = chrono
         self.initUI()
+        self.base_test=0
+
 
     def initUI(self):
         self.MainWindow = QtWidgets.QMainWindow()
@@ -29,10 +33,12 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             for x in ctrl.get_widget():
                 self.ui.verticalLayout.addWidget(x)
 
-        self.controllers['config'].btn_next_sig.connect(self.show_chrono)
-        self.controllers['round'].btn_next_sig.connect(self.next_pilot)
+        self.controllers['config'].btn_next_sig.connect(self.start)
+        self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.show_config)
         self.controllers['round'].btn_refly_sig.connect(self.refly)
+        self.controllers['round'].btn_penalty_sig.connect(self.penalty)
+        self.controllers['round'].btn_null_flight_sig.connect(self.null_flight)
 
         self.show_config()
         self.MainWindow.show()
@@ -49,13 +55,47 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
-    def next_pilot(self):
-        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
-
     def refly(self):
         #TODO : get penalty value if any
         self.event.get_current_round().handle_refly(0)
         self.next_pilot()
+
+    def start(self):
+        self.controllers['config'].get_data()
+        self.event._max_interruption_time=self.controllers['config'].interruption_time_max
+        self.event._max_wind_dir_dev=self.controllers['config'].wind_orientation
+        self.event._min_allowed_wind_speed=self.controllers['config'].wind_speed_min
+        self.event._max_allowed_wind_speed=self.controllers['config'].wind_speed_max
+        self.chrono.reset()
+        self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
+        self.show_chrono()
+
+    def next_action(self):
+        print ("Fctnext_action begin\tchrono status : "+str(self.chrono.get_status())+'\tNb lap : '+str(self.chrono.getLapCount()))
+        if (self.chrono.get_status()<chronoStatus.Finished):
+            if (self.chrono.get_status()==chronoStatus.InStart):
+                self.chrono.startRace()
+                self.controllers['round'].wChronoCtrl.reset_time()
+
+            if (self.chrono.get_status()==chronoStatus.InProgress and self.chrono.getLapCount()<10):
+                self.chrono.declareBase(self.base_test)
+                self.base_test=~self.base_test
+                self.controllers['round'].wChronoCtrl.set_time(self.chrono.get_time(), self.chrono.getLastLapTime())
+                self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
+            else:
+                self.chrono.next_status()
+        elif(self.chrono.getLapCount()>=10):
+            self.chrono.reset()
+            self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
+        print ("Fctnext_action end\tchrono status : "+str(self.chrono.get_status())+'\tNb lap : '+str(self.chrono.getLapCount()))
+
+    def penalty(self):
+        "TODO Insert event class penalty function"
+        print("penalty event")
+
+    def null_flight(self):
+        "TODO Insert event class null flight function"
+        print("null flight event")
 
     def set_initial_data(self):
         print("initial_data method")
@@ -74,9 +114,10 @@ def main ():
     contest_id = 1706
 
     event = Event.from_f3x_vault(login, password, contest_id, max_rounds=1)
+    chrono = Chrono()
 
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(event)
+    ui=MainUiCtrl(event, chrono)
 
     ui.set_initial_data()
 

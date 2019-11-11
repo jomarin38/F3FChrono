@@ -21,7 +21,7 @@
        <item>
         <widget class="QLabel" name="Time_label">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -61,12 +61,17 @@
          </property>
          <item>
           <property name="text">
+           <string>Wait New Run</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>Wait to launch</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Launch</string>
+           <string>Launched</string>
           </property>
          </item>
          <item>
@@ -76,17 +81,12 @@
          </item>
          <item>
           <property name="text">
-           <string>Started</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
            <string>In progress</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Finish</string>
+           <string>Finished</string>
           </property>
          </item>
         </widget>
