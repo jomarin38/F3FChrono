@@ -32,6 +32,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].btn_next_sig.connect(self.show_chrono)
         self.controllers['round'].btn_next_sig.connect(self.next_pilot)
         self.controllers['round'].btn_home_sig.connect(self.show_config)
+        self.controllers['round'].btn_refly_sig.connect(self.refly)
 
         self.show_config()
         self.MainWindow.show()
@@ -51,6 +52,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def next_pilot(self):
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
 
+    def refly(self):
+        #TODO : get penalty value if any
+        self.event.get_current_round().handle_refly(0)
+        self.next_pilot()
 
     def set_initial_data(self):
         print("initial_data method")

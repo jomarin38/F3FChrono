@@ -12,6 +12,8 @@ from F3FChrono.gui.WConfig_ui import Ui_WConfig
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()
+    btn_refly_sig = pyqtSignal()
+
     widgetList = []
 
     def __init__(self, name, parent):
@@ -29,6 +31,7 @@ class WRoundCtrl(QObject):
         # Event connect
         self.view.Btn_Home.clicked.connect(self.btn_home)
         self.view.Btn_Next.clicked.connect(self.btn_next_pilot)
+        self.view.Btn_reflight.clicked.connect(self.btn_refly)
 
     def get_widget(self):
         return (self.widgetList)
@@ -48,6 +51,9 @@ class WRoundCtrl(QObject):
 
     def btn_home(self):
         self.btn_home_sig.emit()
+
+    def btn_refly(self):
+        self.btn_refly_sig.emit()
 
     def set_data(self):
         """
