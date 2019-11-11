@@ -2,17 +2,18 @@ from enum import Enum
 import time
 
 
-class chronoType(Enum):
+class chronoType():
     wire = 0
     wireless = 1
     none = 2
 
-class chronoStatus(Enum):
-    WaitLaunch=0
-    Lunched=1
-    InStart=2
-    InProgress=3
-    Finished=4
+class chronoStatus():
+    InWait=0
+    WaitLaunch=1
+    Lunched=2
+    InStart=3
+    InProgress=4
+    Finished=5
 
 class chrono():
     def __init__(self):
@@ -26,7 +27,7 @@ class chrono():
         self.last10BasesTimeLost = 0.0
         self.lastBase=0
         self.inStart = False
-        self.mode=chronoType.none.value
+        self.mode=chronoType.none
 
         print('Chrono F3F Initialisation ')
 

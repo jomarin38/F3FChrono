@@ -29,7 +29,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             for x in ctrl.get_widget():
                 self.ui.verticalLayout.addWidget(x)
 
-        self.controllers['config'].btn_next_sig.connect(self.show_chrono)
+        self.controllers['config'].btn_next_sig.connect(self.start)
         self.controllers['round'].btn_next_sig.connect(self.next_pilot)
         self.controllers['round'].btn_home_sig.connect(self.show_config)
 
@@ -47,6 +47,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
+
+    def start(self):
+        self.controllers['config'].get_data()
+        self.event._max_interruption_time=self.controllers['config'].interruption_time_max
+        self.event._max_wind_dir_dev=self.controllers['config'].wind_orientation
+        self.event._min_allowed_wind_speed=self.controllers['config'].wind_speed_min
+        self.event._max_allowed_wind_speed=self.controllers['config'].wind_speed_max
+        self.show_chrono()
 
     def next_pilot(self):
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())

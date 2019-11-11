@@ -147,7 +147,7 @@ class WConfigCtrl(QObject):
 
 
     def chrono_changed(self):
-        if (self.view.ChronoType.currentIndex()==chronoType.wire.value):
+        if (self.view.ChronoType.currentIndex()==chronoType.wire):
             self.view.PICamA_Btn.setDisabled(True)
             self.view.PICamA_Value.setDisabled(True)
             self.view.PICamB_Btn.setDisabled(True)
@@ -169,6 +169,7 @@ class WConfigCtrl(QObject):
         print(self.btn_piCamB)
 
     def btn_next(self):
+        self.get_data()
         self.btn_next_sig.emit()
 
     def set_data(self, contest, min_speed, max_speed, dir_dev, max_interrupt, revol=5):
@@ -182,4 +183,11 @@ class WConfigCtrl(QObject):
         self.view.RevolValue.setValue(revol)
         self.view.MaxInterruptValue.setValue(max_interrupt)
 
-
+    def get_data(self):
+        self.wind_speed_min=self.view.WindMinValue.value()
+        self.wind_speed_max=self.view.WindMaxValue.value()
+        self.wind_orientation=self.view.OrientationValue.value()
+        self.interruption_time_max=self.view.MaxInterruptValue.value()
+        self.revol=self.view.RevolValue.value()
+        self.chrono_type=self.view.ChronoType.currentIndex()
+        self.contest=self.view.ContestList.currentIndex()
