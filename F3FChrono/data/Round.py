@@ -28,11 +28,11 @@ class Round:
         f3f_round._flight_order += [c for c in event.get_competitors()]
         return f3f_round
 
-    def handle_terminated_flight(self, competitor, flight_time, penalty, valid):
+    def handle_terminated_flight(self, competitor, chrono, penalty, valid):
         run = Run()
         run.competitor = competitor
         run.penalty = penalty
-        run.run_time = flight_time
+        run.chrono = chrono
         run.valid = valid
         self._add_run(run)
 
@@ -40,7 +40,6 @@ class Round:
         run = Run()
         run.competitor = self.get_current_competitor()
         run.penalty = penalty
-        run.run_time = None
         run.valid = False
         self._add_run(run)
         self._flight_order.insert(self._current_competitor_index + self._event.get_flights_before_refly() + 1,
