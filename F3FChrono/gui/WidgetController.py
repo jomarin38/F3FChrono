@@ -13,8 +13,8 @@ from F3FChrono.chrono.Chrono import *
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()
+    btn_refly_sig = pyqtSignal()
     btn_null_flight_sig = pyqtSignal()
-    btn_revol_sig = pyqtSignal()
     btn_penalty_sig = pyqtSignal()
 
     widgetList = []
@@ -35,7 +35,7 @@ class WRoundCtrl(QObject):
         self.view.Btn_Home.clicked.connect(self.btn_home)
         self.view.Btn_Next.clicked.connect(self.btn_next_pilot)
         self.view.Btn_NullFlight.clicked.connect(self.btn_null_flight)
-        self.view.Btn_reflight.clicked.connect(self.btn_revol)
+        self.view.Btn_reflight.clicked.connect(self.btn_refly)
         self.view.Btn_Penalty.clicked.connect(self.btn_penalty)
 
     def get_widget(self):
@@ -57,14 +57,15 @@ class WRoundCtrl(QObject):
     def btn_home(self):
         self.btn_home_sig.emit()
 
+    def btn_refly(self):
+        self.btn_refly_sig.emit()
+
     def btn_null_flight(self):
         self.btn_null_flight_sig.emit()
 
-    def btn_revol(self):
-        self.btn_revol_sig.emit()
-
     def btn_penalty(self):
         self.btn_penalty_sig.emit()
+
 
     def set_data(self):
         """

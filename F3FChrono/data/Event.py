@@ -5,6 +5,7 @@ import requests
 from F3FChrono.data.Pilot import Pilot
 from F3FChrono.data.Competitor import Competitor
 from F3FChrono.data.Round import Round
+from F3FChrono.data.Chrono import Chrono
 
 
 class Event:
@@ -22,6 +23,7 @@ class Event:
         self._max_wind_dir_dev = 45.0
         self._max_interruption_time = 30 * 60
         self._current_round = None
+        self._flights_before_refly = 5
 
     @staticmethod
     def from_f3x_vault(login, password, contest_id, max_rounds=None):
@@ -93,7 +95,9 @@ class Event:
                 pilot_flight_valid = (pilot_flight_time > 0.0)
 
                 if competitor is not None:
-                    f3f_round.handle_terminated_flight(competitor, pilot_flight_time, pilot_penalty, pilot_flight_valid)
+                    pilot_chrono = Chrono()
+                    pilot_chrono.run_time = pilot_flight_time
+                    f3f_round.handle_terminated_flight(competitor, pilot_chrono, pilot_penalty, pilot_flight_valid)
 
             print(f3f_round.to_string())
 
@@ -122,3 +126,9 @@ class Event:
 
     def get_competitor(self, bib_number):
         return self._competitors[bib_number]
+
+    def get_competitors(self):
+        return self._competitors
+
+    def get_flights_before_refly(self):
+        return self._flights_before_refly

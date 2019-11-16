@@ -36,8 +36,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].btn_next_sig.connect(self.start)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.show_config)
+        self.controllers['round'].btn_refly_sig.connect(self.refly)
         self.controllers['round'].btn_penalty_sig.connect(self.penalty)
-        self.controllers['round'].btn_revol_sig.connect(self.reflight)
         self.controllers['round'].btn_null_flight_sig.connect(self.null_flight)
 
         self.show_config()
@@ -54,6 +54,15 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
+
+    def next_pilot(self):
+        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
+
+    def refly(self):
+        #TODO : get penalty value if any
+        self.event.get_current_round().handle_refly(0)
+        self.chrono.reset()
+        self.next_pilot()
 
     def start(self):
         self.controllers['config'].get_data()
@@ -81,16 +90,12 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 self.chrono.next_status()
         elif(self.chrono.getLapCount()>=10):
             self.chrono.reset()
-            self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
+            self.next_pilot()
         print ("Fctnext_action end\tchrono status : "+str(self.chrono.get_status())+'\tNb lap : '+str(self.chrono.getLapCount()))
 
     def penalty(self):
         "TODO Insert event class penalty function"
         print("penalty event")
-
-    def reflight(self):
-        "TODO Insert event class reflight function"
-        print("reflight event")
 
     def null_flight(self):
         "TODO Insert event class null flight function"
