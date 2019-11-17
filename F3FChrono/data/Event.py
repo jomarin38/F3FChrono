@@ -1,6 +1,7 @@
 import pandas as pd
 from io import StringIO
 import requests
+from datetime import datetime
 
 from F3FChrono.data.Pilot import Pilot
 from F3FChrono.data.Competitor import Competitor
@@ -11,19 +12,20 @@ from F3FChrono.data.Chrono import Chrono
 class Event:
 
     def __init__(self):
-        self._id = None
-        self._begin_date = None
-        self._end_date = None
-        self._location = ""
-        self._name = ""
+        self.id = None
+        self.begin_date = None
+        self.end_date = None
+        self.location = ""
+        self.name = ""
         self._competitors = {}
         self._rounds = []
-        self._min_allowed_wind_speed = 3.0
-        self._max_allowed_wind_speed = 25.0
-        self._max_wind_dir_dev = 45.0
-        self._max_interruption_time = 30 * 60
-        self._current_round = None
-        self._flights_before_refly = 5
+        self.min_allowed_wind_speed = 3.0
+        self.max_allowed_wind_speed = 25.0
+        self.max_wind_dir_dev = 45.0
+        self.max_interruption_time = 30 * 60
+        self.current_round = None
+        self.flights_before_refly = 5
+        self.f3x_vault_id = None
 
     @staticmethod
     def from_f3x_vault(login, password, contest_id, max_rounds=None):
@@ -48,10 +50,12 @@ class Event:
 
         splitted_line = splitted_response.pop(0).split(',')
 
-        event._id = splitted_line[0].strip('\"')
-        event._begin_date = splitted_line[3].strip('\"')
-        event._end_date = splitted_line[4].strip('\"')
-        event._location = splitted_line[2].strip('\"')
+        event.id = splitted_line[0].strip('\"')
+        #dates have to be converted to datetime objects
+        event.begin_date = datetime.strptime(splitted_line[3].strip('\"'), '%m/%d/%y')
+        event.end_date = datetime.strptime(splitted_line[4].strip('\"'), '%m/%d/%y')
+        event.location = splitted_line[2].strip('\"')
+        event.f3x_vault_id = contest_id
 
         n_rounds = int(splitted_line[6].strip('\"'))
 
@@ -112,17 +116,17 @@ class Event:
     def create_new_round(self):
         f3f_round = Round.new_round(self)
         self._rounds.append(f3f_round)
-        if self._current_round is None:
-            self._current_round = 0
+        if self.current_round is None:
+            self.current_round = 0
         else:
-            self._current_round += 1
+            self.current_round += 1
         return f3f_round
 
     def register_pilot(self, pilot, bib_number):
         self._competitors[bib_number] = Competitor.register_pilot(self, bib_number, pilot)
 
     def get_current_round(self):
-        return self._rounds[self._current_round]
+        return self._rounds[self.current_round]
 
     def get_competitor(self, bib_number):
         return self._competitors[bib_number]
@@ -131,4 +135,4 @@ class Event:
         return self._competitors
 
     def get_flights_before_refly(self):
-        return self._flights_before_refly
+        return self.flights_before_refly
