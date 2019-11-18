@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `f3f_chrono` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+USE `f3f_chrono`;
 -- MySQL dump 10.16  Distrib 10.1.41-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: f3f_chrono
@@ -10,79 +12,166 @@
 /*!40101 SET NAMES utf8 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Dumping data for table `chrono`
+-- Table structure for table `chrono`
 --
 
-LOCK TABLES `chrono` WRITE;
-/*!40000 ALTER TABLE `chrono` DISABLE KEYS */;
-/*!40000 ALTER TABLE `chrono` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `chrono`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `chrono` (
+  `chrono_id` int(11) NOT NULL,
+  `run_time` double DEFAULT NULL,
+  `min_wind_speed` double DEFAULT NULL,
+  `max_wind_speed` double DEFAULT NULL,
+  `wind_direction` double DEFAULT NULL,
+  `start_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `end_date` timestamp NULL DEFAULT NULL,
+  `lap1` double DEFAULT NULL,
+  `lap2` double DEFAULT NULL,
+  `lap3` double DEFAULT NULL,
+  `lap4` double DEFAULT NULL,
+  `lap5` double DEFAULT NULL,
+  `lap6` double DEFAULT NULL,
+  `lap7` double DEFAULT NULL,
+  `lap8` double DEFAULT NULL,
+  `lap9` double DEFAULT NULL,
+  `lap10` double DEFAULT NULL,
+  PRIMARY KEY (`chrono_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `competitor`
+-- Table structure for table `competitor`
 --
 
-LOCK TABLES `competitor` WRITE;
-/*!40000 ALTER TABLE `competitor` DISABLE KEYS */;
-/*!40000 ALTER TABLE `competitor` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `competitor`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `competitor` (
+  `pilot_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `team` int(11) DEFAULT NULL,
+  `bib_number` int(11) DEFAULT NULL,
+  PRIMARY KEY (`pilot_id`,`event_id`),
+  KEY `fk_competitor_event_idx` (`event_id`),
+  CONSTRAINT `fk_competitor_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_competitor_pilot` FOREIGN KEY (`pilot_id`) REFERENCES `pilot` (`pilot_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `event`
+-- Table structure for table `event`
 --
 
-LOCK TABLES `event` WRITE;
-/*!40000 ALTER TABLE `event` DISABLE KEYS */;
-/*!40000 ALTER TABLE `event` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `event`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `event` (
+  `event_id` int(11) NOT NULL AUTO_INCREMENT,
+  `begin_date` timestamp NULL DEFAULT NULL,
+  `end_date` timestamp NULL DEFAULT NULL,
+  `location` varchar(100) DEFAULT NULL,
+  `name` varchar(200) DEFAULT NULL,
+  `min_allowed_wind_speed` double DEFAULT NULL,
+  `max_allowed_wind_speed` double DEFAULT NULL,
+  `max_wind_dir_dev` double DEFAULT NULL,
+  `max_interruption_time` double DEFAULT NULL,
+  `f3x_vault_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`event_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1714 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `pilot`
+-- Table structure for table `pilot`
 --
 
-LOCK TABLES `pilot` WRITE;
-/*!40000 ALTER TABLE `pilot` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pilot` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `pilot`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pilot` (
+  `pilot_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) DEFAULT NULL,
+  `first_name` varchar(45) DEFAULT NULL,
+  `fai_id` varchar(45) DEFAULT NULL,
+  `national_id` varchar(45) DEFAULT NULL,
+  `f3x_vault_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`pilot_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `round`
+-- Table structure for table `round`
 --
 
-LOCK TABLES `round` WRITE;
-/*!40000 ALTER TABLE `round` DISABLE KEYS */;
-/*!40000 ALTER TABLE `round` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `round`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `round` (
+  `round_id` int(11) NOT NULL,
+  `round_number` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  PRIMARY KEY (`round_id`),
+  KEY `fk_round_event_idx` (`event_id`),
+  CONSTRAINT `fk_round_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `roundgroup`
+-- Table structure for table `roundgroup`
 --
 
-LOCK TABLES `roundgroup` WRITE;
-/*!40000 ALTER TABLE `roundgroup` DISABLE KEYS */;
-/*!40000 ALTER TABLE `roundgroup` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `roundgroup`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `roundgroup` (
+  `roundgroup_id` int(11) NOT NULL AUTO_INCREMENT,
+  `round_id` int(11) NOT NULL,
+  `start_date` timestamp NULL DEFAULT NULL,
+  `end_date` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`roundgroup_id`),
+  KEY `fk_roundgroup_round_idx` (`round_id`),
+  CONSTRAINT `fk_roundgroup_round` FOREIGN KEY (`round_id`) REFERENCES `round` (`round_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `run`
+-- Table structure for table `run`
 --
 
-LOCK TABLES `run` WRITE;
-/*!40000 ALTER TABLE `run` DISABLE KEYS */;
-/*!40000 ALTER TABLE `run` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `run`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `run` (
+  `run_id` int(11) NOT NULL AUTO_INCREMENT,
+  `competitor_id` int(11) NOT NULL,
+  `chrono_id` int(11) NOT NULL,
+  `penalty` double DEFAULT NULL,
+  `valid` tinyint(4) NOT NULL,
+  `reason` varchar(200) DEFAULT NULL,
+  `roundgroup_id` int(11) NOT NULL,
+  PRIMARY KEY (`run_id`),
+  KEY `fk_run_roundgroup_idx` (`roundgroup_id`),
+  KEY `fk_run_chrono_idx` (`chrono_id`),
+  KEY `fk_run_competitor_idx` (`competitor_id`),
+  CONSTRAINT `fk_run_chrono` FOREIGN KEY (`chrono_id`) REFERENCES `chrono` (`chrono_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_run_competitor` FOREIGN KEY (`competitor_id`) REFERENCES `competitor` (`pilot_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_run_roundgroup` FOREIGN KEY (`roundgroup_id`) REFERENCES `roundgroup` (`roundgroup_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-11-17 20:47:16
+-- Dump completed on 2019-11-18 22:55:16

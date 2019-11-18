@@ -2,15 +2,16 @@
 
 class Pilot:
 
-    def __init__(self, name, first_name, f3x_vault_id=None, fai_id=None, national_id=None):
-        self._name = name
-        self._first_name = first_name
-        self._fai_id = fai_id
-        self._national_ID = national_id
-        self._f3x_vault_id = f3x_vault_id
+    def __init__(self, name, first_name, pilot_id=None, f3x_vault_id=None, fai_id=None, national_id=None):
+        self.id = pilot_id
+        self.name = name
+        self.first_name = first_name
+        self.fai_id = fai_id
+        self.national_ID = national_id
+        self.f3x_vault_id = f3x_vault_id
 
     def get_f3x_vault_id(self):
-        return self._f3x_vault_id
+        return self.f3x_vault_id
 
     def to_string(self):
-        return self._name + '\t' + self._first_name
+        return self.name + '\t' + self.first_name

@@ -19,7 +19,6 @@ class EventDAO(Dao):
               'max_allowed_wind_speed, max_wind_dir_dev, max_interruption_time, f3x_vault_id ' \
               'FROM event WHERE event_id=%s'
         query_result = self._execute_query(sql, event_id)
-        result = None
         #Query should return only one row
         for row in query_result:
             result = Event()
@@ -33,7 +32,8 @@ class EventDAO(Dao):
             result.max_wind_dir_dev = row[7]
             result.max_interruption_time = row[8]
             result.f3x_vault_id = row[9]
-        return result
+            return result
+        return None
 
     def insert(self, event):
         """
