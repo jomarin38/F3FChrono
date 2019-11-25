@@ -18,7 +18,7 @@ class Event:
         self.location = ""
         self.name = ""
         self._competitors = {}
-        self._rounds = []
+        self.rounds = []
         self.min_allowed_wind_speed = 3.0
         self.max_allowed_wind_speed = 25.0
         self.max_wind_dir_dev = 45.0
@@ -115,24 +115,30 @@ class Event:
 
     def create_new_round(self):
         f3f_round = Round.new_round(self)
-        self._rounds.append(f3f_round)
+        self.add_existing_round(f3f_round)
+        return f3f_round
+
+    def add_existing_round(self, f3f_round):
+        self.rounds.append(f3f_round)
         if self.current_round is None:
             self.current_round = 0
         else:
             self.current_round += 1
-        return f3f_round
 
-    def register_pilot(self, pilot, bib_number):
-        self._competitors[bib_number] = Competitor.register_pilot(self, bib_number, pilot)
+    def register_pilot(self, pilot, bib_number, team=None):
+        self._competitors[bib_number] = Competitor.register_pilot(self, bib_number, pilot, team)
 
     def get_current_round(self):
-        return self._rounds[self.current_round]
+        return self.rounds[self.current_round]
 
     def get_competitor(self, bib_number):
         return self._competitors[bib_number]
 
     def get_competitors(self):
         return self._competitors
+
+    def set_competitors(self, competitors):
+        self._competitors = competitors
 
     def get_flights_before_refly(self):
         return self.flights_before_refly

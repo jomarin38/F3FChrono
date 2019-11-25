@@ -1,5 +1,7 @@
 from F3FChrono.data.dao.Dao import Dao
 from F3FChrono.data.Event import Event
+from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
+from F3FChrono.data.dao.RoundDAO import RoundDAO
 
 class EventDAO(Dao):
 
@@ -14,7 +16,7 @@ class EventDAO(Dao):
             result.append(event)
         return result
 
-    def get(self, event_id):
+    def get(self, event_id, fetch_competitors=False, fetch_rounds=False, fetch_runs=False):
         sql = 'SELECT event_id, begin_date, end_date, location, name, min_allowed_wind_speed, ' \
               'max_allowed_wind_speed, max_wind_dir_dev, max_interruption_time, f3x_vault_id ' \
               'FROM event WHERE event_id=%s'
@@ -32,8 +34,25 @@ class EventDAO(Dao):
             result.max_wind_dir_dev = row[7]
             result.max_interruption_time = row[8]
             result.f3x_vault_id = row[9]
+            if fetch_competitors:
+                EventDAO._fetch_competitors(result)
+            if fetch_rounds:
+                EventDAO._fetch_rounds(result, fetch_runs)
             return result
         return None
+
+    @staticmethod
+    def _fetch_competitors(event):
+        event.set_competitors(CompetitorDAO().get_list(event))
+
+    @staticmethod
+    def _fetch_rounds(event, fetch_runs):
+        dao = RoundDAO()
+        rounds = dao.get_list(event)
+        for f3f_round in rounds:
+            fetched_round = dao.get(f3f_round, fetch_runs)
+            event.add_existing_round(fetched_round)
+
 
     def insert(self, event):
         """
