@@ -114,7 +114,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                                             self.event.max_interruption_time)
 
 def main ():
-    contest_id = 1741
+    contest_id = 1
 
     dao = EventDAO()
     event = dao.get(contest_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)

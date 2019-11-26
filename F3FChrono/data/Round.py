@@ -16,7 +16,7 @@ class Round:
         self.valid = False
 
     @staticmethod
-    def new_round(event):
+    def new_round(event, add_initial_group=True):
         f3f_round = Round()
         f3f_round.event = event
         if event in Round.round_counters:
@@ -25,7 +25,8 @@ class Round:
             previous_round = 0
         Round.round_counters[event] = previous_round+1
         f3f_round.round_number = Round.round_counters[event]
-        f3f_round.groups.append(RoundGroup(f3f_round, 1))
+        if add_initial_group:
+            f3f_round.groups.append(RoundGroup(f3f_round, 1))
         f3f_round._flight_order += [c for c in event.get_competitors()]
         return f3f_round
 
