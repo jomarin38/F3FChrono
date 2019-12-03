@@ -53,6 +53,7 @@ class Event:
 
         event.id = splitted_line[0].strip('\"')
         #dates have to be converted to datetime objects
+        event.name = splitted_line[1].strip('\"')
         event.begin_date = datetime.strptime(splitted_line[3].strip('\"'), '%m/%d/%y')
         event.end_date = datetime.strptime(splitted_line[4].strip('\"'), '%m/%d/%y')
         event.location = splitted_line[2].strip('\"')
