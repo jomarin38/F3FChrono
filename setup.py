@@ -21,7 +21,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
      ],
     install_requires=[
-        'pandas', 'requests',
+        'pandas', 'requests', 'pymysql',
     ]
 
  )

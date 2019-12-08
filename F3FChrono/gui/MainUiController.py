@@ -5,6 +5,8 @@ from F3FChrono.gui.WidgetController import *
 from F3FChrono.data.Event import Event
 from F3FChrono.chrono.Chrono import *
 
+from F3FChrono.data.dao.EventDAO import EventDAO
+
 
 class MainUiCtrl (QtWidgets.QMainWindow):
 
@@ -66,10 +68,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def start(self):
         self.controllers['config'].get_data()
-        self.event._max_interruption_time=self.controllers['config'].interruption_time_max
-        self.event._max_wind_dir_dev=self.controllers['config'].wind_orientation
-        self.event._min_allowed_wind_speed=self.controllers['config'].wind_speed_min
-        self.event._max_allowed_wind_speed=self.controllers['config'].wind_speed_max
+        self.event.max_interruption_time=self.controllers['config'].interruption_time_max
+        self.event.max_wind_dir_dev=self.controllers['config'].wind_orientation
+        self.event.min_allowed_wind_speed=self.controllers['config'].wind_speed_min
+        self.event.max_allowed_wind_speed=self.controllers['config'].wind_speed_max
         self.chrono.reset()
         self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
         self.show_chrono()
@@ -105,19 +107,17 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         print("initial_data method")
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor())
         self.controllers['wind'].set_data(0, 0)
-        self.controllers['config'].set_data(self.event._location,
-                                            self.event._min_allowed_wind_speed,
-                                            self.event._max_allowed_wind_speed,
-                                            self.event._max_wind_dir_dev,
-                                            self.event._max_interruption_time)
+        self.controllers['config'].set_data(self.event.location,
+                                            self.event.min_allowed_wind_speed,
+                                            self.event.max_allowed_wind_speed,
+                                            self.event.max_wind_dir_dev,
+                                            self.event.max_interruption_time)
 
 def main ():
+    contest_id = 1
 
-    login = input('F3X Vault login : ')
-    password = input('F3X Vault password : ')
-    contest_id = 1706
-
-    event = Event.from_f3x_vault(login, password, contest_id, max_rounds=1)
+    dao = EventDAO()
+    event = dao.get(contest_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
     chrono = Chrono()
 
     app = QtWidgets.QApplication(sys.argv)

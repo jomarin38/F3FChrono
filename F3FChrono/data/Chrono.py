@@ -3,6 +3,7 @@
 class Chrono:
 
     def __init__(self):
+        self.id = None
         self.run_time = None
         self.min_wind_speed = None
         self.max_wind_speed = None

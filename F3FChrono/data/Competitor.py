@@ -3,34 +3,34 @@
 class Competitor:
 
     def __init__(self):
-        self._bib_number = None
-        self._event = None
-        self._pilot = None
-        self._team = None
+        self.bib_number = None
+        self.event = None
+        self.pilot = None
+        self.team = None
 
     @staticmethod
     def register_pilot(event, bib_number, pilot, team=None):
         competitor = Competitor()
-        competitor._event = event
-        competitor._pilot = pilot
-        competitor._bib_number = bib_number
-        competitor._team = team
+        competitor.event = event
+        competitor.pilot = pilot
+        competitor.bib_number = bib_number
+        competitor.team = team
         return competitor
 
     def get_pilot(self):
-        return self._pilot
+        return self.pilot
 
     def get_bib_number(self):
-        return self._bib_number
+        return self.bib_number
 
     def to_string(self):
-        return str(self._bib_number) + '\t' + self._pilot.to_string()
+        return str(self.bib_number) + '\t' + self.pilot.to_string()
 
     def display_name(self):
-        return self._pilot.to_string()
+        return self.pilot.to_string()
 
     def __hash__(self):
-        return hash(self._bib_number)
+        return hash(self.bib_number)
 
     def __lt__(self, other):
-        return self._bib_number < other.get_bib_number()
+        return self.bib_number < other.get_bib_number()

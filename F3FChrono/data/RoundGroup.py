@@ -3,14 +3,15 @@ import os
 
 class RoundGroup:
 
-    def __init__(self, f3f_round):
+    def __init__(self, f3f_round, group_number):
         self.round = f3f_round
         self.valid = False
         self.start_time = None
         self.end_time = None
+        self.group_number = group_number
         self.runs = {}
 
-    def _add_run(self, run):
+    def add_run(self, run):
         if run.competitor in self.runs:
             self.runs[run.competitor].append(run)
         else:
