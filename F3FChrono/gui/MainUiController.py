@@ -4,9 +4,7 @@ from F3FChrono.gui.MainUi_UI import *
 from F3FChrono.gui.WidgetController import *
 from F3FChrono.data.Event import Event
 from F3FChrono.chrono.Chrono import *
-
-from F3FChrono.data.dao.EventDAO import EventDAO
-
+from F3FChrono.data.dao.EventDAO import  EventDAO
 
 class MainUiCtrl (QtWidgets.QMainWindow):
 
@@ -59,41 +57,47 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def next_pilot(self):
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
+        self.controllers['round'].wChronoCtrl.reset_time()
 
     def refly(self):
         #TODO : get penalty value if any
         self.event.get_current_round().handle_refly(0)
         self.chrono.reset()
         self.next_pilot()
+        self.controllers['round'].wChronoCtrl.reset_time()
 
     def start(self):
         self.controllers['config'].get_data()
-        self.event.max_interruption_time=self.controllers['config'].interruption_time_max
-        self.event.max_wind_dir_dev=self.controllers['config'].wind_orientation
-        self.event.min_allowed_wind_speed=self.controllers['config'].wind_speed_min
-        self.event.max_allowed_wind_speed=self.controllers['config'].wind_speed_max
+        self.event._max_interruption_time=self.controllers['config'].interruption_time_max
+        self.event._max_wind_dir_dev=self.controllers['config'].wind_orientation
+        self.event._min_allowed_wind_speed=self.controllers['config'].wind_speed_min
+        self.event._max_allowed_wind_speed=self.controllers['config'].wind_speed_max
         self.chrono.reset()
         self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
         self.show_chrono()
+        self.controllers['round'].wChronoCtrl.reset_time()
 
     def next_action(self):
-        print ("Fctnext_action begin\tchrono status : "+str(self.chrono.get_status())+'\tNb lap : '+str(self.chrono.getLapCount()))
         if (self.chrono.get_status()<chronoStatus.Finished):
             if (self.chrono.get_status()==chronoStatus.InStart):
                 self.chrono.startRace()
+                self.chrono.declareBase(self.base_test)
+                self.base_test = ~self.base_test
                 self.controllers['round'].wChronoCtrl.reset_time()
 
-            if (self.chrono.get_status()==chronoStatus.InProgress and self.chrono.getLapCount()<10):
+            if (self.chrono.get_status()==chronoStatus.InProgress and self.chrono.getLapCount()<=10):
                 self.chrono.declareBase(self.base_test)
                 self.base_test=~self.base_test
                 self.controllers['round'].wChronoCtrl.set_time(self.chrono.get_time(), self.chrono.getLastLapTime())
                 self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
             else:
                 self.chrono.next_status()
+
+            self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
         elif(self.chrono.getLapCount()>=10):
             self.chrono.reset()
             self.next_pilot()
-        print ("Fctnext_action end\tchrono status : "+str(self.chrono.get_status())+'\tNb lap : '+str(self.chrono.getLapCount()))
+            self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
 
     def penalty(self):
         "TODO Insert event class penalty function"

@@ -13,8 +13,8 @@ from F3FChrono.chrono.Chrono import *
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()
-    btn_refly_sig = pyqtSignal()
     btn_null_flight_sig = pyqtSignal()
+    btn_refly_sig = pyqtSignal()
     btn_penalty_sig = pyqtSignal()
 
     widgetList = []
@@ -57,15 +57,14 @@ class WRoundCtrl(QObject):
     def btn_home(self):
         self.btn_home_sig.emit()
 
-    def btn_refly(self):
-        self.btn_refly_sig.emit()
-
     def btn_null_flight(self):
         self.btn_null_flight_sig.emit()
 
+    def btn_refly(self):
+        self.btn_refly_sig.emit()
+
     def btn_penalty(self):
         self.btn_penalty_sig.emit()
-
 
     def set_data(self):
         """
@@ -122,9 +121,20 @@ class WChronoCtrl():
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
+        self.lap=[]
 
         self.current_lap=0
         self.view.setupUi(self.widget)
+        self.lap.append(self.view.Lap1)
+        self.lap.append(self.view.Lap2)
+        self.lap.append(self.view.Lap3)
+        self.lap.append(self.view.Lap4)
+        self.lap.append(self.view.Lap5)
+        self.lap.append(self.view.Lap6)
+        self.lap.append(self.view.Lap7)
+        self.lap.append(self.view.Lap8)
+        self.lap.append(self.view.Lap9)
+        self.lap.append(self.view.Lap10)
 
     def get_widget(self):
         return (self.widget)
@@ -139,12 +149,16 @@ class WChronoCtrl():
         self.view.comboBox.setCurrentIndex(status)
 
     def set_time(self, time, laptime):
-        self.view.Time_label.setText("{0:.3f}".format(time))
+        self.view.Time_label.setText("{:0>6.3f}".format(time))
+        self.lap[self.current_lap].setText("{:d} : {:0>6.3f}".format(self.current_lap+1, laptime))
+
         #self.lap_list[self.current_lap].setText("{0} : {1:.3f}".format(self.current_lap, laptime))
         self.current_lap += 1
 
     def reset_time(self):
-        self.view.Time_label.setText('00.000')
+        self.view.Time_label.setText("{:0>6.3f}".format(0.0))
+        for lap in self.lap:
+            lap.setText("")
         #for ctrl in self.lap_list:
         #    ctrl.setText("")
         self.current_lap = 0
