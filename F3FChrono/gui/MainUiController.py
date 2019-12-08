@@ -57,14 +57,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def next_pilot(self):
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
-        self.controllers['round'].wChronoCtrl.reset_time()
+        self.controllers['round'].wChronoCtrl.reset_ui()
 
     def refly(self):
         #TODO : get penalty value if any
         self.event.get_current_round().handle_refly(0)
         self.chrono.reset()
         self.next_pilot()
-        self.controllers['round'].wChronoCtrl.reset_time()
+        self.controllers['round'].wChronoCtrl.reset_ui()
 
     def start(self):
         self.controllers['config'].get_data()
@@ -75,7 +75,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chrono.reset()
         self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
         self.show_chrono()
-        self.controllers['round'].wChronoCtrl.reset_time()
+        self.controllers['round'].wChronoCtrl.reset_ui()
 
     def next_action(self):
         if (self.chrono.get_status()<chronoStatus.Finished):
@@ -83,21 +83,32 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 self.chrono.startRace()
                 self.chrono.declareBase(self.base_test)
                 self.base_test = ~self.base_test
-                self.controllers['round'].wChronoCtrl.reset_time()
+                self.controllers['round'].wChronoCtrl.reset_ui()
+                self.controllers['round'].wChronoCtrl.settime(0, True)
 
             if (self.chrono.get_status()==chronoStatus.InProgress and self.chrono.getLapCount()<=10):
+                if (self.chrono.getLapCount() == 10):
+                    self.controllers['round'].wChronoCtrl.stoptime()
+                    self.chrono.next_status()
+                print("chronolapcount : "+str(self.chrono.getLapCount()))
                 self.chrono.declareBase(self.base_test)
                 self.base_test=~self.base_test
-                self.controllers['round'].wChronoCtrl.set_time(self.chrono.get_time(), self.chrono.getLastLapTime())
+                self.controllers['round'].wChronoCtrl.set_laptime(self.chrono.getLastLapTime())
                 self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
+
             else:
                 self.chrono.next_status()
 
             self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
-        elif(self.chrono.getLapCount()>=10):
+        elif (self.chrono.getLapCount()>=10):
             self.chrono.reset()
             self.next_pilot()
             self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
+        if (self.chrono.get_status() == chronoStatus.WaitLaunch):
+            self.controllers['round'].wChronoCtrl.settime(30000, False)
+        if (self.chrono.get_status() == chronoStatus.Launched):
+            self.controllers['round'].wChronoCtrl.settime(30000, False)
+
 
     def penalty(self):
         "TODO Insert event class penalty function"

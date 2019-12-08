@@ -10,7 +10,7 @@ class chronoType():
 class chronoStatus():
     InWait=0
     WaitLaunch=1
-    Lunched=2
+    Launched=2
     InStart=3
     InProgress=4
     Finished=5
@@ -59,7 +59,7 @@ class Chrono():
         self.last10BasesTime = 0.0
         self.last10BasesTimelost = 0.0
         self.inStart = True
-        self.lastBase = -1
+        self.lastBase = -10
         self.chronoLap.clear()
         self.timelost.clear()
         

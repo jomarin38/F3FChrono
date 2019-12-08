@@ -1,4 +1,6 @@
 import sys
+import threading
+from time import sleep
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSignal, QObject
 
@@ -114,14 +116,22 @@ class WPilotCtrl:
         self.view.pilotName.setText(competitor.display_name())
         self.view.bib.setText(str(competitor.get_bib_number()))
 
-class WChronoCtrl():
+class WChronoCtrl(threading.Thread):
 
     def __init__(self, name, parent):
+        super(WChronoCtrl, self).__init__()
+        self.terminated=False
+        self.duration=10
+        self.event=threading.Event()
+
         self.view = Ui_WChrono()
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
         self.lap=[]
+        self.time=0
+        self.time_up=True
+        self.time_count=False
 
         self.current_lap=0
         self.view.setupUi(self.widget)
@@ -136,6 +146,11 @@ class WChronoCtrl():
         self.lap.append(self.view.Lap9)
         self.lap.append(self.view.Lap10)
 
+        self.daemon=True
+        self.event.clear()
+        self.start()
+
+
     def get_widget(self):
         return (self.widget)
 
@@ -148,20 +163,39 @@ class WChronoCtrl():
     def set_status(self, status):
         self.view.comboBox.setCurrentIndex(status)
 
-    def set_time(self, time, laptime):
-        self.view.Time_label.setText("{:0>6.3f}".format(time))
+    def set_laptime(self, laptime):
+        #self.view.Time_label.setText("{:0>6.3f}".format(time)
+        print ("current lap : "+str(self.current_lap))
         self.lap[self.current_lap].setText("{:d} : {:0>6.3f}".format(self.current_lap+1, laptime))
 
         #self.lap_list[self.current_lap].setText("{0} : {1:.3f}".format(self.current_lap, laptime))
         self.current_lap += 1
 
-    def reset_time(self):
-        self.view.Time_label.setText("{:0>6.3f}".format(0.0))
+    def reset_ui(self):
+        #self.view.Time_label.setText("{:0>6.3f}".format(0.0))
         for lap in self.lap:
             lap.setText("")
         #for ctrl in self.lap_list:
         #    ctrl.setText("")
         self.current_lap = 0
+
+    def settime(self, time, count_up):
+        self.time=time
+        self.time_up=count_up
+        self.time_count=True
+
+    def stoptime(self):
+        self.time_count=False
+
+    def run(self):
+        while not self.terminated:
+            if (self.time_count==True):
+                if (self.time_up==True):
+                    self.time=self.time+self.duration
+                else:
+                    self.time=self.time-self.duration
+                self.view.Time_label.setText("{:0>6.3f}".format(self.time/1000))
+            sleep(self.duration/1000)
 
 class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()
