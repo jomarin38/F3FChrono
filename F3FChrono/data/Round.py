@@ -64,6 +64,9 @@ class Round:
     def get_current_competitor(self):
         return self.event.get_competitor(self._flight_order[self._current_competitor_index])
 
+    def set_current_competitor(self, competitor):
+        self._current_competitor_index = self._flight_order.index(competitor.bib_number)
+
     def next_pilot(self):
         #TODO : detect end of round
         if self._current_competitor_index < len(self._flight_order) - 1:

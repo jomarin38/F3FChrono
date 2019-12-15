@@ -16,6 +16,8 @@ class RoundGroup:
             self.runs[run.competitor].append(run)
         else:
             self.runs[run.competitor] = [run]
+        #Set current competitor
+        self.round.set_current_competitor(run.competitor)
 
     def get_valid_run(self, competitor):
         if competitor in self.runs:
