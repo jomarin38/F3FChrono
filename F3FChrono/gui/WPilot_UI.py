@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'WPilot.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_WPilot(object):
     def setupUi(self, WPilot):
@@ -69,4 +71,3 @@ if __name__ == "__main__":
     ui.setupUi(WPilot)
     WPilot.show()
     sys.exit(app.exec_())
-
