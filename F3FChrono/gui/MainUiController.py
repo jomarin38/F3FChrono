@@ -10,9 +10,10 @@ from F3FChrono.data.dao.EventDAO import EventDAO
 
 class MainUiCtrl (QtWidgets.QMainWindow):
 
-    def __init__(self,event,chrono):
+    def __init__(self,dao,chrono):
         super().__init__()
-        self.event = event
+        self.dao = dao
+        self.event = None
         self.chrono = chrono
         self.initUI()
         self.base_test=0
@@ -24,7 +25,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
 
         self.ui.setupUi(self.MainWindow)
-        self.MainWindow.showFullScreen()
+        #self.MainWindow.showFullScreen()
         self.controllers = collections.OrderedDict()
 
         self.controllers['config'] = WConfigCtrl("panel Config", self.ui.centralwidget)
@@ -36,6 +37,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 self.ui.verticalLayout.addWidget(x)
 
         self.controllers['config'].btn_next_sig.connect(self.start)
+        self.controllers['config'].contest_sig.connect(self.contest_changed)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.show_config)
         self.controllers['round'].btn_refly_sig.connect(self.refly)
@@ -44,6 +46,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.show_config()
         self.MainWindow.show()
+        self.controllers['config'].set_contest(self.dao.get_list())
+        self.controllers['wind'].set_data(0, 0)
+
 
     def show_config(self):
         self.controllers['round'].hide()
@@ -74,7 +79,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.event.max_wind_dir_dev=self.controllers['config'].wind_orientation
         self.event.min_allowed_wind_speed=self.controllers['config'].wind_speed_min
         self.event.max_allowed_wind_speed=self.controllers['config'].wind_speed_max
+
         self.chrono.reset()
+        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor())
         self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
         self.show_chrono()
         self.controllers['round'].wChronoCtrl.reset_ui()
@@ -92,7 +99,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 if (self.chrono.getLapCount() == 10):
                     self.controllers['round'].wChronoCtrl.stoptime()
                     self.chrono.next_status()
-                print("chronolapcount : "+str(self.chrono.getLapCount()))
+                #print("chronolapcount : "+str(self.chrono.getLapCount()))
                 self.chrono.declareBase(self.base_test)
                 self.base_test=~self.base_test
                 self.controllers['round'].wChronoCtrl.set_laptime(self.chrono.getLastLapTime())
@@ -120,27 +127,23 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         "TODO Insert event class null flight function"
         print("null flight event")
 
-    def set_initial_data(self):
-        print("initial_data method")
-        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor())
-        self.controllers['wind'].set_data(0, 0)
-        self.controllers['config'].set_data(self.event.location,
-                                            self.event.min_allowed_wind_speed,
+    def contest_changed(self):
+        self.event=self.dao.get(self.controllers['config'].view.ContestList.currentIndex(),
+                                fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
+
+        self.controllers['config'].set_data(self.event.min_allowed_wind_speed,
                                             self.event.max_allowed_wind_speed,
                                             self.event.max_wind_dir_dev,
                                             self.event.max_interruption_time)
 
 def main ():
-    contest_id = 1
 
     dao = EventDAO()
-    event = dao.get(contest_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
     chrono = Chrono()
 
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(event, chrono)
+    ui=MainUiCtrl(dao, chrono)
 
-    ui.set_initial_data()
 
 
     try:
