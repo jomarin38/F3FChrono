@@ -32,6 +32,7 @@ class WRoundCtrl(QObject):
         self.widgetList.append(self.wPilotCtrl.get_widget())
         self.widgetList.append(self.wChronoCtrl.get_widget())
         self.widgetList.append(self.widget)
+
         # Event connect
         self.view.Btn_Home.clicked.connect(self.btn_home)
         self.view.Btn_Next.clicked.connect(self.btn_next_pilot)
@@ -125,6 +126,7 @@ class WChronoCtrl(QTimer):
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
 
+        #initialize labels for lap time
         self.lap=[]
         self.current_lap=0
         self.view.setupUi(self.widget)
@@ -156,7 +158,7 @@ class WChronoCtrl(QTimer):
         self.widget.hide()
 
     def set_status(self, status):
-        self.view.comboBox.setCurrentIndex(status)
+        self.view.Status.setCurrentIndex(status)
 
     def set_laptime(self, laptime):
         #self.view.Time_label.setText("{:0>6.3f}".format(time)
