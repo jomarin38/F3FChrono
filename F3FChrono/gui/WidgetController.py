@@ -1,8 +1,7 @@
 import sys
-import threading
-from time import sleep
+from time import *
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 
 from F3FChrono.gui.WWind_UI import Ui_WWind
 from F3FChrono.gui.WPilot_UI import Ui_WPilot
@@ -116,23 +115,17 @@ class WPilotCtrl:
         self.view.pilotName.setText(competitor.display_name())
         self.view.bib.setText(str(competitor.get_bib_number()))
 
-class WChronoCtrl(threading.Thread):
+class WChronoCtrl(QTimer):
 
     def __init__(self, name, parent):
         super(WChronoCtrl, self).__init__()
-        self.terminated=False
-        self.duration=10
-        self.event=threading.Event()
 
         self.view = Ui_WChrono()
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
-        self.lap=[]
-        self.time=0
-        self.time_up=True
-        self.time_count=False
 
+        self.lap=[]
         self.current_lap=0
         self.view.setupUi(self.widget)
         self.lap.append(self.view.Lap1)
@@ -146,10 +139,12 @@ class WChronoCtrl(threading.Thread):
         self.lap.append(self.view.Lap9)
         self.lap.append(self.view.Lap10)
 
-        self.daemon=True
-        self.event.clear()
-        self.start()
-
+        self.timerEvent = QTimer()
+        self.timerEvent.timeout.connect(self.run)
+        self.duration=10
+        self.startTime = time.time()
+        self.time=0
+        self.time_up = True
 
     def get_widget(self):
         return (self.widget)
@@ -179,23 +174,22 @@ class WChronoCtrl(threading.Thread):
         #    ctrl.setText("")
         self.current_lap = 0
 
-    def settime(self, time, count_up):
-        self.time=time
+
+    def settime(self, setTime, count_up):
+        self.time=setTime
         self.time_up=count_up
-        self.time_count=True
+        self.startTime=time.time()
+        self.timerEvent.start(self.duration)
 
     def stoptime(self):
-        self.time_count=False
+        self.timerEvent.stop()
 
     def run(self):
-        while not self.terminated:
-            if (self.time_count==True):
-                if (self.time_up==True):
-                    self.time=self.time+self.duration
-                else:
-                    self.time=self.time-self.duration
-                self.view.Time_label.setText("{:0>6.3f}".format(self.time/1000))
-            sleep(self.duration/1000)
+        if (self.time_up==True):
+            self.view.Time_label.setText("{:0>6.3f}".format(time.time() - self.startTime))
+        else:
+            self.view.Time_label.setText("{:0>6.3f}".format(self.time / 1000 - (time.time()-self.startTime)))
+
 
 class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()
