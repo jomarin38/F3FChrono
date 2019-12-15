@@ -138,7 +138,7 @@ def main ():
     chrono = Chrono()
 
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(event, chrono)
+    ui = MainUiCtrl(event, chrono)
 
     ui.set_initial_data()
 

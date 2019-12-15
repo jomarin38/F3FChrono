@@ -14,7 +14,7 @@ class RunDAO(Dao):
         sql = 'SELECT r.run_id, c.pilot_id, c.bib_number, c.team, p.name, p.first_name FROM run r ' \
               'LEFT JOIN competitor c ON r.competitor_id=c.pilot_id AND r.event_id=c.event_id ' \
               'LEFT JOIN pilot p ON c.pilot_id=p.pilot_id ' \
-              'WHERE r.event_id=%s AND r.round_number=%s AND r.group_number=%s '
+              'WHERE r.event_id=%s AND r.round_number=%s AND r.group_number=%s ORDER BY c.bib_number'
         query_result = self._execute_query(sql, round_group.round.event.id, round_group.round.round_number,
                                            round_group.group_number)
         result = []
