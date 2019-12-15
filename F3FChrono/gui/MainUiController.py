@@ -24,7 +24,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
 
         self.ui.setupUi(self.MainWindow)
-
+        self.MainWindow.showFullScreen()
         self.controllers = collections.OrderedDict()
 
         self.controllers['config'] = WConfigCtrl("panel Config", self.ui.centralwidget)
