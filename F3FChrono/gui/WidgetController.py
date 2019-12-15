@@ -32,7 +32,6 @@ class WRoundCtrl(QObject):
         self.widgetList.append(self.wPilotCtrl.get_widget())
         self.widgetList.append(self.wChronoCtrl.get_widget())
         self.widgetList.append(self.widget)
-
         # Event connect
         self.view.Btn_Home.clicked.connect(self.btn_home)
         self.view.Btn_Next.clicked.connect(self.btn_next_pilot)
@@ -126,7 +125,6 @@ class WChronoCtrl(QTimer):
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
 
-        #initialize labels for lap time
         self.lap=[]
         self.current_lap=0
         self.view.setupUi(self.widget)
@@ -158,7 +156,7 @@ class WChronoCtrl(QTimer):
         self.widget.hide()
 
     def set_status(self, status):
-        self.view.Status.setCurrentIndex(status)
+        self.view.comboBox.setCurrentIndex(status)
 
     def set_laptime(self, laptime):
         #self.view.Time_label.setText("{:0>6.3f}".format(time)
@@ -195,7 +193,6 @@ class WChronoCtrl(QTimer):
 
 class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()
-    contest_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -239,7 +236,6 @@ class WConfigCtrl(QObject):
 
     def contest_changed(self):
         print(self.contest_changed)
-        self.contest_sig.emit()
 
     def btn_piCamA(self):
         print(self.btn_piCamA)
@@ -251,19 +247,16 @@ class WConfigCtrl(QObject):
         self.get_data()
         self.btn_next_sig.emit()
 
-    def set_data(self, min_speed, max_speed, dir_dev, max_interrupt, revol=5):
+    def set_data(self, contest, min_speed, max_speed, dir_dev, max_interrupt, revol=5):
+        self.view.ChronoType.setCurrentIndex(0)
+        self.chrono_changed()
+        self.view.ContestList.addItem(contest)
+        self.view.ContestList.setCurrentText(contest)
         self.view.WindMinValue.setValue(min_speed)
         self.view.WindMaxValue.setValue(max_speed)
         self.view.OrientationValue.setValue(dir_dev)
         self.view.RevolValue.setValue(revol)
-        self.view.MaxInterruptValue.setValue(max_interrupt/60)
-
-    def set_contest(self, contest):
-        self.view.ChronoType.setCurrentIndex(0)
-        self.chrono_changed()
-        for temp in contest:
-            self.view.ContestList.addItem(temp.name)
-        self.view.ContestList.setCurrentText(contest[0].name)
+        self.view.MaxInterruptValue.setValue(max_interrupt)
 
     def get_data(self):
         self.wind_speed_min=self.view.WindMinValue.value()
