@@ -205,7 +205,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Max Interrupt</string>
+          <string>Max Interrupt (mn)</string>
          </property>
         </widget>
        </item>
@@ -215,6 +215,9 @@
           <font>
            <pointsize>10</pointsize>
           </font>
+         </property>
+         <property name="maximum">
+          <number>100</number>
          </property>
         </widget>
        </item>
@@ -230,7 +233,7 @@
           </font>
          </property>
          <property name="text">
-          <string>WindMin</string>
+          <string>WindMin (m/s)</string>
          </property>
         </widget>
        </item>
@@ -251,7 +254,7 @@
           </font>
          </property>
          <property name="text">
-          <string>WindMax</string>
+          <string>WindMax (m/s)</string>
          </property>
         </widget>
        </item>
@@ -276,7 +279,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Orientation</string>
+          <string>Orientation (°)</string>
          </property>
         </widget>
        </item>
