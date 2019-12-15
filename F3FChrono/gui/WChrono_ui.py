@@ -2,16 +2,19 @@
 
 # Form implementation generated from reading ui file 'WChrono.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_WChrono(object):
     def setupUi(self, WChrono):
         WChrono.setObjectName("WChrono")
         WChrono.resize(480, 153)
+        WChrono.setInputMethodHints(QtCore.Qt.ImhNone)
         self.formLayout = QtWidgets.QFormLayout(WChrono)
         self.formLayout.setObjectName("formLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -32,26 +35,30 @@ class Ui_WChrono(object):
         self.Time_label.setAlignment(QtCore.Qt.AlignCenter)
         self.Time_label.setObjectName("Time_label")
         self.verticalLayout.addWidget(self.Time_label)
-        self.comboBox = QtWidgets.QComboBox(WChrono)
+        self.Status = QtWidgets.QComboBox(WChrono)
+        self.Status.setEnabled(True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.comboBox.sizePolicy().hasHeightForWidth())
-        self.comboBox.setSizePolicy(sizePolicy)
+        sizePolicy.setHeightForWidth(self.Status.sizePolicy().hasHeightForWidth())
+        self.Status.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
         font.setWeight(75)
-        self.comboBox.setFont(font)
-        self.comboBox.setAutoFillBackground(False)
-        self.comboBox.setObjectName("comboBox")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.verticalLayout.addWidget(self.comboBox)
+        self.Status.setFont(font)
+        self.Status.setAutoFillBackground(False)
+        self.Status.setInputMethodHints(QtCore.Qt.ImhNone)
+        self.Status.setEditable(False)
+        self.Status.setFrame(True)
+        self.Status.setObjectName("Status")
+        self.Status.addItem("")
+        self.Status.addItem("")
+        self.Status.addItem("")
+        self.Status.addItem("")
+        self.Status.addItem("")
+        self.Status.addItem("")
+        self.verticalLayout.addWidget(self.Status)
         self.horizontalLayout.addLayout(self.verticalLayout)
         self.formLayout.setLayout(2, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout)
         self.gridLayout = QtWidgets.QGridLayout()
@@ -155,12 +162,12 @@ class Ui_WChrono(object):
         _translate = QtCore.QCoreApplication.translate
         WChrono.setWindowTitle(_translate("WChrono", "Form"))
         self.Time_label.setText(_translate("WChrono", "30.000"))
-        self.comboBox.setItemText(0, _translate("WChrono", "Wait New Run"))
-        self.comboBox.setItemText(1, _translate("WChrono", "Wait to launch"))
-        self.comboBox.setItemText(2, _translate("WChrono", "Launched"))
-        self.comboBox.setItemText(3, _translate("WChrono", "In start"))
-        self.comboBox.setItemText(4, _translate("WChrono", "In progress"))
-        self.comboBox.setItemText(5, _translate("WChrono", "Finished"))
+        self.Status.setItemText(0, _translate("WChrono", "Wait New Run"))
+        self.Status.setItemText(1, _translate("WChrono", "Wait to launch"))
+        self.Status.setItemText(2, _translate("WChrono", "Launched"))
+        self.Status.setItemText(3, _translate("WChrono", "In start"))
+        self.Status.setItemText(4, _translate("WChrono", "In progress"))
+        self.Status.setItemText(5, _translate("WChrono", "Finished"))
         self.Lap3.setText(_translate("WChrono", "3 : XX.XXX"))
         self.Lap4.setText(_translate("WChrono", "4 : XX.XXX"))
         self.Lap1.setText(_translate("WChrono", "1 : XX.XXX"))
@@ -182,4 +189,3 @@ if __name__ == "__main__":
     ui.setupUi(WChrono)
     WChrono.show()
     sys.exit(app.exec_())
-

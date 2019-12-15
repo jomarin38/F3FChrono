@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'WConfig.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_WConfig(object):
     def setupUi(self, WConfig):
@@ -119,6 +121,7 @@ class Ui_WConfig(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.MaxInterruptValue.setFont(font)
+        self.MaxInterruptValue.setMaximum(100)
         self.MaxInterruptValue.setObjectName("MaxInterruptValue")
         self.horizontalLayout_3.addWidget(self.MaxInterruptValue)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
@@ -203,10 +206,10 @@ class Ui_WConfig(object):
         self.PICamB_Btn.setText(_translate("WConfig", "PICAM B"))
         self.PICamB_Value.setText(_translate("WConfig", "XXX.XXX.XXX.XXX"))
         self.ContestLimitLabel.setText(_translate("WConfig", "Contest Limits"))
-        self.MaxInterruptLabel.setText(_translate("WConfig", "Max Interrupt"))
-        self.WindMinLabel.setText(_translate("WConfig", "WindMin"))
-        self.WindMaxLabel.setText(_translate("WConfig", "WindMax"))
-        self.OrientationLabel.setText(_translate("WConfig", "Orientation"))
+        self.MaxInterruptLabel.setText(_translate("WConfig", "Max Interrupt (mn)"))
+        self.WindMinLabel.setText(_translate("WConfig", "WindMin (m/s)"))
+        self.WindMaxLabel.setText(_translate("WConfig", "WindMax (m/s)"))
+        self.OrientationLabel.setText(_translate("WConfig", "Orientation (°)"))
         self.RevolLabel.setText(_translate("WConfig", "Revol"))
         self.StartBtn.setText(_translate("WConfig", "Start"))
 
@@ -219,4 +222,3 @@ if __name__ == "__main__":
     ui.setupUi(WConfig)
     WConfig.show()
     sys.exit(app.exec_())
-
