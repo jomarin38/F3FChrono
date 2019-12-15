@@ -53,7 +53,6 @@ class EventDAO(Dao):
             fetched_round = dao.get(f3f_round, fetch_runs)
             event.add_existing_round(fetched_round)
         event.current_round = max([f3f_round.round_number for f3f_round in rounds])-1
-        pass
 
 
     def insert(self, event):
