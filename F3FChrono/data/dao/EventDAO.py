@@ -52,7 +52,15 @@ class EventDAO(Dao):
         for f3f_round in rounds:
             fetched_round = dao.get(f3f_round, fetch_runs)
             event.add_existing_round(fetched_round)
-        event.current_round = max([f3f_round.round_number for f3f_round in rounds])-1
+        round_numbers = [f3f_round.round_number for f3f_round in rounds]
+        if len(round_numbers) < 1:
+            event.create_new_round()
+        else:
+            event.current_round = max([f3f_round.round_number for f3f_round in rounds])-1
+            #Switch to next Pilot
+            next_pilot = event.get_current_round().next_pilot()
+            if next_pilot is None:
+                event.create_new_round()
 
 
     def insert(self, event):
@@ -69,6 +77,14 @@ class EventDAO(Dao):
                              event.end_date.strftime('%Y-%m-%d %H:%M:%S'), event.location, event.name,
                              event.min_allowed_wind_speed, event.max_allowed_wind_speed, event.max_wind_dir_dev,
                              event.max_interruption_time, event.f3x_vault_id)
+
+        sql = 'SELECT LAST_INSERT_ID()'
+        query_result = self._execute_query(sql)
+        event_id = None
+        for row in query_result:
+            event_id = row[0]
+
+        return event_id
 
     def update(self, event):
         sql = 'UPDATE event SET begin_date=%s, end_date=%s, location=%s, name=%s, ' \
