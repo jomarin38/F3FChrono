@@ -30,9 +30,15 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>210</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="font">
         <font>
-         <pointsize>9</pointsize>
+         <pointsize>10</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
@@ -61,10 +67,24 @@
         </font>
        </property>
        <property name="text">
-        <string> XXX</string>
+        <string>bib : XXX</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="round">
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Round : </string>
        </property>
       </widget>
      </item>
