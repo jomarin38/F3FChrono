@@ -129,6 +129,8 @@ class Event:
         self._competitors[bib_number] = Competitor.register_pilot(self, bib_number, pilot, team)
 
     def get_current_round(self):
+        if len(self.rounds) < 1:
+            self.create_new_round()
         return self.rounds[self.current_round]
 
     def get_competitor(self, bib_number):

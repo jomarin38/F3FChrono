@@ -58,7 +58,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         print(self.MainWindow.size())
 
     def next_pilot(self):
-        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
+        next_pilot = self.event.get_current_round().next_pilot()
+        if next_pilot is None:
+            self.event.create_new_round()
+            next_pilot = self.event.get_current_round().get_current_competitor()
+        self.controllers['round'].wPilotCtrl.set_data(next_pilot)
         self.controllers['round'].wChronoCtrl.reset_ui()
 
     def refly(self):
