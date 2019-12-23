@@ -132,7 +132,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def penalty(self):
         "TODO Insert event class penalty function"
         print("penalty event")
-        self.chrono.AddPenalty()
+        self.chrono.AddPenalty(100) #TODO penalty value must be changed. It's only for test.
 
 
     def cancel_round(self):
