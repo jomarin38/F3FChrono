@@ -34,15 +34,11 @@ class Round:
     def add_group(self, round_group):
         self.groups.append(round_group)
 
-    def handle_terminated_flight(self, competitor, chronoRun, chronoLap, penalty, valid):
+    def handle_terminated_flight(self, competitor, chrono, penalty, valid):
         run = Run()
         run.competitor = competitor
         run.penalty = penalty
-        run.chrono = Chrono()
-        run.chrono.run_time = chronoRun
-        if (chronoLap!=None):
-            for lap in chronoLap:
-                run.chrono.add_lap_time(lap)
+        run.chrono = chrono
         run.valid = valid
         self._add_run(run)
 
