@@ -170,8 +170,10 @@ class WChronoCtrl(QTimer):
         print ("current lap : "+str(self.current_lap))
         self.lap[self.current_lap].setText("{:d} : {:0>6.3f}".format(self.current_lap+1, laptime))
 
-        #self.lap_list[self.current_lap].setText("{0} : {1:.3f}".format(self.current_lap, laptime))
         self.current_lap += 1
+
+    def set_finaltime(self, time):
+        self.view.Time_label.setText("{:0>6.3f}".format(time))
 
     def reset_ui(self):
         #self.view.Time_label.setText("{:0>6.3f}".format(0.0))
