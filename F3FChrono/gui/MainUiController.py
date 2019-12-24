@@ -77,7 +77,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def refly(self):
         #TODO : get penalty value if any
         self.event.get_current_round().handle_refly(0)
-        self.chrono.reset()
+        self.chronoHard.reset()
         self.next_pilot()
         self.controllers['round'].wChronoCtrl.reset_ui()
 
@@ -132,16 +132,22 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
 
     def penalty_1(self):
-        print("penalty event")
+        #print("penalty event 100")
         self.chronoHard.AddPenalty(100)
 
     def penalty_2(self):
-        print("penalty event")
+        #print("penalty event 1000")
         self.chronoHard.AddPenalty(1000)
 
     def cancel_round(self):
-        #TODO Insert event class cancel flight function
-        print("cancel round event")
+        #print("cancel round event")
+        self.event.get_current_round().cancel_round()
+        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor(),
+                                                      self.event.get_current_round().round_number)
+        self.chronoHard.reset()
+        self.controllers['round'].wChronoCtrl.stoptime()
+        self.controllers['round'].wChronoCtrl.reset_ui()
+        self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
 
     def null_flight(self):
         #TODO Insert event class null flight function
