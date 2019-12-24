@@ -2,6 +2,7 @@ import os
 from F3FChrono.data.Run import Run
 from F3FChrono.data.RoundGroup import RoundGroup
 from F3FChrono.data.Chrono import Chrono
+import copy
 
 
 class Round:
@@ -38,7 +39,7 @@ class Round:
         run = Run()
         run.competitor = competitor
         run.penalty = penalty
-        run.chrono = chrono
+        run.chrono = copy.deepcopy(chrono)
         run.valid = valid
         self._add_run(run)
 
@@ -69,6 +70,13 @@ class Round:
         if self._current_competitor_index < len(self._flight_order) - 1:
             self._current_competitor_index += 1
         else:
+            self.valid=True
             self.event.create_new_round()
             self._current_competitor_index = 0
+        return self.get_current_competitor()
+
+    def cancel_round(self):
+        self.valid=False
+        self.event.create_new_round()
+        self._current_competitor_index = 0
         return self.get_current_competitor()
