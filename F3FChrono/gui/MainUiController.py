@@ -44,7 +44,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.show_config)
         self.controllers['round'].btn_refly_sig.connect(self.refly)
-        self.controllers['round'].btn_penalty_sig.connect(self.penalty)
+        self.controllers['round'].btn_penalty_1_sig.connect(self.penalty_1)
+        self.controllers['round'].btn_penalty_2_sig.connect(self.penalty_2)
+
         self.controllers['round'].btn_null_flight_sig.connect(self.null_flight)
         self.controllers['round'].btn_cancel_flight_sig.connect(self.cancel_round)
 
@@ -129,18 +131,20 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['round'].wChronoCtrl.settime(30000, False)
 
 
-    def penalty(self):
-        "TODO Insert event class penalty function"
+    def penalty_1(self):
         print("penalty event")
-        self.chrono.AddPenalty(100) #TODO penalty value must be changed. It's only for test.
+        self.chronoHard.AddPenalty(100)
 
+    def penalty_2(self):
+        print("penalty event")
+        self.chronoHard.AddPenalty(1000)
 
     def cancel_round(self):
-        "TODO Insert event class cancel flight function"
+        #TODO Insert event class cancel flight function
         print("cancel round event")
 
     def null_flight(self):
-        "TODO Insert event class null flight function"
+        #TODO Insert event class null flight function
         print("null flight event")
         self.event.get_current_round().handle_terminated_flight(self.event.get_competitors(),
                                                                 None, None, self.chrono.penalty, True)

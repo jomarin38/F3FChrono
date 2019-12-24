@@ -17,6 +17,8 @@ class WRoundCtrl(QObject):
     btn_null_flight_sig = pyqtSignal()
     btn_refly_sig = pyqtSignal()
     btn_penalty_sig = pyqtSignal()
+    btn_penalty_1_sig = pyqtSignal()
+    btn_penalty_2_sig = pyqtSignal()
     btn_cancel_flight_sig = pyqtSignal()
     widgetList = []
 
@@ -24,22 +26,24 @@ class WRoundCtrl(QObject):
         super(QObject, self).__init__(parent)
         self.wPilotCtrl = WPilotCtrl("PilotCtrl", parent)
         self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent)
-        self.view = Ui_WChronoBtn()
+        self.wBtnCtrl = Ui_WChronoBtn()
         self.name = name
         self.parent = parent
         self.widget=QtWidgets.QWidget(parent)
-        self.view.setupUi(self.widget)
+        self.wBtnCtrl.setupUi(self.widget)
         self.widgetList.append(self.wPilotCtrl.get_widget())
         self.widgetList.append(self.wChronoCtrl.get_widget())
         self.widgetList.append(self.widget)
 
         # Event connect
-        self.view.Btn_Home.clicked.connect(self.btn_home)
-        self.view.Btn_Next.clicked.connect(self.btn_next_pilot)
-        self.view.Btn_NullFlight.clicked.connect(self.btn_null_flight)
-        self.view.Btn_reflight.clicked.connect(self.btn_refly)
-        self.view.Btn_Penalty.clicked.connect(self.btn_penalty)
-        self.view.Btn_CancelRound.clicked.connect(self.btn_cancel_flight)
+        self.wBtnCtrl.Btn_Home.clicked.connect(self.btn_home)
+        self.wBtnCtrl.Btn_Next.clicked.connect(self.btn_next_pilot)
+        self.wBtnCtrl.Btn_NullFlight.clicked.connect(self.btn_null_flight)
+        self.wBtnCtrl.Btn_reflight.clicked.connect(self.btn_refly)
+        self.wBtnCtrl.Btn_Penalty.clicked.connect(self.btn_penalty)
+        self.wBtnCtrl.Btn_CancelRound.clicked.connect(self.btn_cancel_flight)
+        self.wBtnCtrl.Btn_Penalty_1.clicked.connect(self.btn_penalty_1)
+        self.wBtnCtrl.Btn_Penalty_2.clicked.connect(self.btn_penalty_2)
 
     def get_widget(self):
         return (self.widgetList)
@@ -48,6 +52,7 @@ class WRoundCtrl(QObject):
         self.widget.show()
         self.wPilotCtrl.show()
         self.wChronoCtrl.show()
+        self.btn_Penalty_Visible(False)
 
     def hide(self):
         self.widget.hide()
@@ -71,6 +76,31 @@ class WRoundCtrl(QObject):
 
     def btn_penalty(self):
         self.btn_penalty_sig.emit()
+        #toggle penalty button
+        self.btn_Penalty_Visible(self.btn_Penalty_IsVisible()!=True)
+
+    def btn_penalty_1(self):
+        self.btn_penalty_1_sig.emit()
+        self.btn_Penalty_Visible(False)
+
+    def btn_penalty_2(self):
+        self.btn_penalty_2_sig.emit()
+        self.btn_Penalty_Visible(False)
+
+    def btn_Penalty_Visible(self, visible):
+        if (visible):
+            self.wBtnCtrl.Btn_Penalty_1.setVisible(True)
+            self.wBtnCtrl.Btn_Penalty_2.setVisible(True)
+            self.wBtnCtrl.Btn_Next.setVisible(False)
+            self.wBtnCtrl.Btn_NullFlight.setVisible(False)
+        else:
+            self.wBtnCtrl.Btn_Penalty_1.setVisible(False)
+            self.wBtnCtrl.Btn_Penalty_2.setVisible(False)
+            self.wBtnCtrl.Btn_Next.setVisible(True)
+            self.wBtnCtrl.Btn_NullFlight.setVisible(True)
+
+    def btn_Penalty_IsVisible(self):
+        return(self.wBtnCtrl.Btn_Penalty_1.isVisible() or self.wBtnCtrl.Btn_Penalty_2.isVisible())
 
     def set_data(self):
         """

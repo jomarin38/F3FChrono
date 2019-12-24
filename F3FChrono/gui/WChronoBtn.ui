@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>480</width>
+    <width>575</width>
     <height>45</height>
    </rect>
   </property>
@@ -78,6 +78,56 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="Btn_Penalty">
+       <property name="maximumSize">
+        <size>
+         <width>63</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Penalty</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Btn_Penalty_1">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>63</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>100</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Btn_Penalty_2">
+       <property name="maximumSize">
+        <size>
+         <width>63</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>1000</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="Btn_NullFlight">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -104,27 +154,6 @@
        </property>
        <property name="text">
         <string>O Flight</string>
-       </property>
-       <property name="flat">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="Btn_Penalty">
-       <property name="maximumSize">
-        <size>
-         <width>63</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Penalty</string>
        </property>
        <property name="flat">
         <bool>false</bool>
