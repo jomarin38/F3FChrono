@@ -1,5 +1,7 @@
 from enum import Enum
 import time
+import os
+from datetime import datetime
 
 
 class chronoType():
@@ -76,7 +78,7 @@ class ChronoHard():
         now = time.time()
         if (self.status==chronoStatus.InStart):
             self.lastBaseChangeTime = now
-            self.startTime=self.lastBaseChangeTime
+            self.startTime=datetime.now()
             self.last10BasesTime = 0.0
             self.last10BasesTimelost = 0.0
             self.chronoLap.clear()
@@ -100,7 +102,7 @@ class ChronoHard():
                 self.last10BasesTimeLost-=self.timelost[self.getLapCount()-11]
 
             if (self.getLapCount()==10):
-                self.endTime=self.lastBaseChangeTime
+                self.endTime=datetime.now()
 
             self.lastBase =base
             return True
@@ -152,12 +154,25 @@ class ChronoHard():
 
     def getWindDir(self):
         return None
-    
+
+    def to_string(self):
+        result=os.linesep+"Chrono Data : "+os.linesep+"\tStart Time : "+ str(self.startTime)+\
+               os.linesep+"\tEnd Time : "+str(self.endTime)+os.linesep+"\tRun Time : "+\
+               "{:0>6.3f}".format(self.get_time())+os.linesep+"\tLapTime : "
+        for lap in self.getLaps():
+            result+="{:0>6.3f}".format(lap)+","
+        result+=os.linesep+"\tPenalty : "+str(self.penalty)+os.linesep
+        return (result)
+
 if __name__ == '__main__':
     print ('Chrono Test')
-    Chrono = chrono(chronoMode.Practice)
+    Chrono = ChronoHard()
     Chrono.reset ()
     Chrono.startRace ()
+    Chrono.next_status()
+    Chrono.next_status()
+    Chrono.next_status()
+
     print(Chrono.getLapCount ())
     Chrono.declareBase (1)
     time.sleep(0.5)
@@ -172,3 +187,4 @@ if __name__ == '__main__':
     print ('Last Lap : ', Chrono.getLastLapTime ())
     print ('10LastLap : ', Chrono.getLast10BasesTime())
     print ('10LastLapLost : ', Chrono.getLast10BasesLostTime())
+    print(Chrono.to_string())

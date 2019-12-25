@@ -57,6 +57,7 @@ class Round:
         run.round_group = self.groups[0]
         self.groups[0].add_run(run)
 
+
     def to_string(self):
         result = os.linesep + 'Round number ' + str(self.round_number) + os.linesep
         for g in self.groups:

@@ -1,4 +1,4 @@
-
+import os
 
 class Chrono:
 
@@ -21,6 +21,25 @@ class Chrono:
     def add_lap_time(self, lap_time):
         self._lap_times.append(lap_time)
 
+    def reset(self):
+        self.id = None
+        self.run_time = None
+        self.min_wind_speed = None
+        self.max_wind_speed = None
+        self.wind_direction = None
+        self.start_time = None
+        self.end_time = None
+        self._lap_times.clear()
+
     def to_string(self):
-        return str(self.run_time)
+        result = os.linesep + "Chrono Data : " + os.linesep +\
+                 "\tStart Time : " + str(self.start_time) + os.linesep +\
+                 "\tEnd Time : " + str(self.end_time) + os.linesep +\
+                 "\tWindMin : "+str(self.min_wind_speed)+", WindMax : "+str(self.max_wind_speed)+", WindDir : "+str(self.wind_direction)+os.linesep+\
+                 "\tRun Time : " + "{:0>6.3f}".format(self.run_time) + os.linesep + "\tLapTime : "
+        for lap in self._lap_times:
+            if lap!=None:
+                result += "{:0>6.3f}".format(lap) + ","
+        result += os.linesep
+        return (result)
 
