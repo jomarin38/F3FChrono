@@ -2,6 +2,7 @@ import pandas as pd
 from io import StringIO
 import requests
 from datetime import datetime
+import os
 
 from F3FChrono.data.Pilot import Pilot
 from F3FChrono.data.Competitor import Competitor
@@ -142,3 +143,10 @@ class Event:
 
     def get_flights_before_refly(self):
         return self.flights_before_refly
+
+    def to_string(self):
+        result=os.linesep+"Event : "+self.name+os.linesep
+        for round in self.rounds:
+            if (round!=None):
+                result+=round.to_string()
+        return(result)

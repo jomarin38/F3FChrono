@@ -27,8 +27,8 @@ class RoundGroup:
         result = ''
         for competitor in sorted(self.runs):
             valid_run = self.get_valid_run(competitor)
-            if (valid_run is not None):
-                result += self.get_valid_run(competitor).to_string() + os.linesep
+            if valid_run is not None:
+                result += self.get_valid_run(competitor).to_string() + os.linesep+os.linesep
             else:
-                result += competitor.to_string() + '\tFlight not valid' + os.linesep
+                result += competitor.to_string() + os.linesep+'\tFlight not valid' + os.linesep+os.linesep
         return result

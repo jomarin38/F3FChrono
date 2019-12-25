@@ -5,7 +5,7 @@ from F3FChrono.gui.WidgetController import *
 from F3FChrono.data.Event import Event
 from F3FChrono.chrono.Chrono import *
 
-from F3FChrono.data.dao.EventDAO import EventDAO
+from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
 from F3FChrono.data.Chrono import Chrono
 
 
@@ -42,7 +42,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].btn_next_sig.connect(self.start)
         self.controllers['config'].contest_sig.connect(self.contest_changed)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
-        self.controllers['round'].btn_home_sig.connect(self.show_config)
+        self.controllers['round'].btn_home_sig.connect(self.home_action)
         self.controllers['round'].btn_refly_sig.connect(self.refly)
         self.controllers['round'].btn_penalty_1_sig.connect(self.penalty_1)
         self.controllers['round'].btn_penalty_2_sig.connect(self.penalty_2)
@@ -68,8 +68,19 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
-    def next_pilot(self):
+    def home_action(self):
+        #print event data
+        print(self.event.to_string())
+        #add event to database
+        '''
+        dao = RoundDAO()
 
+        for f3f_round in self.event.rounds:
+            dao.insert(f3f_round)
+        '''
+        self.show_config()
+
+    def next_pilot(self):
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot(),
                                                       self.event.get_current_round().round_number)
         self.controllers['round'].wChronoCtrl.reset_ui()
@@ -78,6 +89,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         #TODO : get penalty value if any
         self.event.get_current_round().handle_refly(0)
         self.chronoHard.reset()
+        self.chrono.reset()
         self.next_pilot()
         self.controllers['round'].wChronoCtrl.reset_ui()
 
@@ -89,6 +101,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.event.max_allowed_wind_speed=self.controllers['config'].wind_speed_max
 
         self.chronoHard.reset()
+        self.chrono.reset()
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor(),
                                                       self.event.get_current_round().round_number)
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
@@ -123,6 +136,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                                                                     self.chrono, self.chronoHard.getPenalty(), True)
 
             self.chronoHard.reset()
+            self.chrono.reset()
             self.next_pilot()
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         if (self.chronoHard.get_status() == chronoStatus.WaitLaunch):
@@ -145,6 +159,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor(),
                                                       self.event.get_current_round().round_number)
         self.chronoHard.reset()
+        self.chrono.reset()
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.reset_ui()
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
@@ -156,6 +171,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                                                                 None, None, self.chrono.penalty, True)
         self.controllers['round'].wChronoCtrl.set_status(chronoStatus.Finished)
         self.chronoHard.reset()
+        self.chrono.reset()
         self.next_pilot()
 
     def contest_changed(self):
@@ -174,14 +190,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         chrono.max_wind_speed=chronoHard.getMaxWindSpeed()
         chrono.min_wind_speed=chronoHard.getMinWindSpeed()
         chrono.wind_direction=chronoHard.getWindDir()
-
-        '''print ("lap")
-        time=0
         for lap in chronoHard.getLaps():
             chrono.add_lap_time(lap)
-            time+=lap
-            print ("{:0>6.3f}".format(lap))
-        print("final time : " + "{:0>6.3f}".format(chrono.run_time) + ", calculated time : " + "{:0>6.3f}".format(time))'''
+
+        print(chrono.to_string())
 
 
 def main ():
