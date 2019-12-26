@@ -114,9 +114,12 @@ class Event:
                 return competitor
         return None
 
-    def create_new_round(self):
+    def create_new_round(self, insert_database=False):
         f3f_round = Round.new_round(self)
         self.add_existing_round(f3f_round)
+        if (insert_database):
+            Round.round_dao.insert(f3f_round)
+
         return f3f_round
 
     def add_existing_round(self, f3f_round):
@@ -131,7 +134,7 @@ class Event:
 
     def get_current_round(self):
         if len(self.rounds) < 1:
-            self.create_new_round()
+            self.create_new_round(insert_database=True)
         return self.rounds[self.current_round]
 
     def get_competitor(self, bib_number):

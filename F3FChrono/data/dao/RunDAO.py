@@ -3,8 +3,6 @@ from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
 from F3FChrono.data.Run import Run
 from F3FChrono.data.Competitor import Competitor
 from F3FChrono.data.Pilot import Pilot
-from F3FChrono.data.RoundGroup import RoundGroup
-from F3FChrono.data.Round import Round
 from F3FChrono.data.Chrono import Chrono
 
 
@@ -41,6 +39,7 @@ class RunDAO(Dao):
         return result
 
     def get(self, run_id, round_group):
+        from F3FChrono.data.Round import Round
         sql = 'SELECT r.run_id, c.pilot_id, c.bib_number, c.team, p.name, p.first_name, ' \
               'r.penalty, r.round_number, r.group_number, r.event_id, ' \
               'r.valid, r.reason, ' \

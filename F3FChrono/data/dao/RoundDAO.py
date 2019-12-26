@@ -1,6 +1,5 @@
 from F3FChrono.data.dao.Dao import Dao
 from F3FChrono.data.dao.RunDAO import RunDAO
-from F3FChrono.data.Round import Round
 from F3FChrono.data.Round import RoundGroup
 
 
@@ -9,6 +8,7 @@ class RoundDAO(Dao):
     run_dao = RunDAO()
 
     def get_list(self, event):
+        from F3FChrono.data.Round import Round
         sql = 'SELECT round_number FROM round WHERE event_id=%s'
         query_result = self._execute_query(sql, event.id)
         result = []
@@ -20,6 +20,7 @@ class RoundDAO(Dao):
         return result
 
     def get(self, f3f_round, fetch_runs=False):
+        from F3FChrono.data.Round import Round
         sql = 'SELECT r.valid, rg.group_number, rg.start_date, rg.end_date ' \
               'FROM round r LEFT JOIN roundgroup rg ON r.event_id=rg.event_id AND r.round_number=rg.round_number ' \
               'WHERE r.event_id=%s AND r.round_number=%s'

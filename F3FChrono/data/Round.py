@@ -2,10 +2,12 @@ import os
 from F3FChrono.data.Run import Run
 from F3FChrono.data.RoundGroup import RoundGroup
 from F3FChrono.data.Chrono import Chrono
+from F3FChrono.data.dao.RoundDAO import RoundDAO
 
 class Round:
 
     round_counters = {}
+    round_dao=RoundDAO()
 
     def __init__(self):
         self.event = None
@@ -33,13 +35,14 @@ class Round:
     def add_group(self, round_group):
         self.groups.append(round_group)
 
-    def handle_terminated_flight(self, competitor, chrono, penalty, valid):
+    def handle_terminated_flight(self, competitor, chrono, penalty, valid, insert_database=False):
         run = Run()
         run.competitor = competitor
         run.penalty = penalty
         run.chrono = chrono
         run.valid = valid
-        self._add_run(run)
+        self._add_run(run, insert_database)
+
 
     def handle_refly(self, penalty):
         run = Run()
@@ -50,10 +53,11 @@ class Round:
         self._flight_order.insert(self._current_competitor_index + self.event.get_flights_before_refly() + 1,
                                   self.get_current_competitor().get_bib_number())
 
-    def _add_run(self, run):
+    def _add_run(self, run, insert_database=False):
         #TODO : search in which group the run has to be added
-        run.round_group = self.groups[0]
-        self.groups[0].add_run(run)
+        run.round_group = self.groups[-1]
+        self.groups[-1].add_run(run, insert_database)
+
 
 
     def to_string(self):
@@ -68,17 +72,23 @@ class Round:
     def set_current_competitor(self, competitor):
         self._current_competitor_index = self._flight_order.index(competitor.bib_number)
 
-    def next_pilot(self):
+    def next_pilot(self, insert_database=False):
         if self._current_competitor_index < len(self._flight_order) - 1:
             self._current_competitor_index += 1
         else:
             self.valid=True
-            self.event.create_new_round()
+            if (insert_database):
+                Round.round_dao.update(self)
+            self.event.create_new_round(insert_database)
             self._current_competitor_index = 0
         return self.get_current_competitor()
 
     def cancel_round(self):
         self.valid=False
-        self.event.create_new_round()
+        Round.round_dao.update(self)
+        self.event.create_new_round(insert_database=True)
         self._current_competitor_index = 0
         return self.get_current_competitor()
+
+    def has_run(self):
+        return(self.groups[-1].has_run())

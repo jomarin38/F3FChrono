@@ -92,6 +92,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.reset_ui()
 
     def start(self):
+        self.event = self.dao.get(self.controllers['config'].view.ContestList.currentIndex(),\
+                                  fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
         self.controllers['config'].get_data()
         self.event.max_interruption_time=self.controllers['config'].interruption_time_max
         self.event.max_wind_dir_dev=self.controllers['config'].wind_orientation
@@ -131,7 +133,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         elif (self.chronoHard.getLapCount()>=10):
             self.event.get_current_round().handle_terminated_flight(self.event.get_current_round().get_current_competitor(),
-                                                                    self.chrono, self.chronoHard.getPenalty(), True)
+                                                                    self.chrono, self.chronoHard.getPenalty(), True, insert_database=True)
 
             self.chronoHard.reset()
             self.chrono=Chrono()
@@ -166,16 +168,15 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def null_flight(self):
         #TODO Insert event class null flight function
         print("null flight event")
-        self.event.get_current_round().handle_terminated_flight(self.event.get_competitors(),
-                                                                None, None, self.chrono.penalty, True)
+        self.event.get_current_round().handle_terminated_flight(self.event.get_current_round().get_current_competitor(),
+                                                                None, self.chronoHard.getPenalty(), True, insert_database=True)
         self.controllers['round'].wChronoCtrl.set_status(chronoStatus.Finished)
         self.chronoHard.reset()
         self.chrono.reset()
         self.next_pilot()
 
     def contest_changed(self):
-        self.event=self.dao.get(self.controllers['config'].view.ContestList.currentIndex(),
-                                fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
+        self.event=self.dao.get(self.controllers['config'].view.ContestList.currentIndex())
 
         self.controllers['config'].set_data(self.event.min_allowed_wind_speed,
                                             self.event.max_allowed_wind_speed,
