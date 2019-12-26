@@ -2,8 +2,6 @@ import os
 from F3FChrono.data.Run import Run
 from F3FChrono.data.RoundGroup import RoundGroup
 from F3FChrono.data.Chrono import Chrono
-import copy
-
 
 class Round:
 
@@ -39,7 +37,7 @@ class Round:
         run = Run()
         run.competitor = competitor
         run.penalty = penalty
-        run.chrono = copy.deepcopy(chrono)
+        run.chrono = chrono
         run.valid = valid
         self._add_run(run)
 
