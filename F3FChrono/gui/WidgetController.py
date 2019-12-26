@@ -213,11 +213,13 @@ class WChronoCtrl(QTimer):
         #    ctrl.setText("")
         self.current_lap = 0
 
-    def settime(self, setTime, count_up):
+    def settime(self, setTime, count_up, starttimer=True):
         self.time=setTime
+        self.view.Time_label.setText("{:0>6.3f}".format(self.time / 1000))
         self.time_up=count_up
         self.startTime=time.time()
-        self.timerEvent.start(self.duration)
+        if(starttimer):
+            self.timerEvent.start(self.duration)
 
     def stoptime(self):
         self.timerEvent.stop()
@@ -299,6 +301,7 @@ class WConfigCtrl(QObject):
         self.chrono_changed()
         for temp in contest:
             self.view.ContestList.addItem(temp.name)
+
         self.view.ContestList.setCurrentText(contest[0].name)
 
     def get_data(self):

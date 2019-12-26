@@ -15,6 +15,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def __init__(self,dao,chrono):
         super().__init__()
         self.dao = dao
+        self.daoRound = RoundDAO()
         self.event = None
         self.chrono = chrono
         self.chronoHard=ChronoHard()
@@ -39,6 +40,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             for x in ctrl.get_widget():
                 self.ui.verticalLayout.addWidget(x)
 
+        #connect signal event to method
         self.controllers['config'].btn_next_sig.connect(self.start)
         self.controllers['config'].contest_sig.connect(self.contest_changed)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
@@ -46,7 +48,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].btn_refly_sig.connect(self.refly)
         self.controllers['round'].btn_penalty_1_sig.connect(self.penalty_1)
         self.controllers['round'].btn_penalty_2_sig.connect(self.penalty_2)
-
         self.controllers['round'].btn_null_flight_sig.connect(self.null_flight)
         self.controllers['round'].btn_cancel_flight_sig.connect(self.cancel_round)
 
@@ -56,7 +57,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['wind'].set_data(0, 0)
 
     def show_config(self):
-        self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].hide()
         self.controllers['config'].show()
         self.controllers['wind'].show()
@@ -70,13 +70,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def home_action(self):
         #print event data
+        self.controllers['round'].wChronoCtrl.stoptime()
         print(self.event.to_string())
         #add event to database
-        '''
-        dao = RoundDAO()
-
-        for f3f_round in self.event.rounds:
-            dao.insert(f3f_round)
+        '''for f3f_round in self.event.rounds:
+            self.daoRound.insert(f3f_round)
         '''
         self.show_config()
 
@@ -136,8 +134,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                                                                     self.chrono, self.chronoHard.getPenalty(), True)
 
             self.chronoHard.reset()
-            self.chrono.reset()
+            self.chrono=Chrono()
             self.next_pilot()
+            self.controllers['round'].wChronoCtrl.settime(30000, False, False)
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         if (self.chronoHard.get_status() == chronoStatus.WaitLaunch):
             self.controllers['round'].wChronoCtrl.settime(30000, False)
