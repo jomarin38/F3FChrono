@@ -193,6 +193,7 @@ class WChronoCtrl(QTimer):
 
 class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()
+    contest_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -236,6 +237,7 @@ class WConfigCtrl(QObject):
 
     def contest_changed(self):
         print(self.contest_changed)
+        self.contest_sig.emit()
 
     def btn_piCamA(self):
         print(self.btn_piCamA)
@@ -247,16 +249,19 @@ class WConfigCtrl(QObject):
         self.get_data()
         self.btn_next_sig.emit()
 
-    def set_data(self, contest, min_speed, max_speed, dir_dev, max_interrupt, revol=5):
-        self.view.ChronoType.setCurrentIndex(0)
-        self.chrono_changed()
-        self.view.ContestList.addItem(contest)
-        self.view.ContestList.setCurrentText(contest)
+    def set_data(self, min_speed, max_speed, dir_dev, max_interrupt, revol=5):
         self.view.WindMinValue.setValue(min_speed)
         self.view.WindMaxValue.setValue(max_speed)
         self.view.OrientationValue.setValue(dir_dev)
         self.view.RevolValue.setValue(revol)
-        self.view.MaxInterruptValue.setValue(max_interrupt)
+        self.view.MaxInterruptValue.setValue(max_interrupt/60)
+
+    def set_contest(self, contest):
+        self.view.ChronoType.setCurrentIndex(0)
+        self.chrono_changed()
+        for temp in contest:
+            self.view.ContestList.addItem(temp.name)
+        self.view.ContestList.setCurrentText(contest[0].name)
 
     def get_data(self):
         self.wind_speed_min=self.view.WindMinValue.value()
