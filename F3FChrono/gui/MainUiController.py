@@ -43,6 +43,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].btn_refly_sig.connect(self.refly)
         self.controllers['round'].btn_penalty_sig.connect(self.penalty)
         self.controllers['round'].btn_null_flight_sig.connect(self.null_flight)
+        self.controllers['round'].btn_cancel_flight_sig.connect(self.cancel_round)
 
         self.show_config()
         self.MainWindow.show()
@@ -51,6 +52,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
 
     def show_config(self):
+        self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].hide()
         self.controllers['config'].show()
         self.controllers['wind'].show()
@@ -63,7 +65,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         print(self.MainWindow.size())
 
     def next_pilot(self):
-        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot())
+
+        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot(),
+                                                      self.event.get_current_round().round_number)
         self.controllers['round'].wChronoCtrl.reset_ui()
 
     def refly(self):
@@ -81,7 +85,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.event.max_allowed_wind_speed=self.controllers['config'].wind_speed_max
 
         self.chrono.reset()
-        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor())
+        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor(),
+                                                      self.event.get_current_round().round_number)
         self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
         self.show_chrono()
         self.controllers['round'].wChronoCtrl.reset_ui()
@@ -110,6 +115,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
             self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
         elif (self.chrono.getLapCount()>=10):
+            self.event.get_current_round().handle_terminated_flight(self.event.get_current_round().get_current_competitor(),
+                                                                    self.chrono.chronoRun,
+                                                                    self.chrono.chronoLap,
+                                                                    self.chrono.penalty, True)
+
             self.chrono.reset()
             self.next_pilot()
             self.controllers['round'].wChronoCtrl.set_status(self.chrono.get_status())
@@ -122,11 +132,19 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def penalty(self):
         "TODO Insert event class penalty function"
         print("penalty event")
+        selF.chrono.AddPenalty()
+
+
+    def cancel_round(self):
+        "TODO Insert event class cancel flight function"
+        print("cancel round event")
 
     def null_flight(self):
         "TODO Insert event class null flight function"
         print("null flight event")
 
+        self.event.get_current_round().handle_terminated_flight(self.event.get_competitors(),
+                                                                None, None, self.chrono.penalty, True)
     def contest_changed(self):
         self.event=self.dao.get(self.controllers['config'].view.ContestList.currentIndex(),
                                 fetch_competitors=True, fetch_rounds=True, fetch_runs=True)

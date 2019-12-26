@@ -29,8 +29,9 @@ class Ui_WPilot(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pilotName.sizePolicy().hasHeightForWidth())
         self.pilotName.setSizePolicy(sizePolicy)
+        self.pilotName.setMinimumSize(QtCore.QSize(210, 0))
         font = QtGui.QFont()
-        font.setPointSize(9)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.pilotName.setFont(font)
@@ -51,6 +52,14 @@ class Ui_WPilot(object):
         self.bib.setAlignment(QtCore.Qt.AlignCenter)
         self.bib.setObjectName("bib")
         self.horizontalLayout.addWidget(self.bib)
+        self.round = QtWidgets.QLabel(WPilot)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.round.setFont(font)
+        self.round.setObjectName("round")
+        self.horizontalLayout.addWidget(self.round)
         self.gridLayout.addLayout(self.horizontalLayout, 0, 0, 1, 1)
 
         self.retranslateUi(WPilot)
@@ -60,7 +69,8 @@ class Ui_WPilot(object):
         _translate = QtCore.QCoreApplication.translate
         WPilot.setWindowTitle(_translate("WPilot", "Form"))
         self.pilotName.setText(_translate("WPilot", " _____ _______"))
-        self.bib.setText(_translate("WPilot", " XXX"))
+        self.bib.setText(_translate("WPilot", "bib : XXX"))
+        self.round.setText(_translate("WPilot", "Round : "))
 
 
 if __name__ == "__main__":

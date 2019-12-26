@@ -1,6 +1,7 @@
 import os
 from F3FChrono.data.Run import Run
 from F3FChrono.data.RoundGroup import RoundGroup
+from F3FChrono.data.Chrono import Chrono
 
 
 class Round:
@@ -33,11 +34,14 @@ class Round:
     def add_group(self, round_group):
         self.groups.append(round_group)
 
-    def handle_terminated_flight(self, competitor, chrono, penalty, valid):
+    def handle_terminated_flight(self, competitor, chronoRun, chronoLap, penalty, valid):
         run = Run()
         run.competitor = competitor
         run.penalty = penalty
-        run.chrono = chrono
+        run.chrono = Chrono()
+        run.chrono.run_time=chronoRun
+        for lap in chronoLap:
+            run.chrono.add_lap_time(lap)
         run.valid = valid
         self._add_run(run)
 
@@ -68,6 +72,7 @@ class Round:
         self._current_competitor_index = self._flight_order.index(competitor.bib_number)
 
     def next_pilot(self):
+        #TODO : detect end of round
         if self._current_competitor_index < len(self._flight_order) - 1:
             self._current_competitor_index += 1
             return self.get_current_competitor()

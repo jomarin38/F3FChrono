@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>44</height>
+    <height>45</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,6 +21,12 @@
      </property>
      <item>
       <widget class="QPushButton" name="Btn_Home">
+       <property name="maximumSize">
+        <size>
+         <width>63</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <pointsize>10</pointsize>
@@ -35,10 +41,23 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="Btn_CancelRound">
+       <property name="maximumSize">
+        <size>
+         <width>72</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Cancel R..</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="Btn_reflight">
        <property name="maximumSize">
         <size>
-         <width>16777202</width>
+         <width>63</width>
          <height>16777215</height>
         </size>
        </property>
@@ -72,13 +91,19 @@
          <height>0</height>
         </size>
        </property>
+       <property name="maximumSize">
+        <size>
+         <width>63</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <pointsize>10</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>O</string>
+        <string>O Flight</string>
        </property>
        <property name="flat">
         <bool>false</bool>
@@ -87,6 +112,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="Btn_Penalty">
+       <property name="maximumSize">
+        <size>
+         <width>63</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <pointsize>10</pointsize>
@@ -102,6 +133,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="Btn_Next">
+       <property name="maximumSize">
+        <size>
+         <width>63</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <pointsize>10</pointsize>

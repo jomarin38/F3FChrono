@@ -17,7 +17,7 @@ class WRoundCtrl(QObject):
     btn_null_flight_sig = pyqtSignal()
     btn_refly_sig = pyqtSignal()
     btn_penalty_sig = pyqtSignal()
-
+    btn_cancel_flight_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -39,6 +39,7 @@ class WRoundCtrl(QObject):
         self.view.Btn_NullFlight.clicked.connect(self.btn_null_flight)
         self.view.Btn_reflight.clicked.connect(self.btn_refly)
         self.view.Btn_Penalty.clicked.connect(self.btn_penalty)
+        self.view.Btn_CancelRound.clicked.connect(self.btn_cancel_flight)
 
     def get_widget(self):
         return (self.widgetList)
@@ -58,6 +59,9 @@ class WRoundCtrl(QObject):
 
     def btn_home(self):
         self.btn_home_sig.emit()
+
+    def btn_cancel_flight(self):
+        self.btn_cancel_flight_sig.emit()
 
     def btn_null_flight(self):
         self.btn_null_flight_sig.emit()
@@ -112,9 +116,10 @@ class WPilotCtrl:
     def hide(self):
         self.widget.hide()
 
-    def set_data(self, competitor):
+    def set_data(self, competitor, round):
         self.view.pilotName.setText(competitor.display_name())
-        self.view.bib.setText(str(competitor.get_bib_number()))
+        self.view.bib.setText("BIB : "+str(competitor.get_bib_number()))
+        self.view.round.setText("Round : "+str(round))
 
 class WChronoCtrl(QTimer):
 
@@ -175,7 +180,6 @@ class WChronoCtrl(QTimer):
         #for ctrl in self.lap_list:
         #    ctrl.setText("")
         self.current_lap = 0
-
 
     def settime(self, setTime, count_up):
         self.time=setTime

@@ -29,6 +29,7 @@ class Chrono():
         self.inStart = False
         self.mode=chronoType.none
         self.status=chronoStatus.InWait
+        self.penalty=False
 
         print('Chrono F3F Initialisation ')
 
@@ -54,6 +55,7 @@ class Chrono():
         self.chronoLap.clear()
         self.timelost.clear()
         self.status=chronoStatus.InWait
+        self.penalty=False
 
     def startRace(self):
         self.last10BasesTime = 0.0
@@ -66,7 +68,9 @@ class Chrono():
     def isInStart (self):
         return self.inStart
     
-    
+    def AddPenalty(self):
+        self.penalty += 1
+
     def declareBase (self, base):
         now = time.time ();
         if (self.inStart):
