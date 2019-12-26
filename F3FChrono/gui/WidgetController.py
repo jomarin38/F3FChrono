@@ -1,8 +1,7 @@
 import sys
-import threading
-from time import sleep
+from time import *
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 
 from F3FChrono.gui.WWind_UI import Ui_WWind
 from F3FChrono.gui.WPilot_UI import Ui_WPilot
@@ -18,27 +17,33 @@ class WRoundCtrl(QObject):
     btn_null_flight_sig = pyqtSignal()
     btn_refly_sig = pyqtSignal()
     btn_penalty_sig = pyqtSignal()
-
+    btn_penalty_1_sig = pyqtSignal()
+    btn_penalty_2_sig = pyqtSignal()
+    btn_cancel_flight_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
         super(QObject, self).__init__(parent)
         self.wPilotCtrl = WPilotCtrl("PilotCtrl", parent)
         self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent)
-        self.view = Ui_WChronoBtn()
+        self.wBtnCtrl = Ui_WChronoBtn()
         self.name = name
         self.parent = parent
         self.widget=QtWidgets.QWidget(parent)
-        self.view.setupUi(self.widget)
+        self.wBtnCtrl.setupUi(self.widget)
         self.widgetList.append(self.wPilotCtrl.get_widget())
         self.widgetList.append(self.wChronoCtrl.get_widget())
         self.widgetList.append(self.widget)
+
         # Event connect
-        self.view.Btn_Home.clicked.connect(self.btn_home)
-        self.view.Btn_Next.clicked.connect(self.btn_next_pilot)
-        self.view.Btn_NullFlight.clicked.connect(self.btn_null_flight)
-        self.view.Btn_reflight.clicked.connect(self.btn_refly)
-        self.view.Btn_Penalty.clicked.connect(self.btn_penalty)
+        self.wBtnCtrl.Btn_Home.clicked.connect(self.btn_home)
+        self.wBtnCtrl.Btn_Next.clicked.connect(self.btn_next_pilot)
+        self.wBtnCtrl.Btn_NullFlight.clicked.connect(self.btn_null_flight)
+        self.wBtnCtrl.Btn_reflight.clicked.connect(self.btn_refly)
+        self.wBtnCtrl.Btn_Penalty.clicked.connect(self.btn_penalty)
+        self.wBtnCtrl.Btn_CancelRound.clicked.connect(self.btn_cancel_flight)
+        self.wBtnCtrl.Btn_Penalty_1.clicked.connect(self.btn_penalty_1)
+        self.wBtnCtrl.Btn_Penalty_2.clicked.connect(self.btn_penalty_2)
 
     def get_widget(self):
         return (self.widgetList)
@@ -47,6 +52,7 @@ class WRoundCtrl(QObject):
         self.widget.show()
         self.wPilotCtrl.show()
         self.wChronoCtrl.show()
+        self.btn_Penalty_Visible(False)
 
     def hide(self):
         self.widget.hide()
@@ -59,6 +65,9 @@ class WRoundCtrl(QObject):
     def btn_home(self):
         self.btn_home_sig.emit()
 
+    def btn_cancel_flight(self):
+        self.btn_cancel_flight_sig.emit()
+
     def btn_null_flight(self):
         self.btn_null_flight_sig.emit()
 
@@ -67,6 +76,31 @@ class WRoundCtrl(QObject):
 
     def btn_penalty(self):
         self.btn_penalty_sig.emit()
+        #toggle penalty button
+        self.btn_Penalty_Visible(self.btn_Penalty_IsVisible()!=True)
+
+    def btn_penalty_1(self):
+        self.btn_penalty_1_sig.emit()
+        self.btn_Penalty_Visible(False)
+
+    def btn_penalty_2(self):
+        self.btn_penalty_2_sig.emit()
+        self.btn_Penalty_Visible(False)
+
+    def btn_Penalty_Visible(self, visible):
+        if (visible):
+            self.wBtnCtrl.Btn_Penalty_1.setVisible(True)
+            self.wBtnCtrl.Btn_Penalty_2.setVisible(True)
+            self.wBtnCtrl.Btn_Next.setVisible(False)
+            self.wBtnCtrl.Btn_NullFlight.setVisible(False)
+        else:
+            self.wBtnCtrl.Btn_Penalty_1.setVisible(False)
+            self.wBtnCtrl.Btn_Penalty_2.setVisible(False)
+            self.wBtnCtrl.Btn_Next.setVisible(True)
+            self.wBtnCtrl.Btn_NullFlight.setVisible(True)
+
+    def btn_Penalty_IsVisible(self):
+        return(self.wBtnCtrl.Btn_Penalty_1.isVisible() or self.wBtnCtrl.Btn_Penalty_2.isVisible())
 
     def set_data(self):
         """
@@ -112,27 +146,23 @@ class WPilotCtrl:
     def hide(self):
         self.widget.hide()
 
-    def set_data(self, competitor):
+    def set_data(self, competitor, round):
         self.view.pilotName.setText(competitor.display_name())
-        self.view.bib.setText(str(competitor.get_bib_number()))
+        self.view.bib.setText("BIB : "+str(competitor.get_bib_number()))
+        self.view.round.setText("Round : "+str(round))
 
-class WChronoCtrl(threading.Thread):
+class WChronoCtrl(QTimer):
 
     def __init__(self, name, parent):
         super(WChronoCtrl, self).__init__()
-        self.terminated=False
-        self.duration=10
-        self.event=threading.Event()
 
         self.view = Ui_WChrono()
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
-        self.lap=[]
-        self.time=0
-        self.time_up=True
-        self.time_count=False
 
+        #initialize labels for lap time
+        self.lap=[]
         self.current_lap=0
         self.view.setupUi(self.widget)
         self.lap.append(self.view.Lap1)
@@ -146,10 +176,12 @@ class WChronoCtrl(threading.Thread):
         self.lap.append(self.view.Lap9)
         self.lap.append(self.view.Lap10)
 
-        self.daemon=True
-        self.event.clear()
-        self.start()
-
+        self.timerEvent = QTimer()
+        self.timerEvent.timeout.connect(self.run)
+        self.duration=10
+        self.startTime = time.time()
+        self.time=0
+        self.time_up = True
 
     def get_widget(self):
         return (self.widget)
@@ -161,15 +193,17 @@ class WChronoCtrl(threading.Thread):
         self.widget.hide()
 
     def set_status(self, status):
-        self.view.comboBox.setCurrentIndex(status)
+        self.view.Status.setCurrentIndex(status)
 
     def set_laptime(self, laptime):
         #self.view.Time_label.setText("{:0>6.3f}".format(time)
         print ("current lap : "+str(self.current_lap))
         self.lap[self.current_lap].setText("{:d} : {:0>6.3f}".format(self.current_lap+1, laptime))
 
-        #self.lap_list[self.current_lap].setText("{0} : {1:.3f}".format(self.current_lap, laptime))
         self.current_lap += 1
+
+    def set_finaltime(self, time):
+        self.view.Time_label.setText("{:0>6.3f}".format(time))
 
     def reset_ui(self):
         #self.view.Time_label.setText("{:0>6.3f}".format(0.0))
@@ -179,26 +213,27 @@ class WChronoCtrl(threading.Thread):
         #    ctrl.setText("")
         self.current_lap = 0
 
-    def settime(self, time, count_up):
-        self.time=time
+    def settime(self, setTime, count_up, starttimer=True):
+        self.time=setTime
+        self.view.Time_label.setText("{:0>6.3f}".format(self.time / 1000))
         self.time_up=count_up
-        self.time_count=True
+        self.startTime=time.time()
+        if(starttimer):
+            self.timerEvent.start(self.duration)
 
     def stoptime(self):
-        self.time_count=False
+        self.timerEvent.stop()
 
     def run(self):
-        while not self.terminated:
-            if (self.time_count==True):
-                if (self.time_up==True):
-                    self.time=self.time+self.duration
-                else:
-                    self.time=self.time-self.duration
-                self.view.Time_label.setText("{:0>6.3f}".format(self.time/1000))
-            sleep(self.duration/1000)
+        if (self.time_up==True):
+            self.view.Time_label.setText("{:0>6.3f}".format(time.time() - self.startTime))
+        else:
+            self.view.Time_label.setText("{:0>6.3f}".format(self.time / 1000 - (time.time()-self.startTime)))
+
 
 class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()
+    contest_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -242,6 +277,7 @@ class WConfigCtrl(QObject):
 
     def contest_changed(self):
         print(self.contest_changed)
+        self.contest_sig.emit()
 
     def btn_piCamA(self):
         print(self.btn_piCamA)
@@ -253,16 +289,20 @@ class WConfigCtrl(QObject):
         self.get_data()
         self.btn_next_sig.emit()
 
-    def set_data(self, contest, min_speed, max_speed, dir_dev, max_interrupt, revol=5):
-        self.view.ChronoType.setCurrentIndex(0)
-        self.chrono_changed()
-        self.view.ContestList.addItem(contest)
-        self.view.ContestList.setCurrentText(contest)
+    def set_data(self, min_speed, max_speed, dir_dev, max_interrupt, revol=5):
         self.view.WindMinValue.setValue(min_speed)
         self.view.WindMaxValue.setValue(max_speed)
         self.view.OrientationValue.setValue(dir_dev)
         self.view.RevolValue.setValue(revol)
-        self.view.MaxInterruptValue.setValue(max_interrupt)
+        self.view.MaxInterruptValue.setValue(max_interrupt/60)
+
+    def set_contest(self, contest):
+        self.view.ChronoType.setCurrentIndex(0)
+        self.chrono_changed()
+        for temp in contest:
+            self.view.ContestList.addItem(temp.name)
+
+        self.view.ContestList.setCurrentText(contest[0].name)
 
     def get_data(self):
         self.wind_speed_min=self.view.WindMinValue.value()

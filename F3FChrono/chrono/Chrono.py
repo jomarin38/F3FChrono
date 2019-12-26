@@ -1,5 +1,7 @@
 from enum import Enum
 import time
+import os
+from datetime import datetime
 
 
 class chronoType():
@@ -15,11 +17,12 @@ class chronoStatus():
     InProgress=4
     Finished=5
 
-class Chrono():
+class ChronoHard():
     def __init__(self):
         self.chronoLaunch = 30
         self.chronoFisrtBase = 30
-        self.chronoRun = 0
+        self.startTime=None
+        self.endTime=None
         self.chronoLap=[]
         self.timelost=[]
         self.lastBaseChangeTime =0
@@ -29,6 +32,7 @@ class Chrono():
         self.inStart = False
         self.mode=chronoType.none
         self.status=chronoStatus.InWait
+        self.penalty=0.0
 
         print('Chrono F3F Initialisation ')
 
@@ -54,6 +58,7 @@ class Chrono():
         self.chronoLap.clear()
         self.timelost.clear()
         self.status=chronoStatus.InWait
+        self.penalty=0.0
 
     def startRace(self):
         self.last10BasesTime = 0.0
@@ -66,46 +71,53 @@ class Chrono():
     def isInStart (self):
         return self.inStart
     
-    
+    def AddPenalty(self, value):
+        self.penalty += value
+
     def declareBase (self, base):
-        now = time.time ();
-        if (self.inStart):
-            self.lastBaseChangeTime = now;
-            self.last10BasesTime = 0.0;
-            self.last10BasesTimelost = 0.0;
-            self.chronoLap.clear();
-            self.timelost.clear();
-            self.inStart = False;
+        now = time.time()
+        if (self.status==chronoStatus.InStart):
+            self.lastBaseChangeTime = now
+            self.startTime=datetime.now()
+            self.last10BasesTime = 0.0
+            self.last10BasesTimelost = 0.0
+            self.chronoLap.clear()
+            self.timelost.clear()
+            self.inStart = False
 
         if (base!=self.lastBase):
-            elapsedTime = ((now- self.lastBaseChangeTime));
-            self.lastBaseChangeTime = now;
-            self.lastDetectionTime = now;
+            elapsedTime = ((now- self.lastBaseChangeTime))
+            self.lastBaseChangeTime = now
+            self.lastDetectionTime = now
+            #print("chrono status : "+str(self.status)+", Nb Lap : "+str(self.getLapCount()))
             if (self.getLapCount()>1):
                 self.last10BasesTimeLost += self.timelost[self.getLapCount() - 1]
             
-            self.chronoLap.append(elapsedTime);
-            self.timelost.append(0.0);
-            self.last10BasesTime+=elapsedTime;
-            print (self.getLapCount())
+            if (self.status!=chronoStatus.InStart):
+                self.chronoLap.append(elapsedTime)
+                self.timelost.append(0.0)
+            self.last10BasesTime+=elapsedTime
             if (self.getLapCount()>10):
                 self.last10BasesTime-= self.chronoLap[self.getLapCount()-11]
                 self.last10BasesTimeLost-=self.timelost[self.getLapCount()-11]
-            
-            self.lastBase =base;
-            return True;
+
+            if (self.getLapCount()==10):
+                self.endTime=datetime.now()
+
+            self.lastBase =base
+            return True
         elif (self.getLapCount()>1):#Base declaration is the same
-                elapsedTime = ((now - self.lastDetectionTime));
+                elapsedTime = ((now - self.lastDetectionTime))
                 self.lastDetectionTime = now;
                 self.timelost[self.getLapCount() - 1] = self.timelost[self.getLapCount() - 1] + elapsedTime
 
-        return False;
+        return False
 
     def getLast10BasesTime(self):
-        return self.last10BasesTime;
+        return self.last10BasesTime
     
     def getLast10BasesLostTime(self):
-        return self.last10BasesTimeLost;
+        return self.last10BasesTimeLost
 
     def getLastLapTime(self):
         if self.getLapCount()>0:
@@ -119,15 +131,48 @@ class Chrono():
             time=time+self.chronoLap[i]
         return time
 
+    def getLaps(self):
+        return (self.chronoLap)
+
+    def getStartTime(self):
+        return (self.startTime)
+
+    def getEndTime(self):
+        return (self.endTime)
 
     def getLapCount(self):
         return len(self.chronoLap)
-    
+
+    def getPenalty(self):
+        return (self.penalty)
+
+    def getMaxWindSpeed(self):
+        return None
+
+    def getMinWindSpeed(self):
+        return None
+
+    def getWindDir(self):
+        return None
+
+    def to_string(self):
+        result=os.linesep+"Chrono Data : "+os.linesep+"\tStart Time : "+ str(self.startTime)+\
+               os.linesep+"\tEnd Time : "+str(self.endTime)+os.linesep+"\tRun Time : "+\
+               "{:0>6.3f}".format(self.get_time())+os.linesep+"\tLapTime : "
+        for lap in self.getLaps():
+            result+="{:0>6.3f}".format(lap)+","
+        result+=os.linesep+"\tPenalty : "+str(self.penalty)+os.linesep
+        return (result)
+
 if __name__ == '__main__':
     print ('Chrono Test')
-    Chrono = chrono(chronoMode.Practice)
+    Chrono = ChronoHard()
     Chrono.reset ()
     Chrono.startRace ()
+    Chrono.next_status()
+    Chrono.next_status()
+    Chrono.next_status()
+
     print(Chrono.getLapCount ())
     Chrono.declareBase (1)
     time.sleep(0.5)
@@ -142,3 +187,4 @@ if __name__ == '__main__':
     print ('Last Lap : ', Chrono.getLastLapTime ())
     print ('10LastLap : ', Chrono.getLast10BasesTime())
     print ('10LastLapLost : ', Chrono.getLast10BasesLostTime())
+    print(Chrono.to_string())

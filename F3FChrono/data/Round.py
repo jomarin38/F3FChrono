@@ -1,7 +1,7 @@
 import os
 from F3FChrono.data.Run import Run
 from F3FChrono.data.RoundGroup import RoundGroup
-
+from F3FChrono.data.Chrono import Chrono
 
 class Round:
 
@@ -55,6 +55,7 @@ class Round:
         run.round_group = self.groups[0]
         self.groups[0].add_run(run)
 
+
     def to_string(self):
         result = os.linesep + 'Round number ' + str(self.round_number) + os.linesep
         for g in self.groups:
@@ -70,8 +71,14 @@ class Round:
     def next_pilot(self):
         if self._current_competitor_index < len(self._flight_order) - 1:
             self._current_competitor_index += 1
-            return self.get_current_competitor()
         else:
-            return None
+            self.valid=True
+            self.event.create_new_round()
+            self._current_competitor_index = 0
+        return self.get_current_competitor()
 
-
+    def cancel_round(self):
+        self.valid=False
+        self.event.create_new_round()
+        self._current_competitor_index = 0
+        return self.get_current_competitor()
