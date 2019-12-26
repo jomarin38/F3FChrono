@@ -39,9 +39,10 @@ class Round:
         run.competitor = competitor
         run.penalty = penalty
         run.chrono = Chrono()
-        run.chrono.run_time=chronoRun
-        for lap in chronoLap:
-            run.chrono.add_lap_time(lap)
+        run.chrono.run_time = chronoRun
+        if (chronoLap!=None):
+            for lap in chronoLap:
+                run.chrono.add_lap_time(lap)
         run.valid = valid
         self._add_run(run)
 
@@ -72,11 +73,9 @@ class Round:
         self._current_competitor_index = self._flight_order.index(competitor.bib_number)
 
     def next_pilot(self):
-        #TODO : detect end of round
         if self._current_competitor_index < len(self._flight_order) - 1:
             self._current_competitor_index += 1
-            return self.get_current_competitor()
         else:
-            return None
-
-
+            self.event.create_new_round()
+            self._current_competitor_index = 0
+        return self.get_current_competitor()

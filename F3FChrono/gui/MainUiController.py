@@ -132,7 +132,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def penalty(self):
         "TODO Insert event class penalty function"
         print("penalty event")
-        selF.chrono.AddPenalty()
+        self.chrono.AddPenalty()
 
 
     def cancel_round(self):
@@ -142,9 +142,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def null_flight(self):
         "TODO Insert event class null flight function"
         print("null flight event")
-
         self.event.get_current_round().handle_terminated_flight(self.event.get_competitors(),
                                                                 None, None, self.chrono.penalty, True)
+        self.controllers['round'].wChronoCtrl.set_status(chronoStatus.Finished)
+        self.chrono.reset()
+        self.next_pilot()
     def contest_changed(self):
         self.event=self.dao.get(self.controllers['config'].view.ContestList.currentIndex(),
                                 fetch_competitors=True, fetch_rounds=True, fetch_runs=True)

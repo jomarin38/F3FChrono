@@ -19,7 +19,7 @@ class Chrono():
     def __init__(self):
         self.chronoLaunch = 30
         self.chronoFisrtBase = 30
-        self.chronoRun = 0
+        self.chronoRun = 0.0
         self.chronoLap=[]
         self.timelost=[]
         self.lastBaseChangeTime =0
@@ -54,6 +54,7 @@ class Chrono():
         self.last10BasesTimeLost = 0.0
         self.chronoLap.clear()
         self.timelost.clear()
+        self.chronoRun=0.0
         self.status=chronoStatus.InWait
         self.penalty=False
 
@@ -62,6 +63,7 @@ class Chrono():
         self.last10BasesTimelost = 0.0
         self.inStart = True
         self.lastBase = -10
+        self.chronoRun=0.0
         self.chronoLap.clear()
         self.timelost.clear()
         
@@ -72,44 +74,44 @@ class Chrono():
         self.penalty += 1
 
     def declareBase (self, base):
-        now = time.time ();
+        now = time.time ()
         if (self.inStart):
-            self.lastBaseChangeTime = now;
-            self.last10BasesTime = 0.0;
-            self.last10BasesTimelost = 0.0;
-            self.chronoLap.clear();
-            self.timelost.clear();
-            self.inStart = False;
+            self.lastBaseChangeTime = now
+            self.last10BasesTime = 0.0
+            self.last10BasesTimelost = 0.0
+            self.chronoLap.clear()
+            self.timelost.clear()
+            self.inStart = False
 
         if (base!=self.lastBase):
-            elapsedTime = ((now- self.lastBaseChangeTime));
-            self.lastBaseChangeTime = now;
-            self.lastDetectionTime = now;
+            elapsedTime = ((now- self.lastBaseChangeTime))
+            self.lastBaseChangeTime = now
+            self.lastDetectionTime = now
             if (self.getLapCount()>1):
                 self.last10BasesTimeLost += self.timelost[self.getLapCount() - 1]
             
-            self.chronoLap.append(elapsedTime);
-            self.timelost.append(0.0);
-            self.last10BasesTime+=elapsedTime;
-            print (self.getLapCount())
+            self.chronoLap.append(elapsedTime)
+            self.timelost.append(0.0)
+            self.last10BasesTime+=elapsedTime
+            self.chronoRun+=elapsedTime
             if (self.getLapCount()>10):
                 self.last10BasesTime-= self.chronoLap[self.getLapCount()-11]
                 self.last10BasesTimeLost-=self.timelost[self.getLapCount()-11]
             
-            self.lastBase =base;
-            return True;
+            self.lastBase =base
+            return True
         elif (self.getLapCount()>1):#Base declaration is the same
-                elapsedTime = ((now - self.lastDetectionTime));
+                elapsedTime = ((now - self.lastDetectionTime))
                 self.lastDetectionTime = now;
                 self.timelost[self.getLapCount() - 1] = self.timelost[self.getLapCount() - 1] + elapsedTime
 
-        return False;
+        return False
 
     def getLast10BasesTime(self):
-        return self.last10BasesTime;
+        return self.last10BasesTime
     
     def getLast10BasesLostTime(self):
-        return self.last10BasesTimeLost;
+        return self.last10BasesTimeLost
 
     def getLastLapTime(self):
         if self.getLapCount()>0:
