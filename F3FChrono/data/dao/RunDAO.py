@@ -117,11 +117,11 @@ class RunDAO(Dao):
                              run.round_group.round.event.id)
 
     def update(self, run):
-        sql = 'UPDATE run SET competitor_id=%s, event_id=%, chrono_id=%, penalty=%, valid=%, round_number=%, ' \
-              'group_number=% ' \
-              'WHERE run_id=%'
+        sql = 'UPDATE run SET competitor_id=%s, event_id=%s, chrono_id=%s, penalty=%s, valid=%s, round_number=%s, ' \
+              'group_number=%s ' \
+              'WHERE run_id=%s'
         self._execute_update(sql, run.competitor.pilot.id, run.round_group.round.event.id, run.chrono.id, run.penalty,
-                             run.valid, run.round_group.round.round_number, run.round_group.group_number)
+                             run.valid, run.round_group.round.round_number, run.round_group.group_number, run.id)
 
     def delete(self, run):
         sql = 'DELETE FROM run WHERE run_id=%s'
