@@ -83,6 +83,14 @@ class Round:
             self._current_competitor_index = 0
         return self.get_current_competitor()
 
+    def next_pilot_database(self):
+        if self._current_competitor_index < len(self._flight_order) - 1:
+            self._current_competitor_index += 1
+        else:
+            self.event.create_new_round(insert_database=True)
+            self._current_competitor_index = 0
+        return self.get_current_competitor()
+
     def cancel_round(self):
         self.valid=False
         Round.round_dao.update(self)

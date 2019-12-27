@@ -125,9 +125,19 @@ class WChronoCtrl(QTimer, QObject):
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
 
+        _translate = QtCore.QCoreApplication.translate
+        self.statusText = []
+        self.statusText.append(_translate("chronoStatus_WaitNewRun", "Wait New Run"))
+        self.statusText.append(_translate("chronoStatus_WaitToLaunch", "Wait To Launch"))
+        self.statusText.append(_translate("chronoStatus_Launched", "Wait Launched"))
+        self.statusText.append(_translate("chronoStatus_InStart", "In Start"))
+        self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
+        self.statusText.append(_translate("chronoStatus_Finished", "Finished"))
+
         #initialize labels for lap time
-        self.lap=[]
-        self.current_lap=0
+        self.lap = []
+        #initialize labels for status
+        self.current_lap = 0
         self.view.setupUi(self.widget)
         self.lap.append(self.view.Lap1)
         self.lap.append(self.view.Lap2)
@@ -162,7 +172,7 @@ class WChronoCtrl(QTimer, QObject):
         self.widget.hide()
 
     def set_status(self, status):
-        self.view.Status.setCurrentIndex(status)
+        self.view.Status.setText(self.statusText[status])
 
     def set_laptime(self, laptime):
         #self.view.Time_label.setText("{:0>6.3f}".format(time)

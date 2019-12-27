@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>153</height>
+    <height>186</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,65 +45,26 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="Status">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
+        <widget class="QLabel" name="Status">
          <property name="font">
           <font>
-           <pointsize>12</pointsize>
+           <pointsize>14</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
-         <property name="autoFillBackground">
+         <property name="text">
+          <string>Wait New Run</string>
+         </property>
+         <property name="scaledContents">
           <bool>false</bool>
          </property>
-         <property name="inputMethodHints">
-          <set>Qt::ImhNone</set>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
-         <property name="editable">
+         <property name="wordWrap">
           <bool>false</bool>
          </property>
-         <property name="frame">
-          <bool>true</bool>
-         </property>
-         <item>
-          <property name="text">
-           <string>Wait New Run</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Wait to launch</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Launched</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>In start</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>In progress</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Finished</string>
-          </property>
-         </item>
         </widget>
        </item>
       </layout>
