@@ -47,6 +47,9 @@ class ChronoHard():
             self.status=self.status+1
         return self.status
 
+    def set_status(self, value):
+        self.status=value
+        return self.status
     def start(self):
         self.lastBaseChangeTime = time.time ()
         self.lastDetectionTime = self.lastBaseChangeTime
@@ -71,9 +74,11 @@ class ChronoHard():
     def isInStart (self):
         return self.inStart
     
-    def AddPenalty(self, value):
+    def addPenalty(self, value):
         self.penalty += value
 
+    def clearPenalty(self):
+        self.penalty=0
     def declareBase (self, base):
         now = time.time()
         if (self.status==chronoStatus.InStart):

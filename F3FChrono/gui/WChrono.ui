@@ -271,7 +271,7 @@
       </widget>
      </item>
      <item row="0" column="2">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="penaltyLabel">
        <property name="font">
         <font>
          <pointsize>9</pointsize>
@@ -288,7 +288,7 @@
       </widget>
      </item>
      <item row="1" column="2">
-      <widget class="QPushButton" name="penalty_100">
+      <widget class="QPushButton" name="btn_penalty_100">
        <property name="font">
         <font>
          <pointsize>9</pointsize>
@@ -302,7 +302,7 @@
       </widget>
      </item>
      <item row="2" column="2">
-      <widget class="QPushButton" name="penalty_1000">
+      <widget class="QPushButton" name="btn_penalty_1000">
        <property name="font">
         <font>
          <pointsize>9</pointsize>
@@ -312,23 +312,6 @@
        </property>
        <property name="text">
         <string>1000</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="QLabel" name="label">
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -347,7 +330,7 @@
       </widget>
      </item>
      <item row="5" column="2">
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="nullFlightLabel">
        <property name="font">
         <font>
          <pointsize>9</pointsize>
@@ -362,6 +345,47 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
+     </item>
+     <item row="3" column="2">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="penalty_value">
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_clear_penalty">
+         <property name="maximumSize">
+          <size>
+           <width>19</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>9</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>x</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

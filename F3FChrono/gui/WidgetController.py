@@ -115,6 +115,7 @@ class WChronoCtrl(QTimer, QObject):
     btn_null_flight_sig = pyqtSignal()
     btn_penalty_100_sig = pyqtSignal()
     btn_penalty_1000_sig = pyqtSignal()
+    btn_clear_penalty_sig = pyqtSignal()
 
     def __init__(self, name, parent):
         super(WChronoCtrl, self).__init__()
@@ -140,8 +141,9 @@ class WChronoCtrl(QTimer, QObject):
         self.lap.append(self.view.Lap10)
 
         self.view.nullFlight.clicked.connect(self.null_flight)
-        self.view.penalty_100.clicked.connect(self.penalty_100)
-        self.view.penalty_1000.clicked.connect(self.penalty_1000)
+        self.view.btn_penalty_100.clicked.connect(self.penalty_100)
+        self.view.btn_penalty_1000.clicked.connect(self.penalty_1000)
+        self.view.btn_clear_penalty.clicked.connect(self.clear_penalty)
 
         self.timerEvent = QTimer()
         self.timerEvent.timeout.connect(self.run)
@@ -203,8 +205,20 @@ class WChronoCtrl(QTimer, QObject):
     def penalty_1000(self):
         self.btn_penalty_1000_sig.emit()
 
+    def clear_penalty(self):
+        self.btn_clear_penalty_sig.emit()
+
+    def set_penalty_value(self,value):
+        self.view.penalty_value.setText(str(value))
+
     def null_flight(self):
         self.btn_null_flight_sig.emit()
+
+    def set_null_flight(self, value=False):
+        if(value):
+            self.view.nullFlightLabel.setText("Null Flight")
+        else:
+            self.view.nullFlightLabel.setText("")
 
 
 class WConfigCtrl(QObject):

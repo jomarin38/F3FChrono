@@ -48,6 +48,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].btn_refly_sig.connect(self.refly)
         self.controllers['round'].wChronoCtrl.btn_penalty_100_sig.connect(self.penalty_100)
         self.controllers['round'].wChronoCtrl.btn_penalty_1000_sig.connect(self.penalty_1000)
+        self.controllers['round'].wChronoCtrl.btn_clear_penalty_sig.connect(self.clear_penalty)
         self.controllers['round'].wChronoCtrl.btn_null_flight_sig.connect(self.null_flight)
         self.controllers['round'].btn_cancel_flight_sig.connect(self.cancel_round)
 
@@ -131,10 +132,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 self.chronoHard.next_status()
 
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
-        elif (self.chronoHard.getLapCount()>=10):
+        else:
             self.event.get_current_round().handle_terminated_flight(self.event.get_current_round().get_current_competitor(),
                                                                     self.chrono, self.chronoHard.getPenalty(), True, insert_database=True)
-
             self.chronoHard.reset()
             self.chrono=Chrono()
             self.next_pilot()
@@ -148,11 +148,17 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def penalty_100(self):
         #print("penalty event 100")
-        self.chronoHard.AddPenalty(100)
+        self.chronoHard.addPenalty(100)
+        self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
     def penalty_1000(self):
         #print("penalty event 1000")
-        self.chronoHard.AddPenalty(1000)
+        self.chronoHard.addPenalty(1000)
+        self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
+
+    def clear_penalty(self):
+        self.chronoHard.clearPenalty()
+        self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
     def cancel_round(self):
         #print("cancel round event")
@@ -168,12 +174,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def null_flight(self):
         #TODO Insert event class null flight function
         print("null flight event")
-        self.event.get_current_round().handle_terminated_flight(self.event.get_current_round().get_current_competitor(),
-                                                                None, self.chronoHard.getPenalty(), True, insert_database=True)
-        self.controllers['round'].wChronoCtrl.set_status(chronoStatus.Finished)
-        self.chronoHard.reset()
-        self.chrono.reset()
-        self.next_pilot()
+        self.chronoHard.set_status(chronoStatus.Finished)
+        self.controllers['round'].wChronoCtrl.stoptime()
+        self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
+        self.controllers['round'].wChronoCtrl.set_null_flight(True)
 
     def contest_changed(self):
         self.event=self.dao.get(self.controllers['config'].view.ContestList.currentIndex())
