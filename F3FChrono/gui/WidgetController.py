@@ -14,11 +14,7 @@ from F3FChrono.chrono.Chrono import *
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()
-    btn_null_flight_sig = pyqtSignal()
     btn_refly_sig = pyqtSignal()
-    btn_penalty_sig = pyqtSignal()
-    btn_penalty_1_sig = pyqtSignal()
-    btn_penalty_2_sig = pyqtSignal()
     btn_cancel_flight_sig = pyqtSignal()
     widgetList = []
 
@@ -38,12 +34,8 @@ class WRoundCtrl(QObject):
         # Event connect
         self.wBtnCtrl.Btn_Home.clicked.connect(self.btn_home)
         self.wBtnCtrl.Btn_Next.clicked.connect(self.btn_next_pilot)
-        self.wBtnCtrl.Btn_NullFlight.clicked.connect(self.btn_null_flight)
         self.wBtnCtrl.Btn_reflight.clicked.connect(self.btn_refly)
-        self.wBtnCtrl.Btn_Penalty.clicked.connect(self.btn_penalty)
         self.wBtnCtrl.Btn_CancelRound.clicked.connect(self.btn_cancel_flight)
-        self.wBtnCtrl.Btn_Penalty_1.clicked.connect(self.btn_penalty_1)
-        self.wBtnCtrl.Btn_Penalty_2.clicked.connect(self.btn_penalty_2)
 
     def get_widget(self):
         return (self.widgetList)
@@ -52,7 +44,6 @@ class WRoundCtrl(QObject):
         self.widget.show()
         self.wPilotCtrl.show()
         self.wChronoCtrl.show()
-        self.btn_Penalty_Visible(False)
 
     def hide(self):
         self.widget.hide()
@@ -68,39 +59,8 @@ class WRoundCtrl(QObject):
     def btn_cancel_flight(self):
         self.btn_cancel_flight_sig.emit()
 
-    def btn_null_flight(self):
-        self.btn_null_flight_sig.emit()
-
     def btn_refly(self):
         self.btn_refly_sig.emit()
-
-    def btn_penalty(self):
-        self.btn_penalty_sig.emit()
-        #toggle penalty button
-        self.btn_Penalty_Visible(self.btn_Penalty_IsVisible()!=True)
-
-    def btn_penalty_1(self):
-        self.btn_penalty_1_sig.emit()
-        self.btn_Penalty_Visible(False)
-
-    def btn_penalty_2(self):
-        self.btn_penalty_2_sig.emit()
-        self.btn_Penalty_Visible(False)
-
-    def btn_Penalty_Visible(self, visible):
-        if (visible):
-            self.wBtnCtrl.Btn_Penalty_1.setVisible(True)
-            self.wBtnCtrl.Btn_Penalty_2.setVisible(True)
-            self.wBtnCtrl.Btn_Next.setVisible(False)
-            self.wBtnCtrl.Btn_NullFlight.setVisible(False)
-        else:
-            self.wBtnCtrl.Btn_Penalty_1.setVisible(False)
-            self.wBtnCtrl.Btn_Penalty_2.setVisible(False)
-            self.wBtnCtrl.Btn_Next.setVisible(True)
-            self.wBtnCtrl.Btn_NullFlight.setVisible(True)
-
-    def btn_Penalty_IsVisible(self):
-        return(self.wBtnCtrl.Btn_Penalty_1.isVisible() or self.wBtnCtrl.Btn_Penalty_2.isVisible())
 
     def set_data(self):
         """
@@ -151,7 +111,10 @@ class WPilotCtrl:
         self.view.bib.setText("BIB : "+str(competitor.get_bib_number()))
         self.view.round.setText("Round : "+str(round))
 
-class WChronoCtrl(QTimer):
+class WChronoCtrl(QTimer, QObject):
+    btn_null_flight_sig = pyqtSignal()
+    btn_penalty_100_sig = pyqtSignal()
+    btn_penalty_1000_sig = pyqtSignal()
 
     def __init__(self, name, parent):
         super(WChronoCtrl, self).__init__()
@@ -176,6 +139,10 @@ class WChronoCtrl(QTimer):
         self.lap.append(self.view.Lap9)
         self.lap.append(self.view.Lap10)
 
+        self.view.nullFlight.clicked.connect(self.null_flight)
+        self.view.penalty_100.clicked.connect(self.penalty_100)
+        self.view.penalty_1000.clicked.connect(self.penalty_1000)
+
         self.timerEvent = QTimer()
         self.timerEvent.timeout.connect(self.run)
         self.duration=10
@@ -198,12 +165,12 @@ class WChronoCtrl(QTimer):
     def set_laptime(self, laptime):
         #self.view.Time_label.setText("{:0>6.3f}".format(time)
         print ("current lap : "+str(self.current_lap))
-        self.lap[self.current_lap].setText("{:d} : {:0>6.3f}".format(self.current_lap+1, laptime))
+        self.lap[self.current_lap].setText("{:d} : {:0>6.2f}".format(self.current_lap+1, laptime))
 
         self.current_lap += 1
 
     def set_finaltime(self, time):
-        self.view.Time_label.setText("{:0>6.3f}".format(time))
+        self.view.Time_label.setText("{:0>6.2f}".format(time))
 
     def reset_ui(self):
         #self.view.Time_label.setText("{:0>6.3f}".format(0.0))
@@ -215,7 +182,7 @@ class WChronoCtrl(QTimer):
 
     def settime(self, setTime, count_up, starttimer=True):
         self.time=setTime
-        self.view.Time_label.setText("{:0>6.3f}".format(self.time / 1000))
+        self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000))
         self.time_up=count_up
         self.startTime=time.time()
         if(starttimer):
@@ -226,9 +193,18 @@ class WChronoCtrl(QTimer):
 
     def run(self):
         if (self.time_up==True):
-            self.view.Time_label.setText("{:0>6.3f}".format(time.time() - self.startTime))
+            self.view.Time_label.setText("{:0>6.2f}".format(time.time() - self.startTime))
         else:
-            self.view.Time_label.setText("{:0>6.3f}".format(self.time / 1000 - (time.time()-self.startTime)))
+            self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000 - (time.time()-self.startTime)))
+
+    def penalty_100(self):
+        self.btn_penalty_100_sig.emit()
+
+    def penalty_1000(self):
+        self.btn_penalty_1000_sig.emit()
+
+    def null_flight(self):
+        self.btn_null_flight_sig.emit()
 
 
 class WConfigCtrl(QObject):

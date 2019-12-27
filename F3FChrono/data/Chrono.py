@@ -32,14 +32,16 @@ class Chrono:
         self._lap_times.clear()
 
     def to_string(self):
-        result = os.linesep + "Chrono Data : " + os.linesep +\
-                 "\tStart Time : " + str(self.start_time) + os.linesep +\
-                 "\tEnd Time : " + str(self.end_time) + os.linesep +\
-                 "\tWindMin : "+str(self.min_wind_speed)+", WindMax : "+str(self.max_wind_speed)+", WindDir : "+str(self.wind_direction)+os.linesep+\
-                 "\tRun Time : " + "{:0>6.3f}".format(self.run_time) + os.linesep + "\tLapTime : "
-        for lap in self._lap_times:
-            if lap!=None:
-                result += "{:0>6.3f}".format(lap) + ","
-        result += os.linesep
+        result=''
+        if (self.run_time!=None):
+            result = os.linesep + "Chrono Data : " + os.linesep +\
+                     "\tStart Time : " + str(self.start_time) + os.linesep +\
+                     "\tEnd Time : " + str(self.end_time) + os.linesep +\
+                     "\tWindMin : "+str(self.min_wind_speed)+", WindMax : "+str(self.max_wind_speed)+", WindDir : "+str(self.wind_direction)+os.linesep+\
+                     "\tRun Time : " + "{:0>6.3f}".format(self.run_time) + os.linesep + "\tLapTime : "
+            for lap in self._lap_times:
+                if lap!=None:
+                    result += "{:0>6.3f}".format(lap) + ","
+            result += os.linesep
         return (result)
 

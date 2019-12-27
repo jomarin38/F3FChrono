@@ -46,9 +46,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.home_action)
         self.controllers['round'].btn_refly_sig.connect(self.refly)
-        self.controllers['round'].btn_penalty_1_sig.connect(self.penalty_1)
-        self.controllers['round'].btn_penalty_2_sig.connect(self.penalty_2)
-        self.controllers['round'].btn_null_flight_sig.connect(self.null_flight)
+        self.controllers['round'].wChronoCtrl.btn_penalty_100_sig.connect(self.penalty_100)
+        self.controllers['round'].wChronoCtrl.btn_penalty_1000_sig.connect(self.penalty_1000)
+        self.controllers['round'].wChronoCtrl.btn_null_flight_sig.connect(self.null_flight)
         self.controllers['round'].btn_cancel_flight_sig.connect(self.cancel_round)
 
         self.show_config()
@@ -146,11 +146,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['round'].wChronoCtrl.settime(30000, False)
 
 
-    def penalty_1(self):
+    def penalty_100(self):
         #print("penalty event 100")
         self.chronoHard.AddPenalty(100)
 
-    def penalty_2(self):
+    def penalty_1000(self):
         #print("penalty event 1000")
         self.chronoHard.AddPenalty(1000)
 
