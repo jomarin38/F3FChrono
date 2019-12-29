@@ -25,6 +25,9 @@ class udpbeep(QObject):
     def send(self):
         self.sock.sendto(bytes('event', 'utf-8'), (self.udpip, self.port))
 
+    def sendData(self, data):
+        self.sock.sendto(bytes(data, 'utf-8'), (self.udpip, self.port))
+
     def terminate(self):
         print('terminated event')
         self.sock.sendto(bytes('terminated', 'utf-8'), (self.udpip, self.port)) 
