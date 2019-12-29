@@ -14,6 +14,7 @@ from F3FChrono.data.Chrono import Chrono
 from F3FChrono.data.dao.EventDAO import EventDAO
 from F3FChrono.chrono.UDPReceive import udpreceive
 from F3FChrono.chrono.UDPBeep import udpbeep
+from F3FChrono.gui.Simulate_base import SimulateBase
 
 def get_raspi_revision():
     rev_file = '/sys/firmware/devicetree/base/model'
@@ -50,6 +51,7 @@ def main():
     chronohard = ChronoHard()
     app = QtWidgets.QApplication(sys.argv)
     ui=MainUiCtrl(dao, chronodata, chronohard)
+    ui_simulate=SimulateBase()
     udpReceive=udpreceive(4445, ui.refresh_chronoui)
     udpBeep=udpbeep("255.255.255.255", 4445)
 

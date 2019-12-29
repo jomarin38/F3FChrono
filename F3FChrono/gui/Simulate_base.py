@@ -1,7 +1,7 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
-from simulate_base_UI import Ui_MainWindow
+from F3FChrono.gui.simulate_base_ui import Ui_MainWindow
 from F3FChrono.chrono.UDPBeep import udpbeep
 
 class SimulateBase (QtWidgets.QMainWindow):
