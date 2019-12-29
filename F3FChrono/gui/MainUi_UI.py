@@ -50,7 +50,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "F3F Chrono"))
         self.actionInStart.setText(_translate("MainWindow", "InStart"))
         self.actionResetChrono.setText(_translate("MainWindow", "ResetChrono"))
         self.actionSave.setText(_translate("MainWindow", "Save"))

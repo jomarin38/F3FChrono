@@ -49,11 +49,14 @@ def main():
     dao = EventDAO()
     chronodata = Chrono()
     chronohard = ChronoHard()
+
     app = QtWidgets.QApplication(sys.argv)
     ui=MainUiCtrl(dao, chronodata, chronohard)
-    ui_simulate=SimulateBase()
-    udpReceive=udpreceive(4445, ui.refresh_chronoui)
-    udpBeep=udpbeep("255.255.255.255", 4445)
+    udpReceive=udpreceive(config.conf['UDPPORT'], ui.refresh_chronoui)
+    udpBeep=udpbeep(config.conf['IPUDPBEEP'], config.conf['UDPPORT'])
+
+    if (config.conf['simulate']):
+        ui_simulate=SimulateBase()
 
     try:
         sys.exit(app.exec_())

@@ -1,5 +1,6 @@
 {
  "debug": false,
+ "simulate": true,
  "sound": false,
  "vocal": false,
  "greenLEDPort": 17, 
@@ -8,6 +9,6 @@
  "statusLEDPort":22,
  "signalLength":300.0, 
  "IPUDPBEEP" : "255.255.255.255",
- "IPUDPPORT" : 4445
+ "UDPPORT" : 4445
 
 }

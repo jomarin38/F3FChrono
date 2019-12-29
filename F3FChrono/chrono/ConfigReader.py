@@ -41,9 +41,8 @@ import json
 
 default_config = \
 {
-    "cmdFIFO": "/home/pi/piCAMTracker/www/FIFO", 
     "debug": False,
-    "display":False,
+    "simulate":False,
     "sound":False,
     "vocal":False,
     "greenLEDPort": 17, 
@@ -54,7 +53,7 @@ default_config = \
     "signalLength":300.0, 
     "trackLifeTime": 17, 
     "IPUDPBEEP" : "255.255.255.255",
-    "IPUDPPORT" : 4445
+    "UDPPORT" : 4445
 }
 
 class Configuration:
