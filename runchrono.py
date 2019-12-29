@@ -34,31 +34,10 @@ def get_raspi_revision():
 
     return info
 
-'''def terminateApp (thread1, thread2, thread3, thread4):
-    if not (thread1==None):
-        thread1.terminated = True
-    if not (thread3==None):
-        thread3.terminate()
-    if not (thread4==None):
-        thread4.terminated = True
-    # wait and join threads
-    sleep(0.5)
-    if not (thread1==None):
-        thread1.join()
-    if not (thread2==None):
-        thread2.join ()
-    if not (thread3==None):
-        thread3.join()
-    if not (thread4==None):
-        thread4.join()
-    
-    print ("terminate")   
-'''
-
 def main():
     global config
     
-    logging.basicConfig (filename="runchrono.log", level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')    
+    #logging.basicConfig (filename="runchrono.log", level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     pi=get_raspi_revision()
     if(pi['pi']!=''):
         print("warm-up 2 seconds...")
@@ -81,7 +60,6 @@ def main():
         pass
     finally:
         udpBeep.terminate()
-        #sleep(0.5)
         #udpReceive.event.join()
         pass
 

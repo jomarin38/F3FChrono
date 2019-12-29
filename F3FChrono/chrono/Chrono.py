@@ -90,7 +90,7 @@ class ChronoHard():
             self.timelost.clear()
             self.inStart = False
 
-        if (self.status==chronoStatus.InStart or self.status==chronoStatus.InProgress and base!=self.lastBase):
+        if (self.status==chronoStatus.InStart or self.status==chronoStatus.InProgress and base!=self.lastBase or base=="btnnext"):
             elapsedTime = ((now- self.lastBaseChangeTime))
             self.lastBaseChangeTime = now
             self.lastDetectionTime = now
