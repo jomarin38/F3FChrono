@@ -10,7 +10,6 @@ from F3FChrono.gui.WChronoBtn_ui import Ui_WChronoBtn
 from F3FChrono.gui.WConfig_ui import Ui_WConfig
 from F3FChrono.chrono.Chrono import *
 
-
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()

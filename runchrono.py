@@ -51,7 +51,7 @@ def main():
     chronohard = ChronoHard()
 
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(dao, chronodata, chronohard)
+    ui=MainUiCtrl(dao, chronodata, chronohard, config.conf['sound'])
     udpReceive=udpreceive(config.conf['UDPPORT'], ui.refresh_chronoui)
     udpBeep=udpbeep(config.conf['IPUDPBEEP'], config.conf['UDPPORT'])
 
@@ -75,6 +75,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     global config
     config = Configuration ('config.json')
-    #os.system("[ ! -d /run/picamtracker ] && sudo mkdir -p /run/picamtracker && sudo chown pi:www-data /run/picamtracker && sudo chmod 775 /run/picamtracker")
-    
+
     main()

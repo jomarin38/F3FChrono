@@ -5,6 +5,7 @@ from F3FChrono.gui.WidgetController import *
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
 from F3FChrono.data.Chrono import Chrono
+from F3FChrono.chrono.Sound import chronoSound
 
 
 
@@ -13,7 +14,7 @@ class MainUiCtrl (QtWidgets.QMainWindow, QObject):
     refresh_chronoui = pyqtSignal(str, str, str)
     refresh_windui = pyqtSignal(int, int)
 
-    def __init__(self, dao, chronodata, chronohard):
+    def __init__(self, dao, chronodata, chronohard, sound):
         super(QObject, self).__init__()
         self.dao = dao
         self.daoRound = RoundDAO()
@@ -22,6 +23,8 @@ class MainUiCtrl (QtWidgets.QMainWindow, QObject):
         self.chronoHard = chronohard
         self.initUI()
         self.base_test = -10
+
+        self.vocal = chronoSound(sound)
 
         self.refresh_chronoui.connect(self.process_ui)
         self.refresh_windui.connect(self.wind_ui)
@@ -201,7 +204,6 @@ class MainUiCtrl (QtWidgets.QMainWindow, QObject):
 
     def process_ui(self, caller, data, address):
         print("process ui : \n"+"\tdata : "+data+"\n\taddress : "+address)
-
         #config page Wait detection on picam
         if (self.controllers['config'].is_piCamA_onConfig()):
             self.controllers['config'].piCamA_config=False
@@ -217,6 +219,7 @@ class MainUiCtrl (QtWidgets.QMainWindow, QObject):
                     self.chronoHard.declareBase(address)
                     self.controllers['round'].wChronoCtrl.settime(0, True)
 
+
                 if (status == chronoStatus.InProgress and self.chronoHard.getLapCount() <= 10):
                     if self.chronoHard.declareBase(address):
                         #detection is not the same base : processing
@@ -227,11 +230,17 @@ class MainUiCtrl (QtWidgets.QMainWindow, QObject):
                             self.chronoHard.next_status()
                             self.controllers['round'].wChronoCtrl.set_finaltime(self.chronoHard.get_time())
                             self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
+
                 else:
                     if caller=="btnnext" or \
                             (caller=="udpreceive" and  (status == chronoStatus.InStart or status==chronoStatus.Launched)):
                         self.chronoHard.next_status()
                 self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
+                if self.chronoHard.getLapCount()==10:
+                    self.vocal.check(self.chronoHard.get_status(), self.chronodata.run_time)
+                else:
+                    self.vocal.check(self.chronoHard.get_status(), self.chronoHard.getLapCount())
+
             else:
                 if (caller=='btnnext'):
                     self.event.get_current_round().handle_terminated_flight(
