@@ -5,6 +5,7 @@ import threading
 import socket
 import time
 import logging
+import re
 
 from PyQt5.QtCore import pyqtSignal, QObject
 
@@ -41,8 +42,11 @@ class udpreceive(threading.Thread, QObject):
                 dt=time.time()
                 print ('received {} bytes from {}, time : {}'.format(len (data), address, dt))
                 print (data)
-                if (data.decode ('utf-8')=='terminated'):
+                m=re.split(r'\s', data.decode('utf-8'))
+                if (m[0]=='terminated'):
                     self.terminated=True
+                elif (m[0]=='simulate'):
+                    self.eventUI.emit("udpreceive", m[2], m[1])
                 else:
                     self.eventUI.emit("udpreceive", data.decode("utf-8") , address[0])
             except socket.error as msg:

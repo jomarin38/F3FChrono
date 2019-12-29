@@ -20,14 +20,14 @@ class SimulateBase (QtWidgets.QMainWindow):
 
     def send_base_A(self):
         print("base A")
-        self.udpbeep.sendData("debug, "+self.ui.ip_A.text()+", "+self.ui.data_A.text())
+        self.udpbeep.sendData("simulate, "+self.ui.ip_A.text()+", "+self.ui.data_A.text())
 
 
 
 
     def send_base_B(self):
         print("base B")
-        self.udpbeep.sendData("debug, "+self.ui.ip_B.text()+", "+self.ui.data_B.text())
+        self.udpbeep.sendData("simulate "+self.ui.ip_B.text()+" "+self.ui.data_B.text())
 
 def main ():
 

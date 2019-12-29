@@ -223,14 +223,15 @@ class MainUiCtrl (QtWidgets.QMainWindow, QObject):
                     self.chronoHard.next_status()
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         else:
-            self.event.get_current_round().handle_terminated_flight(
-                self.event.get_current_round().get_current_competitor(),
-                self.chronodata, self.chronoHard.getPenalty(), True, insert_database=True)
-            self.chronoHard.reset()
-            self.chronodata = Chrono()
-            self.next_pilot(insert_database=True)
-            self.controllers['round'].wChronoCtrl.settime(30000, False, False)
-            self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
+            if (caller=='btnnext'):
+                self.event.get_current_round().handle_terminated_flight(
+                    self.event.get_current_round().get_current_competitor(),
+                    self.chronodata, self.chronoHard.getPenalty(), True, insert_database=True)
+                self.chronoHard.reset()
+                self.chronodata = Chrono()
+                self.next_pilot(insert_database=True)
+                self.controllers['round'].wChronoCtrl.settime(30000, False, False)
+                self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         if (self.chronoHard.get_status() == chronoStatus.WaitLaunch):
             self.controllers['round'].wChronoCtrl.settime(30000, False)
         if (self.chronoHard.get_status() == chronoStatus.Launched):
