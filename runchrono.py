@@ -12,6 +12,8 @@ from F3FChrono.chrono.Chrono import ChronoHard
 from F3FChrono.gui.MainUiController import MainUiCtrl
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.data.dao.EventDAO import EventDAO
+from F3FChrono.chrono.UDPReceive import udpreceive
+from F3FChrono.chrono.UDPBeep import udpbeep
 
 def get_raspi_revision():
     rev_file = '/sys/firmware/devicetree/base/model'
@@ -57,8 +59,8 @@ def main():
     global config
     
     logging.basicConfig (filename="runchrono.log", level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')    
-    pi=get_raspi_revision())
-    if(pi[0]!=''):
+    pi=get_raspi_revision()
+    if(pi['pi']!=''):
         print("warm-up 2 seconds...")
         sleep(2.0)
 
@@ -69,16 +71,18 @@ def main():
     chronohard = ChronoHard()
     app = QtWidgets.QApplication(sys.argv)
     ui=MainUiCtrl(dao, chronodata, chronohard)
-
+    udpReceive=udpreceive(4445, ui.refresh_chronoui)
+    udpBeep=udpbeep("255.255.255.255", 4445)
 
     try:
-        # writer.setupDecoder()
-        print("lancement IHM")
         sys.exit(app.exec_())
 
     except KeyboardInterrupt:
         pass
     finally:
+        udpBeep.terminate()
+        #sleep(0.5)
+        #udpReceive.event.join()
         pass
 
 if __name__ == '__main__':

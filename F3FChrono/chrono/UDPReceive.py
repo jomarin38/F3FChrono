@@ -6,19 +6,20 @@ import socket
 import time
 import logging
 
+from PyQt5.QtCore import pyqtSignal, QObject
 
 
 UDP_PORT = 4445
 INITMSG = "Init"
 EVENTMSG = "Event"
 
-class udpreceive(threading.Thread):
-    def __init__(self, udpport, chronoID, ledID, eventUI):
-        super(udpreceive, self).__init__()
+class udpreceive(threading.Thread, QObject):
+    def __init__(self, udpport, eventUI):
+        super().__init__()
+        super(QObject, self).__init__()
         self.port = udpport
-        self.chronoID = chronoID
-        self.ledID = ledID
         self.eventUI = eventUI
+
         self.terminated = False
         self.msg = ""
         self.event = threading.Event()
@@ -42,13 +43,8 @@ class udpreceive(threading.Thread):
                 print (data)
                 if (data.decode ('utf-8')=='terminated'):
                     self.terminated=True
-                elif not (self.chronoID==None):
-                    #if (self.chronoID.isInStart ()):
-                    self.chronoID.declareBase(address)
-
-                if not (self.ledID==None):
-                    self.ledID.event.set()
-
+                else:
+                    self.eventUI.emit("udpreceive", data.decode("utf-8") , address[0])
             except socket.error as msg:
                 print ('udp receive error {}'.format(msg))
                 logging.warning('udp receive error {}'.format(msg))

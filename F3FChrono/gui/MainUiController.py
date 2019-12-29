@@ -10,11 +10,11 @@ from F3FChrono.data.Chrono import Chrono
 
 class MainUiCtrl (QtWidgets.QMainWindow, QObject):
 
-    refresh_chronoui = pyqtSignal()
-    refresh_windui = pyqtSignal()
+    refresh_chronoui = pyqtSignal(str, str, str)
+    refresh_windui = pyqtSignal(int, int)
 
     def __init__(self, dao, chronodata, chronohard):
-        super().__init__()
+        super(QObject, self).__init__()
         self.dao = dao
         self.daoRound = RoundDAO()
         self.event = None
@@ -114,7 +114,8 @@ class MainUiCtrl (QtWidgets.QMainWindow, QObject):
         self.controllers['round'].wChronoCtrl.reset_ui()
 
     def next_action(self):
-        if (self.chronoHard.get_status()<chronoStatus.Finished):
+        self.refresh_chronoui.emit("btnnext","event","btnnext")
+        '''if (self.chronoHard.get_status()<chronoStatus.Finished):
             if (self.chronoHard.get_status()==chronoStatus.InStart):
                 self.chronoHard.declareBase(self.base_test)
                 self.base_test = ~self.base_test
@@ -147,7 +148,7 @@ class MainUiCtrl (QtWidgets.QMainWindow, QObject):
             self.controllers['round'].wChronoCtrl.settime(30000, False)
         if (self.chronoHard.get_status() == chronoStatus.Launched):
             self.controllers['round'].wChronoCtrl.settime(30000, False)
-
+'''
 
     def penalty_100(self):
         #print("penalty event 100")
@@ -198,9 +199,42 @@ class MainUiCtrl (QtWidgets.QMainWindow, QObject):
 
         print(chrono.to_string())
 
-    def process_ui(self):
-        print("proces sui")
+    def process_ui(self, caller, data, address):
+        print("process ui : \n"+"\tdata : "+data+"\n\taddress : "+address)
+        status=self.chronoHard.get_status()
+        if (status< chronoStatus.Finished):
+            if (status == chronoStatus.InStart):
+                self.chronoHard.declareBase(address)
+                self.controllers['round'].wChronoCtrl.settime(0, True)
 
+            if (status == chronoStatus.InProgress and self.chronoHard.getLapCount() <= 10):
+                if self.chronoHard.declareBase(address):
+                    #detection is not the same base : processing
+                    self.controllers['round'].wChronoCtrl.set_laptime(self.chronoHard.getLastLapTime())
+                    self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
+                    if (self.chronoHard.getLapCount() == 10):
+                        self.controllers['round'].wChronoCtrl.stoptime()
+                        self.chronoHard.next_status()
+                        self.controllers['round'].wChronoCtrl.set_finaltime(self.chronoHard.get_time())
+                        self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
+            else:
+                if caller=="btnnext" or \
+                        (caller=="udpreceive" and  (status == chronoStatus.InStart or status==chronoStatus.Launched)):
+                    self.chronoHard.next_status()
+            self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
+        else:
+            self.event.get_current_round().handle_terminated_flight(
+                self.event.get_current_round().get_current_competitor(),
+                self.chronodata, self.chronoHard.getPenalty(), True, insert_database=True)
+            self.chronoHard.reset()
+            self.chronodata = Chrono()
+            self.next_pilot(insert_database=True)
+            self.controllers['round'].wChronoCtrl.settime(30000, False, False)
+            self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
+        if (self.chronoHard.get_status() == chronoStatus.WaitLaunch):
+            self.controllers['round'].wChronoCtrl.settime(30000, False)
+        if (self.chronoHard.get_status() == chronoStatus.Launched):
+            self.controllers['round'].wChronoCtrl.settime(30000, False)
 
     def wind_ui(self, wind, angle):
         print ("Wind UI")

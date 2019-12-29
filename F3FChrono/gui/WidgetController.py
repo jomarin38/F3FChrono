@@ -19,7 +19,7 @@ class WRoundCtrl(QObject):
     widgetList = []
 
     def __init__(self, name, parent):
-        super(QObject, self).__init__(parent)
+        super(QObject, self).__init__()
         self.wPilotCtrl = WPilotCtrl("PilotCtrl", parent)
         self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent)
         self.wBtnCtrl = Ui_WChronoBtn()
@@ -129,7 +129,7 @@ class WChronoCtrl(QTimer, QObject):
         self.statusText = []
         self.statusText.append(_translate("chronoStatus_WaitNewRun", "Wait New Run"))
         self.statusText.append(_translate("chronoStatus_WaitToLaunch", "Wait To Launch"))
-        self.statusText.append(_translate("chronoStatus_Launched", "Wait Launched"))
+        self.statusText.append(_translate("chronoStatus_Launched", "Launched"))
         self.statusText.append(_translate("chronoStatus_InStart", "In Start"))
         self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
         self.statusText.append(_translate("chronoStatus_Finished", "Finished"))
@@ -177,9 +177,9 @@ class WChronoCtrl(QTimer, QObject):
     def set_laptime(self, laptime):
         #self.view.Time_label.setText("{:0>6.3f}".format(time)
         print ("current lap : "+str(self.current_lap))
-        self.lap[self.current_lap].setText("{:d} : {:0>6.2f}".format(self.current_lap+1, laptime))
-
-        self.current_lap += 1
+        if self.current_lap<len(self.lap):
+            self.lap[self.current_lap].setText("{:d} : {:0>6.2f}".format(self.current_lap+1, laptime))
+            self.current_lap += 1
 
     def set_finaltime(self, time):
         self.view.Time_label.setText("{:0>6.2f}".format(time))
