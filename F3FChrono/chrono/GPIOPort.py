@@ -84,7 +84,7 @@ if __name__ == '__main__':
     def pressed(value):
         print("pressed %d" % value)
 
-    addCallback(2,pressed)
+    #addCallback(2,pressed)
     statusLED(23,on=True)
 
     p1=17
@@ -102,5 +102,5 @@ if __name__ == '__main__':
     port1.join()
     port2.join()
 
-    statusLED(23,on=False)
+    statusLED(23, on=False)
     GPIO.cleanup()

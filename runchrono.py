@@ -55,6 +55,7 @@ def main():
     udpReceive=udpreceive(config.conf['UDPPORT'], ui.refresh_chronoui)
     udpBeep=udpbeep(config.conf['IPUDPBEEP'], config.conf['UDPPORT'])
 
+    #launched simulate mode
     if (config.conf['simulate']):
         ui_simulate=SimulateBase()
 

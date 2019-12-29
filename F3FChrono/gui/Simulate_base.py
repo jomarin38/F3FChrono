@@ -20,7 +20,7 @@ class SimulateBase (QtWidgets.QMainWindow):
 
     def send_base_A(self):
         print("base A")
-        self.udpbeep.sendData("simulate, "+self.ui.ip_A.text()+", "+self.ui.data_A.text())
+        self.udpbeep.sendData("simulate "+self.ui.ip_A.text()+" "+self.ui.data_A.text())
 
 
 

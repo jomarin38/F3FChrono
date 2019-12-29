@@ -246,6 +246,8 @@ class WConfigCtrl(QObject):
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
+        self.piCamA_config=False
+        self.piCamB_config = False
 
         # Event connect
         self.view.StartBtn.clicked.connect(self.btn_next)
@@ -278,14 +280,27 @@ class WConfigCtrl(QObject):
 
 
     def contest_changed(self):
-        print(self.contest_changed)
         self.contest_sig.emit()
 
     def btn_piCamA(self):
-        print(self.btn_piCamA)
+        self.piCamA_config=True
+        self.set_piCamA("Wait Detection")
+
+    def set_piCamA(self, value):
+        self.view.PICamA_Value.setText(value)
+
+    def is_piCamA_onConfig(self):
+        return (self.piCamA_config)
 
     def btn_piCamB(self):
-        print(self.btn_piCamB)
+        self.piCamB_config=True
+        self.set_piCamB("Wait Detection")
+
+    def set_piCamB(self, value):
+        self.view.PICamB_Value.setText(value)
+
+    def is_piCamB_onConfig(self):
+        return (self.piCamB_config)
 
     def btn_next(self):
         self.get_data()

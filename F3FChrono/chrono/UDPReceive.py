@@ -43,11 +43,14 @@ class udpreceive(threading.Thread, QObject):
                 print ('received {} bytes from {}, time : {}'.format(len (data), address, dt))
                 print (data)
                 m=re.split(r'\s', data.decode('utf-8'))
+                print (m)
                 if (m[0]=='terminated'):
                     self.terminated=True
                 elif (m[0]=='simulate'):
+                    print ("UDP Receive simulate mode")
                     self.eventUI.emit("udpreceive", m[2], m[1])
                 else:
+                    print ("UDP Receive normal mode")
                     self.eventUI.emit("udpreceive", data.decode("utf-8") , address[0])
             except socket.error as msg:
                 print ('udp receive error {}'.format(msg))
