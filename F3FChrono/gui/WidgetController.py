@@ -191,6 +191,8 @@ class WChronoCtrl(QTimer, QObject):
         #for ctrl in self.lap_list:
         #    ctrl.setText("")
         self.current_lap = 0
+        self.set_penalty_value(0)
+        self.set_null_flight(False)
 
     def settime(self, setTime, count_up, starttimer=True):
         self.time=setTime
