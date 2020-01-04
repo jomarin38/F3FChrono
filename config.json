@@ -1,17 +1,14 @@
 {
- "cmdFIFO": "/home/pi/piCAMTracker/www/FIFO", 
  "debug": false,
- "display": true,
- "sound": false,
+ "simulate": true,
+ "sound": true,
  "vocal": false,
  "greenLEDPort": 17, 
  "ledActiveLow": false, 
- "quitAppByGPIO": false, 
  "redLEDPort": 27,
  "statusLEDPort":22,
  "signalLength":300.0, 
- "trackLifeTime": 17, 
  "IPUDPBEEP" : "255.255.255.255",
- "IPUDPPORT" : 4445
+ "UDPPORT" : 4445
 
 }

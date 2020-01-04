@@ -10,7 +10,6 @@ from F3FChrono.gui.WChronoBtn_ui import Ui_WChronoBtn
 from F3FChrono.gui.WConfig_ui import Ui_WConfig
 from F3FChrono.chrono.Chrono import *
 
-
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()
@@ -19,7 +18,7 @@ class WRoundCtrl(QObject):
     widgetList = []
 
     def __init__(self, name, parent):
-        super(QObject, self).__init__(parent)
+        super(QObject, self).__init__()
         self.wPilotCtrl = WPilotCtrl("PilotCtrl", parent)
         self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent)
         self.wBtnCtrl = Ui_WChronoBtn()
@@ -129,7 +128,7 @@ class WChronoCtrl(QTimer, QObject):
         self.statusText = []
         self.statusText.append(_translate("chronoStatus_WaitNewRun", "Wait New Run"))
         self.statusText.append(_translate("chronoStatus_WaitToLaunch", "Wait To Launch"))
-        self.statusText.append(_translate("chronoStatus_Launched", "Wait Launched"))
+        self.statusText.append(_translate("chronoStatus_Launched", "Launched"))
         self.statusText.append(_translate("chronoStatus_InStart", "In Start"))
         self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
         self.statusText.append(_translate("chronoStatus_Finished", "Finished"))
@@ -177,9 +176,9 @@ class WChronoCtrl(QTimer, QObject):
     def set_laptime(self, laptime):
         #self.view.Time_label.setText("{:0>6.3f}".format(time)
         print ("current lap : "+str(self.current_lap))
-        self.lap[self.current_lap].setText("{:d} : {:0>6.2f}".format(self.current_lap+1, laptime))
-
-        self.current_lap += 1
+        if self.current_lap<len(self.lap):
+            self.lap[self.current_lap].setText("{:d} : {:0>6.2f}".format(self.current_lap+1, laptime))
+            self.current_lap += 1
 
     def set_finaltime(self, time):
         self.view.Time_label.setText("{:0>6.2f}".format(time))
@@ -246,6 +245,8 @@ class WConfigCtrl(QObject):
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
+        self.piCamA_config=False
+        self.piCamB_config = False
 
         # Event connect
         self.view.StartBtn.clicked.connect(self.btn_next)
@@ -278,14 +279,27 @@ class WConfigCtrl(QObject):
 
 
     def contest_changed(self):
-        print(self.contest_changed)
         self.contest_sig.emit()
 
     def btn_piCamA(self):
-        print(self.btn_piCamA)
+        self.piCamA_config=True
+        self.set_piCamA("Wait Detection")
+
+    def set_piCamA(self, value):
+        self.view.PICamA_Value.setText(value)
+
+    def is_piCamA_onConfig(self):
+        return (self.piCamA_config)
 
     def btn_piCamB(self):
-        print(self.btn_piCamB)
+        self.piCamB_config=True
+        self.set_piCamB("Wait Detection")
+
+    def set_piCamB(self, value):
+        self.view.PICamB_Value.setText(value)
+
+    def is_piCamB_onConfig(self):
+        return (self.piCamB_config)
 
     def btn_next(self):
         self.get_data()
