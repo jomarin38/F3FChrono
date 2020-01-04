@@ -122,6 +122,7 @@ class MainUiCtrl (QtWidgets.QMainWindow, QObject):
             if (self.chronoHard.get_status()==chronoStatus.InStart):
                 self.chronoHard.declareBase(self.base_test)
                 self.base_test = ~self.base_test
+
                 self.controllers['round'].wChronoCtrl.settime(0, True)
 
             if (self.chronoHard.get_status()==chronoStatus.InProgress and self.chronoHard.getLapCount()<=10):
@@ -144,6 +145,7 @@ class MainUiCtrl (QtWidgets.QMainWindow, QObject):
                                                                     self.chronodata, self.chronoHard.getPenalty(), True, insert_database=True)
             self.chronoHard.reset()
             self.chronodata=Chrono()
+
             self.next_pilot(insert_database=True)
             self.controllers['round'].wChronoCtrl.settime(30000, False, False)
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
