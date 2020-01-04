@@ -35,9 +35,12 @@ class RoundGroup:
     def to_string(self):
         result = ''
         for competitor in sorted(self.runs):
-            valid_run = self.get_valid_run(competitor)
-            if valid_run is not None:
-                result += self.get_valid_run(competitor).to_string() + os.linesep+os.linesep
-            else:
-                result += competitor.to_string() + os.linesep+'\tFlight not valid' + os.linesep+os.linesep
+            result += competitor.to_string() + '\t' + self.run_value_as_string(competitor) + os.linesep + os.linesep
         return result
+
+    def run_value_as_string(self, competitor):
+        valid_run = self.get_valid_run(competitor)
+        if valid_run is not None:
+            return valid_run.value_as_string()
+        else:
+            return 'Flight not valid'

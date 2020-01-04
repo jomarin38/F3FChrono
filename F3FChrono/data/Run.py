@@ -12,8 +12,10 @@ class Run:
         self.reason = ""
 
     def to_string(self):
-        result = self.competitor.to_string() + '\t:\t' + self.chrono.to_string()
-        if self.penalty > 0.0:
-            result += '\tpenalty\t' + str(self.penalty)
-        return result
+        return self.competitor.to_string() + '\t:\t' + self.value_as_string()
 
+    def value_as_string(self):
+        res = self.chrono.to_string()
+        if self.penalty > 0.0:
+            res += '\tpenalty\t' + str(self.penalty)
+        return res

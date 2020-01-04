@@ -1,5 +1,10 @@
 from django.http import HttpResponse
 from F3FChrono.data.dao.EventDAO import EventDAO
+from F3FChrono.data.web.TableResultPage import TableResultPage
+from F3FChrono.data.web.Header import Header
+from F3FChrono.data.web.Line import Line
+from F3FChrono.data.web.Cell import Cell
+from F3FChrono.data.web.Link import Link
 
 
 def index(request):
@@ -29,13 +34,31 @@ def event_view(request):
 
     event_id = request.GET.get('event_id')
 
+    return HttpResponse(event_view_html(event_id))
+
+def event_view_html(event_id):
+
     event = EventDAO().get(event_id=event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
 
-    result = '<h1>' + event.name + '</h1>'
+    page = TableResultPage(title=event.name)
+    header = Header(name=Cell('Bib'))
+    header.add_cell(Cell('Name'))
+    header.add_cell(Cell('Flight time'))
+    page.set_header(header)
 
-    result += '<p>Number of competitors : ' + str(len(event.get_competitors())) + '</p>'
-    result += '<p>Number of rounds : ' + str(len(event.rounds)) + '</p>'
+    #Later loop on rounds and round groups
+    round_group = event.rounds[0].groups[0]
+    for competitor in sorted(round_group.runs):
+        row = Line(name=Cell(str(competitor.bib_number)))
+        row.add_cell(Cell(competitor.pilot.to_string()))
+        row.add_cell(Cell(round_group.run_value_as_string(competitor)))
+        page.add_line(row)
 
+    result = page.to_html()
+    return result
 
-    return HttpResponse(result)
+if __name__ == "__main__":
+    # execute only if run as a script
+    event_view_html(1)
+
 
