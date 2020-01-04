@@ -3,6 +3,7 @@ from io import StringIO
 import requests
 from datetime import datetime
 import os
+import scipy.stats as ss
 
 from F3FChrono.data.Pilot import Pilot
 from F3FChrono.data.Competitor import Competitor
@@ -18,7 +19,7 @@ class Event:
         self.end_date = None
         self.location = ""
         self.name = ""
-        self._competitors = {}
+        self.competitors = {}
         self.rounds = []
         self.min_allowed_wind_speed = 3.0
         self.max_allowed_wind_speed = 25.0
@@ -110,7 +111,7 @@ class Event:
         return event
 
     def competitor_from_f3x_vault_id(self, f3x_vault_id):
-        for key, competitor in self._competitors.items():
+        for key, competitor in self.competitors.items():
             if competitor.get_pilot().get_f3x_vault_id() == f3x_vault_id:
                 return competitor
         return None
@@ -131,7 +132,7 @@ class Event:
             self.current_round += 1
 
     def register_pilot(self, pilot, bib_number, team=None):
-        self._competitors[bib_number] = Competitor.register_pilot(self, bib_number, pilot, team)
+        self.competitors[bib_number] = Competitor.register_pilot(self, bib_number, pilot, team)
 
     def get_current_round(self):
         if len(self.rounds) < 1:
@@ -139,16 +140,26 @@ class Event:
         return self.rounds[self.current_round]
 
     def get_competitor(self, bib_number):
-        return self._competitors[bib_number]
+        return self.competitors[bib_number]
 
     def get_competitors(self):
-        return self._competitors
+        return self.competitors
 
     def set_competitors(self, competitors):
-        self._competitors = competitors
+        self.competitors = competitors
 
     def get_flights_before_refly(self):
         return self.flights_before_refly
+
+    def compute_ranking(self):
+        f3f_round = self.rounds[0]
+        for group in f3f_round.groups:
+            group.compute_scores()
+            bibs = sorted(self.competitors)
+            pilots_ranks = ss.rankdata([-group.get_valid_run(self.competitors[bib]).score
+                                        for bib in bibs])
+            for i in range(0, len(bibs)):
+                self.competitors[bibs[i]].rank = pilots_ranks[i]
 
     def to_string(self):
         result=os.linesep+"Event : "+self.name+os.linesep

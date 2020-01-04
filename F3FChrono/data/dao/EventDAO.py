@@ -3,6 +3,7 @@ from F3FChrono.data.Event import Event
 from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
 from F3FChrono.data.dao.RoundDAO import RoundDAO
 
+
 class EventDAO(Dao):
 
     def get_list(self):

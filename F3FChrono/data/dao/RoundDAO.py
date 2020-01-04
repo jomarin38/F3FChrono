@@ -38,6 +38,14 @@ class RoundDAO(Dao):
                 RoundDAO._fetch_runs(round_group)
         return fetched_f3f_round
 
+    def get_from_ids(self, event_id, round_number, fetch_runs=False):
+        from F3FChrono.data.dao.EventDAO import EventDAO
+        event = EventDAO().get(event_id)
+        f3f_round = Round()
+        f3f_round.event = event
+        f3f_round.round_number = round_number
+        return self.get(f3f_round, fetch_runs)
+
     @staticmethod
     def _fetch_runs(round_group):
         dao = RunDAO()

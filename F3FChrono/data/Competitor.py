@@ -7,6 +7,8 @@ class Competitor:
         self.event = None
         self.pilot = None
         self.team = None
+        self.rank = None
+        self.score = 0.0
 
     @staticmethod
     def register_pilot(event, bib_number, pilot, team=None):
@@ -34,3 +36,12 @@ class Competitor:
 
     def __lt__(self, other):
         return self.bib_number < other.get_bib_number()
+
+    def __eq__(self, other):
+        return self.bib_number == other.get_bib_number()
+
+    def __ne__(self, other):
+        return self.bib_number != other.get_bib_number()
+
+    def compare_rank(self, other):
+        return self.rank < other.rank

@@ -1,5 +1,6 @@
 import os
 from F3FChrono.data.dao.RunDAO import RunDAO
+import sys
 
 class RoundGroup:
     rundao=RunDAO()
@@ -28,6 +29,7 @@ class RoundGroup:
             for run in self.runs[competitor]:
                 if run.valid:
                     return run
+        return None
 
     def has_run(self):
         return len(self.runs)>0
@@ -44,3 +46,22 @@ class RoundGroup:
             return valid_run.value_as_string()
         else:
             return 'Flight not valid'
+
+    def run_score_as_string(self, competitor):
+        valid_run = self.get_valid_run(competitor)
+        if valid_run is not None:
+            return str(valid_run.score_as_string())
+        else:
+            return str(0.0)
+
+    def compute_scores(self):
+        best_run_time = min([self.get_valid_run(competitor).get_flight_time() for competitor in sorted(self.runs)
+                             if self.get_valid_run(competitor) and self.get_valid_run(competitor).get_flight_time()])
+        for competitor in sorted(self.runs):
+            valid_run = self.get_valid_run(competitor)
+            if valid_run is not None:
+                if not valid_run.get_flight_time():
+                    valid_run.score = 0.0
+                else:
+                    valid_run.score = best_run_time / valid_run.get_flight_time() * 1000.0
+
