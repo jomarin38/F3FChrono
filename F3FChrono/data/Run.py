@@ -13,10 +13,10 @@ class Run:
         self.score = None
 
     def to_string(self):
-        return self.competitor.to_string() + '\t:\t' + self.value_as_string()
+        return self.competitor.display_name() + '\t:\t' + self.value_as_string()
 
     def value_as_string(self):
-        res = self.chrono.to_string()
+        res = self.chrono.run_time_as_string()
         if self.penalty > 0.0:
             res += '\tP\t' + str(self.penalty)
         return res

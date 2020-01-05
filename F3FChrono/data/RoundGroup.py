@@ -42,7 +42,7 @@ class RoundGroup:
 
     def run_value_as_string(self, competitor):
         valid_run = self.get_valid_run(competitor)
-        if valid_run is not None:
+        if valid_run is not None and valid_run.chrono.run_time is not None:
             return '{:6.2f}'.format(valid_run.chrono.run_time)
         else:
             return 'Flight not valid'
@@ -56,8 +56,12 @@ class RoundGroup:
 
     def compute_scores(self):
         if self.has_run():
-            best_run_time = min([self.get_valid_run(competitor).get_flight_time() for competitor in sorted(self.runs)
-                                 if self.get_valid_run(competitor) and self.get_valid_run(competitor).get_flight_time()])
+            run_times = [self.get_valid_run(competitor).get_flight_time() for competitor in sorted(self.runs)
+                                 if self.get_valid_run(competitor) and self.get_valid_run(competitor).get_flight_time()]
+            if len(run_times) > 0:
+                best_run_time = min(run_times)
+            else:
+                best_run_time = 0
             for competitor in sorted(self.runs):
                 valid_run = self.get_valid_run(competitor)
                 if valid_run is not None:
@@ -66,3 +70,12 @@ class RoundGroup:
                     else:
                         valid_run.score = best_run_time / valid_run.get_flight_time() * 1000.0
 
+    def get_best_run(self):
+        best_run = None
+        for competitor, runs in self.runs.items():
+            for run in runs:
+                if run.valid and (best_run is None or
+                                  best_run.get_flight_time() is None or
+                                  run.get_flight_time() < best_run.get_flight_time()):
+                    best_run = run
+        return best_run

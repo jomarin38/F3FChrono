@@ -8,6 +8,7 @@ from F3FChrono.data.web.Line import Line
 from F3FChrono.data.web.Cell import Cell
 from F3FChrono.data.web.Link import Link
 from django.views.decorators.cache import never_cache
+import datetime
 
 
 @never_cache
@@ -133,12 +134,20 @@ def round_view_html(event_id, round_number):
 
     f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
 
-    page = ResultTable(title=f3f_round.event.name + '\tRound : ' + str(f3f_round.round_number))
+    page = ResultPage(title=f3f_round.event.name + '\tRound : ' + str(f3f_round.round_number))
+
+    best_runs = f3f_round.get_best_runs()
+    best_runs_string = 'Best time : <br>'
+
+    for run in best_runs:
+        best_runs_string += run.to_string()
+
+    table = ResultTable(title=best_runs_string)
     header = Header(name=Cell('Bib'))
     header.add_cell(Cell('Name'))
     header.add_cell(Cell('Flight time'))
     header.add_cell(Cell('Score'))
-    page.set_header(header)
+    table.set_header(header)
 
     #Later loop on rounds and round groups
     round_group = f3f_round.groups[0]
@@ -148,7 +157,9 @@ def round_view_html(event_id, round_number):
         row.add_cell(Cell(competitor.pilot.to_string()))
         row.add_cell(Cell(round_group.run_value_as_string(competitor)))
         row.add_cell(Cell(str(round_group.run_score_as_string(competitor))))
-        page.add_line(row)
+        table.add_line(row)
+
+    page.add_table(table)
 
     result = page.to_html()
     return result
@@ -156,7 +167,7 @@ def round_view_html(event_id, round_number):
 
 if __name__ == "__main__":
     # execute only if run as a script
-    event_view_html(4)
-    #round_view_html(4, 2)
+    #event_view_html(4)
+    round_view_html(4, 7)
 
 
