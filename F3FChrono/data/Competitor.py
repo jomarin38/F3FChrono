@@ -14,6 +14,7 @@ class Competitor:
         self.first_joker_score = None
         self.second_joker_round_number = None
         self.second_joker_score = None
+        self.penalty = 0.0
 
     @staticmethod
     def register_pilot(event, bib_number, pilot, team=None):
@@ -63,8 +64,8 @@ class Competitor:
 
     def score_with_jokers(self, number_of_valid_rounds):
         if number_of_valid_rounds < self.event.first_joker_round_number:
-            return self.score
+            return self.score - self.penalty
         elif number_of_valid_rounds >= self.event.second_joker_round_number:
-            return self.score - self.first_joker_score - self.second_joker_score
+            return self.score - self.first_joker_score - self.second_joker_score - self.penalty
         else:
-            return self.score - self.first_joker_score
+            return self.score - self.first_joker_score - self.penalty

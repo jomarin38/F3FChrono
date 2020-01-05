@@ -155,21 +155,25 @@ class Event:
         return self.flights_before_refly
 
     def compute_ranking(self):
-        number_of_valid_rounds = 0
         for f3f_round in self.rounds:
             if f3f_round.valid:
                 self.number_of_valid_rounds += 1
                 for group in f3f_round.groups:
                     group.compute_scores()
-                    bibs = sorted(self.competitors)
-                    for i in range(0, len(bibs)):
-                        valid_run = group.get_valid_run(self.competitors[bibs[i]])
+                    for bib_number, competitor in self.competitors.items():
+                        valid_run = group.get_valid_run(competitor)
                         if valid_run is not None:
-                            self.competitors[bibs[i]].score += valid_run.score
-                            self.competitors[bibs[i]].update_jokers(f3f_round.round_number, valid_run.score)
+                            competitor.score += valid_run.score
+                            competitor.update_jokers(f3f_round.round_number, valid_run.score)
                         else:
-                            self.competitors[bibs[i]].update_jokers(f3f_round.round_number, 0)
+                            competitor.update_jokers(f3f_round.round_number, 0)
 
+                        #Get penalties
+                        runs = group.runs[competitor]
+                        for run in runs:
+                            competitor.penalty += run.penalty
+
+                    bibs = sorted(self.competitors)
                     pilots_ranks = ss.rankdata([-self.competitors[bib].score_with_jokers(self.number_of_valid_rounds)
                                                 for bib in bibs])
                     for i in range(0, len(bibs)):
