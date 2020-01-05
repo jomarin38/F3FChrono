@@ -76,7 +76,7 @@ def event_view_html(event_id):
         row.add_cell(Cell('{:2d}'.format(int(competitor_score / best_score * 1000))))
         row.add_cell(Cell(competitor.pilot.to_string()))
         for f3f_round in event.rounds:
-            if f3f_round.has_run():
+            if f3f_round.valid:
                 row.add_cell(Cell('{:2d}'.format(int(competitor.evolutive_rank[f3f_round.round_number-1]))))
         table.add_line(row)
 
@@ -97,7 +97,7 @@ def event_view_html(event_id):
         row = Line(name=Cell(str(competitor.bib_number)))
         row.add_cell(Cell(competitor.pilot.to_string()))
         for f3f_round in event.rounds:
-            if f3f_round.has_run():
+            if f3f_round.valid:
                 round_group = f3f_round.groups[0]
                 run = round_group.get_valid_run(competitor)
                 if run is None:
@@ -156,7 +156,7 @@ def round_view_html(event_id, round_number):
 
 if __name__ == "__main__":
     # execute only if run as a script
-    event_view_html(1)
+    event_view_html(4)
     #round_view_html(4, 2)
 
 
