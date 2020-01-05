@@ -28,6 +28,9 @@ class Event:
         self.current_round = None
         self.flights_before_refly = 5
         self.f3x_vault_id = None
+        self.number_of_valid_rounds = 0
+        self.first_joker_round_number = 4
+        self.second_joker_round_number = 15
 
     @staticmethod
     def from_f3x_vault(login, password, contest_id, max_rounds=None):
@@ -152,14 +155,27 @@ class Event:
         return self.flights_before_refly
 
     def compute_ranking(self):
-        f3f_round = self.rounds[0]
-        for group in f3f_round.groups:
-            group.compute_scores()
-            bibs = sorted(self.competitors)
-            pilots_ranks = ss.rankdata([-group.get_valid_run(self.competitors[bib]).score
-                                        for bib in bibs])
-            for i in range(0, len(bibs)):
-                self.competitors[bibs[i]].rank = pilots_ranks[i]
+        number_of_valid_rounds = 0
+        for f3f_round in self.rounds:
+            if f3f_round.valid:
+                self.number_of_valid_rounds += 1
+                for group in f3f_round.groups:
+                    group.compute_scores()
+                    bibs = sorted(self.competitors)
+                    for i in range(0, len(bibs)):
+                        valid_run = group.get_valid_run(self.competitors[bibs[i]])
+                        if valid_run is not None:
+                            self.competitors[bibs[i]].score += valid_run.score
+                            self.competitors[bibs[i]].update_jokers(f3f_round.round_number, valid_run.score)
+                        else:
+                            self.competitors[bibs[i]].update_jokers(f3f_round.round_number, 0)
+
+                    pilots_ranks = ss.rankdata([-self.competitors[bib].score_with_jokers(self.number_of_valid_rounds)
+                                                for bib in bibs])
+                    for i in range(0, len(bibs)):
+                        self.competitors[bibs[i]].rank = pilots_ranks[i]
+                        self.competitors[bibs[i]].evolutive_rank.append(pilots_ranks[i])
+
 
     def to_string(self):
         result=os.linesep+"Event : "+self.name+os.linesep

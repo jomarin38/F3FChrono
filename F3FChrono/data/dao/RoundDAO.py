@@ -40,7 +40,8 @@ class RoundDAO(Dao):
 
     def get_from_ids(self, event_id, round_number, fetch_runs=False):
         from F3FChrono.data.dao.EventDAO import EventDAO
-        event = EventDAO().get(event_id)
+        from F3FChrono.data.Round import Round
+        event = EventDAO().get(event_id, fetch_competitors=fetch_runs)
         f3f_round = Round()
         f3f_round.event = event
         f3f_round.round_number = round_number

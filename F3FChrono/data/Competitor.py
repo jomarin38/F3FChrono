@@ -9,6 +9,11 @@ class Competitor:
         self.team = None
         self.rank = None
         self.score = 0.0
+        self.evolutive_rank = []
+        self.first_joker_round_number = None
+        self.first_joker_score = None
+        self.second_joker_round_number = None
+        self.second_joker_score = None
 
     @staticmethod
     def register_pilot(event, bib_number, pilot, team=None):
@@ -45,3 +50,21 @@ class Competitor:
 
     def compare_rank(self, other):
         return self.rank < other.rank
+
+    def update_jokers(self, round_number, score):
+        if self.first_joker_score is None or score < self.first_joker_score:
+            self.second_joker_score = self.first_joker_score
+            self.second_joker_round_number = self.first_joker_round_number
+            self.first_joker_score = score
+            self.first_joker_round_number = round_number
+        elif self.second_joker_score is None or score < self.second_joker_score:
+            self.second_joker_score = score
+            self.second_joker_round_number = round_number
+
+    def score_with_jokers(self, number_of_valid_rounds):
+        if number_of_valid_rounds < self.event.first_joker_round_number:
+            return self.score
+        elif number_of_valid_rounds >= self.event.second_joker_round_number:
+            return self.score - self.first_joker_score - self.second_joker_score
+        else:
+            return self.score - self.first_joker_score

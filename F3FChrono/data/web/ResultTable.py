@@ -1,6 +1,6 @@
 
 
-class TableResultPage:
+class ResultTable:
 
     def __init__(self, title=None):
         self.title = title
@@ -17,7 +17,7 @@ class TableResultPage:
         self.lines.append(line)
 
     def to_html(self):
-        res = '<h1>' + self.title + '</h1>'
+        res = '<h2>' + self.title + '</h2>'
         res += '<table>'
         res += '<thead>' + self.header.to_html() + '</thead>'
         res += '<tbody>'
