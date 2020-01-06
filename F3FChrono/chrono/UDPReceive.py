@@ -15,11 +15,12 @@ INITMSG = "Init"
 EVENTMSG = "Event"
 
 class udpreceive(threading.Thread, QObject):
-    def __init__(self, udpport, eventUI):
+    def __init__(self, udpport, eventUI, eventwindUI):
         super().__init__()
         super(QObject, self).__init__()
         self.port = udpport
         self.eventUI = eventUI
+        self.event_windUI = eventwindUI
 
         self.terminated = False
         self.msg = ""
@@ -40,17 +41,14 @@ class udpreceive(threading.Thread, QObject):
             try:
                 data, address = self.sock.recvfrom(1024)
                 dt=time.time()
-                print ('received {} bytes from {}, time : {}'.format(len (data), address, dt))
-                print (data)
                 m=re.split(r'\s', data.decode('utf-8'))
-                print (m)
                 if (m[0]=='terminated'):
                     self.terminated=True
-                elif (m[0]=='simulate'):
-                    print ("UDP Receive simulate mode")
-                    self.eventUI.emit("udpreceive", m[2], m[1])
+                elif (m[0]=='simulate' and m[1]=='base'):
+                    self.eventUI.emit("udpreceive", m[3], m[2])
+                elif (m[0]=='simulate' and m[1]=='weather'):
+                    self.event_windUI.emit(int(m[3]), int(m[2]), bool(m[4]=='True'))
                 else:
-                    print ("UDP Receive normal mode")
                     self.eventUI.emit("udpreceive", data.decode("utf-8") , address[0])
             except socket.error as msg:
                 print ('udp receive error {}'.format(msg))

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>33</height>
+    <height>43</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,6 +20,20 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="1">
+    <widget class="QLabel" name="Elapsedtime">
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Elapsed time : </string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="WindInfo">
      <property name="sizePolicy">
@@ -36,10 +50,23 @@
       </font>
      </property>
      <property name="text">
-      <string>Wind : 6.2m/S, NNE</string>
+      <string>Wind : 6.2m/s, 10°, No rain</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="btn_clear">
+     <property name="maximumSize">
+      <size>
+       <width>19</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>X</string>
      </property>
     </widget>
    </item>

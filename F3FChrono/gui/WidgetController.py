@@ -1,5 +1,7 @@
 import sys
+import collections
 from time import *
+from datetime import datetime
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 
@@ -66,29 +68,85 @@ class WRoundCtrl(QObject):
             TODO: roundCtrl.set_data
         """
 
-class WWindCtrl:
-    widgetList = []
-
+class WWindCtrl():
+    widgetList=[]
     def __init__(self, name, parent):
         self.view = Ui_WWind()
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
+        self.view.btn_clear.clicked.connect(self.clear_alarm)
         self.widgetList.append(self.widget)
+        self.rules = collections.OrderedDict()
+        self.rules['dir'] = 0
+        self.rules['speed'] = 0
+        self.rules['rain'] = 0
+        self.rules['starttime'] = datetime.now()
+        self.rules['time(s)'] = time.time()
+        self.rules['detected'] = False
+        self.rules['alarm']=False
+
     def get_widget(self):
         return(self.widgetList)
 
     def show(self):
         self.widget.show()
+        self.view.Elapsedtime.setVisible(False)
+        self.view.btn_clear.setVisible(False)
 
     def hide(self):
         self.widget.hide()
 
-    def set_data(self, wind, angle):
-        self.view.WindInfo.setText('Wind : '+str(wind)+'m.s, Angle : '+str(angle)+'°')
+    def set_data(self, speed, angle, rain):
+        if rain:
+            strrain = 'Rain'
+        else:
+            strrain = 'No Rain'
+        self.view.WindInfo.setText('Wind : '+str(speed)+'m/s, Angle : '+str(angle)+'°'+', '+strrain)
+        self.rules['dir'] = angle
+        self.rules['speed'] = speed
+        self.rules['rain']=rain
 
-class WPilotCtrl:
+    def check_rules(self, limit_angle, speed_min, speed_max, time_limit):
+        if abs(self.rules['dir']) > limit_angle or self.rules['speed'] < speed_min or self.rules['speed'] > speed_max \
+                or self.rules['rain']:
+            if self.rules['detected']==False:
+                self.rules['starttime'] = datetime.now()
+                self.rules['time(s)'] = time.time()
+                self.rules['detected']=True
+            else:
+                if ((time.time()-self.rules['time(s)'])>20):
+                    self.view.WindInfo.setStyleSheet('color: red')
+                    self.view.Elapsedtime.setVisible(True)
+                    if (time.time()-self.rules['time(s)'])>(time_limit*60):
+                        self.view.Elapsedtime.setStyleSheet('color: red')
+                        self.view.btn_clear.setVisible(True)
+                        self.rules['alarm']=True
+
+                    self.view.Elapsedtime.setText("Elapsed time : "+\
+                                time.strftime("%H:%M:%S", time.gmtime(time.time()-self.rules['time(s)']))\
+                                +self.cancelroundtostr())
+
+        else:
+            self.view.WindInfo.setStyleSheet('color: black')
+            self.rules['detected']=False
+            if not self.rules['alarm']:
+                self.view.Elapsedtime.setStyleSheet('color: black')
+                self.view.Elapsedtime.setVisible(False)
+
+    def clear_alarm(self):
+        self.rules['alarm']=False
+        self.view.Elapsedtime.setVisible(False)
+        self.view.btn_clear.setVisible(False)
+
+    def cancelroundtostr(self):
+        cancelstr=''
+        if self.rules['alarm']:
+            cancelstr=', Cancel Round'
+        return cancelstr
+
+class WPilotCtrl():
     def __init__(self, name, parent):
         self.view = Ui_WPilot()
         self.name = name
