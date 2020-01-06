@@ -20,7 +20,7 @@ class WRoundCtrl(QObject):
     widgetList = []
 
     def __init__(self, name, parent):
-        super().__init__()
+        super(QObject, self).__init__()
         self.wPilotCtrl = WPilotCtrl("PilotCtrl", parent)
         self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent)
         self.wBtnCtrl = Ui_WChronoBtn()
@@ -146,13 +146,6 @@ class WWindCtrl():
             cancelstr=', Cancel Round'
         return cancelstr
 
-    def set_voltage(self, voltage):
-        self.view.voltage.setText(str(voltage)+" V")
-
-    def set_rssi(self, rssi1, rssi2):
-        self.view.rssi.setText("piCAM1 : "+str(rssi1) + "%, piCAM2 : "+str(rssi2)+"%")
-
-
 class WPilotCtrl():
     def __init__(self, name, parent):
         self.view = Ui_WPilot()
@@ -175,14 +168,14 @@ class WPilotCtrl():
         self.view.bib.setText("BIB : "+str(competitor.get_bib_number()))
         self.view.round.setText("Round : "+str(round))
 
-class WChronoCtrl(QTimer):
+class WChronoCtrl(QTimer, QObject):
     btn_null_flight_sig = pyqtSignal()
     btn_penalty_100_sig = pyqtSignal()
     btn_penalty_1000_sig = pyqtSignal()
     btn_clear_penalty_sig = pyqtSignal()
 
     def __init__(self, name, parent):
-        super().__init__()
+        super(WChronoCtrl, self).__init__()
 
         self.view = Ui_WChrono()
         self.name = name
@@ -300,11 +293,10 @@ class WChronoCtrl(QTimer):
 class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()
     contest_sig = pyqtSignal()
-    chrono_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
-        super().__init__(parent)
+        super(QObject, self).__init__(parent)
         self.view = Ui_WConfig()
         self.name = name
         self.parent = parent
@@ -342,7 +334,6 @@ class WConfigCtrl(QObject):
             self.view.PICamA_Value.setDisabled(False)
             self.view.PICamB_Btn.setDisabled(False)
             self.view.PICamB_Value.setDisabled(False)
-        self.chrono_sig.emit()
 
 
     def contest_changed(self):

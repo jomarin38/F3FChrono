@@ -23,24 +23,27 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         self.duration = 1000
 
     def send_base_A(self):
+        print("base A")
         self.udpbeep.sendData("simulate base " + self.ui.ip_A.text() + " " + self.ui.data_A.text())
 
     def send_base_B(self):
+        print("base B")
         self.udpbeep.sendData("simulate base " + self.ui.ip_B.text() + " " + self.ui.data_B.text())
 
     def send_weather(self):
+        print("Wind send")
         if self.timerEvent.isActive() == False:
             self.timerEvent.start(self.duration)
-            self.ui.btn_send_wind.setText("info Processing...")
+            self.udpbeep.sendData("simulate weather " + str(self.ui.wind_dir.value()) + " " + \
+                                  str(self.ui.wind_speed.value()) + " " + str(self.ui.rain.isChecked()))
+            self.ui.btn_send_wind.setText("Weather Processing...")
         else:
-            self.ui.btn_send_wind.setText("Send info")
+            self.ui.btn_send_wind.setText("Send Weather")
             self.timerEvent.stop()
 
     def run(self):
         self.udpbeep.sendData("simulate weather " + str(self.ui.wind_dir.value()) + " " + \
                               str(self.ui.wind_speed.value()) + " " + str(self.ui.rain.isChecked()))
-        self.udpbeep.sendData("simulate info " + str(self.ui.AccuRace.value()) + " " + \
-                              str(self.ui.rssi_picam1.value()) + " " + str(self.ui.rssi_picam2.value()))
 
 
 def main():
