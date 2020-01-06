@@ -10,7 +10,9 @@ class Dao:
 
     def _execute_query(self, sql, *args):
         self._cursor.execute(sql, args)
-        return self._cursor.fetchall()
+        result = self._cursor.fetchall()
+        Dao._db.commit()
+        return result
 
     def _execute_insert(self, sql, *args):
         self._cursor.execute(sql, args)

@@ -98,3 +98,9 @@ class Round:
 
     def has_run(self):
         return(self.groups[-1].has_run())
+
+    def get_best_runs(self):
+        result = []
+        for group in self.groups:
+            result.append(group.get_best_run())
+        return result
