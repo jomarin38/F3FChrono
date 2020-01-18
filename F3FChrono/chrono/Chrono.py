@@ -1,4 +1,3 @@
-from enum import Enum
 import time
 import os
 from datetime import datetime
@@ -17,7 +16,7 @@ class chronoStatus():
     InProgress=4
     Finished=5
 
-class ChronoHard():
+class ChronoRpi(ChronoHard):
     def __init__(self):
         self.chronoLaunch = 30
         self.chronoFisrtBase = 30
@@ -32,7 +31,7 @@ class ChronoHard():
         self.inStart = False
         self.mode=chronoType.none
         self.status=chronoStatus.InWait
-        self.penalty=0.0
+
 
         print('Chrono F3F Initialisation ')
 
@@ -74,11 +73,6 @@ class ChronoHard():
     def isInStart (self):
         return self.inStart
     
-    def addPenalty(self, value):
-        self.penalty += value
-
-    def clearPenalty(self):
-        self.penalty=0
     def declareBase (self, base):
         now = time.time()
         if (self.status==chronoStatus.InStart):
@@ -151,8 +145,7 @@ class ChronoHard():
     def getLapCount(self):
         return len(self.chronoLap)
 
-    def getPenalty(self):
-        return (self.penalty)
+
 
     def getMaxWindSpeed(self):
         return None
@@ -171,6 +164,41 @@ class ChronoHard():
             result+="{:0>6.3f}".format(lap)+","
         result+=os.linesep+"\tPenalty : "+str(self.penalty)+os.linesep
         return (result)
+
+class ChronoArduino(ChronoHard):
+    def __init__(self):
+
+    def reset(self):
+
+    def get_status(self):
+
+    def set_status(self):
+
+
+class ChronoHard():
+    def __init__(self):
+        self.penalty = 0.0
+
+    def reset(self):
+
+    def addPenalty(self, value):
+        self.penalty += value
+        return (self.penalty)
+
+    def clearPenalty(self):
+        self.penalty=0.0
+        return (self.penalty)
+
+    def getPenalty(self):
+        return (self.penalty)
+
+    def getStatus(self):
+
+    def set_status(self, status):
+
+    def next_status(self):
+
+
 
 if __name__ == '__main__':
     print ('Chrono Test')

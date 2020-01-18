@@ -14,6 +14,7 @@ UDP_PORT = 4445
 INITMSG = "Init"
 EVENTMSG = "Event"
 
+#todo Qthread à la place de Thread & Qobject.
 class udpreceive(threading.Thread, QObject):
     def __init__(self, udpport, eventUI, eventwindUI):
         super().__init__()
