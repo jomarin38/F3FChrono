@@ -7,11 +7,13 @@ from F3FChrono.data.dao.RoundDAO import RoundDAO
 class Round:
 
     round_counters = {}
+    valid_round_counters = {}
     round_dao=RoundDAO()
 
     def __init__(self):
         self.event = None
         self.round_number = None
+        self.valid_round_number = None
         self.groups = []
         self._current_competitor_index = 0
         self._flight_order = []
@@ -74,9 +76,7 @@ class Round:
         if self._current_competitor_index < len(self._flight_order) - 1:
             self._current_competitor_index += 1
         else:
-            self.valid=True
-            if (insert_database):
-                Round.round_dao.update(self)
+            self.validate_round(insert_database)
             self.event.create_new_round(insert_database)
             self._current_competitor_index = 0
         return self.get_current_competitor()
@@ -91,10 +91,24 @@ class Round:
 
     def cancel_round(self):
         self.valid=False
+        self.valid_round_number=None
+        Round.round_counters[self.event] -= 1
         Round.round_dao.update(self)
         self.event.create_new_round(insert_database=True)
         self._current_competitor_index = 0
         return self.get_current_competitor()
+
+    def validate_round(self, insert_database=False):
+        self.valid = True
+        if self.event in Round.valid_round_counters:
+            previous_round = Round.valid_round_counters[self.event]
+        else:
+            previous_round = 0
+        self.valid_round_number = previous_round+1
+        Round.valid_round_counters[self.event] = self.valid_round_number
+        self.event.valid_rounds.append(self)
+        if insert_database:
+            Round.round_dao.update(self)
 
     def has_run(self):
         return(self.groups[-1].has_run())

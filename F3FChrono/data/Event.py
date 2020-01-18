@@ -21,6 +21,7 @@ class Event:
         self.name = ""
         self.competitors = {}
         self.rounds = []
+        self.valid_rounds = []
         self.min_allowed_wind_speed = 3.0
         self.max_allowed_wind_speed = 25.0
         self.max_wind_dir_dev = 45.0
@@ -164,9 +165,9 @@ class Event:
                         valid_run = group.get_valid_run(competitor)
                         if valid_run is not None:
                             competitor.score += valid_run.score
-                            competitor.update_jokers(f3f_round.round_number, valid_run.score)
+                            competitor.update_jokers(f3f_round.valid_round_number, valid_run.score)
                         else:
-                            competitor.update_jokers(f3f_round.round_number, 0)
+                            competitor.update_jokers(f3f_round.valid_round_number, 0)
 
                         #Get penalties
                         runs = group.runs[competitor]
@@ -179,6 +180,15 @@ class Event:
                     for i in range(0, len(bibs)):
                         self.competitors[bibs[i]].rank = pilots_ranks[i]
                         self.competitors[bibs[i]].evolutive_rank.append(pilots_ranks[i])
+            else:
+                #penalties applies also for cancelled rounds
+                for group in f3f_round.groups:
+                    for bib_number, competitor in self.competitors.items():
+                        # Get penalties
+                        if competitor in group.runs:
+                            runs = group.runs[competitor]
+                            for run in runs:
+                                competitor.penalty += run.penalty
 
 
     def to_string(self):
