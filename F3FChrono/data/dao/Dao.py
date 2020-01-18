@@ -3,7 +3,7 @@ import pymysql
 
 class Dao:
 
-    _db = pymysql.connect("localhost", "f3f_ctrl", "F3FCtrl", "f3f_chrono_sdaviet")
+    _db = pymysql.connect("localhost", "f3f_ctrl", "F3FCtrl", "f3f_chrono")
 
     def __init__(self):
         self._cursor = Dao._db.cursor()
