@@ -9,13 +9,14 @@ from F3FChrono.chrono.Sound import chronoSound
 
 
 
-class MainUiCtrl (QtWidgets.QMainWindow, QObject):
+class MainUiCtrl (QtWidgets.QMainWindow):
 
     refresh_chronoui = pyqtSignal(str, str, str)
     refresh_windui = pyqtSignal(int, int, bool)
 
     def __init__(self, dao, chronodata, chronohard, sound):
-        super(QObject, self).__init__()
+        super().__init__()
+
         self.dao = dao
         self.daoRound = RoundDAO()
         self.event = None

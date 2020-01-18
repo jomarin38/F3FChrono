@@ -20,7 +20,7 @@ class WRoundCtrl(QObject):
     widgetList = []
 
     def __init__(self, name, parent):
-        super(QObject, self).__init__()
+        super().__init__()
         self.wPilotCtrl = WPilotCtrl("PilotCtrl", parent)
         self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent)
         self.wBtnCtrl = Ui_WChronoBtn()
@@ -168,14 +168,14 @@ class WPilotCtrl():
         self.view.bib.setText("BIB : "+str(competitor.get_bib_number()))
         self.view.round.setText("Round : "+str(round))
 
-class WChronoCtrl(QTimer, QObject):
+class WChronoCtrl(QTimer):
     btn_null_flight_sig = pyqtSignal()
     btn_penalty_100_sig = pyqtSignal()
     btn_penalty_1000_sig = pyqtSignal()
     btn_clear_penalty_sig = pyqtSignal()
 
     def __init__(self, name, parent):
-        super(WChronoCtrl, self).__init__()
+        super().__init__()
 
         self.view = Ui_WChrono()
         self.name = name
@@ -296,7 +296,7 @@ class WConfigCtrl(QObject):
     widgetList = []
 
     def __init__(self, name, parent):
-        super(QObject, self).__init__(parent)
+        super().__init__(parent)
         self.view = Ui_WConfig()
         self.name = name
         self.parent = parent
