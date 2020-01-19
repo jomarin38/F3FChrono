@@ -181,6 +181,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
 
     def run_validated(self):
+        self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
         self.event.get_current_round().handle_terminated_flight(
             self.event.get_current_round().get_current_competitor(),
             self.chronodata, self.chronoHard.getPenalty(), True, insert_database=True)
