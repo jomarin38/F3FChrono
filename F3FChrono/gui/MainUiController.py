@@ -14,21 +14,21 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     refresh_chronoui = pyqtSignal(str, str, str)
     refresh_windui = pyqtSignal(int, int, bool)
 
-    def __init__(self, dao, chronodata, chronohard, sound):
+    def __init__(self, dao, chronodata, sound):
         super().__init__()
 
         self.dao = dao
         self.daoRound = RoundDAO()
         self.event = None
         self.chronodata = chronodata
-        self.chronoHard = chronohard
+        self.chronoHard = ChronoRpi()
         self.initUI()
         self.base_test = -10
 
         self.vocal = chronoSound(sound)
 
-        self.refresh_chronoui.connect(self.process_ui)
-        self.refresh_windui.connect(self.wind_ui)
+        #self.refresh_chronoui.connect(self.process_ui)
+        #self.refresh_windui.connect(self.wind_ui)
 
 
     def initUI(self):
@@ -51,6 +51,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         #connect signal event to method
         self.controllers['config'].btn_next_sig.connect(self.start)
         self.controllers['config'].contest_sig.connect(self.contest_changed)
+        self.controllers['config'].chrono_sig.connect(self.chronotype_changed)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.home_action)
         self.controllers['round'].btn_refly_sig.connect(self.refly)
@@ -156,6 +157,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                                             self.event.max_allowed_wind_speed,
                                             self.event.max_wind_dir_dev,
                                             self.event.max_interruption_time)
+
+    def chronotype_changed(self):
+        del (self.chronoHard)
+        if (self.controllers['config'].view.ChronoType.currentIndex()==0):
+            self.chronoHard = ChronoArduino()
+        else:
+            self.chronoHard=ChronoRpi()
+
     @staticmethod
     def chronoHard_to_chrono(chronoHard, chrono):
         chrono.run_time=chronoHard.get_time()
@@ -169,7 +178,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         print(chrono.to_string())
 
-    def process_ui(self, caller, data, address):
+    '''def process_ui(self, caller, data, address):
         print("process ui : \n"+"\tdata : "+data+"\n\taddress : "+address)
         #config page Wait detection on picam
         if (self.controllers['config'].is_piCamA_onConfig()):
@@ -222,7 +231,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 self.controllers['round'].wChronoCtrl.settime(30000, False)
             if (self.chronoHard.get_status() == chronoStatus.Launched):
                 self.controllers['round'].wChronoCtrl.settime(30000, False)
-
+'''
     def wind_ui(self, wind, angle, rain=False):
         print("Wind UI")
         self.controllers['wind'].set_data(wind, angle, rain)
@@ -234,9 +243,8 @@ def main ():
 
     dao = EventDAO()
     chronodata = Chrono()
-    chronohard = ChronoHard()
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(dao, chronodata, chronohard)
+    ui=MainUiCtrl(dao, chronodata, False)
 
 
 

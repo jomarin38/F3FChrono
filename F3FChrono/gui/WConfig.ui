@@ -39,17 +39,12 @@
          </property>
          <item>
           <property name="text">
-           <string>Wire Chrono</string>
+           <string>µC Chrono</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Wireless Chrono</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Test</string>
+           <string>Rpi Chrono</string>
           </property>
          </item>
         </widget>

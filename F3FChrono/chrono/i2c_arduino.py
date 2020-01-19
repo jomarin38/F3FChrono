@@ -15,7 +15,7 @@ class chronoStatus():
 #anemoaddress = 0x04
 #chronoaddress = 0x05
 
-class chronoArduino():
+class chrono_I2C_Arduino():
     def __init__(self):
         # for RPI version 1, use “bus = smbus.SMBus(0)”
         self.bus = smbus.SMBus(1)
