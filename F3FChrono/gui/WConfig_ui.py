@@ -193,8 +193,8 @@ class Ui_WConfig(object):
         _translate = QtCore.QCoreApplication.translate
         WConfig.setWindowTitle(_translate("WConfig", "Form"))
         self.ChronoLabel.setText(_translate("WConfig", "Chrono type"))
-        self.ChronoType.setItemText(0, _translate("WConfig", "Rpi Chrono"))
-        self.ChronoType.setItemText(1, _translate("WConfig", "µC Chrono"))
+        self.ChronoType.setItemText(0, _translate("WConfig", "µC Chrono"))
+        self.ChronoType.setItemText(1, _translate("WConfig", "Rpi Chrono"))
         self.Contest.setText(_translate("WConfig", "Contest"))
         self.ContestList.setItemText(0, _translate("WConfig", "None"))
         self.WireChronoLabel.setText(_translate("WConfig", "Wire Chrono"))

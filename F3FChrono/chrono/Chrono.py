@@ -1,7 +1,7 @@
 import time
 import os
 from datetime import datetime
-
+from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 
 class chronoType():
     wire = 0
@@ -16,63 +16,71 @@ class chronoStatus():
     InProgress=4
     Finished=5
 
-class ChronoRpi(ChronoHard):
+class ChronoHard(QObject):
+    status_changed = pyqtSignal(int)
+    lap_finished = pyqtSignal(int, float)
+    run_finished = pyqtSignal(float)
+    chrono_signal = pyqtSignal(str, str, str)
+
     def __init__(self):
+        super().__init__()
+        self.penalty = 0.0
         self.chronoLaunch = 30
         self.chronoFisrtBase = 30
         self.startTime=None
         self.endTime=None
-        self.chronoLap=[]
-        self.timelost=[]
-        self.lastBaseChangeTime =0
-        self.last10BasesTime = 0.0
-        self.last10BasesTimeLost = 0.0
-        self.lastBase=0
-        self.inStart = False
-        self.mode=chronoType.none
-        self.status=chronoStatus.InWait
 
+    def reset(self):
+        print("reset")
 
-        print('Chrono F3F Initialisation ')
+    def addPenalty(self, value):
+        self.penalty += value
+        return (self.penalty)
 
-    def set_mode(self, mode):
-        self.mode=mode
+    def clearPenalty(self):
+        self.penalty=0.0
+        return (self.penalty)
+
+    def getPenalty(self):
+        return (self.penalty)
 
     def get_status(self):
-        return self.status
+        print("getstatus")
 
-    def next_status(self):
-        if (self.status<chronoStatus.Finished):
-            self.status=self.status+1
+    def set_status(self, status):
+        print("setstatus")
+
+
+    def wind_info(self):
+        print("wind_info")
+
+class ChronoRpi(ChronoHard):
+    def __init__(self):
+        super().__init__()
+        self.chronoLap=[]
+        self.timelost=[]
+        self.lastBase=-2
+        self.status=chronoStatus.InWait
+        self.chrono_signal.connect(self.handle_chrono_event)
+
+    def get_status(self):
         return self.status
 
     def set_status(self, value):
         self.status=value
         return self.status
-    def start(self):
-        self.lastBaseChangeTime = time.time ()
-        self.lastDetectionTime = self.lastBaseChangeTime
-        return 0
-        
+
     def reset(self):
-        self.last10BasesTime = 0.0
-        self.last10BasesTimeLost = 0.0
         self.chronoLap.clear()
         self.timelost.clear()
         self.status=chronoStatus.InWait
+        self.lastBase=-2
         self.penalty=0.0
 
-    def startRace(self):
-        self.last10BasesTime = 0.0
-        self.last10BasesTimelost = 0.0
-        self.inStart = True
-        self.lastBase = -10
-        self.chronoLap.clear()
-        self.timelost.clear()
-        
-    def isInStart (self):
-        return self.inStart
-    
+    def handle_chrono_event(self, caller, data, address):
+        print("handle_chrono_event")
+
+    @staticmethod
     def declareBase (self, base):
         now = time.time()
         if (self.status==chronoStatus.InStart):
@@ -114,12 +122,6 @@ class ChronoRpi(ChronoHard):
                 self.timelost[self.getLapCount() - 1] = self.timelost[self.getLapCount() - 1] + elapsedTime
 
         return False
-
-    def getLast10BasesTime(self):
-        return self.last10BasesTime
-    
-    def getLast10BasesLostTime(self):
-        return self.last10BasesTimeLost
 
     def getLastLapTime(self):
         if self.getLapCount()>0:
@@ -167,60 +169,25 @@ class ChronoRpi(ChronoHard):
 
 class ChronoArduino(ChronoHard):
     def __init__(self):
+        super().__init__()
+        print ("chronoArduino init")
 
     def reset(self):
+        print ("chronoArduino reset")
 
     def get_status(self):
+        print ("chronoArduino get_status")
 
     def set_status(self):
+        print ("chronoArduino set_status")
 
+def main ():
 
-class ChronoHard():
-    def __init__(self):
-        self.penalty = 0.0
-
-    def reset(self):
-
-    def addPenalty(self, value):
-        self.penalty += value
-        return (self.penalty)
-
-    def clearPenalty(self):
-        self.penalty=0.0
-        return (self.penalty)
-
-    def getPenalty(self):
-        return (self.penalty)
-
-    def getStatus(self):
-
-    def set_status(self, status):
-
-    def next_status(self):
-
+    print ('Chrono Test')
+    chronoRpi=ChronoRpi()
+    chronoRpi.reset()
+    chronoRpi.chrono_signal.emit("test","test1","test2")
 
 
 if __name__ == '__main__':
-    print ('Chrono Test')
-    Chrono = ChronoHard()
-    Chrono.reset ()
-    Chrono.startRace ()
-    Chrono.next_status()
-    Chrono.next_status()
-    Chrono.next_status()
-
-    print(Chrono.getLapCount ())
-    Chrono.declareBase (1)
-    time.sleep(0.5)
-    Chrono.declareBase (2)
-    time.sleep(0.1)
-    Chrono.declareBase (2)
-    time.sleep(0.5)
-    Chrono.declareBase (1)
-    time.sleep (0.5)
-    Chrono.declareBase (2)
-    print ('Numero de base : ', Chrono.getLapCount ())
-    print ('Last Lap : ', Chrono.getLastLapTime ())
-    print ('10LastLap : ', Chrono.getLast10BasesTime())
-    print ('10LastLapLost : ', Chrono.getLast10BasesLostTime())
-    print(Chrono.to_string())
+    main()

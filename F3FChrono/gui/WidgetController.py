@@ -293,6 +293,7 @@ class WChronoCtrl(QTimer):
 class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()
     contest_sig = pyqtSignal()
+    chrono_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -334,6 +335,7 @@ class WConfigCtrl(QObject):
             self.view.PICamA_Value.setDisabled(False)
             self.view.PICamB_Btn.setDisabled(False)
             self.view.PICamB_Value.setDisabled(False)
+        self.chrono_sig.emit()
 
 
     def contest_changed(self):

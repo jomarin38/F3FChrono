@@ -39,12 +39,12 @@
          </property>
          <item>
           <property name="text">
-           <string>Rpi Chrono</string>
+           <string>µC Chrono</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>µC Chrono</string>
+           <string>Rpi Chrono</string>
           </property>
          </item>
         </widget>

@@ -15,11 +15,7 @@ class chronoStatus():
 #anemoaddress = 0x04
 #chronoaddress = 0x05
 
-<<<<<<< HEAD
-class chrono_I2C_Arduino():
-=======
 class chronoArduino():
->>>>>>> 991ee8f... adding weather simulation mode by udp message
     def __init__(self):
         # for RPI version 1, use “bus = smbus.SMBus(0)”
         self.bus = smbus.SMBus(1)

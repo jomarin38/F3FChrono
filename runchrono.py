@@ -48,10 +48,10 @@ def main():
 
     dao = EventDAO()
     chronodata = Chrono()
-    chronohard = ChronoHard()
+
 
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(dao, chronodata, chronohard, config.conf['sound'])
+    ui=MainUiCtrl(dao, chronodata, config.conf['sound'])
     udpReceive=udpreceive(config.conf['UDPPORT'], ui.refresh_chronoui, ui.refresh_windui)
     udpBeep=udpbeep(config.conf['IPUDPBEEP'], config.conf['UDPPORT'])
 
