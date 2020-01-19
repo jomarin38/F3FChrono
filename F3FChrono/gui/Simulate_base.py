@@ -23,15 +23,12 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         self.duration = 1000
 
     def send_base_A(self):
-        print("base A")
         self.udpbeep.sendData("simulate base " + self.ui.ip_A.text() + " " + self.ui.data_A.text())
 
     def send_base_B(self):
-        print("base B")
         self.udpbeep.sendData("simulate base " + self.ui.ip_B.text() + " " + self.ui.data_B.text())
 
     def send_weather(self):
-        print("Wind send")
         if self.timerEvent.isActive() == False:
             self.timerEvent.start(self.duration)
             self.udpbeep.sendData("simulate weather " + str(self.ui.wind_dir.value()) + " " + \

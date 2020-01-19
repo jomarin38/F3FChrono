@@ -94,19 +94,19 @@ class ChronoRpi(ChronoHard):
         self.penalty=0.0
 
     def handle_chrono_event(self, caller, data, address):
-        if ((self.status == chronoStatus.InStart or self.status == chronoStatus.InProgress) and caller == "udpreceive"
-                or caller == "btnnext"):
+        if ((self.status == chronoStatus.Launched or self.status == chronoStatus.InStart or
+             self.status == chronoStatus.InProgress) and caller == "udpreceive" or caller == "btnnext") and data == "event":
             self.__declareBase(address)
 
 
     def __declareBase (self, base):
         now = time.time()
-        if (self.status==chronoStatus.InWait or self.status==chronoStatus.WaitLaunch or self.status==chronoStatus.Launched):
+        if (self.status==chronoStatus.InWait or self.status==chronoStatus.WaitLaunch or
+                self.status==chronoStatus.Launched):
             self.set_status(self.status+1)
             return True
 
         if (self.status==chronoStatus.Finished):
-            self.reset()
             self.run_validated.emit()
 
         if (self.status==chronoStatus.InStart):
@@ -127,45 +127,45 @@ class ChronoRpi(ChronoHard):
                 self.timelost.append(0.0)
                 self.lap_finished.emit(elapsedTime)
 
-            if (self.__getLapCount()==10):
+            if (self.getLapCount()==10):
                 self.endTime=datetime.now()
                 self.set_status(chronoStatus.Finished)
-                self.run_finished.emit(self.__get_time())
+                self.run_finished.emit(self.get_time())
 
             if self.status==chronoStatus.InStart:
                 self.lastBase = ""
             else:
                 self.lastBase = base
             return True
-        elif self.__getLapCount()>1:#Base declaration is the same
+        elif self.getLapCount()>1:#Base declaration is the same
                 elapsedTime = ((now - self.lastDetectionTime))
-                self.lastDetectionTime = now;
-                self.timelost[self.__getLapCount() - 1] = self.timelost[self.__getLapCount() - 1] + elapsedTime
+                self.lastDetectionTime = now
+                self.timelost[self.getLapCount() - 1] = self.timelost[self.getLapCount() - 1] + elapsedTime
 
         return False
 
     def getLastLapTime(self):
-        if self.__getLapCount()>0:
-            return self.chronoLap[self.__getLapCount()-1]
+        if self.getLapCount()>0:
+            return self.chronoLap[self.getLapCount()-1]
         else:
             return 0
 
-    def __get_time(self):
+    def get_time(self):
         time=0
-        for i in range(self.__getLapCount()):
+        for i in range(self.getLapCount()):
             time=time+self.chronoLap[i]
         return time
 
-    def __getLaps(self):
+    def getLaps(self):
         return self.chronoLap
 
-    def __getStartTime(self):
+    def getStartTime(self):
         return self.startTime
 
-    def __getEndTime(self):
+    def getEndTime(self):
         return self.endTime
 
-    def __getLapCount(self):
+    def getLapCount(self):
         return len(self.chronoLap)
 
 
