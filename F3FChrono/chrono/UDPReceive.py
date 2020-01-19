@@ -10,18 +10,17 @@ import re
 from PyQt5.QtCore import pyqtSignal, QObject
 
 
-UDP_PORT = 4445
 INITMSG = "Init"
 EVENTMSG = "Event"
 
 #todo Qthread à la place de Thread & Qobject.
 class udpreceive(threading.Thread, QObject):
-    def __init__(self, udpport, eventUI, eventwindUI):
+    def __init__(self, udpport, signal_chrono, signal_wind):
         super().__init__()
         super(QObject, self).__init__()
         self.port = udpport
-        self.eventUI = eventUI
-        self.event_windUI = eventwindUI
+        self.event_chrono = signal_chrono
+        self.event_wind = signal_wind
 
         self.terminated = False
         self.msg = ""
@@ -46,11 +45,11 @@ class udpreceive(threading.Thread, QObject):
                 if (m[0]=='terminated'):
                     self.terminated=True
                 elif (m[0]=='simulate' and m[1]=='base'):
-                    self.eventUI.emit("udpreceive", m[3], m[2])
+                    self.event_chrono.emit("udpreceive", m[3], m[2])
                 elif (m[0]=='simulate' and m[1]=='weather'):
-                    self.event_windUI.emit(int(m[3]), int(m[2]), bool(m[4]=='True'))
+                    self.event_wind.emit(int(m[3]), int(m[2]), bool(m[4]=='True'))
                 else:
-                    self.eventUI.emit("udpreceive", data.decode("utf-8") , address[0])
+                    self.event_chrono.emit("udpreceive", data.decode("utf-8") , address[0])
             except socket.error as msg:
                 print ('udp receive error {}'.format(msg))
                 logging.warning('udp receive error {}'.format(msg))
