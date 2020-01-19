@@ -36,6 +36,8 @@ class RoundDAO(Dao):
             fetched_f3f_round.add_group(round_group)
             if fetch_runs:
                 RoundDAO._fetch_runs(round_group)
+            if fetched_f3f_round.valid:
+                fetched_f3f_round.validate_round(insert_database=False)
         return fetched_f3f_round
 
     def get_from_ids(self, event_id, round_number, fetch_runs=False):

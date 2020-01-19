@@ -50,55 +50,61 @@ def event_view_html(event_id):
 
     page = ResultPage(title=event.name)
 
-    #Evolutive ranking table
-    table = ResultTable('Evolutive ranking')
-    header = Header(name=Cell('Rank'))
-    header.add_cell(Cell('Bib'))
-    header.add_cell(Cell('Points'))
-    header.add_cell(Cell('Points / 1000'))
-    header.add_cell(Cell('Name'))
-    for f3f_round in event.rounds:
-        if f3f_round.has_run():
-            header.add_cell(Link('Round ' + str(f3f_round.round_number),
+    if event.current_round is not None:
+        table = ResultTable('Ongoing round :')
+        header = Header(name=Link('Round ' + str(len(event.valid_rounds)+1),
+                                  'round_view?event_id=' + str(event_id) +
+                                  '&round_number=' + str(event.get_current_round().round_number)))
+        table.set_header(header)
+        page.add_table(table)
+
+    if len(event.valid_rounds) > 0:
+        event.compute_ranking()
+
+        #Evolutive ranking table
+        table = ResultTable('Evolutive ranking')
+        header = Header(name=Cell('Rank'))
+        header.add_cell(Cell('Bib'))
+        header.add_cell(Cell('Points'))
+        header.add_cell(Cell('Points / 1000'))
+        header.add_cell(Cell('Name'))
+        for f3f_round in event.valid_rounds:
+            header.add_cell(Link('Round ' + str(f3f_round.valid_round_number),
                                  'round_view?event_id=' + str(event_id) +
                                  '&round_number=' + str(f3f_round.round_number)))
-    table.set_header(header)
+        table.set_header(header)
 
-    event.compute_ranking()
+        best_score = None
+        for competitor in sorted([competitor for bib, competitor in event.competitors.items()], key=lambda c: c.rank):
+            row = Line(name=Cell('{:2d}'.format(int(competitor.rank))))
+            row.add_cell(Cell(str(competitor.bib_number)))
+            competitor_score = competitor.score_with_jokers(len(event.valid_rounds))
+            row.add_cell(Cell('{:6.2f}'.format(competitor_score)))
+            if best_score is None:
+                best_score = competitor_score
+            row.add_cell(Cell('{:2d}'.format(int(competitor_score / best_score * 1000))))
+            row.add_cell(Cell(competitor.pilot.to_string()))
+            for f3f_round in event.valid_rounds:
+                row.add_cell(Cell('{:2d}'.format(int(competitor.evolutive_rank[f3f_round.valid_round_number-1]))))
+            table.add_line(row)
 
-    best_score = None
-    for competitor in sorted([competitor for bib, competitor in event.competitors.items()], key=lambda c: c.rank):
-        row = Line(name=Cell('{:2d}'.format(int(competitor.rank))))
-        row.add_cell(Cell(str(competitor.bib_number)))
-        competitor_score = competitor.score_with_jokers(event.number_of_valid_rounds)
-        row.add_cell(Cell('{:6.2f}'.format(competitor_score)))
-        if best_score is None:
-            best_score = competitor_score
-        row.add_cell(Cell('{:2d}'.format(int(competitor_score / best_score * 1000))))
-        row.add_cell(Cell(competitor.pilot.to_string()))
+        page.add_table(table)
+
+        # Round scores table
+        table = ResultTable('Round scores')
+        header = Header(name=Cell('Bib'))
+        header.add_cell(Cell('Name'))
         for f3f_round in event.rounds:
             if f3f_round.valid:
-                row.add_cell(Cell('{:2d}'.format(int(competitor.evolutive_rank[f3f_round.round_number-1]))))
-        table.add_line(row)
+                header.add_cell(Link('Round ' + str(f3f_round.valid_round_number),
+                                     'round_view?event_id=' + str(event_id) +
+                                     '&round_number=' + str(f3f_round.round_number)))
+        table.set_header(header)
 
-    page.add_table(table)
-
-    # Round scores table
-    table = ResultTable('Round scores')
-    header = Header(name=Cell('Bib'))
-    header.add_cell(Cell('Name'))
-    for f3f_round in event.rounds:
-        if f3f_round.has_run():
-            header.add_cell(Link('Round ' + str(f3f_round.round_number),
-                                 'round_view?event_id=' + str(event_id) +
-                                 '&round_number=' + str(f3f_round.round_number)))
-    table.set_header(header)
-
-    for competitor in sorted([competitor for bib, competitor in event.competitors.items()], key=lambda c: c.bib_number):
-        row = Line(name=Cell(str(competitor.bib_number)))
-        row.add_cell(Cell(competitor.pilot.to_string()))
-        for f3f_round in event.rounds:
-            if f3f_round.valid:
+        for competitor in sorted([competitor for bib, competitor in event.competitors.items()], key=lambda c: c.bib_number):
+            row = Line(name=Cell(str(competitor.bib_number)))
+            row.add_cell(Cell(competitor.pilot.to_string()))
+            for f3f_round in event.valid_rounds:
                 round_group = f3f_round.groups[0]
                 run = round_group.get_valid_run(competitor)
                 if run is None:
@@ -113,9 +119,9 @@ def event_view_html(event_id):
                          f3f_round.round_number == competitor.second_joker_round_number)
 
                 row.add_cell(Cell('{:2d}'.format(int(score)), joker=joker, winner=winner))
-        table.add_line(row)
+            table.add_line(row)
 
-    page.add_table(table)
+        page.add_table(table)
 
     result = page.to_html()
     return result
@@ -134,13 +140,20 @@ def round_view_html(event_id, round_number):
 
     f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
 
-    page = ResultPage(title=f3f_round.event.name + '\tRound : ' + str(f3f_round.round_number))
+    if f3f_round.valid:
+        round_number = str(f3f_round.valid_round_number)
+    else:
+        round_number = 'not valid'
+
+    page = ResultPage(title=f3f_round.event.name + '\tRound : ' + round_number +
+                            '(id:' + str(f3f_round.round_number) + ')')
 
     best_runs = f3f_round.get_best_runs()
     best_runs_string = 'Best time : <br>'
 
     for run in best_runs:
-        best_runs_string += run.to_string()
+        if run is not None:
+            best_runs_string += run.to_string()
 
     table = ResultTable(title=best_runs_string)
     header = Header(name=Cell('Bib'))
@@ -167,7 +180,7 @@ def round_view_html(event_id, round_number):
 
 if __name__ == "__main__":
     # execute only if run as a script
-    #event_view_html(4)
-    round_view_html(4, 7)
+    #event_view_html(1)
+    round_view_html(1, 21)
 
 
