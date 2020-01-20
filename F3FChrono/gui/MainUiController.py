@@ -28,9 +28,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.chronoHard.status_changed.connect(self.slot_status_changed)
         self.chronoHard.lap_finished.connect(self.slot_lap_finished)
-        self.chronoHard.run_finished.connect(self.run_finished)
-        self.chronoHard.run_validated.connect(self.run_validated)
+        self.chronoHard.run_finished.connect(self.slot_run_finished)
+        self.chronoHard.run_validated.connect(self.slot_run_validated)
         self.chronoHard.wind_signal.connect(self.slot_wind_ui)
+        self.chronoHard.rssi_signal.connect(self.slot_rssi)
+        self.chronoHard.accu_signal.connect(self.slot_accu)
 
 
     def initUI(self):
@@ -176,11 +178,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_lap_finished (self, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
 
-    def run_finished(self, run_time):
+    def slot_run_finished(self, run_time):
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
 
-    def run_validated(self):
+    def slot_run_validated(self):
         self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
         self.event.get_current_round().handle_terminated_flight(
             self.event.get_current_round().get_current_competitor(),
@@ -220,6 +222,12 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['wind'].check_rules(self.event.max_wind_dir_dev,\
                                     self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,\
                                     self.event.max_interruption_time)
+
+    def slot_accu(self, voltage):
+        self.controllers['wind'].set_voltage(voltage)
+
+    def slot_rssi(self, rssi1, rssi2):
+        self.controllers['wind'].set_rssi(rssi1, rssi2)
 
 def main ():
 

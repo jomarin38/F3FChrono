@@ -28,6 +28,8 @@ class ChronoHard(QObject):
     run_validated = pyqtSignal()
     chrono_signal = pyqtSignal(str, str, str)
     wind_signal = pyqtSignal(int, int, bool)
+    accu_signal = pyqtSignal(float)
+    rssi_signal = pyqtSignal(int, int)
 
     def __init__(self):
         super().__init__()
@@ -69,7 +71,7 @@ class ChronoRpi(ChronoHard):
         self.lastDetectionTime=0.0
         self.status=chronoStatus.InWait
         self.chrono_signal.connect(self.handle_chrono_event)
-        self.udpReceive=udpreceive(UDPPORT, self.chrono_signal, self.wind_signal)
+        self.udpReceive=udpreceive(UDPPORT, self.chrono_signal, self.wind_signal, self.accu_signal, self.rssi_signal)
         self.udpBeep=udpbeep(IPUDPBEEP, UDPPORT)
 
     def __del__(self):
