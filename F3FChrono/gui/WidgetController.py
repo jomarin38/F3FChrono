@@ -146,6 +146,13 @@ class WWindCtrl():
             cancelstr=', Cancel Round'
         return cancelstr
 
+    def set_voltage(self, voltage):
+        self.view.voltage.setText(str(voltage)+" V")
+
+    def set_rssi(self, rssi1, rssi2):
+        self.view.rssi.setText("piCAM1 : "+str(rssi1) + "%, piCAM2 : "+str(rssi2)+"%")
+
+
 class WPilotCtrl():
     def __init__(self, name, parent):
         self.view = Ui_WPilot()
