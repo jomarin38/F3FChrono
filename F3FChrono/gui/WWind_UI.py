@@ -68,7 +68,7 @@ class Ui_WWind(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.rssi.sizePolicy().hasHeightForWidth())
         self.rssi.setSizePolicy(sizePolicy)
-        self.rssi.setMaximumSize(QtCore.QSize(163, 16777215))
+        self.rssi.setMaximumSize(QtCore.QSize(120, 16777215))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -88,7 +88,7 @@ class Ui_WWind(object):
         self.voltage.setText(_translate("WWind", "12.6 V"))
         self.btn_clear.setText(_translate("WWind", "X"))
         self.Elapsedtime.setText(_translate("WWind", "Elapsed time : "))
-        self.rssi.setText(_translate("WWind", "piCAM1 : 90%, piCAM2 : 95%"))
+        self.rssi.setText(_translate("WWind", "rssi1, 2 : 90%, 95%"))
 
 
 if __name__ == "__main__":

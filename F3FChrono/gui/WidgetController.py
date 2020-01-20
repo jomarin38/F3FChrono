@@ -124,7 +124,7 @@ class WWindCtrl():
                         self.view.btn_clear.setVisible(True)
                         self.rules['alarm']=True
 
-                    self.view.Elapsedtime.setText("Elapsed time : "+\
+                    self.view.Elapsedtime.setText("time : "+\
                                 time.strftime("%H:%M:%S", time.gmtime(time.time()-self.rules['time(s)']))\
                                 +self.cancelroundtostr())
 
@@ -143,14 +143,15 @@ class WWindCtrl():
     def cancelroundtostr(self):
         cancelstr=''
         if self.rules['alarm']:
-            cancelstr=', Cancel Round'
+            #cancelstr=', Cancel Round'
+            cancelstr =''
         return cancelstr
 
     def set_voltage(self, voltage):
         self.view.voltage.setText(str(voltage)+" V")
 
     def set_rssi(self, rssi1, rssi2):
-        self.view.rssi.setText("piCAM1 : "+str(rssi1) + "%, piCAM2 : "+str(rssi2)+"%")
+        self.view.rssi.setText("rssi1, 2 : "+str(rssi1) + "%, "+str(rssi2)+"%")
 
 
 class WPilotCtrl():
