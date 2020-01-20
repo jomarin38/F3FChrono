@@ -7,7 +7,7 @@ import os
 import platform
 from F3FChrono.chrono.Chrono import chronoStatus
 
-
+#https://pythonbasics.org/python-play-sound/
 class chronoSound(threading.Thread):
     def __init__(self, sound):
         super(chronoSound, self).__init__()

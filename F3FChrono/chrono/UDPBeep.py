@@ -7,9 +7,7 @@ import logging
 import sys
 from PyQt5.QtCore import QObject
 
-UDP_IP_UDPBEEP = "192.168.1.72"
-UDP_IP_HOME = "192.168.0.23"
-UDP_PORT = 4445
+
 INITMSG = "Init"
 EVENTMSG = "Event"
 
@@ -21,6 +19,9 @@ class udpbeep(QObject):
         self.sock=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+    def __del__(self):
+        del self.sock
 
     def send(self):
         self.sock.sendto(bytes('event', 'utf-8'), (self.udpip, self.port))
@@ -34,8 +35,8 @@ class udpbeep(QObject):
 
 if __name__ == '__main__':
     print ("UDP Beep Debug")
-    #udpbeep = udpBeep ("192.168.0.22", UDP_PORT)
-    udpBeep = udpbeep ("255.255.255.255", UDP_PORT)
+    #udpbeep = udpBeep ("192.168.0.22", 4445)
+    udpBeep = udpbeep ("255.255.255.255", 4445)
     end=False
     while not end:
         cmdline=sys.stdin.readline ()
