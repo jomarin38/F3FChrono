@@ -6,11 +6,11 @@ from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.chrono.Sound import chronoSound
-
+from F3FChrono.chrono.GPIOPort import *
 
 
 class MainUiCtrl (QtWidgets.QMainWindow):
-    def __init__(self, dao, chronodata, sound):
+    def __init__(self, dao, chronodata, sound, rpi):
         super().__init__()
 
         self.dao = dao
@@ -19,6 +19,15 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronodata = chronodata
         self.chronoRpi=ChronoRpi()
         self.chronoArduino=ChronoArduino()
+        self.buzzer=None
+        if rpi!='':
+            self.buzzer=gpioPort(19, duration=1000,start_blinks=2)
+            #btn_next callback
+            addCallback(12, self.btn_next_action, False)
+            #btn_baseA
+            addCallback(5, self.btn_baseA, False)
+            #btn_baseB
+            addCallback(6, self.btn_baseB, False)
 
         self.chronoHard = self.chronoRpi
         self.initUI()
@@ -33,7 +42,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard.wind_signal.connect(self.slot_wind_ui)
         self.chronoHard.rssi_signal.connect(self.slot_rssi)
         self.chronoHard.accu_signal.connect(self.slot_accu)
+        self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
 
+    def __del__(self):
+        self.buzzer.terminated=True
+        self.buzzer.join()
 
     def initUI(self):
         self.MainWindow = QtWidgets.QMainWindow()
@@ -122,6 +135,21 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def next_action(self):
         self.chronoHard.chrono_signal.emit("btnnext","event","btnnext")
 
+    def btn_next_action(self, port):
+        self.chronoHard.chrono_signal.emit("btnnext","event","btnnext")
+
+    def btn_baseA(self, port):
+        print("btn base A")
+        self.chronoHard.chrono_signal.emit("udpreceive","event","baseA")
+
+    def btn_baseB(self, port):
+        print("btn base B")
+        self.chronoHard.chrono_signal.emit("udpreceive","event","baseB")
+    
+    def slot_buzzer(self):
+        if (self.buzzer):
+            self.buzzer.event.set()
+
     def penalty_100(self):
         #print("penalty event 100")
         self.chronoHard.addPenalty(100)
@@ -177,6 +205,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def slot_lap_finished (self, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
+
 
     def slot_run_finished(self, run_time):
         self.controllers['round'].wChronoCtrl.stoptime()

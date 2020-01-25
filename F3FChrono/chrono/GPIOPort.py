@@ -79,15 +79,30 @@ class gpioPort(threading.Thread):
 
         #GPIO.cleanup(self.port)
         GPIO.cleanup()
+        
+        
+def event_detected(port):
+    print("callback "+str(port))
 
 if __name__ == '__main__':
-    def pressed(value):
+    led=gpioPort(19, duration=1000,start_blinks=2)
+    addCallback (12, event_detected, False)
+    addCallback (5, event_detected, False)
+    addCallback (6, event_detected, False)
+    
+    sleep(10)
+
+    led.terminated=True
+    led.join()
+          
+
+'''    def pressed(value):
         print("pressed %d" % value)
 
     #addCallback(2,pressed)
     statusLED(23,on=True)
 
-    p1=17
+    p1=19
     p2=27
 
     port1 = gpioPort(p1)
@@ -104,3 +119,4 @@ if __name__ == '__main__':
 
     statusLED(23, on=False)
     GPIO.cleanup()
+'''
