@@ -25,14 +25,13 @@ def get_raspi_revision():
         line = os.read(fd,256)
         os.close(fd)
         print (line)
-        m = re.match('Raspberry Pi (\d+) Model (\w(?: Plus)?) Rev ([\d\.]+)', line)
+        m=re.split(r'\s', line.decode('utf-8'))
         if m:
-            info['pi'] = m.group(1)
-            info['model'] = m.group(2)
-            info['rev'] = m.group(3)
+            info['pi'] = m[3]
+            info['model'] = m[5]
+        return info
     except:
         pass
-
     return info
 
 def main():
@@ -51,7 +50,7 @@ def main():
 
 
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(dao, chronodata, config.conf['sound'])
+    ui=MainUiCtrl(dao, chronodata, config.conf['sound'], rpi=pi['pi'])
 
     #launched simulate mode
     if (config.conf['simulate']):
@@ -64,6 +63,7 @@ def main():
         pass
     finally:
         pass
+
 
 if __name__ == '__main__':
     parser = ArgumentParser(prog='chrono')

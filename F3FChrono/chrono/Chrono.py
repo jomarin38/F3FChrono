@@ -26,6 +26,7 @@ class ChronoHard(QObject):
     lap_finished = pyqtSignal(float)
     run_finished = pyqtSignal(float)
     run_validated = pyqtSignal()
+    buzzer_validated = pyqtSignal()
     chrono_signal = pyqtSignal(str, str, str)
     wind_signal = pyqtSignal(int, int, bool)
     accu_signal = pyqtSignal(float)
@@ -36,6 +37,7 @@ class ChronoHard(QObject):
         self.penalty = 0.0
         self.startTime=None
         self.endTime=None
+
 
     def reset(self):
         print("reset")
@@ -96,6 +98,7 @@ class ChronoRpi(ChronoHard):
         self.penalty=0.0
 
     def handle_chrono_event(self, caller, data, address):
+        self.buzzer_validated.emit()
         if ((self.status == chronoStatus.Launched or self.status == chronoStatus.InStart or
              self.status == chronoStatus.InProgress) and caller == "udpreceive" or caller == "btnnext") and data == "event":
             self.__declareBase(address)
