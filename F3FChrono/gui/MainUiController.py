@@ -5,7 +5,7 @@ from F3FChrono.gui.WidgetController import *
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
 from F3FChrono.data.Chrono import Chrono
-from F3FChrono.chrono.Sound import chronoSound
+from F3FChrono.chrono.Sound import chronoVocal
 from F3FChrono.chrono.GPIOPort import *
 
 
@@ -33,7 +33,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.initUI()
         self.base_test = -10
 
-        self.vocal = chronoSound(sound)
+        if sound:
+            self.vocal = chronoVocal()
 
         self.chronoHard.status_changed.connect(self.slot_status_changed)
         self.chronoHard.lap_finished.connect(self.slot_lap_finished)
@@ -45,8 +46,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
 
     def __del__(self):
-        self.buzzer.terminated=True
-        self.buzzer.join()
+        if self.buzzer!=None:
+            self.buzzer.terminated=True
+            self.buzzer.join()
 
     def initUI(self):
         self.MainWindow = QtWidgets.QMainWindow()
@@ -152,10 +154,12 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def penalty_100(self):
         #print("penalty event 100")
+        self.vocal.sound_penalty()
         self.chronoHard.addPenalty(100)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
     def penalty_1000(self):
+        self.vocal.sound_penalty()
         self.chronoHard.addPenalty(1000)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
@@ -203,13 +207,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if (status == chronoStatus.InProgress):
             self.controllers['round'].wChronoCtrl.settime(0, True)
 
-    def slot_lap_finished (self, last_lap_time):
+    def slot_lap_finished (self, lap, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
-
+        self.vocal.sound_base(lap)
 
     def slot_run_finished(self, run_time):
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
+        self.vocal.sound_time(run_time)
 
     def slot_run_validated(self):
         self.chronoHard_to_chrono(self.chronoHard, self.chronodata)

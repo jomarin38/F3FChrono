@@ -5,6 +5,7 @@ import threading
 import time
 import os
 import platform
+import pygame
 from F3FChrono.chrono.Chrono import chronoStatus
 
 #https://pythonbasics.org/python-play-sound/
@@ -56,9 +57,16 @@ class chronoSound(threading.Thread):
             os.system("play -n -C1 synth 0.2 sine 500")
             
 class chronoVocal(): #to use this class, it's needed to install festival application. Terminal commande line : sudo apt-get install festival
+
     def __init__(self):
         super().__init__()
-
+        pygame.mixer.init()
+        self.sound=[]
+        pathname = '/home/sdaviet/PycharmProjects/F3FChrono/Sound/'
+        for index in range(11):
+            self.sound.append(pathname+'base'+str(index)+'.wav')
+        self.penalty=pathname+'penalty.wav'
+        self.start=pathname+'start.wav'
     def Sound (self, status, chronoLap):
         if (platform.system()=='Linux'):
             msg=None
@@ -71,16 +79,38 @@ class chronoVocal(): #to use this class, it's needed to install festival applica
                 msg = 'echo "Started" | festival --tts'
             elif(status==chronoStatus.InProgress and chronoLap>0):
                 msg = 'echo "Lap {}" | festival --tts'.format(chronoLap)
+
             if (msg!=None):
                 os.system(msg)
 
+    def sound_time (self, time):
+        self.waitfinish()
+        if (platform.system()=='Linux'):
+            msg=None
+            msg = 'echo "{:0>.2f} seconds" | festival --tts'.format(time)
+            if (msg!=None):
+                os.system(msg)
 
-        
+    def sound_base(self, index):
+        self.waitfinish()
+        pygame.mixer.music.load(self.sound[index])
+        pygame.mixer.music.play()
+
+    def sound_penalty(self):
+        self.waitfinish()
+        pygame.mixer.music.load(self.penalty)
+        pygame.mixer.music.play()
+
+    def waitfinish(self):
+        while pygame.mixer.music.get_busy() == True:
+            continue
+
 
         
         
 if __name__ == '__main__':
-    print ("Main start")
+
+    '''print ("Main start")
     #Sound = chronoSound ()
     Vocal = chronoVocal ()
     #Sound.event.set ()
@@ -89,7 +119,15 @@ if __name__ == '__main__':
     #Sound.terminated=True
     #Sound.join ()
 
-    
+    '''
+    Vocal=chronoVocal()
+    for i in range(11):
+        Vocal.sound_base(i)
+        time.sleep(1)
+        Vocal.waitfinish()
+    Vocal.sound_time(50.31)
+    Vocal.sound_penalty()
+    Vocal.waitfinish()
 
 
 

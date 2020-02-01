@@ -1,7 +1,7 @@
 {
  "debug": false,
  "simulate": true,
- "sound": false,
+ "sound": true,
  "vocal": false,
  "greenLEDPort": 17, 
  "ledActiveLow": false, 

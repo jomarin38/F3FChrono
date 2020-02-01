@@ -1,6 +1,7 @@
 import time
 import os
 from datetime import datetime
+import collections
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.chrono.UDPBeep import *
 from F3FChrono.chrono.UDPReceive import *
@@ -23,7 +24,7 @@ class chronoStatus():
 
 class ChronoHard(QObject):
     status_changed = pyqtSignal(int)
-    lap_finished = pyqtSignal(float)
+    lap_finished = pyqtSignal(int, float)
     run_finished = pyqtSignal(float)
     run_validated = pyqtSignal()
     buzzer_validated = pyqtSignal()
@@ -37,6 +38,9 @@ class ChronoHard(QObject):
         self.penalty = 0.0
         self.startTime=None
         self.endTime=None
+        self.wind_signal.connect(self.wind_info)
+        self.wind= collections.OrderedDict()
+        self.reset_wind()
 
 
     def reset(self):
@@ -60,8 +64,46 @@ class ChronoHard(QObject):
         print("setstatus")
 
 
-    def wind_info(self):
+    def wind_info(self, speed, orientation, rain):
         print("wind_info")
+        self.wind['speed_nb']+=1
+        self.wind['speed_sum']+=speed
+
+        if speed<self.wind['speed_min']:
+            self.wind['speed_min']=speed
+        if speed>self.wind['speed_max']:
+            self.wind['speed_max'] = speed
+
+        self.wind['orientation_sum']+=orientation
+        self.wind['orientation_nb']+=1
+        if rain:
+            self.wind['rain']=True
+
+    def getMaxWindSpeed(self):
+        return self.wind['speed_max']
+
+    def getMinWindSpeed(self):
+        return self.wind['speed_min']
+
+    def getMeanWindSpeed(self):
+        return self.wind['speed_sum']/self.wind['speef_nb']
+
+    def getWindDir(self):
+        return self.wind['orientation_sum']/self.wind['orientation_nb']
+
+    def getRain(self):
+        return self.wind['rain']
+
+    def reset_wind(self):
+        self.wind['speed_sum'] = 0
+        self.wind['speed_nb'] = 0
+        self.wind['speed_min']=0
+        self.wind['speed_max']=0
+        self.wind['orientation_sum']=0
+        self.wind['orientation_nb']=0
+
+        self.wind['rain']=False
+
 
 class ChronoRpi(ChronoHard):
     def __init__(self):
@@ -96,6 +138,7 @@ class ChronoRpi(ChronoHard):
         self.set_status(chronoStatus.InWait)
         self.lastBase=-2
         self.penalty=0.0
+        self.reset_wind()
 
     def handle_chrono_event(self, caller, data, address):
         self.buzzer_validated.emit()
@@ -130,7 +173,7 @@ class ChronoRpi(ChronoHard):
             if (self.status==chronoStatus.InProgress):
                 self.chronoLap.append(elapsedTime)
                 self.timelost.append(0.0)
-                self.lap_finished.emit(elapsedTime)
+                self.lap_finished.emit(self.getLapCount(), elapsedTime)
 
             if (self.getLapCount()==10):
                 self.endTime=datetime.now()
@@ -173,17 +216,6 @@ class ChronoRpi(ChronoHard):
     def getLapCount(self):
         return len(self.chronoLap)
 
-
-
-    def getMaxWindSpeed(self):
-        return None
-
-    def getMinWindSpeed(self):
-        return None
-
-    def getWindDir(self):
-        return None
-
     def to_string(self):
         result=os.linesep+"Chrono Data : "+os.linesep+"\tStart Time : "+ str(self.startTime)+\
                os.linesep+"\tEnd Time : "+str(self.endTime)+os.linesep+"\tRun Time : "+\
@@ -191,6 +223,11 @@ class ChronoRpi(ChronoHard):
         for lap in self.getLaps():
             result+="{:0>6.3f}".format(lap)+","
         result+=os.linesep+"\tPenalty : "+str(self.penalty)+os.linesep
+        result+="Wind Speed :"+os.linesep+"\tMean : "+"{:0>6.1f}".format(self.getMeanWindSpeed())+os.linesep+\
+                "\tMin : "+"{:0>6.1f}".format(self.getMinWindSpeed())+os.linesep+\
+                "\tMax : " + "{:0>6.1f}".format(self.getMaxWindSpeed()) + os.linesep +\
+                "Wind Orientation : " + "{:0>6.1f}".format(self.getMaxWindSpeed()) + os.linesep +\
+                "rain : " + str(self.getRain()) + os.linesep
         return (result)
 
 class ChronoArduino(ChronoHard):
