@@ -33,6 +33,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.initUI()
         self.base_test = -10
 
+        self.vocal=None
         if sound:
             self.vocal = chronoVocal()
 
@@ -154,12 +155,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def penalty_100(self):
         #print("penalty event 100")
-        self.vocal.sound_penalty()
+        if self.vocal:
+            self.vocal.sound_penalty()
         self.chronoHard.addPenalty(100)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
     def penalty_1000(self):
-        self.vocal.sound_penalty()
+        if self.vocal:
+            self.vocal.sound_penalty()
         self.chronoHard.addPenalty(1000)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
@@ -209,12 +212,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def slot_lap_finished (self, lap, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
-        self.vocal.sound_base(lap)
+        if self.vocal:
+            self.vocal.sound_base(lap)
 
     def slot_run_finished(self, run_time):
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
-        self.vocal.sound_time(run_time)
+        if self.vocal:
+            self.vocal.sound_time(run_time)
 
     def slot_run_validated(self):
         self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
