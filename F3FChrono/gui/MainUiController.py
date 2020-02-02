@@ -1,11 +1,11 @@
-import collections
+
 
 from F3FChrono.gui.MainUi_UI import *
 from F3FChrono.gui.WidgetController import *
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
 from F3FChrono.data.Chrono import Chrono
-from F3FChrono.chrono.Sound import chronoVocal
+from F3FChrono.chrono.Sound import *
 from F3FChrono.chrono.GPIOPort import *
 
 
@@ -35,7 +35,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.vocal=None
         if sound:
-            self.vocal = chronoVocal()
+            self.vocal = chronoQSound()
 
         self.chronoHard.status_changed.connect(self.slot_status_changed)
         self.chronoHard.lap_finished.connect(self.slot_lap_finished)
@@ -156,13 +156,13 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def penalty_100(self):
         #print("penalty event 100")
         if self.vocal:
-            self.vocal.sound_penalty()
+            self.vocal.signal_penalty.emit()
         self.chronoHard.addPenalty(100)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
     def penalty_1000(self):
         if self.vocal:
-            self.vocal.sound_penalty()
+            self.vocal.signal_penalty.emit()
         self.chronoHard.addPenalty(1000)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
@@ -204,22 +204,30 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_status_changed(self, status):
         self.controllers['round'].wChronoCtrl.set_status(status)
         if (status==chronoStatus.WaitLaunch):
+            if self.vocal:
+                self.vocal.signal_start.emit()
+                time.sleep(0.7)
             self.controllers['round'].wChronoCtrl.settime(30000, False)
         if (status == chronoStatus.Launched):
+            if self.vocal:
+                self.vocal.signal_start.emit()
+                time.sleep(1)
             self.controllers['round'].wChronoCtrl.settime(30000, False)
         if (status == chronoStatus.InProgress):
+            if self.vocal:
+                self.vocal.signal_base.emit(0)
             self.controllers['round'].wChronoCtrl.settime(0, True)
 
     def slot_lap_finished (self, lap, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
         if self.vocal:
-            self.vocal.sound_base(lap)
+            self.vocal.signal_base.emit(lap)
 
     def slot_run_finished(self, run_time):
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         if self.vocal:
-            self.vocal.sound_time(run_time)
+            self.vocal.signal_time.emit(run_time)
 
     def slot_run_validated(self):
         self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
@@ -267,6 +275,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def slot_rssi(self, rssi1, rssi2):
         self.controllers['wind'].set_rssi(rssi1, rssi2)
+
 
 def main ():
 
