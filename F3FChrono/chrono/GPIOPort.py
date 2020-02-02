@@ -2,6 +2,7 @@
 import threading
 from time import sleep
 import RPi.GPIO as GPIO
+from PyQt5.QtCore import QObject, pyqtSignal
 
 def statusLED(port, on=True):
     """
@@ -83,6 +84,32 @@ class gpioPort(threading.Thread):
         
 def event_detected(port):
     print("callback "+str(port))
+
+
+class rpi_gpio(QObject):
+    signal_buzzer = pyqtSignal ()
+
+    def __init__(self, rpi, btn_next_action, btn_baseA, btn_baseB):
+        super().__init__()
+        self.signal_buzzer.connect(self.buzzer_fct)
+        self.buzzer = None
+        if rpi != '':
+            self.buzzer = gpioPort(19, duration=1000,start_blinks=2)
+            #btn_next callback
+            addCallback(12, btn_next_action, False)
+            #btn_baseA
+            addCallback(5, btn_baseA, False)
+            #btn_baseB
+            addCallback(6, btn_baseB, False)
+
+    def __del__(self):
+        if self.buzzer!=None:
+            self.buzzer.terminated=True
+            self.buzzer.join()
+
+    def buzzer_fct(self):
+        if self.buzzer!=None:
+            self.buzzer.event()
 
 if __name__ == '__main__':
     led=gpioPort(19, duration=1000,start_blinks=2)

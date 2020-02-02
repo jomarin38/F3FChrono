@@ -2,15 +2,13 @@ import time
 import os
 import sys
 import platform
-import pygame
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer, QCoreApplication
 from PyQt5.QtMultimedia import QSound
+from F3FChrono.chrono import ConfigReader
 
 
-
-from F3FChrono.chrono.Chrono import chronoStatus
-
-class chronoVocal(QObject): #to use this class, it's needed to install festival and pygame class. Terminal commande line : sudo apt-get install festival, pip3 install pygame
+'''class chronoVocal(QObject): #to use this class, it's needed to install festival and pygame class. Terminal commande line : sudo apt-get install festival, pip3 install pygame
+    import pygame
     signal_penalty = pyqtSignal()
     signal_base = pyqtSignal(int)
     signal_time = pyqtSignal(float)
@@ -59,12 +57,15 @@ class chronoVocal(QObject): #to use this class, it's needed to install festival 
     def waitfinish(self):
         while pygame.mixer.music.get_busy() == True:
             continue
+'''
+
 
 class chronoQSound(QObject):
     signal_penalty = pyqtSignal()
     signal_base = pyqtSignal(int)
     signal_time = pyqtSignal(float)
-    signal_start = pyqtSignal()
+    signal_waitlaunch = pyqtSignal()
+    signal_waitstart = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -73,34 +74,43 @@ class chronoQSound(QObject):
         for index in range(11):
             self.sound.append(QSound(self.pathname+'base'+str(index)+'.wav'))
         self.penalty=QSound(self.pathname+'penalty.wav')
-        self.start=QSound(self.pathname+'start.wav')
+        self.waitlaunch=QSound(self.pathname+'start.wav')
+        self.waitstart=QSound(self.pathname+'start.wav')
 
         self.signal_base.connect(self.sound_base)
         self.signal_penalty.connect(self.sound_penalty)
         self.signal_time.connect(self.sound_time)
-        self.signal_start.connect(self.sound_start)
+        self.signal_waitlaunch.connect(self.sound_waitlaunch)
+        self.signal_waitstart.connect(self.sound_waitstart)
         self.soundstart_run=False
+
 
     def sound_time(self, time):
         if (platform.system()=='Linux'):
-            msg=None
             msg = 'echo "{:0>.2f} seconds" | festival --tts'.format(time)
-            if (msg!=None):
+            if (ConfigReader.config.conf['sound']):
                 os.system(msg)
 
     def sound_base(self, index):
-        if self.soundstart_run:
-            self.start.stop()
-        self.sound[index].play()
+        if ConfigReader.config.conf['sound']:
+            self.sound[index].play()
+            if self.soundstart_run:
+                self.waitstart.stop()
 
     def sound_penalty(self):
-        self.penalty.play()
+        if ConfigReader.config.conf['sound']:
+            self.penalty.play()
 
-    def sound_start(self):
-        if self.soundstart_run:
-            self.start.stop()
-        self.start.play()
-        self.soundstart_run=True
+    def sound_waitlaunch(self):
+        if ConfigReader.config.conf['sound']:
+            self.waitlaunch.play()
+            self.soundstart_run=True
+    def sound_waitstart(self):
+        if ConfigReader.config.conf['sound']:
+            self.waitstart.play()
+            if self.soundstart_run:
+                self.waitlaunch.stop()
+            self.soundstart_run=True
 
 
 if __name__ == '__main__':
@@ -126,8 +136,9 @@ if __name__ == '__main__':
     '''
     app = QCoreApplication(sys.argv)
     Vocal = chronoQSound()
-    Vocal.sound_start()
+    Vocal.sound_waitstart()
     time.sleep(1)
+    #Vocal.sound_time(100)
     sys.exit(app.exec_())
 
 

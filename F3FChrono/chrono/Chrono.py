@@ -86,10 +86,16 @@ class ChronoHard(QObject):
         return self.wind['speed_min']
 
     def getMeanWindSpeed(self):
-        return self.wind['speed_sum']/self.wind['speef_nb']
+        if (self.wind['speed_nb']!=0):
+            return self.wind['speed_sum']/self.wind['speed_nb']
+        else:
+            return 0
 
     def getWindDir(self):
-        return self.wind['orientation_sum']/self.wind['orientation_nb']
+        if (self.wind['orientation_nb']!=0):
+            return self.wind['orientation_sum']/self.wind['orientation_nb']
+        else:
+            return 0
 
     def getRain(self):
         return self.wind['rain']

@@ -1,16 +1,16 @@
-
-
+from F3FChrono.chrono import ConfigReader
 from F3FChrono.gui.MainUi_UI import *
 from F3FChrono.gui.WidgetController import *
+from F3FChrono.gui.Simulate_base import SimulateBase
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.chrono.Sound import *
-from F3FChrono.chrono.GPIOPort import *
+from F3FChrono.chrono.GPIOPort import rpi_gpio
 
 
 class MainUiCtrl (QtWidgets.QMainWindow):
-    def __init__(self, dao, chronodata, sound, rpi):
+    def __init__(self, dao, chronodata, rpi):
         super().__init__()
 
         self.dao = dao
@@ -19,23 +19,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronodata = chronodata
         self.chronoRpi=ChronoRpi()
         self.chronoArduino=ChronoArduino()
-        self.buzzer=None
-        if rpi!='':
-            self.buzzer=gpioPort(19, duration=1000,start_blinks=2)
-            #btn_next callback
-            addCallback(12, self.btn_next_action, False)
-            #btn_baseA
-            addCallback(5, self.btn_baseA, False)
-            #btn_baseB
-            addCallback(6, self.btn_baseB, False)
-
+        self.rpigpio=rpi_gpio(rpi, self.btn_next_action, self.btn_baseA, self.btn_baseB)
         self.chronoHard = self.chronoRpi
-        self.initUI()
         self.base_test = -10
-
-        self.vocal=None
-        if sound:
-            self.vocal = chronoQSound()
+        self.vocal = chronoQSound()
 
         self.chronoHard.status_changed.connect(self.slot_status_changed)
         self.chronoHard.lap_finished.connect(self.slot_lap_finished)
@@ -45,11 +32,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard.rssi_signal.connect(self.slot_rssi)
         self.chronoHard.accu_signal.connect(self.slot_accu)
         self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
-
-    def __del__(self):
-        if self.buzzer!=None:
-            self.buzzer.terminated=True
-            self.buzzer.join()
+        self.initUI()
 
     def initUI(self):
         self.MainWindow = QtWidgets.QMainWindow()
@@ -139,30 +122,27 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard.chrono_signal.emit("btnnext","event","btnnext")
 
     def btn_next_action(self, port):
-        self.chronoHard.chrono_signal.emit("btnnext","event","btnnext")
+        self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
 
     def btn_baseA(self, port):
         print("btn base A")
-        self.chronoHard.chrono_signal.emit("udpreceive","event","baseA")
+        self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseA")
 
     def btn_baseB(self, port):
         print("btn base B")
-        self.chronoHard.chrono_signal.emit("udpreceive","event","baseB")
+        self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseB")
     
     def slot_buzzer(self):
-        if (self.buzzer):
-            self.buzzer.event.set()
+        self.rpigpio.signal_buzzer.emit()
 
     def penalty_100(self):
         #print("penalty event 100")
-        if self.vocal:
-            self.vocal.signal_penalty.emit()
+        self.vocal.signal_penalty.emit()
         self.chronoHard.addPenalty(100)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
     def penalty_1000(self):
-        if self.vocal:
-            self.vocal.signal_penalty.emit()
+        self.vocal.signal_penalty.emit()
         self.chronoHard.addPenalty(1000)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
@@ -204,30 +184,26 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_status_changed(self, status):
         self.controllers['round'].wChronoCtrl.set_status(status)
         if (status==chronoStatus.WaitLaunch):
-            if self.vocal:
-                self.vocal.signal_start.emit()
-                time.sleep(0.7)
+            self.vocal.signal_waitlaunch.emit()
+            time.sleep(0.7)
             self.controllers['round'].wChronoCtrl.settime(30000, False)
         if (status == chronoStatus.Launched):
-            if self.vocal:
-                self.vocal.signal_start.emit()
-                time.sleep(1)
+            self.vocal.signal_waitstart.emit()
+            time.sleep(1)
             self.controllers['round'].wChronoCtrl.settime(30000, False)
         if (status == chronoStatus.InProgress):
-            if self.vocal:
-                self.vocal.signal_base.emit(0)
+            self.vocal.signal_base.emit(0)
             self.controllers['round'].wChronoCtrl.settime(0, True)
 
     def slot_lap_finished (self, lap, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
-        if self.vocal:
-            self.vocal.signal_base.emit(lap)
+        self.vocal.signal_base.emit(lap)
 
     def slot_run_finished(self, run_time):
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
-        if self.vocal:
-            self.vocal.signal_time.emit(run_time)
+        time.sleep(0.5)     #wait gui has been refresh otherwise the time is updated after vocal sound
+        self.vocal.signal_time.emit(run_time)
 
     def slot_run_validated(self):
         self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
@@ -279,13 +255,15 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
 def main ():
 
+    ConfigReader.init()
+    ConfigReader.config = ConfigReader.Configuration ('../../config.json')
     dao = EventDAO()
     chronodata = Chrono()
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(dao, chronodata, False)
-
-
-
+    ui=MainUiCtrl(dao, chronodata, '')
+    #launched simulate mode
+    if (ConfigReader.config.conf['simulate']):
+        ui_simulate=SimulateBase()
     try:
         # writer.setupDecoder()
         print("lancement IHM")

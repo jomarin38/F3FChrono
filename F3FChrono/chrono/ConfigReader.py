@@ -56,6 +56,10 @@ default_config = \
     "UDPPORT" : 4445
 }
 
+def init():
+    global config
+    config=default_config
+
 class Configuration:
     def __init__(self, file_name=None):
         self.conf = default_config
