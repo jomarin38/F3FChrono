@@ -86,9 +86,9 @@ class chronoQSound(QObject):
 
 
     def sound_time(self, time):
-        if (platform.system()=='Linux'):
-            msg = 'echo "{:0>.2f} seconds" | festival --tts'.format(time)
-            if (ConfigReader.config.conf['sound']):
+        if (ConfigReader.config.conf['voice']):
+            if (platform.system()=='Linux'):
+                msg = 'echo "{:0>.2f} seconds" | festival --tts'.format(time)
                 os.system(msg)
 
     def sound_base(self, index):

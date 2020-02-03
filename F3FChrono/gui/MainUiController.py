@@ -54,7 +54,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 self.ui.verticalLayout.addWidget(x)
 
         #connect signal event to method
-        self.controllers['config'].btn_settings_sig.connect(self.show_settings)
+        self.controllers['config'].btn_settings_sig.connect(self.set_show_settings)
         self.controllers['config'].btn_next_sig.connect(self.start)
         self.controllers['config'].contest_sig.connect(self.contest_changed)
         self.controllers['config'].chrono_sig.connect(self.chronotype_changed)
@@ -108,7 +108,15 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
+    def set_show_settings(self):
+        self.controllers['settings'].set_data()
+        self.controllers['settingsadvanced'].set_data()
+        self.show_settings()
+
     def settings_valid(self):
+        self.controllers['settings'].get_data()
+        self.controllers['settingsadvanced'].get_data()
+        ConfigReader.config.write('config.json')
         self.show_config()
 
     def home_action(self):
@@ -232,8 +240,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_run_finished(self, run_time):
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
-        time.sleep(0.5)     #wait gui has been refresh otherwise the time is updated after vocal sound
-        self.vocal.signal_time.emit(run_time)
+        if ConfigReader.config.conf["voice"]:
+            time.sleep(0.5)     #wait gui has been refresh otherwise the time is updated after vocal sound
+            self.vocal.signal_time.emit(run_time)
 
     def slot_run_validated(self):
         self.chronoHard_to_chrono(self.chronoHard, self.chronodata)

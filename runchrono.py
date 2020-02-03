@@ -46,7 +46,7 @@ def main():
     ui=MainUiCtrl(dao, chronodata, rpi=pi['pi'])
 
     #launched simulate mode
-    if (ConfigReader.config.conf['simulate']):
+    if (ConfigReader.config.conf['simulatemode']):
         ui_simulate=SimulateBase()
 
     try:

@@ -41,19 +41,22 @@ import json
 
 default_config = \
 {
-    "debug": False,
-    "simulate":False,
+    "simulatemode":False,
     "sound":False,
-    "vocal":False,
-    "greenLEDPort": 17, 
-    "ledActiveLow": False, 
-    "quitAppByGPIO": False, 
-    "redLEDPort": 27,
-    "statusLEDPort":22,
-    "signalLength":300.0, 
-    "trackLifeTime": 17, 
-    "IPUDPBEEP" : "255.255.255.255",
-    "UDPPORT" : 4445
+    "voice":False,
+    "anemometer":False,
+    "arduino":False,
+    "voltage_min":9.9,
+    "btn_baseA":5,
+    "btn_baseB":6,
+    "btn_next":12,
+    "ledA":20,
+    "ledB":26,
+    "buzzer":19,
+    "buzzer_duration":1000,
+    "buzzer_next":21,
+    "buzzer_next_duration":500,
+    "udpport" : 4445
 }
 
 def init():

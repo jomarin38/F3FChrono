@@ -39,13 +39,6 @@
      </item>
      <item>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="2" column="1">
-        <widget class="QRadioButton" name="simulate_mode">
-         <property name="text">
-          <string>Simulate Mode</string>
-         </property>
-        </widget>
-       </item>
        <item row="5" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
@@ -85,7 +78,14 @@
        <item row="2" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QDoubleSpinBox" name="voltagemin"/>
+          <widget class="QDoubleSpinBox" name="voltagemin">
+           <property name="decimals">
+            <number>1</number>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_2">
@@ -95,34 +95,6 @@
           </widget>
          </item>
         </layout>
-       </item>
-       <item row="1" column="0">
-        <widget class="QRadioButton" name="arduino">
-         <property name="text">
-          <string>ArduinoChrono</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QRadioButton" name="sound">
-         <property name="text">
-          <string>Sound</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QRadioButton" name="anemometer">
-         <property name="text">
-          <string>Anemometer</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QRadioButton" name="voice">
-         <property name="text">
-          <string>Voice</string>
-         </property>
-        </widget>
        </item>
        <item row="3" column="0">
         <widget class="QPushButton" name="btn_invertpicam">
@@ -245,6 +217,41 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="sound">
+         <property name="text">
+          <string>Sound</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QCheckBox" name="voice">
+         <property name="text">
+          <string>Voice</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="anemometer">
+         <property name="text">
+          <string>Anemometer</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="simulate_mode">
+         <property name="text">
+          <string>Simulate Mode</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="arduino">
+         <property name="text">
+          <string>ArduinoChrono</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

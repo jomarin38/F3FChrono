@@ -3,6 +3,7 @@ import threading
 from time import sleep
 import RPi.GPIO as GPIO
 from PyQt5.QtCore import QObject, pyqtSignal
+from F3FChrono.chrono import ConfigReader
 
 def statusLED(port, on=True):
     """
@@ -94,13 +95,13 @@ class rpi_gpio(QObject):
         self.signal_buzzer.connect(self.buzzer_fct)
         self.buzzer = None
         if rpi != '':
-            self.buzzer = gpioPort(19, duration=1000,start_blinks=2)
+            self.buzzer = gpioPort(ConfigReader.config.conf['buzzer'], duration=ConfigReader.config.conf['buzzer_duration'],start_blinks=2)
             #btn_next callback
-            addCallback(12, btn_next_action, False)
+            addCallback(ConfigReader.config.conf['btn_next'], btn_next_action, False)
             #btn_baseA
-            addCallback(5, btn_baseA, False)
+            addCallback(ConfigReader.config.conf['btn_baseA'], btn_baseA, False)
             #btn_baseB
-            addCallback(6, btn_baseB, False)
+            addCallback(ConfigReader.config.conf['btn_baseB'], btn_baseB, False)
 
     def __del__(self):
         if self.buzzer!=None:
