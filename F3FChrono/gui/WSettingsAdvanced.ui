@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WConfig</class>
- <widget class="QWidget" name="WConfig">
+ <class>WSettingsAdvanced</class>
+ <widget class="QWidget" name="WSettingsAdvanced">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -42,7 +42,7 @@
        <item row="3" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
-          <widget class="QSpinBox" name="btn_baseB"/>
+          <widget class="QSpinBox" name="port_btn_baseB"/>
          </item>
          <item>
           <widget class="QLabel" name="label_4">
@@ -56,7 +56,7 @@
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_9">
          <item>
-          <widget class="QSpinBox" name="buzzer"/>
+          <widget class="QSpinBox" name="port_buzzer"/>
          </item>
          <item>
           <widget class="QLabel" name="label_7">
@@ -84,7 +84,7 @@
        <item row="0" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
-          <widget class="QSpinBox" name="buzzer_next"/>
+          <widget class="QSpinBox" name="port_buzzer_next"/>
          </item>
          <item>
           <widget class="QLabel" name="label_6">
@@ -98,7 +98,7 @@
        <item row="2" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QSpinBox" name="btn_baseA"/>
+          <widget class="QSpinBox" name="port_btn_baseA"/>
          </item>
          <item>
           <widget class="QLabel" name="label_2">
@@ -112,7 +112,7 @@
        <item row="2" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
-          <widget class="QSpinBox" name="btn_next"/>
+          <widget class="QSpinBox" name="port_btn_next"/>
          </item>
          <item>
           <widget class="QLabel" name="label_5">
@@ -126,7 +126,7 @@
        <item row="1" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_11">
          <item>
-          <widget class="QSpinBox" name="ledA"/>
+          <widget class="QSpinBox" name="port_ledA"/>
          </item>
          <item>
           <widget class="QLabel" name="label_9">
@@ -140,7 +140,7 @@
        <item row="1" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_12">
          <item>
-          <widget class="QSpinBox" name="ledB"/>
+          <widget class="QSpinBox" name="port_ledB"/>
          </item>
          <item>
           <widget class="QLabel" name="label_10">
@@ -156,7 +156,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QPushButton" name="StartBtn">
+        <widget class="QPushButton" name="btn_back">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -174,22 +174,15 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>buzzer</tabstop>
-  <tabstop>buzzer_next</tabstop>
-  <tabstop>ledA</tabstop>
-  <tabstop>ledB</tabstop>
-  <tabstop>btn_next</tabstop>
-  <tabstop>btn_baseA</tabstop>
+  <tabstop>port_buzzer</tabstop>
+  <tabstop>port_buzzer_next</tabstop>
+  <tabstop>port_ledA</tabstop>
+  <tabstop>port_ledB</tabstop>
+  <tabstop>port_btn_next</tabstop>
+  <tabstop>port_btn_baseA</tabstop>
   <tabstop>udp_port</tabstop>
-  <tabstop>btn_baseB</tabstop>
-  <tabstop>StartBtn</tabstop>
-  <tabstop>pushButton_4</tabstop>
-  <tabstop>radioButton_6</tabstop>
-  <tabstop>radioButton_7</tabstop>
-  <tabstop>pushButton_5</tabstop>
-  <tabstop>radioButton_8</tabstop>
-  <tabstop>spinBox_2</tabstop>
-  <tabstop>radioButton_4</tabstop>
+  <tabstop>port_btn_baseB</tabstop>
+  <tabstop>btn_back</tabstop>
  </tabstops>
  <resources/>
  <connections/>

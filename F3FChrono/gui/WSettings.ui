@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WConfig</class>
- <widget class="QWidget" name="WConfig">
+ <class>WSettings</class>
+ <widget class="QWidget" name="WSettings">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -85,7 +85,7 @@
        <item row="2" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+          <widget class="QDoubleSpinBox" name="voltagemin"/>
          </item>
          <item>
           <widget class="QLabel" name="label_2">
@@ -168,7 +168,7 @@
         </layout>
        </item>
        <item row="3" column="1">
-        <widget class="QPushButton" name="btn_invert_btn_bases">
+        <widget class="QPushButton" name="btn_invert_bases">
          <property name="text">
           <string>Invert Buttons</string>
          </property>
@@ -177,7 +177,7 @@
        <item row="4" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
-          <widget class="QLineEdit" name="btn_baseA">
+          <widget class="QLineEdit" name="baseA">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -213,7 +213,7 @@
        <item row="5" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_9">
          <item>
-          <widget class="QLineEdit" name="btn_baseB">
+          <widget class="QLineEdit" name="baseB">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -287,14 +287,14 @@
   <tabstop>voice</tabstop>
   <tabstop>arduino</tabstop>
   <tabstop>anemometer</tabstop>
-  <tabstop>doubleSpinBox</tabstop>
+  <tabstop>voltagemin</tabstop>
   <tabstop>simulate_mode</tabstop>
   <tabstop>btn_invertpicam</tabstop>
-  <tabstop>btn_invert_btn_bases</tabstop>
+  <tabstop>btn_invert_bases</tabstop>
   <tabstop>picamA</tabstop>
-  <tabstop>btn_baseA</tabstop>
+  <tabstop>baseA</tabstop>
   <tabstop>picamB</tabstop>
-  <tabstop>btn_baseB</tabstop>
+  <tabstop>baseB</tabstop>
   <tabstop>btn_advanced_settings</tabstop>
   <tabstop>btn_cancel</tabstop>
   <tabstop>btn_valid</tabstop>

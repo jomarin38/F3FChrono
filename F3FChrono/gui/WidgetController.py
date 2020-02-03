@@ -10,7 +10,11 @@ from F3FChrono.gui.WPilot_UI import Ui_WPilot
 from F3FChrono.gui.WChrono_ui import Ui_WChrono
 from F3FChrono.gui.WChronoBtn_ui import Ui_WChronoBtn
 from F3FChrono.gui.WConfig_ui import Ui_WConfig
+from F3FChrono.gui.WSettings_ui import Ui_WSettings
+from F3FChrono.gui.WSettingsAdvanced_ui import Ui_WSettingsAdvanced
 from F3FChrono.chrono.Chrono import *
+
+
 
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
@@ -176,6 +180,72 @@ class WPilotCtrl():
         self.view.bib.setText("BIB : "+str(competitor.get_bib_number()))
         self.view.round.setText("Round : "+str(round))
 
+class WSettingsAdvanced(QObject):
+    btn_settings_sig = pyqtSignal()
+    widgetList=[]
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WSettingsAdvanced()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.btn_back.clicked.connect(self.settings)
+    def get_widget(self):
+        return(self.widgetList)
+
+    def show(self):
+        self.widget.show()
+
+    def hide(self):
+        self.widget.hide()
+
+    def settings(self):
+        self.btn_settings_sig.emit()
+
+    def set_data(self):
+        print("setData")
+
+class WSettings(QObject):
+    btn_settingsadvanced_sig = pyqtSignal()
+    btn_cancel_sig = pyqtSignal()
+    btn_valid_sig = pyqtSignal()
+    widgetList=[]
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WSettings()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.btn_advanced_settings.clicked.connect(self.settingsadvanced)
+        self.view.btn_cancel.clicked.connect(self.cancel)
+        self.view.btn_valid.clicked.connect(self.valid)
+
+    def get_widget(self):
+        return(self.widgetList)
+
+    def show(self):
+        self.widget.show()
+
+    def hide(self):
+        self.widget.hide()
+
+    def settingsadvanced(self):
+        self.btn_settingsadvanced_sig.emit()
+
+    def cancel(self):
+        self.btn_cancel_sig.emit()
+
+    def valid(self):
+        self.btn_valid_sig.emit()
+
+    def set_data(self):
+        print("setData")
+
+
 class WChronoCtrl(QTimer):
     btn_null_flight_sig = pyqtSignal()
     btn_penalty_100_sig = pyqtSignal()
@@ -302,6 +372,7 @@ class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()
     contest_sig = pyqtSignal()
     chrono_sig = pyqtSignal()
+    btn_settings_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -317,10 +388,9 @@ class WConfigCtrl(QObject):
 
         # Event connect
         self.view.StartBtn.clicked.connect(self.btn_next)
-        self.view.PICamA_Btn.clicked.connect(self.btn_piCamA)
-        self.view.PICamB_Btn.clicked.connect(self.btn_piCamB)
         self.view.ContestList.currentIndexChanged.connect(self.contest_changed)
         self.view.ChronoType.currentIndexChanged.connect(self.chrono_changed)
+        self.view.btn_settings.clicked.connect(self.btn_settings)
 
     def get_widget(self):
         return(self.widgetList)
@@ -331,18 +401,9 @@ class WConfigCtrl(QObject):
     def hide(self):
         self.widget.hide()
 
-
+    def btn_settings(self):
+        self.btn_settings_sig.emit()
     def chrono_changed(self):
-        if (self.view.ChronoType.currentIndex()==chronoType.wire):
-            self.view.PICamA_Btn.setDisabled(True)
-            self.view.PICamA_Value.setDisabled(True)
-            self.view.PICamB_Btn.setDisabled(True)
-            self.view.PICamB_Value.setDisabled(True)
-        else:
-            self.view.PICamA_Btn.setDisabled(False)
-            self.view.PICamA_Value.setDisabled(False)
-            self.view.PICamB_Btn.setDisabled(False)
-            self.view.PICamB_Value.setDisabled(False)
         self.chrono_sig.emit()
 
 

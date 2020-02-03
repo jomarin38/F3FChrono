@@ -45,6 +45,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.controllers['config'] = WConfigCtrl("panel Config", self.ui.centralwidget)
         self.controllers['round'] = WRoundCtrl("panel Chrono", self.ui.centralwidget)
+        self.controllers['settings'] = WSettings("panel Settings", self.ui.centralwidget)
+        self.controllers['settingsadvanced'] = WSettingsAdvanced("panel SettingsAdvanced", self.ui.centralwidget)
         self.controllers['wind'] = WWindCtrl("panel Wind", self.ui.centralwidget)
 
         for key, ctrl in self.controllers.items():
@@ -52,6 +54,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 self.ui.verticalLayout.addWidget(x)
 
         #connect signal event to method
+        self.controllers['config'].btn_settings_sig.connect(self.show_settings)
         self.controllers['config'].btn_next_sig.connect(self.start)
         self.controllers['config'].contest_sig.connect(self.contest_changed)
         self.controllers['config'].chrono_sig.connect(self.chronotype_changed)
@@ -63,6 +66,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.btn_clear_penalty_sig.connect(self.clear_penalty)
         self.controllers['round'].wChronoCtrl.btn_null_flight_sig.connect(self.null_flight)
         self.controllers['round'].btn_cancel_flight_sig.connect(self.cancel_round)
+        self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
+        self.controllers['settings'].btn_cancel_sig.connect(self.show_config)
+        self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
+        self.controllers['settingsadvanced'].btn_settings_sig.connect(self.show_settings)
 
         self.show_config()
         self.MainWindow.show()
@@ -71,15 +78,38 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def show_config(self):
         self.controllers['round'].hide()
+        self.controllers['settings'].hide()
+        self.controllers['settingsadvanced'].hide()
         self.controllers['config'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
     def show_chrono(self):
         self.controllers['config'].hide()
+        self.controllers['settings'].hide()
+        self.controllers['settingsadvanced'].hide()
         self.controllers['round'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
+
+    def show_settings(self):
+        self.controllers['config'].hide()
+        self.controllers['settingsadvanced'].hide()
+        self.controllers['round'].hide()
+        self.controllers['settings'].show()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
+
+    def show_settingsadvanced(self):
+        self.controllers['config'].hide()
+        self.controllers['settings'].hide()
+        self.controllers['round'].hide()
+        self.controllers['settingsadvanced'].show()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
+
+    def settings_valid(self):
+        self.show_config()
 
     def home_action(self):
         #print event data
