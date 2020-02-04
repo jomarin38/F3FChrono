@@ -10,6 +10,7 @@ from F3FChrono.chrono.GPIOPort import rpi_gpio
 
 
 class MainUiCtrl (QtWidgets.QMainWindow):
+    close_signal = pyqtSignal()
     def __init__(self, dao, chronodata, rpi):
         super().__init__()
 
@@ -36,11 +37,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def initUI(self):
         self.MainWindow = QtWidgets.QMainWindow()
-
+        self.MainWindow.closeEvent = self.closeEvent
         self.ui = Ui_MainWindow()
 
         self.ui.setupUi(self.MainWindow)
-        #self.MainWindow.showFullScreen()
+        if ConfigReader.config.conf['fullscreen']:
+            self.MainWindow.showFullScreen()
+
+
         self.controllers = collections.OrderedDict()
 
         self.controllers['config'] = WConfigCtrl("panel Config", self.ui.centralwidget)
@@ -291,6 +295,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_rssi(self, rssi1, rssi2):
         self.controllers['wind'].set_rssi(rssi1, rssi2)
 
+    def closeEvent(self, event):
+        self.close_signal.emit()
+        event.accept()
 
 def main ():
 
@@ -303,6 +310,9 @@ def main ():
     #launched simulate mode
     if (ConfigReader.config.conf['simulate']):
         ui_simulate=SimulateBase()
+        ui_simulate.close_signal.connect(ui.MainWindow.close)
+        ui.close_signal.connect(ui_simulate.MainWindow.close)
+
     try:
         # writer.setupDecoder()
         print("lancement IHM")

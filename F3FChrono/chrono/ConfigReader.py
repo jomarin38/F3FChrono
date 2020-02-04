@@ -56,7 +56,8 @@ default_config = \
     "buzzer_duration":1000,
     "buzzer_next":21,
     "buzzer_next_duration":500,
-    "udpport" : 4445
+    "udpport" : 4445,
+    "fullscreen":False
 }
 
 def init():

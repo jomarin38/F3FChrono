@@ -483,6 +483,7 @@ class WSettings(QObject):
         self.view.arduino.setChecked(ConfigReader.config.conf['arduino'])
         self.view.simulate_mode.setChecked(ConfigReader.config.conf['simulatemode'])
         self.view.voltagemin.setValue(ConfigReader.config.conf['voltage_min'])
+        self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
 
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
@@ -490,4 +491,5 @@ class WSettings(QObject):
         ConfigReader.config.conf['anemometer'] = self.view.anemometer.isChecked()
         ConfigReader.config.conf['arduino'] = self.view.arduino.isChecked()
         ConfigReader.config.conf['simulatemode'] = self.view.simulate_mode.isChecked()
+        ConfigReader.config.conf['fullscreen'] = self.view.fullscreen.isChecked()
         ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()

@@ -10,10 +10,25 @@
     <height>268</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="topMargin">
+    <number>3</number>
+   </property>
+   <property name="bottomMargin">
+    <number>3</number>
+   </property>
+   <property name="verticalSpacing">
+    <number>6</number>
+   </property>
    <item row="0" column="0">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
@@ -39,7 +54,25 @@
      </item>
      <item>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="5" column="0">
+       <item row="3" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QCheckBox" name="voice">
+           <property name="text">
+            <string>Voice</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="sound">
+           <property name="text">
+            <string>Sound</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="6" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
           <widget class="QLineEdit" name="picamB">
@@ -75,7 +108,7 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
           <widget class="QDoubleSpinBox" name="voltagemin">
@@ -96,14 +129,14 @@
          </item>
         </layout>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QPushButton" name="btn_invertpicam">
          <property name="text">
           <string>Invert piCam</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
           <widget class="QLineEdit" name="picamA">
@@ -139,14 +172,14 @@
          </item>
         </layout>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="QPushButton" name="btn_invert_bases">
          <property name="text">
           <string>Invert Buttons</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
           <widget class="QLineEdit" name="baseA">
@@ -182,7 +215,7 @@
          </item>
         </layout>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_9">
          <item>
           <widget class="QLineEdit" name="baseB">
@@ -218,38 +251,31 @@
          </item>
         </layout>
        </item>
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="sound">
-         <property name="text">
-          <string>Sound</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QCheckBox" name="voice">
-         <property name="text">
-          <string>Voice</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
+       <item row="2" column="1">
         <widget class="QCheckBox" name="anemometer">
          <property name="text">
           <string>Anemometer</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="arduino">
+         <property name="text">
+          <string>ArduinoChrono</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
         <widget class="QCheckBox" name="simulate_mode">
          <property name="text">
           <string>Simulate Mode</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="arduino">
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="fullscreen">
          <property name="text">
-          <string>ArduinoChrono</string>
+          <string>FullScreen</string>
          </property>
         </widget>
        </item>
@@ -290,12 +316,9 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>sound</tabstop>
-  <tabstop>voice</tabstop>
   <tabstop>arduino</tabstop>
   <tabstop>anemometer</tabstop>
   <tabstop>voltagemin</tabstop>
-  <tabstop>simulate_mode</tabstop>
   <tabstop>btn_invertpicam</tabstop>
   <tabstop>btn_invert_bases</tabstop>
   <tabstop>picamA</tabstop>

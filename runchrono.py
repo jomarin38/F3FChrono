@@ -48,6 +48,8 @@ def main():
     #launched simulate mode
     if (ConfigReader.config.conf['simulatemode']):
         ui_simulate=SimulateBase()
+        ui_simulate.close_signal.connect(ui.MainWindow.close)
+        ui.close_signal.connect(ui_simulate.MainWindow.close)
 
     try:
         sys.exit(app.exec_())

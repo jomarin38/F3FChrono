@@ -20,6 +20,8 @@ class Ui_WWind(object):
         sizePolicy.setHeightForWidth(WWind.sizePolicy().hasHeightForWidth())
         WWind.setSizePolicy(sizePolicy)
         self.gridLayout = QtWidgets.QGridLayout(WWind)
+        self.gridLayout.setContentsMargins(-1, 3, -1, 3)
+        self.gridLayout.setVerticalSpacing(6)
         self.gridLayout.setObjectName("gridLayout")
         self.WindInfo = QtWidgets.QLabel(WWind)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)

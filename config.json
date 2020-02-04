@@ -8,6 +8,7 @@
  "buzzer_duration": 1000,
  "buzzer_next": 21,
  "buzzer_next_duration": 500,
+ "fullscreen": false,
  "ledA": 20,
  "ledB": 26,
  "simulatemode": true,

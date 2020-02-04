@@ -15,6 +15,7 @@ class Ui_WSettingsAdvanced(object):
         WSettingsAdvanced.setObjectName("WSettingsAdvanced")
         WSettingsAdvanced.resize(480, 268)
         self.gridLayout = QtWidgets.QGridLayout(WSettingsAdvanced)
+        self.gridLayout.setContentsMargins(-1, 3, -1, 3)
         self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
