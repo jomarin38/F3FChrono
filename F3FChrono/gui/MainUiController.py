@@ -51,6 +51,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'] = WRoundCtrl("panel Chrono", self.ui.centralwidget)
         self.controllers['settings'] = WSettings("panel Settings", self.ui.centralwidget)
         self.controllers['settingsadvanced'] = WSettingsAdvanced("panel SettingsAdvanced", self.ui.centralwidget)
+        self.controllers['picampair'] = WPiCamPair("panel picam", self.ui.centralwidget)
         self.controllers['wind'] = WWindCtrl("panel Wind", self.ui.centralwidget)
 
         for key, ctrl in self.controllers.items():
@@ -62,6 +63,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].btn_next_sig.connect(self.start)
         self.controllers['config'].contest_sig.connect(self.contest_changed)
         self.controllers['config'].chrono_sig.connect(self.chronotype_changed)
+        self.controllers['config'].btn_picampair_sig.connect(self.show_picampair)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.home_action)
         self.controllers['round'].btn_refly_sig.connect(self.refly)
@@ -73,7 +75,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
         self.controllers['settings'].btn_cancel_sig.connect(self.show_config)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
+        self.controllers['settings'].btn_quitapp_sig.connect(self.close)
         self.controllers['settingsadvanced'].btn_settings_sig.connect(self.show_settings)
+        self.controllers['picampair'].btn_valid_sig.connect(self.picampair_valid)
+        self.controllers['picampair'].btn_cancel_sig.connect(self.show_config)
 
         self.show_config()
         self.MainWindow.show()
@@ -84,6 +89,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].hide()
         self.controllers['settings'].hide()
         self.controllers['settingsadvanced'].hide()
+        self.controllers['picampair'].hide()
         self.controllers['config'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
@@ -92,6 +98,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].hide()
         self.controllers['settings'].hide()
         self.controllers['settingsadvanced'].hide()
+        self.controllers['picampair'].hide()
         self.controllers['round'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
@@ -100,7 +107,17 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].hide()
         self.controllers['settingsadvanced'].hide()
         self.controllers['round'].hide()
+        self.controllers['picampair'].hide()
         self.controllers['settings'].show()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
+
+    def show_picampair(self):
+        self.controllers['config'].hide()
+        self.controllers['settingsadvanced'].hide()
+        self.controllers['round'].hide()
+        self.controllers['settings'].hide()
+        self.controllers['picampair'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
@@ -108,6 +125,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].hide()
         self.controllers['settings'].hide()
         self.controllers['round'].hide()
+        self.controllers['picampair'].hide()
         self.controllers['settingsadvanced'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
@@ -121,6 +139,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].get_data()
         self.controllers['settingsadvanced'].get_data()
         ConfigReader.config.write('config.json')
+        self.show_config()
+
+    def picampair_valid(self):
+        print ("todo add picampair valid action")
         self.show_config()
 
     def home_action(self):

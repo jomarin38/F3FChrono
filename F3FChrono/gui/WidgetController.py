@@ -12,6 +12,7 @@ from F3FChrono.gui.WChronoBtn_ui import Ui_WChronoBtn
 from F3FChrono.gui.WConfig_ui import Ui_WConfig
 from F3FChrono.gui.WSettings_ui import Ui_WSettings
 from F3FChrono.gui.WSettingsAdvanced_ui import Ui_WSettingsAdvanced
+from F3FChrono.gui.WPicamPair_ui import Ui_WPicamPair
 from F3FChrono.chrono.Chrono import *
 
 
@@ -307,6 +308,7 @@ class WConfigCtrl(QObject):
     contest_sig = pyqtSignal()
     chrono_sig = pyqtSignal()
     btn_settings_sig = pyqtSignal()
+    btn_picampair_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -322,9 +324,10 @@ class WConfigCtrl(QObject):
 
         # Event connect
         self.view.StartBtn.clicked.connect(self.btn_next)
-        self.view.ContestList.currentIndexChanged.connect(self.contest_changed)
-        self.view.ChronoType.currentIndexChanged.connect(self.chrono_changed)
-        self.view.btn_settings.clicked.connect(self.btn_settings)
+        self.view.ContestList.currentIndexChanged.connect(self.contest_sig.emit)
+        self.view.ChronoType.currentIndexChanged.connect(self.chrono_sig.emit)
+        self.view.btn_settings.clicked.connect(self.btn_settings_sig.emit)
+        self.view.picampaired.clicked.connect(self.btn_picampair_sig.emit)
 
     def get_widget(self):
         return(self.widgetList)
@@ -334,15 +337,6 @@ class WConfigCtrl(QObject):
 
     def hide(self):
         self.widget.hide()
-
-    def btn_settings(self):
-        self.btn_settings_sig.emit()
-    def chrono_changed(self):
-        self.chrono_sig.emit()
-
-
-    def contest_changed(self):
-        self.contest_sig.emit()
 
     def btn_piCamA(self):
         self.piCamA_config=True
@@ -377,7 +371,7 @@ class WConfigCtrl(QObject):
 
     def set_contest(self, contest):
         self.view.ChronoType.setCurrentIndex(0)
-        self.chrono_changed()
+        self.chrono_sig.emit()
         for temp in contest:
             self.view.ContestList.addItem(temp.name)
 
@@ -403,7 +397,7 @@ class WSettingsAdvanced(QObject):
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
-        self.view.btn_back.clicked.connect(self.settings)
+        self.view.btn_back.clicked.connect(self.btn_settings_sig.emit)
     def get_widget(self):
         return(self.widgetList)
 
@@ -412,9 +406,6 @@ class WSettingsAdvanced(QObject):
 
     def hide(self):
         self.widget.hide()
-
-    def settings(self):
-        self.btn_settings_sig.emit()
 
     def set_data(self):
         self.view.port_btn_baseA.setValue(ConfigReader.config.conf['btn_baseA'])
@@ -444,6 +435,7 @@ class WSettings(QObject):
     btn_settingsadvanced_sig = pyqtSignal()
     btn_cancel_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
+    btn_quitapp_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -454,9 +446,10 @@ class WSettings(QObject):
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
-        self.view.btn_advanced_settings.clicked.connect(self.settingsadvanced)
-        self.view.btn_cancel.clicked.connect(self.cancel)
-        self.view.btn_valid.clicked.connect(self.valid)
+        self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
+        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
+        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
 
     def get_widget(self):
         return(self.widgetList)
@@ -467,15 +460,6 @@ class WSettings(QObject):
     def hide(self):
         self.widget.hide()
 
-    def settingsadvanced(self):
-        self.btn_settingsadvanced_sig.emit()
-
-    def cancel(self):
-        self.btn_cancel_sig.emit()
-
-    def valid(self):
-        self.btn_valid_sig.emit()
-
     def set_data(self):
         self.view.sound.setChecked(ConfigReader.config.conf['sound'])
         self.view.voice.setChecked(ConfigReader.config.conf['voice'])
@@ -484,6 +468,8 @@ class WSettings(QObject):
         self.view.simulate_mode.setChecked(ConfigReader.config.conf['simulatemode'])
         self.view.voltagemin.setValue(ConfigReader.config.conf['voltage_min'])
         self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
+        self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
+        self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzernext_valid'])
 
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
@@ -492,4 +478,36 @@ class WSettings(QObject):
         ConfigReader.config.conf['arduino'] = self.view.arduino.isChecked()
         ConfigReader.config.conf['simulatemode'] = self.view.simulate_mode.isChecked()
         ConfigReader.config.conf['fullscreen'] = self.view.fullscreen.isChecked()
+        ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
+        ConfigReader.config.conf['buzzernext_valid'] = self.view.buzzernext.isChecked()
         ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
+
+class WPiCamPair(QObject):
+    btn_cancel_sig = pyqtSignal()
+    btn_valid_sig = pyqtSignal()
+    widgetList = []
+
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WPicamPair()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
+        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+
+    def get_widget(self):
+        return(self.widgetList)
+
+    def show(self):
+        self.widget.show()
+
+    def hide(self):
+        self.widget.hide()
+
+    def set_data(self):
+        print ("todo PiCamPair - set data")
+    def get_data(self):
+        print("todo PiCamPair - get data")

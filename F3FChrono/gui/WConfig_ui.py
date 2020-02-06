@@ -20,6 +20,9 @@ class Ui_WConfig(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.picampaired = QtWidgets.QPushButton(WConfig)
+        self.picampaired.setObjectName("picampaired")
+        self.horizontalLayout_4.addWidget(self.picampaired)
         self.btn_settings = QtWidgets.QPushButton(WConfig)
         self.btn_settings.setObjectName("btn_settings")
         self.horizontalLayout_4.addWidget(self.btn_settings)
@@ -156,6 +159,7 @@ class Ui_WConfig(object):
     def retranslateUi(self, WConfig):
         _translate = QtCore.QCoreApplication.translate
         WConfig.setWindowTitle(_translate("WConfig", "Form"))
+        self.picampaired.setText(_translate("WConfig", "piCAMs + base buttons"))
         self.btn_settings.setText(_translate("WConfig", "Settings"))
         self.ChronoLabel.setText(_translate("WConfig", "Chrono type"))
         self.ChronoType.setItemText(0, _translate("WConfig", "Rpi Chrono"))

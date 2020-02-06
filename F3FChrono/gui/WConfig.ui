@@ -19,6 +19,13 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
+        <widget class="QPushButton" name="picampaired">
+         <property name="text">
+          <string>piCAMs + base buttons</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btn_settings">
          <property name="text">
           <string>Settings</string>

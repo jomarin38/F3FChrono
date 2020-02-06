@@ -8,12 +8,14 @@
  "buzzer_duration": 1000,
  "buzzer_next": 21,
  "buzzer_next_duration": 500,
+ "buzzer_valid": true,
+ "buzzernext_valid": true,
  "fullscreen": false,
  "ledA": 20,
  "ledB": 26,
  "simulatemode": true,
- "sound": false,
+ "sound": true,
  "udpport": 4445,
- "voice": true,
+ "voice": false,
  "voltage_min": 9.9
 }

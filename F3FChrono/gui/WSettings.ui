@@ -54,61 +54,56 @@
      </item>
      <item>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="3" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <item>
-          <widget class="QCheckBox" name="voice">
-           <property name="text">
-            <string>Voice</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="sound">
-           <property name="text">
-            <string>Sound</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="fullscreen">
+         <property name="text">
+          <string>FullScreen</string>
+         </property>
+        </widget>
        </item>
-       <item row="6" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <item>
-          <widget class="QLineEdit" name="picamB">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>192.168.0.16</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>piCamB</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="arduino">
+         <property name="text">
+          <string>ArduinoChrono</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="simulate_mode">
+         <property name="text">
+          <string>Simulate Mode</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="anemometer">
+         <property name="text">
+          <string>Anemometer</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QCheckBox" name="voice">
+         <property name="text">
+          <string>Voice</string>
+         </property>
+        </widget>
        </item>
        <item row="3" column="0">
+        <widget class="QCheckBox" name="sound">
+         <property name="text">
+          <string>Sound</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="buzzer">
+         <property name="text">
+          <string>Buzzer</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
           <widget class="QDoubleSpinBox" name="voltagemin">
@@ -129,153 +124,17 @@
          </item>
         </layout>
        </item>
-       <item row="4" column="0">
-        <widget class="QPushButton" name="btn_invertpicam">
-         <property name="text">
-          <string>Invert piCam</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
-         <item>
-          <widget class="QLineEdit" name="picamA">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>192.168.0.17</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>piCamA</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item row="4" column="1">
-        <widget class="QPushButton" name="btn_invert_bases">
+        <widget class="QCheckBox" name="buzzernext">
          <property name="text">
-          <string>Invert Buttons</string>
+          <string>Buzzer Next button</string>
          </property>
         </widget>
        </item>
        <item row="5" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_8">
-         <item>
-          <widget class="QLineEdit" name="baseA">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Port 17</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>BaseA</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="6" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_9">
-         <item>
-          <widget class="QLineEdit" name="baseB">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Port 18</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>BaseB</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="2" column="1">
-        <widget class="QCheckBox" name="anemometer">
+        <widget class="QPushButton" name="closebtn">
          <property name="text">
-          <string>Anemometer</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="arduino">
-         <property name="text">
-          <string>ArduinoChrono</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="simulate_mode">
-         <property name="text">
-          <string>Simulate Mode</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QCheckBox" name="fullscreen">
-         <property name="text">
-          <string>FullScreen</string>
+          <string>Close Race Management</string>
          </property>
         </widget>
        </item>
@@ -301,7 +160,7 @@
         <widget class="QPushButton" name="btn_valid">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
+           <pointsize>11</pointsize>
           </font>
          </property>
          <property name="text">
@@ -319,12 +178,6 @@
   <tabstop>arduino</tabstop>
   <tabstop>anemometer</tabstop>
   <tabstop>voltagemin</tabstop>
-  <tabstop>btn_invertpicam</tabstop>
-  <tabstop>btn_invert_bases</tabstop>
-  <tabstop>picamA</tabstop>
-  <tabstop>baseA</tabstop>
-  <tabstop>picamB</tabstop>
-  <tabstop>baseB</tabstop>
   <tabstop>btn_advanced_settings</tabstop>
   <tabstop>btn_cancel</tabstop>
   <tabstop>btn_valid</tabstop>
