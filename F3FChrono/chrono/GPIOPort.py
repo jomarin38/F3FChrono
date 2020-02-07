@@ -60,11 +60,15 @@ class gpioPort(threading.Thread):
         self.start()
 
     def blink(self, numbers):
-        for i in range(0,numbers):
-            GPIO.output(self.port,self.activate)
-            sleep(self.duration/1000.0)
-            GPIO.output(self.port,self.deactivate)
-            sleep(self.duration/1000.0)
+        if (self.port == ConfigReader.Configuration.conf['buzzer'] and ConfigReader.Configuration.conf[
+            'buzzer_valid'] or
+                self.port == ConfigReader.Configuration.conf['buzzer_next'] and ConfigReader.Configuration.conf[
+                    'buzzer_next_valid']):
+            for i in range(0,numbers):
+                GPIO.output(self.port,self.activate)
+                sleep(self.duration/1000.0)
+                GPIO.output(self.port,self.deactivate)
+                sleep(self.duration/1000.0)
 
     def check(self, value):
         self.event.set()
@@ -73,11 +77,14 @@ class gpioPort(threading.Thread):
         while not self.terminated:
             # wait until somebody throws an event
             if self.event.wait(1):
-                # create rectangle signal on GPIO port
-                GPIO.output(self.port,self.activate)
-                sleep(self.duration/1000.0)
-                GPIO.output(self.port,self.deactivate)
-                self.event.clear()
+                if (self.port==ConfigReader.Configuration.conf['buzzer'] and ConfigReader.Configuration.conf['buzzer_valid'] or
+                    self.port == ConfigReader.Configuration.conf['buzzer_next'] and ConfigReader.Configuration.conf[
+                        'buzzer_next_valid']):
+                    # create rectangle signal on GPIO port
+                    GPIO.output(self.port,self.activate)
+                    sleep(self.duration/1000.0)
+                    GPIO.output(self.port,self.deactivate)
+                    self.event.clear()
 
         #GPIO.cleanup(self.port)
         GPIO.cleanup()
@@ -96,6 +103,7 @@ class rpi_gpio(QObject):
         self.buzzer = None
         if rpi != '':
             self.buzzer = gpioPort(ConfigReader.config.conf['buzzer'], duration=ConfigReader.config.conf['buzzer_duration'],start_blinks=2)
+            self.buzzer = gpioPort(ConfigReader.config.conf['buzzer_next'], duration=ConfigReader.config.conf['buzzer_next_duration'],start_blinks=2)
             #btn_next callback
             addCallback(ConfigReader.config.conf['btn_next'], btn_next_action, False)
             #btn_baseA
