@@ -43,9 +43,9 @@ class RunDAO(Dao):
         sql = 'SELECT r.run_id, c.pilot_id, c.bib_number, c.team, p.name, p.first_name, ' \
               'r.penalty, r.round_number, r.group_number, r.event_id, ' \
               'r.valid, r.reason, ' \
-              'ch.run_time, ch.min_wind_speed, ch.max_wind_speed, ch.wind_direction, ch.start_date, ch.end_date, ' \
-              'ch.lap1, ch.lap2, ch.lap3, ch.lap4, ch.lap5, ch.lap6, ch.lap7, ch.lap8, ch.lap9, ch.lap10, ' \
-              'ch.chrono_id ' \
+              'ch.run_time, ch.min_wind_speed, ch.max_wind_speed, ch.mean_wind_speed, ch.wind_direction, ' \
+              'ch.start_date, ch.end_date, ch.lap1, ch.lap2, ch.lap3, ch.lap4, ch.lap5, ch.lap6, ch.lap7, ch.lap8, ' \
+              'ch.lap9, ch.lap10, ch.chrono_id ' \
               'FROM run r ' \
               'LEFT JOIN competitor c ON r.competitor_id=c.pilot_id AND r.event_id=c.event_id ' \
               'LEFT JOIN pilot p ON c.pilot_id=p.pilot_id ' \
@@ -69,12 +69,13 @@ class RunDAO(Dao):
             chrono.run_time = row[12]
             chrono.min_wind_speed = row[13]
             chrono.max_wind_speed = row[14]
-            chrono.wind_direction = row[15]
-            chrono.start_time = row[16]
-            chrono.end_time = row[17]
-            for i in range(18, 28):
+            chrono.mean_wind_speed = row[15]
+            chrono.wind_direction = row[16]
+            chrono.start_time = row[17]
+            chrono.end_time = row[18]
+            for i in range(19, 29):
                 chrono.add_lap_time(row[i])
-            chrono.id = row[28]
+            chrono.id = row[29]
 
             f3f_run.chrono = chrono
 
@@ -83,9 +84,9 @@ class RunDAO(Dao):
     def insert(self, run):
         chrono = run.chrono
         if chrono is not None:
-            sql = 'INSERT INTO chrono (run_time, min_wind_speed, max_wind_speed, wind_direction, start_date, end_date, ' \
-                  'lap1, lap2, lap3, lap4, lap5, lap6, lap7, lap8, lap9, lap10) ' \
-                  'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+            sql = 'INSERT INTO chrono (run_time, min_wind_speed, max_wind_speed, mean_wind_speed, wind_direction, ' \
+                  'start_date, end_date, lap1, lap2, lap3, lap4, lap5, lap6, lap7, lap8, lap9, lap10) ' \
+                  'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
             if chrono.start_time is not None:
                 start_time = chrono.start_time.strftime('%Y-%m-%d %H:%M:%S')
             else:
@@ -95,6 +96,7 @@ class RunDAO(Dao):
             else:
                 end_time = None
             self._execute_insert(sql, chrono.run_time, chrono.min_wind_speed, chrono.max_wind_speed,
+                                 chrono.mean_wind_speed,
                                  chrono.wind_direction, start_time, end_time, chrono.get_lap_time(0),
                                  chrono.get_lap_time(1), chrono.get_lap_time(2), chrono.get_lap_time(3),
                                  chrono.get_lap_time(4), chrono.get_lap_time(5), chrono.get_lap_time(6),
