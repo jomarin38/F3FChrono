@@ -63,6 +63,7 @@ from F3FChrono.chrono import ConfigReader
 class chronoQSound(QObject):
     signal_penalty = pyqtSignal()
     signal_base = pyqtSignal(int)
+    signal_entry = pyqtSignal()
     signal_time = pyqtSignal(float)
     signal_waitlaunch = pyqtSignal()
     signal_waitstart = pyqtSignal()
@@ -70,18 +71,21 @@ class chronoQSound(QObject):
     def __init__(self):
         super().__init__()
         self.sound=[]
-        self.pathname = '/home/sdaviet/PycharmProjects/F3FChrono/Sound/'
-        for index in range(11):
-            self.sound.append(QSound(self.pathname+'base'+str(index)+'.wav'))
-        self.penalty=QSound(self.pathname+'penalty.wav')
-        self.waitlaunch=QSound(self.pathname+'start.wav')
-        self.waitstart=QSound(self.pathname+'start.wav')
+        self.pathname=os.path.dirname(os.path.realpath('Sound/base0.wav'))
 
-        self.signal_base.connect(self.sound_base)
-        self.signal_penalty.connect(self.sound_penalty)
-        self.signal_time.connect(self.sound_time)
+        for index in range(11):
+            self.sound.append(QSound(self.pathname+'/base'+str(index)+'.wav'))
+        self.entry=QSound(self.pathname+'/entry.wav')
+        self.penalty=QSound(self.pathname+'/penalty.wav')
+        self.waitlaunch=QSound(self.pathname+'/start.wav')
+        self.waitstart=QSound(self.pathname+'/start.wav')
+
         self.signal_waitlaunch.connect(self.sound_waitlaunch)
         self.signal_waitstart.connect(self.sound_waitstart)
+        self.signal_entry.connect(self.sound_entry)
+        self.signal_base.connect(self.sound_base)
+        self.signal_time.connect(self.sound_time)
+        self.signal_penalty.connect(self.sound_penalty)
         self.soundstart_run=False
 
 
@@ -96,6 +100,10 @@ class chronoQSound(QObject):
             self.sound[index].play()
             if self.soundstart_run:
                 self.waitstart.stop()
+
+    def sound_entry(self):
+        if ConfigReader.config.conf['sound']:
+            self.entry.play()
 
     def sound_penalty(self):
         if ConfigReader.config.conf['sound']:
