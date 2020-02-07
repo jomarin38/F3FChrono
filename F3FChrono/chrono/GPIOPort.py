@@ -2,6 +2,8 @@
 import threading
 from time import sleep
 import RPi.GPIO as GPIO
+from PyQt5.QtCore import QObject, pyqtSignal
+from F3FChrono.chrono import ConfigReader
 
 def statusLED(port, on=True):
     """
@@ -58,11 +60,15 @@ class gpioPort(threading.Thread):
         self.start()
 
     def blink(self, numbers):
-        for i in range(0,numbers):
-            GPIO.output(self.port,self.activate)
-            sleep(self.duration/1000.0)
-            GPIO.output(self.port,self.deactivate)
-            sleep(self.duration/1000.0)
+        if (self.port == ConfigReader.Configuration.conf['buzzer'] and ConfigReader.Configuration.conf[
+            'buzzer_valid'] or
+                self.port == ConfigReader.Configuration.conf['buzzer_next'] and ConfigReader.Configuration.conf[
+                    'buzzer_next_valid']):
+            for i in range(0,numbers):
+                GPIO.output(self.port,self.activate)
+                sleep(self.duration/1000.0)
+                GPIO.output(self.port,self.deactivate)
+                sleep(self.duration/1000.0)
 
     def check(self, value):
         self.event.set()
@@ -71,11 +77,14 @@ class gpioPort(threading.Thread):
         while not self.terminated:
             # wait until somebody throws an event
             if self.event.wait(1):
-                # create rectangle signal on GPIO port
-                GPIO.output(self.port,self.activate)
-                sleep(self.duration/1000.0)
-                GPIO.output(self.port,self.deactivate)
-                self.event.clear()
+                if (self.port==ConfigReader.Configuration.conf['buzzer'] and ConfigReader.Configuration.conf['buzzer_valid'] or
+                    self.port == ConfigReader.Configuration.conf['buzzer_next'] and ConfigReader.Configuration.conf[
+                        'buzzer_next_valid']):
+                    # create rectangle signal on GPIO port
+                    GPIO.output(self.port,self.activate)
+                    sleep(self.duration/1000.0)
+                    GPIO.output(self.port,self.deactivate)
+                    self.event.clear()
 
         #GPIO.cleanup(self.port)
         GPIO.cleanup()
@@ -83,6 +92,33 @@ class gpioPort(threading.Thread):
         
 def event_detected(port):
     print("callback "+str(port))
+
+
+class rpi_gpio(QObject):
+    signal_buzzer = pyqtSignal ()
+
+    def __init__(self, rpi, btn_next_action, btn_baseA, btn_baseB):
+        super().__init__()
+        self.signal_buzzer.connect(self.buzzer_fct)
+        self.buzzer = None
+        if rpi != '':
+            self.buzzer = gpioPort(ConfigReader.config.conf['buzzer'], duration=ConfigReader.config.conf['buzzer_duration'],start_blinks=2)
+            self.buzzer = gpioPort(ConfigReader.config.conf['buzzer_next'], duration=ConfigReader.config.conf['buzzer_next_duration'],start_blinks=2)
+            #btn_next callback
+            addCallback(ConfigReader.config.conf['btn_next'], btn_next_action, False)
+            #btn_baseA
+            addCallback(ConfigReader.config.conf['btn_baseA'], btn_baseA, False)
+            #btn_baseB
+            addCallback(ConfigReader.config.conf['btn_baseB'], btn_baseB, False)
+
+    def __del__(self):
+        if self.buzzer!=None:
+            self.buzzer.terminated=True
+            self.buzzer.join()
+
+    def buzzer_fct(self):
+        if self.buzzer!=None:
+            self.buzzer.event()
 
 if __name__ == '__main__':
     led=gpioPort(19, duration=1000,start_blinks=2)

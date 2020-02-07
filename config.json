@@ -1,14 +1,21 @@
 {
- "debug": false,
- "simulate": true,
- "sound": false,
- "vocal": false,
- "greenLEDPort": 17, 
- "ledActiveLow": false, 
- "redLEDPort": 27,
- "statusLEDPort":22,
- "signalLength":300.0, 
- "IPUDPBEEP" : "255.255.255.255",
- "UDPPORT" : 4445
-
+ "anemometer": false,
+ "arduino": false,
+ "btn_baseA": 5,
+ "btn_baseB": 6,
+ "btn_next": 12,
+ "buzzer": 19,
+ "buzzer_duration": 1000,
+ "buzzer_next": 21,
+ "buzzer_next_duration": 500,
+ "buzzer_valid": true,
+ "buzzernext_valid": true,
+ "fullscreen": false,
+ "ledA": 20,
+ "ledB": 26,
+ "simulatemode": true,
+ "sound": true,
+ "udpport": 4445,
+ "voice": false,
+ "voltage_min": 9.9
 }

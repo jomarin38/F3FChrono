@@ -15,6 +15,7 @@ class Ui_WChronoBtn(object):
         WChronoBtn.setObjectName("WChronoBtn")
         WChronoBtn.resize(480, 45)
         self.gridLayout = QtWidgets.QGridLayout(WChronoBtn)
+        self.gridLayout.setContentsMargins(-1, 3, -1, 3)
         self.gridLayout.setObjectName("gridLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)

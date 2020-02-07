@@ -4,13 +4,18 @@ from time import *
 from datetime import datetime
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
-
+from F3FChrono.chrono import ConfigReader
 from F3FChrono.gui.WWind_UI import Ui_WWind
 from F3FChrono.gui.WPilot_UI import Ui_WPilot
 from F3FChrono.gui.WChrono_ui import Ui_WChrono
 from F3FChrono.gui.WChronoBtn_ui import Ui_WChronoBtn
 from F3FChrono.gui.WConfig_ui import Ui_WConfig
+from F3FChrono.gui.WSettings_ui import Ui_WSettings
+from F3FChrono.gui.WSettingsAdvanced_ui import Ui_WSettingsAdvanced
+from F3FChrono.gui.WPicamPair_ui import Ui_WPicamPair
 from F3FChrono.chrono.Chrono import *
+
+
 
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
@@ -302,6 +307,8 @@ class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()
     contest_sig = pyqtSignal()
     chrono_sig = pyqtSignal()
+    btn_settings_sig = pyqtSignal()
+    btn_picampair_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -317,10 +324,10 @@ class WConfigCtrl(QObject):
 
         # Event connect
         self.view.StartBtn.clicked.connect(self.btn_next)
-        self.view.PICamA_Btn.clicked.connect(self.btn_piCamA)
-        self.view.PICamB_Btn.clicked.connect(self.btn_piCamB)
-        self.view.ContestList.currentIndexChanged.connect(self.contest_changed)
-        self.view.ChronoType.currentIndexChanged.connect(self.chrono_changed)
+        self.view.ContestList.currentIndexChanged.connect(self.contest_sig.emit)
+        self.view.ChronoType.currentIndexChanged.connect(self.chrono_sig.emit)
+        self.view.btn_settings.clicked.connect(self.btn_settings_sig.emit)
+        self.view.picampaired.clicked.connect(self.btn_picampair_sig.emit)
 
     def get_widget(self):
         return(self.widgetList)
@@ -330,24 +337,6 @@ class WConfigCtrl(QObject):
 
     def hide(self):
         self.widget.hide()
-
-
-    def chrono_changed(self):
-        if (self.view.ChronoType.currentIndex()==chronoType.wire):
-            self.view.PICamA_Btn.setDisabled(True)
-            self.view.PICamA_Value.setDisabled(True)
-            self.view.PICamB_Btn.setDisabled(True)
-            self.view.PICamB_Value.setDisabled(True)
-        else:
-            self.view.PICamA_Btn.setDisabled(False)
-            self.view.PICamA_Value.setDisabled(False)
-            self.view.PICamB_Btn.setDisabled(False)
-            self.view.PICamB_Value.setDisabled(False)
-        self.chrono_sig.emit()
-
-
-    def contest_changed(self):
-        self.contest_sig.emit()
 
     def btn_piCamA(self):
         self.piCamA_config=True
@@ -382,7 +371,7 @@ class WConfigCtrl(QObject):
 
     def set_contest(self, contest):
         self.view.ChronoType.setCurrentIndex(0)
-        self.chrono_changed()
+        self.chrono_sig.emit()
         for temp in contest:
             self.view.ContestList.addItem(temp.name)
 
@@ -396,3 +385,129 @@ class WConfigCtrl(QObject):
         self.revol=self.view.RevolValue.value()
         self.chrono_type=self.view.ChronoType.currentIndex()
         self.contest=self.view.ContestList.currentIndex()
+
+class WSettingsAdvanced(QObject):
+    btn_settings_sig = pyqtSignal()
+    widgetList=[]
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WSettingsAdvanced()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.btn_back.clicked.connect(self.btn_settings_sig.emit)
+    def get_widget(self):
+        return(self.widgetList)
+
+    def show(self):
+        self.widget.show()
+
+    def hide(self):
+        self.widget.hide()
+
+    def set_data(self):
+        self.view.port_btn_baseA.setValue(ConfigReader.config.conf['btn_baseA'])
+        self.view.port_btn_baseB.setValue(ConfigReader.config.conf['btn_baseB'])
+        self.view.port_btn_next.setValue(ConfigReader.config.conf['btn_next'])
+        self.view.port_ledA.setValue(ConfigReader.config.conf['ledA'])
+        self.view.port_ledB.setValue(ConfigReader.config.conf['ledB'])
+        self.view.port_buzzer.setValue(ConfigReader.config.conf['buzzer'])
+        self.view.buzzer_duration.setValue(ConfigReader.config.conf['buzzer_duration'])
+        self.view.port_buzzer_next.setValue(ConfigReader.config.conf['buzzer_next'])
+        self.view.buzzer_next_duration.setValue(ConfigReader.config.conf['buzzer_next_duration'])
+        self.view.udp_port.setValue(ConfigReader.config.conf['udpport'])
+
+    def get_data(self):
+        ConfigReader.config.conf['btn_baseA'] = self.view.port_btn_baseA.value()
+        ConfigReader.config.conf['btn_baseB'] = self.view.port_btn_baseB.value()
+        ConfigReader.config.conf['btn_next'] = self.view.port_btn_next.value()
+        ConfigReader.config.conf['ledA'] = self.view.port_ledA.value()
+        ConfigReader.config.conf['ledB'] = self.view.port_ledB.value()
+        ConfigReader.config.conf['buzzer'] = self.view.port_buzzer.value()
+        ConfigReader.config.conf['buzzer_duration'] = self.view.buzzer_duration.value()
+        ConfigReader.config.conf['buzzer_next'] = self.view.port_buzzer_next.value()
+        ConfigReader.config.conf['buzzer_next_duration'] = self.view.buzzer_next_duration.value()
+        ConfigReader.config.conf['udpport'] = self.view.udp_port.value()
+
+class WSettings(QObject):
+    btn_settingsadvanced_sig = pyqtSignal()
+    btn_cancel_sig = pyqtSignal()
+    btn_valid_sig = pyqtSignal()
+    btn_quitapp_sig = pyqtSignal()
+    widgetList = []
+
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WSettings()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
+        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
+        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
+
+    def get_widget(self):
+        return(self.widgetList)
+
+    def show(self):
+        self.widget.show()
+
+    def hide(self):
+        self.widget.hide()
+
+    def set_data(self):
+        self.view.sound.setChecked(ConfigReader.config.conf['sound'])
+        self.view.voice.setChecked(ConfigReader.config.conf['voice'])
+        self.view.anemometer.setChecked(ConfigReader.config.conf['anemometer'])
+        self.view.arduino.setChecked(ConfigReader.config.conf['arduino'])
+        self.view.simulate_mode.setChecked(ConfigReader.config.conf['simulatemode'])
+        self.view.voltagemin.setValue(ConfigReader.config.conf['voltage_min'])
+        self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
+        self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
+        self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzernext_valid'])
+
+    def get_data(self):
+        ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
+        ConfigReader.config.conf['voice'] = self.view.voice.isChecked()
+        ConfigReader.config.conf['anemometer'] = self.view.anemometer.isChecked()
+        ConfigReader.config.conf['arduino'] = self.view.arduino.isChecked()
+        ConfigReader.config.conf['simulatemode'] = self.view.simulate_mode.isChecked()
+        ConfigReader.config.conf['fullscreen'] = self.view.fullscreen.isChecked()
+        ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
+        ConfigReader.config.conf['buzzernext_valid'] = self.view.buzzernext.isChecked()
+        ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
+
+class WPiCamPair(QObject):
+    btn_cancel_sig = pyqtSignal()
+    btn_valid_sig = pyqtSignal()
+    widgetList = []
+
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WPicamPair()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
+        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+
+    def get_widget(self):
+        return(self.widgetList)
+
+    def show(self):
+        self.widget.show()
+
+    def hide(self):
+        self.widget.hide()
+
+    def set_data(self):
+        print ("todo PiCamPair - set data")
+    def get_data(self):
+        print("todo PiCamPair - get data")

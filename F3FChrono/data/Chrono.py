@@ -37,7 +37,7 @@ class Chrono:
             result = os.linesep + "Chrono Data : " + os.linesep +\
                      "\tStart Time : " + str(self.start_time) + os.linesep +\
                      "\tEnd Time : " + str(self.end_time) + os.linesep +\
-                     "\tWindMin : "+str(self.min_wind_speed)+", WindMax : "+str(self.max_wind_speed)+", WindDir : "+str(self.wind_direction)+os.linesep+\
+                     "\tWindMin : "+str(self.min_wind_speed)+", WindMax : "+str(self.max_wind_speed)+", WindDir : "+"{:0>.2f}".format(self.wind_direction)+os.linesep+\
                      "\tRun Time : " + self.run_time_as_string() + os.linesep + "\tLapTime : "
             for lap in self._lap_times:
                 if lap!=None:

@@ -13,13 +13,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_WPilot(object):
     def setupUi(self, WPilot):
         WPilot.setObjectName("WPilot")
-        WPilot.resize(480, 35)
+        WPilot.resize(480, 36)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(WPilot.sizePolicy().hasHeightForWidth())
         WPilot.setSizePolicy(sizePolicy)
         self.gridLayout = QtWidgets.QGridLayout(WPilot)
+        self.gridLayout.setContentsMargins(-1, 3, -1, 3)
         self.gridLayout.setObjectName("gridLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")

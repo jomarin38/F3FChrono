@@ -1,19 +1,13 @@
-#!/usr/bin/env python
-# vim: set et sw=4 sts=4 fileencoding=utf-8:
 import os
 import re
 import sys
-import logging
 from time import sleep
 from argparse import ArgumentParser
 from PyQt5 import QtWidgets
-from F3FChrono.chrono.ConfigReader import Configuration
-from F3FChrono.chrono.Chrono import ChronoHard
+from F3FChrono.chrono import ConfigReader
 from F3FChrono.gui.MainUiController import MainUiCtrl
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.data.dao.EventDAO import EventDAO
-from F3FChrono.chrono.UDPReceive import udpreceive
-from F3FChrono.chrono.UDPBeep import udpbeep
 from F3FChrono.gui.Simulate_base import SimulateBase
 
 def get_raspi_revision():
@@ -35,8 +29,7 @@ def get_raspi_revision():
     return info
 
 def main():
-    global config
-    
+
     #logging.basicConfig (filename="runchrono.log", level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     pi=get_raspi_revision()
     if(pi['pi']!=''):
@@ -50,11 +43,13 @@ def main():
 
 
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(dao, chronodata, config.conf['sound'], rpi=pi['pi'])
+    ui=MainUiCtrl(dao, chronodata, rpi=pi['pi'])
 
     #launched simulate mode
-    if (config.conf['simulate']):
+    if (ConfigReader.config.conf['simulatemode']):
         ui_simulate=SimulateBase()
+        ui_simulate.close_signal.connect(ui.MainWindow.close)
+        ui.close_signal.connect(ui_simulate.MainWindow.close)
 
     try:
         sys.exit(app.exec_())
@@ -69,7 +64,8 @@ if __name__ == '__main__':
     parser = ArgumentParser(prog='chrono')
     #parser.add_argument('show=false')
     args = parser.parse_args()
-    global config
-    config = Configuration ('config.json')
+
+    ConfigReader.init()
+    ConfigReader.config = ConfigReader.Configuration ('config.json')
 
     main()

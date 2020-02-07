@@ -1,16 +1,19 @@
 import sys
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.gui.simulate_base_ui import Ui_MainWindow
 from F3FChrono.chrono.UDPBeep import udpbeep
 
 
 class SimulateBase(QtWidgets.QMainWindow, QTimer):
+    close_signal = pyqtSignal()
+
     def __init__(self):
-        super(SimulateBase, self).__init__()
+        super().__init__()
         self.MainWindow = QtWidgets.QMainWindow()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.MainWindow)
+        self.MainWindow.closeEvent=self.closeEvent
         self.MainWindow.show()
 
         self.ui.btn_send_A.clicked.connect(self.send_base_A)
@@ -21,6 +24,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         self.timerEvent = QTimer()
         self.timerEvent.timeout.connect(self.run)
         self.duration = 1000
+
 
     def send_base_A(self):
         self.udpbeep.sendData("simulate base " + self.ui.ip_A.text() + " " + self.ui.data_A.text())
@@ -42,6 +46,9 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         self.udpbeep.sendData("simulate info " + str(self.ui.AccuRace.value()) + " " + \
                               str(self.ui.rssi_picam1.value()) + " " + str(self.ui.rssi_picam2.value()))
 
+    def closeEvent(self, event):
+        self.close_signal.emit()
+        event.accept()
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

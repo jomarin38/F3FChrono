@@ -1,16 +1,17 @@
-import collections
-
+from F3FChrono.chrono import ConfigReader
 from F3FChrono.gui.MainUi_UI import *
 from F3FChrono.gui.WidgetController import *
+from F3FChrono.gui.Simulate_base import SimulateBase
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
 from F3FChrono.data.Chrono import Chrono
-from F3FChrono.chrono.Sound import chronoSound
-from F3FChrono.chrono.GPIOPort import *
+from F3FChrono.chrono.Sound import *
+from F3FChrono.chrono.GPIOPort import rpi_gpio
 
 
 class MainUiCtrl (QtWidgets.QMainWindow):
-    def __init__(self, dao, chronodata, sound, rpi):
+    close_signal = pyqtSignal()
+    def __init__(self, dao, chronodata, rpi):
         super().__init__()
 
         self.dao = dao
@@ -19,21 +20,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronodata = chronodata
         self.chronoRpi=ChronoRpi()
         self.chronoArduino=ChronoArduino()
-        self.buzzer=None
-        if rpi!='':
-            self.buzzer=gpioPort(19, duration=1000,start_blinks=2)
-            #btn_next callback
-            addCallback(12, self.btn_next_action, False)
-            #btn_baseA
-            addCallback(5, self.btn_baseA, False)
-            #btn_baseB
-            addCallback(6, self.btn_baseB, False)
-
+        self.rpigpio=rpi_gpio(rpi, self.btn_next_action, self.btn_baseA, self.btn_baseB)
         self.chronoHard = self.chronoRpi
-        self.initUI()
         self.base_test = -10
-
-        self.vocal = chronoSound(sound)
+        self.vocal = chronoQSound()
 
         self.chronoHard.status_changed.connect(self.slot_status_changed)
         self.chronoHard.lap_finished.connect(self.slot_lap_finished)
@@ -43,22 +33,25 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard.rssi_signal.connect(self.slot_rssi)
         self.chronoHard.accu_signal.connect(self.slot_accu)
         self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
-
-    def __del__(self):
-        self.buzzer.terminated=True
-        self.buzzer.join()
+        self.initUI()
 
     def initUI(self):
         self.MainWindow = QtWidgets.QMainWindow()
-
+        self.MainWindow.closeEvent = self.closeEvent
         self.ui = Ui_MainWindow()
 
         self.ui.setupUi(self.MainWindow)
-        #self.MainWindow.showFullScreen()
+        if ConfigReader.config.conf['fullscreen']:
+            self.MainWindow.showFullScreen()
+
+
         self.controllers = collections.OrderedDict()
 
         self.controllers['config'] = WConfigCtrl("panel Config", self.ui.centralwidget)
         self.controllers['round'] = WRoundCtrl("panel Chrono", self.ui.centralwidget)
+        self.controllers['settings'] = WSettings("panel Settings", self.ui.centralwidget)
+        self.controllers['settingsadvanced'] = WSettingsAdvanced("panel SettingsAdvanced", self.ui.centralwidget)
+        self.controllers['picampair'] = WPiCamPair("panel picam", self.ui.centralwidget)
         self.controllers['wind'] = WWindCtrl("panel Wind", self.ui.centralwidget)
 
         for key, ctrl in self.controllers.items():
@@ -66,9 +59,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 self.ui.verticalLayout.addWidget(x)
 
         #connect signal event to method
+        self.controllers['config'].btn_settings_sig.connect(self.set_show_settings)
         self.controllers['config'].btn_next_sig.connect(self.start)
         self.controllers['config'].contest_sig.connect(self.contest_changed)
         self.controllers['config'].chrono_sig.connect(self.chronotype_changed)
+        self.controllers['config'].btn_picampair_sig.connect(self.show_picampair)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.home_action)
         self.controllers['round'].btn_refly_sig.connect(self.refly)
@@ -77,6 +72,13 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.btn_clear_penalty_sig.connect(self.clear_penalty)
         self.controllers['round'].wChronoCtrl.btn_null_flight_sig.connect(self.null_flight)
         self.controllers['round'].btn_cancel_flight_sig.connect(self.cancel_round)
+        self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
+        self.controllers['settings'].btn_cancel_sig.connect(self.show_config)
+        self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
+        self.controllers['settings'].btn_quitapp_sig.connect(self.close)
+        self.controllers['settingsadvanced'].btn_settings_sig.connect(self.show_settings)
+        self.controllers['picampair'].btn_valid_sig.connect(self.picampair_valid)
+        self.controllers['picampair'].btn_cancel_sig.connect(self.show_config)
 
         self.show_config()
         self.MainWindow.show()
@@ -85,15 +87,63 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def show_config(self):
         self.controllers['round'].hide()
+        self.controllers['settings'].hide()
+        self.controllers['settingsadvanced'].hide()
+        self.controllers['picampair'].hide()
         self.controllers['config'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
     def show_chrono(self):
         self.controllers['config'].hide()
+        self.controllers['settings'].hide()
+        self.controllers['settingsadvanced'].hide()
+        self.controllers['picampair'].hide()
         self.controllers['round'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
+
+    def show_settings(self):
+        self.controllers['config'].hide()
+        self.controllers['settingsadvanced'].hide()
+        self.controllers['round'].hide()
+        self.controllers['picampair'].hide()
+        self.controllers['settings'].show()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
+
+    def show_picampair(self):
+        self.controllers['config'].hide()
+        self.controllers['settingsadvanced'].hide()
+        self.controllers['round'].hide()
+        self.controllers['settings'].hide()
+        self.controllers['picampair'].show()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
+
+    def show_settingsadvanced(self):
+        self.controllers['config'].hide()
+        self.controllers['settings'].hide()
+        self.controllers['round'].hide()
+        self.controllers['picampair'].hide()
+        self.controllers['settingsadvanced'].show()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
+
+    def set_show_settings(self):
+        self.controllers['settings'].set_data()
+        self.controllers['settingsadvanced'].set_data()
+        self.show_settings()
+
+    def settings_valid(self):
+        self.controllers['settings'].get_data()
+        self.controllers['settingsadvanced'].get_data()
+        ConfigReader.config.write('config.json')
+        self.show_config()
+
+    def picampair_valid(self):
+        print ("todo add picampair valid action")
+        self.show_config()
 
     def home_action(self):
         #print event data
@@ -136,26 +186,27 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard.chrono_signal.emit("btnnext","event","btnnext")
 
     def btn_next_action(self, port):
-        self.chronoHard.chrono_signal.emit("btnnext","event","btnnext")
+        self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
 
     def btn_baseA(self, port):
         print("btn base A")
-        self.chronoHard.chrono_signal.emit("udpreceive","event","baseA")
+        self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseA")
 
     def btn_baseB(self, port):
         print("btn base B")
-        self.chronoHard.chrono_signal.emit("udpreceive","event","baseB")
+        self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseB")
     
     def slot_buzzer(self):
-        if (self.buzzer):
-            self.buzzer.event.set()
+        self.rpigpio.signal_buzzer.emit()
 
     def penalty_100(self):
         #print("penalty event 100")
+        self.vocal.signal_penalty.emit()
         self.chronoHard.addPenalty(100)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
     def penalty_1000(self):
+        self.vocal.signal_penalty.emit()
         self.chronoHard.addPenalty(1000)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
@@ -197,19 +248,29 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_status_changed(self, status):
         self.controllers['round'].wChronoCtrl.set_status(status)
         if (status==chronoStatus.WaitLaunch):
+            self.vocal.signal_waitlaunch.emit()
+            time.sleep(0.7)
             self.controllers['round'].wChronoCtrl.settime(30000, False)
         if (status == chronoStatus.Launched):
+            self.vocal.signal_waitstart.emit()
+            time.sleep(1)
             self.controllers['round'].wChronoCtrl.settime(30000, False)
+        if (status==chronoStatus.InStart):
+            self.vocal.signal_base.emit(0)
         if (status == chronoStatus.InProgress):
+            self.vocal.signal_base.emit(0)
             self.controllers['round'].wChronoCtrl.settime(0, True)
 
-    def slot_lap_finished (self, last_lap_time):
+    def slot_lap_finished (self, lap, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
-
+        self.vocal.signal_base.emit(lap)
 
     def slot_run_finished(self, run_time):
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
+        if ConfigReader.config.conf["voice"]:
+            time.sleep(0.5)     #wait gui has been refresh otherwise the time is updated after vocal sound
+            self.vocal.signal_time.emit(run_time)
 
     def slot_run_validated(self):
         self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
@@ -258,14 +319,23 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_rssi(self, rssi1, rssi2):
         self.controllers['wind'].set_rssi(rssi1, rssi2)
 
+    def closeEvent(self, event):
+        self.close_signal.emit()
+        event.accept()
+
 def main ():
 
+    ConfigReader.init()
+    ConfigReader.config = ConfigReader.Configuration ('../../config.json')
     dao = EventDAO()
     chronodata = Chrono()
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(dao, chronodata, False)
-
-
+    ui=MainUiCtrl(dao, chronodata, '')
+    #launched simulate mode
+    if (ConfigReader.config.conf['simulate']):
+        ui_simulate=SimulateBase()
+        ui_simulate.close_signal.connect(ui.MainWindow.close)
+        ui.close_signal.connect(ui_simulate.MainWindow.close)
 
     try:
         # writer.setupDecoder()
