@@ -92,7 +92,6 @@ class Round:
     def cancel_round(self):
         self.valid=False
         self.valid_round_number=None
-        Round.round_counters[self.event] -= 1
         Round.round_dao.update(self)
         self.event.create_new_round(insert_database=True)
         self._current_competitor_index = 0

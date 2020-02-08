@@ -160,7 +160,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def next_pilot(self, insert_database=False):
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot(insert_database),
-                                                      self.event.get_current_round().round_number)
+                                                      self.event.get_current_round())
         self.controllers['round'].wChronoCtrl.reset_ui()
 
     def refly(self):
@@ -183,7 +183,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard.reset()
         self.chronodata.reset()
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor(),
-                                                      self.event.get_current_round().round_number)
+                                                      self.event.get_current_round())
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.show_chrono()
         self.controllers['round'].wChronoCtrl.reset_ui()
@@ -223,7 +223,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def cancel_round(self):
         self.event.get_current_round().cancel_round()
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor(),
-                                                      self.event.get_current_round().round_number)
+                                                      self.event.get_current_round())
         self.chronoHard.reset()
         self.chronodata.reset()
         self.controllers['round'].wChronoCtrl.stoptime()
