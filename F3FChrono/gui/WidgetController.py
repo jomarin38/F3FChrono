@@ -469,7 +469,7 @@ class WSettings(QObject):
         self.view.voltagemin.setValue(ConfigReader.config.conf['voltage_min'])
         self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
         self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
-        self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzernext_valid'])
+        self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
 
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
@@ -479,7 +479,7 @@ class WSettings(QObject):
         ConfigReader.config.conf['simulatemode'] = self.view.simulate_mode.isChecked()
         ConfigReader.config.conf['fullscreen'] = self.view.fullscreen.isChecked()
         ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
-        ConfigReader.config.conf['buzzernext_valid'] = self.view.buzzernext.isChecked()
+        ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
         ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
 
 class WPiCamPair(QObject):

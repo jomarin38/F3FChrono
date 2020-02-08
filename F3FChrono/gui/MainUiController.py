@@ -193,6 +193,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def btn_next_action(self, port):
         self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
+        self.rpigpio.signal_buzzer_next.emit()
 
     def btn_baseA(self, port):
         print("btn base A")

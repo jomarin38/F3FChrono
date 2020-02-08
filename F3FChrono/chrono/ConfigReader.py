@@ -59,7 +59,7 @@ default_config = \
     "udpport" : 4445,
     "fullscreen":False,
     "buzzer_valid":True,
-    "buzzernext_valid":True
+    "buzzer_next_valid":True
 }
 
 def init():
