@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'WPilot.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.2
+# Created by: PyQt5 UI code generator 5.13.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -20,7 +20,8 @@ class Ui_WPilot(object):
         sizePolicy.setHeightForWidth(WPilot.sizePolicy().hasHeightForWidth())
         WPilot.setSizePolicy(sizePolicy)
         self.gridLayout = QtWidgets.QGridLayout(WPilot)
-        self.gridLayout.setContentsMargins(-1, 3, -1, 3)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName("gridLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")

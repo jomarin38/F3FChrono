@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'WWind.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.2
+# Created by: PyQt5 UI code generator 5.13.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -13,15 +13,15 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_WWind(object):
     def setupUi(self, WWind):
         WWind.setObjectName("WWind")
-        WWind.resize(480, 43)
+        WWind.resize(559, 25)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(WWind.sizePolicy().hasHeightForWidth())
         WWind.setSizePolicy(sizePolicy)
         self.gridLayout = QtWidgets.QGridLayout(WWind)
-        self.gridLayout.setContentsMargins(-1, 3, -1, 3)
-        self.gridLayout.setVerticalSpacing(6)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName("gridLayout")
         self.WindInfo = QtWidgets.QLabel(WWind)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
