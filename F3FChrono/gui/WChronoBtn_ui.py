@@ -20,7 +20,7 @@ class Ui_WChronoBtn(object):
         sizePolicy.setHeightForWidth(WChronoBtn.sizePolicy().hasHeightForWidth())
         WChronoBtn.setSizePolicy(sizePolicy)
         self.gridLayout = QtWidgets.QGridLayout(WChronoBtn)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout.setContentsMargins(0, 3, 0, 3)
         self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName("gridLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()

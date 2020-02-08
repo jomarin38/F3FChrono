@@ -60,8 +60,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         round_widgets_list = self.controllers['round'].get_widget()
         self.ui.verticalLayout.setStretchFactor(round_widgets_list[0], 1)
-        self.ui.verticalLayout.setStretchFactor(round_widgets_list[1], 4)
-        self.ui.verticalLayout.setStretchFactor(round_widgets_list[2], 1)
+        self.ui.verticalLayout.setStretchFactor(round_widgets_list[1], 12)
+        self.ui.verticalLayout.setStretchFactor(round_widgets_list[2], 3)
 
 
         #connect signal event to method

@@ -10,4 +10,3 @@ python3 -m PyQt5.uic.pyuic -x simulate_base.ui -o simulate_base_ui.py
 python3 -m PyQt5.uic.pyuic -x WSettings.ui -o WSettings_ui.py
 python3 -m PyQt5.uic.pyuic -x WSettingsAdvanced.ui -o WSettingsAdvanced_ui.py
 python3 -m PyQt5.uic.pyuic -x WPicamPair.ui -o WPicamPair_ui.py
-python3 -m PyQt5.uic.pyuic -x WRound.ui -o WRound_ui.py
