@@ -58,6 +58,12 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             for x in ctrl.get_widget():
                 self.ui.verticalLayout.addWidget(x)
 
+        round_widgets_list = self.controllers['round'].get_widget()
+        self.ui.verticalLayout.setStretchFactor(round_widgets_list[0], 1)
+        self.ui.verticalLayout.setStretchFactor(round_widgets_list[1], 4)
+        self.ui.verticalLayout.setStretchFactor(round_widgets_list[2], 1)
+
+
         #connect signal event to method
         self.controllers['config'].btn_settings_sig.connect(self.set_show_settings)
         self.controllers['config'].btn_next_sig.connect(self.start)

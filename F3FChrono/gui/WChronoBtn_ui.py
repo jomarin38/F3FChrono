@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'WChronoBtn.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.2
+# Created by: PyQt5 UI code generator 5.13.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -14,13 +14,24 @@ class Ui_WChronoBtn(object):
     def setupUi(self, WChronoBtn):
         WChronoBtn.setObjectName("WChronoBtn")
         WChronoBtn.resize(480, 45)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(WChronoBtn.sizePolicy().hasHeightForWidth())
+        WChronoBtn.setSizePolicy(sizePolicy)
         self.gridLayout = QtWidgets.QGridLayout(WChronoBtn)
-        self.gridLayout.setContentsMargins(-1, 3, -1, 3)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName("gridLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.Btn_Home = QtWidgets.QPushButton(WChronoBtn)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.Btn_Home.sizePolicy().hasHeightForWidth())
+        self.Btn_Home.setSizePolicy(sizePolicy)
         self.Btn_Home.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -29,10 +40,20 @@ class Ui_WChronoBtn(object):
         self.Btn_Home.setObjectName("Btn_Home")
         self.horizontalLayout.addWidget(self.Btn_Home)
         self.Btn_CancelRound = QtWidgets.QPushButton(WChronoBtn)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.Btn_CancelRound.sizePolicy().hasHeightForWidth())
+        self.Btn_CancelRound.setSizePolicy(sizePolicy)
         self.Btn_CancelRound.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.Btn_CancelRound.setObjectName("Btn_CancelRound")
         self.horizontalLayout.addWidget(self.Btn_CancelRound)
         self.Btn_reflight = QtWidgets.QPushButton(WChronoBtn)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.Btn_reflight.sizePolicy().hasHeightForWidth())
+        self.Btn_reflight.setSizePolicy(sizePolicy)
         self.Btn_reflight.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -42,6 +63,11 @@ class Ui_WChronoBtn(object):
         self.Btn_reflight.setObjectName("Btn_reflight")
         self.horizontalLayout.addWidget(self.Btn_reflight)
         self.Btn_Next = QtWidgets.QPushButton(WChronoBtn)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.Btn_Next.sizePolicy().hasHeightForWidth())
+        self.Btn_Next.setSizePolicy(sizePolicy)
         self.Btn_Next.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setPointSize(10)
