@@ -290,6 +290,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         chrono.end_time=chronoHard.getEndTime()
         chrono.max_wind_speed=chronoHard.getMaxWindSpeed()
         chrono.min_wind_speed=chronoHard.getMinWindSpeed()
+        chrono.mean_wind_speed=chronoHard.getMeanWindSpeed()
         chrono.wind_direction=chronoHard.getWindDir()
         for lap in chronoHard.getLaps():
             chrono.add_lap_time(lap)
