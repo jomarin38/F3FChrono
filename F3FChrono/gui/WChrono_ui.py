@@ -2,18 +2,16 @@
 
 # Form implementation generated from reading ui file 'WChrono.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.1
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_WChrono(object):
     def setupUi(self, WChrono):
         WChrono.setObjectName("WChrono")
-        WChrono.resize(741, 279)
+        WChrono.resize(437, 166)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -45,6 +43,30 @@ class Ui_WChrono(object):
         self.verticalLayout.addWidget(self.Time_label)
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem1)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.label = QtWidgets.QLabel(WChrono)
+        self.label.setObjectName("label")
+        self.horizontalLayout_4.addWidget(self.label)
+        self.penalty_value = QtWidgets.QLabel(WChrono)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.penalty_value.sizePolicy().hasHeightForWidth())
+        self.penalty_value.setSizePolicy(sizePolicy)
+        self.penalty_value.setMinimumSize(QtCore.QSize(0, 0))
+        self.penalty_value.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.penalty_value.setFont(font)
+        self.penalty_value.setAlignment(QtCore.Qt.AlignCenter)
+        self.penalty_value.setObjectName("penalty_value")
+        self.horizontalLayout_4.addWidget(self.penalty_value)
+        self.verticalLayout.addLayout(self.horizontalLayout_4)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem2)
         self.Status = QtWidgets.QLabel(WChrono)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -104,7 +126,7 @@ class Ui_WChrono(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.Lap1.sizePolicy().hasHeightForWidth())
         self.Lap1.setSizePolicy(sizePolicy)
-        self.Lap1.setMinimumSize(QtCore.QSize(100, 0))
+        self.Lap1.setMinimumSize(QtCore.QSize(80, 0))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -173,7 +195,7 @@ class Ui_WChrono(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.Lap2.sizePolicy().hasHeightForWidth())
         self.Lap2.setSizePolicy(sizePolicy)
-        self.Lap2.setMinimumSize(QtCore.QSize(100, 0))
+        self.Lap2.setMinimumSize(QtCore.QSize(80, 0))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -239,6 +261,8 @@ class Ui_WChrono(object):
         self.verticalLayout_5.setStretch(1, 4)
         self.horizontalLayout_3.addLayout(self.verticalLayout_5)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
+        self.verticalLayout_2.setSpacing(1)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.penaltyLabel = QtWidgets.QLabel(WChrono)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -283,27 +307,8 @@ class Ui_WChrono(object):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem2)
-        self.penalty_value = QtWidgets.QLabel(WChrono)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.penalty_value.sizePolicy().hasHeightForWidth())
-        self.penalty_value.setSizePolicy(sizePolicy)
-        self.penalty_value.setMinimumSize(QtCore.QSize(100, 0))
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        font.setBold(True)
-        font.setWeight(75)
-        self.penalty_value.setFont(font)
-        self.penalty_value.setAlignment(QtCore.Qt.AlignCenter)
-        self.penalty_value.setObjectName("penalty_value")
-        self.horizontalLayout_2.addWidget(self.penalty_value)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem3)
         self.btn_clear_penalty = QtWidgets.QPushButton(WChrono)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.btn_clear_penalty.sizePolicy().hasHeightForWidth())
@@ -339,6 +344,8 @@ class Ui_WChrono(object):
         _translate = QtCore.QCoreApplication.translate
         WChrono.setWindowTitle(_translate("WChrono", "Form"))
         self.Time_label.setText(_translate("WChrono", "30.00"))
+        self.label.setText(_translate("WChrono", "Penalty :"))
+        self.penalty_value.setText(_translate("WChrono", "0"))
         self.Status.setText(_translate("WChrono", "Wait New Run"))
         self.LapTimeLabel.setText(_translate("WChrono", "Lap Time (s)"))
         self.Lap1.setText(_translate("WChrono", "1 : XX.XXX"))
@@ -354,7 +361,6 @@ class Ui_WChrono(object):
         self.penaltyLabel.setText(_translate("WChrono", "Penalty"))
         self.btn_penalty_100.setText(_translate("WChrono", "100"))
         self.btn_penalty_1000.setText(_translate("WChrono", "1000"))
-        self.penalty_value.setText(_translate("WChrono", "0"))
         self.btn_clear_penalty.setText(_translate("WChrono", "x"))
         self.nullFlight.setText(_translate("WChrono", "0 Flight"))
 
@@ -367,3 +373,4 @@ if __name__ == "__main__":
     ui.setupUi(WChrono)
     WChrono.show()
     sys.exit(app.exec_())
+

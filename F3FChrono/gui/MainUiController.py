@@ -43,6 +43,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.ui.setupUi(self.MainWindow)
         if ConfigReader.config.conf['fullscreen']:
             self.MainWindow.showFullScreen()
+        else:
+            self.MainWindow.setFixedSize(480, 320)
 
 
         self.controllers = collections.OrderedDict()

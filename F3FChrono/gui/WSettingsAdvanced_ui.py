@@ -2,13 +2,11 @@
 
 # Form implementation generated from reading ui file 'WSettingsAdvanced.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.1
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_WSettingsAdvanced(object):
     def setupUi(self, WSettingsAdvanced):
@@ -174,3 +172,4 @@ if __name__ == "__main__":
     ui.setupUi(WSettingsAdvanced)
     WSettingsAdvanced.show()
     sys.exit(app.exec_())
+
