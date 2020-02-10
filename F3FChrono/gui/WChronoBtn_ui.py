@@ -2,13 +2,11 @@
 
 # Form implementation generated from reading ui file 'WChronoBtn.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.1
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_WChronoBtn(object):
     def setupUi(self, WChronoBtn):
@@ -25,6 +23,7 @@ class Ui_WChronoBtn(object):
         self.gridLayout.setObjectName("gridLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
+        self.horizontalLayout.setSpacing(1)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.Btn_Home = QtWidgets.QPushButton(WChronoBtn)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -98,3 +97,4 @@ if __name__ == "__main__":
     ui.setupUi(WChronoBtn)
     WChronoBtn.show()
     sys.exit(app.exec_())
+
