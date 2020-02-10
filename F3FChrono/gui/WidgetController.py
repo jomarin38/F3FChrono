@@ -179,7 +179,7 @@ class WPilotCtrl():
     def set_data(self, competitor, round):
         self.view.pilotName.setText(competitor.display_name())
         self.view.bib.setText("BIB : "+str(competitor.get_bib_number()))
-        self.view.round.setText("Round : "+str(round))
+        self.view.round.setText("Round : "+str(len(round.event.valid_rounds)+1))
 
 class WChronoCtrl(QTimer):
     btn_null_flight_sig = pyqtSignal()
