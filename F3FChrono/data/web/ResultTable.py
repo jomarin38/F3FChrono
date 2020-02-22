@@ -2,10 +2,11 @@
 
 class ResultTable:
 
-    def __init__(self, title=None):
+    def __init__(self, title=None, css_id=None):
         self.title = title
         self.header = None
         self.lines = []
+        self.css_id = css_id
 
     def set_title(self, title):
         self.title = title
@@ -18,7 +19,10 @@ class ResultTable:
 
     def to_html(self):
         res = '<h2>' + self.title + '</h2>'
-        res += '<table>'
+        if self.css_id is None:
+            res += '<table>'
+        else:
+            res += '<table id=\"' + self.css_id + '\">'
         res += '<thead>' + self.header.to_html() + '</thead>'
         res += '<tbody>'
         for line in self.lines:
