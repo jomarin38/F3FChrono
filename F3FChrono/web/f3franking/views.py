@@ -89,8 +89,6 @@ def event_view_html(event_id):
                                  '&round_number=' + str(f3f_round.round_number)))
         table.set_header(header)
 
-        css_id_dict = {1: 'first', 2: 'second', 3: 'third'}
-
         best_score = None
         for competitor in sorted([competitor for bib, competitor in event.competitors.items()], key=lambda c: c.rank):
             row = Line(name=Cell('{:2d}'.format(int(competitor.rank))))
