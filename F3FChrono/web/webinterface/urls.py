@@ -17,6 +17,6 @@ from django.contrib import admin
 from django.urls import include,path
 
 urlpatterns = [
-    path('f3franking/', include('f3franking.urls')),
+    path('f3franking/', include('F3FChrono.web.f3franking.urls')),
     path('admin/', admin.site.urls),
 ]
