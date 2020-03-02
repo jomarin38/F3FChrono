@@ -192,7 +192,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.reset_ui()
 
     def next_action(self):
-        self.chronoHard.chrono_signal.emit("btnnext","event","btnnext")
+        self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
 
     def btn_next_action(self, port):
         self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
