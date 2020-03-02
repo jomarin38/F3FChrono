@@ -103,7 +103,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
           <widget class="QDoubleSpinBox" name="voltagemin">
@@ -131,10 +131,17 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="QPushButton" name="closebtn">
          <property name="text">
           <string>Close Race Management</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="webserver">
+         <property name="text">
+          <string>run web server</string>
          </property>
         </widget>
        </item>

@@ -473,6 +473,7 @@ class WSettings(QObject):
         self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
         self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
         self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
+        self.view.webserver.setChecked(ConfigReader.config.conf['run_webserver'])
 
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
@@ -484,6 +485,7 @@ class WSettings(QObject):
         ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
         ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
         ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
+        ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
 
 class WPiCamPair(QObject):
     btn_cancel_sig = pyqtSignal()

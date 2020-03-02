@@ -211,6 +211,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if self.chronoHard.get_status()==chronoStatus.WaitLaunch:
             self.vocal.signal_penalty.emit()
             self.controllers['round'].wChronoCtrl.stoptime()
+            self.vocal.signal_waitlaunch_stop.emit()
 
         if self.chronoHard.get_status()==chronoStatus.Launched or self.chronoHard.get_status()==chronoStatus.InStart:
             self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
