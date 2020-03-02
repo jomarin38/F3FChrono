@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import subprocess
 from time import sleep
 from argparse import ArgumentParser
 from PyQt5 import QtWidgets
@@ -35,6 +36,11 @@ def main():
     if(pi['pi']!=''):
         print("warm-up 2 seconds...")
         sleep(2.0)
+
+    if ConfigReader.config.conf['run_webserver']:
+        print("Starting webserver ...")
+        manage_py_path = os.path.realpath('F3FChrono/web')
+        subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:8000'])
 
     print("...start")
 

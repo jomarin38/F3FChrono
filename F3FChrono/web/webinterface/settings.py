@@ -49,7 +49,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'webinterface.urls'
+ROOT_URLCONF = 'F3FChrono.web.webinterface.urls'
 
 TEMPLATES = [
     {
@@ -67,7 +67,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'webinterface.wsgi.application'
+WSGI_APPLICATION = 'F3FChrono.web.webinterface.wsgi.application'
 
 
 # Database
