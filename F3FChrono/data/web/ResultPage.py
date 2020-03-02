@@ -29,7 +29,7 @@ class ResultPage:
     def get_css_string():
         if ResultPage.css_string is None:
             ResultPage.css_string = ''
-            css_path = os.path.realpath('f3franking/static/event_view.css')
+            css_path = os.path.realpath('F3FChrono/web/f3franking/static/event_view.css')
             with open(css_path) as fp:
                 lines = fp.readlines()
                 for line in lines:
