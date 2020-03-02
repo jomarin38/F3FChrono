@@ -186,6 +186,7 @@ class WChronoCtrl(QTimer):
     btn_penalty_100_sig = pyqtSignal()
     btn_penalty_1000_sig = pyqtSignal()
     btn_clear_penalty_sig = pyqtSignal()
+    time_elapsed_sig = pyqtSignal()
 
     def __init__(self, name, parent):
         super().__init__()
@@ -280,6 +281,8 @@ class WChronoCtrl(QTimer):
             self.view.Time_label.setText("{:0>6.2f}".format(time.time() - self.startTime))
         else:
             self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000 - (time.time()-self.startTime)))
+            if(self.time / 1000 - (time.time()-self.startTime))<0):
+                self.time_elapsed_sig.emit()
 
     def penalty_100(self):
         self.btn_penalty_100_sig.emit()

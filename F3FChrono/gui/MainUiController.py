@@ -79,6 +79,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.btn_penalty_1000_sig.connect(self.penalty_1000)
         self.controllers['round'].wChronoCtrl.btn_clear_penalty_sig.connect(self.clear_penalty)
         self.controllers['round'].wChronoCtrl.btn_null_flight_sig.connect(self.null_flight)
+        self.controllers['round'].wChronoCtrl.time_elapsed_sig.connect(self.handle_time_elapsed)
         self.controllers['round'].btn_cancel_flight_sig.connect(self.cancel_round)
         self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
         self.controllers['settings'].btn_cancel_sig.connect(self.show_config)
@@ -204,7 +205,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def btn_baseB(self, port):
         print("btn base B")
         self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseB")
-    
+
+    def handle_time_elapsed(self):
+        print("time elapsed")
+        self.chronoHard.get_status()==
+
     def slot_buzzer(self):
         self.rpigpio.signal_buzzer.emit()
 
@@ -265,7 +270,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             time.sleep(1)
             self.controllers['round'].wChronoCtrl.settime(30000, False)
         if (status==chronoStatus.InStart):
-            self.vocal.signal_base.emit(0)
+            self.vocal.signal_entry.emit()
         if (status == chronoStatus.InProgress):
             self.vocal.signal_base.emit(0)
             self.controllers['round'].wChronoCtrl.settime(0, True)
