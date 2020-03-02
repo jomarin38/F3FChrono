@@ -281,7 +281,7 @@ class WChronoCtrl(QTimer):
             self.view.Time_label.setText("{:0>6.2f}".format(time.time() - self.startTime))
         else:
             self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000 - (time.time()-self.startTime)))
-            if(self.time / 1000 - (time.time()-self.startTime))<0):
+            if(self.time / 1000 - (time.time()-self.startTime))<0:
                 self.time_elapsed_sig.emit()
 
     def penalty_100(self):

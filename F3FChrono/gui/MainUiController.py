@@ -208,7 +208,13 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def handle_time_elapsed(self):
         print("time elapsed")
-        self.chronoHard.get_status()==
+        if self.chronoHard.get_status()==chronoStatus.WaitLaunch:
+            self.vocal.signal_penalty.emit()
+            self.controllers['round'].wChronoCtrl.stoptime()
+
+        if self.chronoHard.get_status()==chronoStatus.Launched or self.chronoHard.get_status()==chronoStatus.InStart:
+            self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
+
 
     def slot_buzzer(self):
         self.rpigpio.signal_buzzer.emit()

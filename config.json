@@ -18,5 +18,5 @@
  "udpport": 4445,
  "voice": false,
  "voltage_min": 9.9,
- "run_webserver": false
+ "run_webserver": true
 }
