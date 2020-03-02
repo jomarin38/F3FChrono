@@ -18,22 +18,27 @@ def index(request):
 
     events = dao.get_list()
 
-    result = '<h1>Events list</h1>\n'
+    page = ResultPage(title='Events list')
 
-    result += '<table>\n'
-    result += '<thead><tr><th>Name</th><th>Location</th><th>Begin date</th><th>End Date</th></tr></thead>\n'
-    result += '<tbody>'
+    table = ResultTable(title='', css_id='ranking')
+
+    header = Header(name=Cell('Name'))
+    header.add_cell(Cell('Location'))
+    header.add_cell(Cell('Begin date'))
+    header.add_cell((Cell('End date')))
+    table.set_header(header)
+
     for event in events:
         fetched_event = dao.get(event.id)
-        result += '<tr><td><a href=\"event_view?event_id=' + str(fetched_event.id) + '\">'+fetched_event.name + \
-                  '</a></td><td>' + \
-                  fetched_event.location + '</td><td>' + \
-                  str(fetched_event.begin_date) + '</td><td>' + \
-                  str(fetched_event.end_date) + '</td></tr>'
+        row = Line(name=Link(fetched_event.name, 'event_view?event_id=' + str(fetched_event.id)))
+        row.add_cell(Cell(fetched_event.location))
+        row.add_cell(Cell(str(fetched_event.begin_date)))
+        row.add_cell(Cell(str(fetched_event.end_date)))
+        table.add_line(row)
 
-    result += '</tbody></table>\n'
+    page.add_table(table)
 
-    return HttpResponse(result)
+    return HttpResponse(page.to_html())
 
 
 @never_cache
@@ -43,6 +48,16 @@ def event_view(request):
 
     return HttpResponse(event_view_html(event_id))
 
+def get_cell_css_id(competitor_rank):
+    if competitor_rank==1:
+        return 'first'
+    elif competitor_rank==2:
+        return 'second'
+    elif competitor_rank==3:
+        return 'third'
+    else:
+        return None
+
 
 def event_view_html(event_id):
 
@@ -51,7 +66,7 @@ def event_view_html(event_id):
     page = ResultPage(title=event.name)
 
     if event.current_round is not None:
-        table = ResultTable('Ongoing round :')
+        table = ResultTable('Ongoing round :', css_id='ranking')
         header = Header(name=Link('Round ' + str(len(event.valid_rounds)+1),
                                   'round_view?event_id=' + str(event_id) +
                                   '&round_number=' + str(event.get_current_round().round_number)))
@@ -62,7 +77,7 @@ def event_view_html(event_id):
         event.compute_ranking()
 
         #Evolutive ranking table
-        table = ResultTable('Evolutive ranking')
+        table = ResultTable(title='Evolutive ranking', css_id="ranking")
         header = Header(name=Cell('Rank'))
         header.add_cell(Cell('Bib'))
         header.add_cell(Cell('Points'))
@@ -85,13 +100,14 @@ def event_view_html(event_id):
             row.add_cell(Cell('{:2d}'.format(int(competitor_score / best_score * 1000))))
             row.add_cell(Cell(competitor.pilot.to_string()))
             for f3f_round in event.valid_rounds:
-                row.add_cell(Cell('{:2d}'.format(int(competitor.evolutive_rank[f3f_round.valid_round_number-1]))))
+                competitor_rank = int(competitor.evolutive_rank[f3f_round.valid_round_number-1])
+                row.add_cell(Cell('{:2d}'.format(competitor_rank), css_id=get_cell_css_id(competitor_rank)))
             table.add_line(row)
 
         page.add_table(table)
 
         # Round scores table
-        table = ResultTable('Round scores')
+        table = ResultTable(title='Round scores', css_id="ranking")
         header = Header(name=Cell('Bib'))
         header.add_cell(Cell('Name'))
         for f3f_round in event.rounds:
@@ -155,7 +171,7 @@ def round_view_html(event_id, round_number):
         if run is not None:
             best_runs_string += run.to_string()
 
-    table = ResultTable(title=best_runs_string)
+    table = ResultTable(title=best_runs_string, css_id='ranking')
     header = Header(name=Cell('Bib'))
     header.add_cell(Cell('Name'))
     header.add_cell(Cell('Flight time'))
@@ -180,7 +196,7 @@ def round_view_html(event_id, round_number):
 
 if __name__ == "__main__":
     # execute only if run as a script
-    #event_view_html(1)
-    round_view_html(1, 21)
+    event_view_html(1)
+    #round_view_html(1, 21)
 
 

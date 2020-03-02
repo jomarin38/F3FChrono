@@ -1,0 +1,29 @@
+#ranking {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#ranking td, #ranking th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+#ranking tr:nth-child(even){background-color: #f2f2f2;}
+
+#ranking tr:hover {background-color: #ddd;}
+
+#ranking td#first {background-color: #ff9900;}
+#ranking td#second {background-color: #999966;}
+#ranking td#third {background-color: #ff3300;}
+#ranking td#win {background-color: #99ff33;}
+#ranking td#joker {background-color: #ff6666;}
+
+#ranking th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: center;
+  background-color: #798686;
+  color: white;
+}
