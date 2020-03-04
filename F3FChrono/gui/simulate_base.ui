@@ -153,7 +153,7 @@
           <item>
            <widget class="QLineEdit" name="data_B">
             <property name="text">
-             <string>event</string>
+             <string>Event</string>
             </property>
            </widget>
           </item>

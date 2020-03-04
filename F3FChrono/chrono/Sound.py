@@ -66,6 +66,7 @@ class chronoQSound(QObject):
     signal_entry = pyqtSignal()
     signal_time = pyqtSignal(float)
     signal_waitlaunch = pyqtSignal()
+    signal_waitlaunch_stop = pyqtSignal()
     signal_waitstart = pyqtSignal()
 
     def __init__(self):
@@ -81,6 +82,7 @@ class chronoQSound(QObject):
         self.waitstart=QSound(self.pathname+'/start.wav')
 
         self.signal_waitlaunch.connect(self.sound_waitlaunch)
+        self.signal_waitlaunch_stop.connect(self.sound_waitlaunch_stop)
         self.signal_waitstart.connect(self.sound_waitstart)
         self.signal_entry.connect(self.sound_entry)
         self.signal_base.connect(self.sound_base)
@@ -113,6 +115,10 @@ class chronoQSound(QObject):
         if ConfigReader.config.conf['sound']:
             self.waitlaunch.play()
             self.soundstart_run=True
+
+    def sound_waitlaunch_stop(self):
+        self.waitlaunch.stop()
+        
     def sound_waitstart(self):
         if ConfigReader.config.conf['sound']:
             self.waitstart.play()

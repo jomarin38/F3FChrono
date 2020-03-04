@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'WSettings.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_WSettings(object):
     def setupUi(self, WSettings):
@@ -68,13 +70,16 @@ class Ui_WSettings(object):
         self.label_2 = QtWidgets.QLabel(WSettings)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout_4.addWidget(self.label_2)
-        self.gridLayout_2.addLayout(self.horizontalLayout_4, 5, 0, 1, 1)
+        self.gridLayout_2.addLayout(self.horizontalLayout_4, 6, 0, 1, 1)
         self.buzzernext = QtWidgets.QCheckBox(WSettings)
         self.buzzernext.setObjectName("buzzernext")
         self.gridLayout_2.addWidget(self.buzzernext, 4, 1, 1, 1)
         self.closebtn = QtWidgets.QPushButton(WSettings)
         self.closebtn.setObjectName("closebtn")
-        self.gridLayout_2.addWidget(self.closebtn, 5, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.closebtn, 6, 1, 1, 1)
+        self.webserver = QtWidgets.QCheckBox(WSettings)
+        self.webserver.setObjectName("webserver")
+        self.gridLayout_2.addWidget(self.webserver, 5, 0, 1, 1)
         self.verticalLayout.addLayout(self.gridLayout_2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -115,6 +120,7 @@ class Ui_WSettings(object):
         self.label_2.setText(_translate("WSettings", "Min Voltage"))
         self.buzzernext.setText(_translate("WSettings", "Buzzer Next button"))
         self.closebtn.setText(_translate("WSettings", "Close Race Management"))
+        self.webserver.setText(_translate("WSettings", "web server"))
         self.btn_advanced_settings.setText(_translate("WSettings", "Advanced Settings"))
         self.btn_cancel.setText(_translate("WSettings", "Cancel"))
         self.btn_valid.setText(_translate("WSettings", "Valid"))
@@ -128,4 +134,3 @@ if __name__ == "__main__":
     ui.setupUi(WSettings)
     WSettings.show()
     sys.exit(app.exec_())
-

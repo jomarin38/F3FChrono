@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'simulate_base.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -250,7 +252,7 @@ class Ui_MainWindow(object):
         self.label_4.setText(_translate("MainWindow", "IP Address"))
         self.ip_B.setText(_translate("MainWindow", "192.168.0.11"))
         self.label_6.setText(_translate("MainWindow", "Data"))
-        self.data_B.setText(_translate("MainWindow", "event"))
+        self.data_B.setText(_translate("MainWindow", "Event"))
         self.btn_send_B.setText(_translate("MainWindow", "Send UDP"))
         self.label_9.setText(_translate("MainWindow", "Info"))
         self.label_8.setText(_translate("MainWindow", "Speed\n"
@@ -271,4 +273,3 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-

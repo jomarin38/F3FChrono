@@ -186,6 +186,7 @@ class WChronoCtrl(QTimer):
     btn_penalty_100_sig = pyqtSignal()
     btn_penalty_1000_sig = pyqtSignal()
     btn_clear_penalty_sig = pyqtSignal()
+    time_elapsed_sig = pyqtSignal()
 
     def __init__(self, name, parent):
         super().__init__()
@@ -280,6 +281,8 @@ class WChronoCtrl(QTimer):
             self.view.Time_label.setText("{:0>6.2f}".format(time.time() - self.startTime))
         else:
             self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000 - (time.time()-self.startTime)))
+            if(self.time / 1000 - (time.time()-self.startTime))<0:
+                self.time_elapsed_sig.emit()
 
     def penalty_100(self):
         self.btn_penalty_100_sig.emit()
@@ -470,6 +473,7 @@ class WSettings(QObject):
         self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
         self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
         self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
+        self.view.webserver.setChecked(ConfigReader.config.conf['run_webserver'])
 
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
@@ -481,6 +485,7 @@ class WSettings(QObject):
         ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
         ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
         ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
+        ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
 
 class WPiCamPair(QObject):
     btn_cancel_sig = pyqtSignal()

@@ -63,7 +63,6 @@ class ChronoHard(QObject):
     def set_status(self, status):
         print("setstatus")
 
-
     def wind_info(self, speed, orientation, rain):
         print("wind_info")
         self.wind['speed_nb']+=1
@@ -146,10 +145,11 @@ class ChronoRpi(ChronoHard):
         self.penalty=0.0
         self.reset_wind()
 
+
     def handle_chrono_event(self, caller, data, address):
         self.buzzer_validated.emit()
         if ((self.status == chronoStatus.Launched or self.status == chronoStatus.InStart or
-             self.status == chronoStatus.InProgress) and caller == "udpreceive" or caller == "btnnext") and data == "event":
+             self.status == chronoStatus.InProgress) and caller == "udpreceive" or caller == "btnnext") and data.lower() == "event":
             self.__declareBase(address)
 
 
