@@ -7,13 +7,15 @@ from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.chrono.Sound import *
 from F3FChrono.chrono.GPIOPort import rpi_gpio
+import signal
 
 
 class MainUiCtrl (QtWidgets.QMainWindow):
     close_signal = pyqtSignal()
-    def __init__(self, dao, chronodata, rpi):
+    def __init__(self, dao, chronodata, rpi, webserver_process):
         super().__init__()
 
+        self.webserver_process = webserver_process
         self.dao = dao
         self.daoRound = RoundDAO()
         self.event = None
@@ -84,7 +86,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
         self.controllers['settings'].btn_cancel_sig.connect(self.show_config)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
-        self.controllers['settings'].btn_quitapp_sig.connect(self.close)
+        self.controllers['settings'].btn_quitapp_sig.connect(self.shutdown_app)
         self.controllers['settingsadvanced'].btn_settings_sig.connect(self.show_settings)
         self.controllers['picampair'].btn_valid_sig.connect(self.picampair_valid)
         self.controllers['picampair'].btn_cancel_sig.connect(self.show_config)
@@ -344,6 +346,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def closeEvent(self, event):
         self.close_signal.emit()
         event.accept()
+
+    def shutdown_app(self):
+        if self.webserver_process is not None:
+            print('Kill process ' + str(self.webserver_process.pid))
+            time.sleep(5)  # Wait for the process to be killed
+            self.webserver_process.kill()
+
+        exit()
 
 def main ():
 

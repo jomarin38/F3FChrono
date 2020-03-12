@@ -37,10 +37,14 @@ def main():
         print("warm-up 2 seconds...")
         sleep(2.0)
 
+    webserver_process = None
+
     if ConfigReader.config.conf['run_webserver']:
         print("Starting webserver ...")
         manage_py_path = os.path.realpath('F3FChrono/web')
-        subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:8000'])
+        webserver_process = \
+            subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:8000'],
+                             shell=True)
 
     print("...start")
 
@@ -49,7 +53,7 @@ def main():
 
 
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(dao, chronodata, rpi=pi['pi'])
+    ui=MainUiCtrl(dao, chronodata, rpi=pi['pi'], webserver_process=webserver_process)
 
     #launched simulate mode
     if (ConfigReader.config.conf['simulatemode']):
