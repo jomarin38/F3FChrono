@@ -350,7 +350,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def shutdown_app(self):
         if self.webserver_process is not None:
             print('Kill process ' + str(self.webserver_process.pid))
-            time.sleep(5)  # Wait for the process to be killed
+            time.sleep(1)  # Wait for the process to be killed
             self.webserver_process.kill()
 
         exit()
