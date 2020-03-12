@@ -7,7 +7,6 @@ from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.chrono.Sound import *
 from F3FChrono.chrono.GPIOPort import rpi_gpio
-import signal
 
 
 class MainUiCtrl (QtWidgets.QMainWindow):
