@@ -31,16 +31,23 @@ def get_raspi_revision():
 
 def main():
 
+    use_popen_shell = True
+
     #logging.basicConfig (filename="runchrono.log", level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     pi=get_raspi_revision()
     if(pi['pi']!=''):
         print("warm-up 2 seconds...")
         sleep(2.0)
+        use_popen_shell = False
+
+    webserver_process = None
 
     if ConfigReader.config.conf['run_webserver']:
         print("Starting webserver ...")
         manage_py_path = os.path.realpath('F3FChrono/web')
-        subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:8000'])
+        webserver_process = \
+            subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:8000'],
+                             shell=use_popen_shell)
 
     print("...start")
 
@@ -49,7 +56,7 @@ def main():
 
 
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(dao, chronodata, rpi=pi['pi'])
+    ui=MainUiCtrl(dao, chronodata, rpi=pi['pi'], webserver_process=webserver_process)
 
     #launched simulate mode
     if (ConfigReader.config.conf['simulatemode']):
