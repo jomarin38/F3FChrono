@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'WConfig.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_WConfig(object):
     def setupUi(self, WConfig):
@@ -143,6 +145,27 @@ class Ui_WConfig(object):
         self.RevolValue.setObjectName("RevolValue")
         self.horizontalLayout_9.addWidget(self.RevolValue)
         self.verticalLayout.addLayout(self.horizontalLayout_9)
+        self.horizontalLayout_11 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_11.setObjectName("horizontalLayout_11")
+        self.randombtn = QtWidgets.QPushButton(WConfig)
+        self.randombtn.setObjectName("randombtn")
+        self.horizontalLayout_11.addWidget(self.randombtn)
+        self.day_1btn = QtWidgets.QPushButton(WConfig)
+        self.day_1btn.setObjectName("day_1btn")
+        self.horizontalLayout_11.addWidget(self.day_1btn)
+        self.bib_start_label = QtWidgets.QLabel(WConfig)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.bib_start_label.setFont(font)
+        self.bib_start_label.setObjectName("bib_start_label")
+        self.horizontalLayout_11.addWidget(self.bib_start_label)
+        self.bib_start = QtWidgets.QSpinBox(WConfig)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.bib_start.setFont(font)
+        self.bib_start.setObjectName("bib_start")
+        self.horizontalLayout_11.addWidget(self.bib_start)
+        self.verticalLayout.addLayout(self.horizontalLayout_11)
         self.StartBtn = QtWidgets.QPushButton(WConfig)
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -170,6 +193,9 @@ class Ui_WConfig(object):
         self.WindMaxLabel.setText(_translate("WConfig", "WindMax (m/s)"))
         self.OrientationLabel.setText(_translate("WConfig", "Orientation (°)"))
         self.RevolLabel.setText(_translate("WConfig", "Revol"))
+        self.randombtn.setText(_translate("WConfig", "Random"))
+        self.day_1btn.setText(_translate("WConfig", "Day+1"))
+        self.bib_start_label.setText(_translate("WConfig", "BIB Starting"))
         self.StartBtn.setText(_translate("WConfig", "Start"))
 
 
@@ -181,4 +207,3 @@ if __name__ == "__main__":
     ui.setupUi(WConfig)
     WConfig.show()
     sys.exit(app.exec_())
-

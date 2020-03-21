@@ -309,6 +309,8 @@ class WConfigCtrl(QObject):
     chrono_sig = pyqtSignal()
     btn_settings_sig = pyqtSignal()
     btn_picampair_sig = pyqtSignal()
+    btn_random_sig = pyqtSignal()
+    btn_day_1_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -328,6 +330,8 @@ class WConfigCtrl(QObject):
         self.view.ChronoType.currentIndexChanged.connect(self.chrono_sig.emit)
         self.view.btn_settings.clicked.connect(self.btn_settings_sig.emit)
         self.view.picampaired.clicked.connect(self.btn_picampair_sig.emit)
+        self.view.randombtn.clicked.connect(self.btn_random_sig.emit)
+        self.view.day_1btn.clicked.connect(self.btn_day_1_sig.emit)
 
     def get_widget(self):
         return(self.widgetList)
@@ -362,12 +366,13 @@ class WConfigCtrl(QObject):
         self.get_data()
         self.btn_next_sig.emit()
 
-    def set_data(self, min_speed, max_speed, dir_dev, max_interrupt, revol=5):
-        self.view.WindMinValue.setValue(min_speed)
-        self.view.WindMaxValue.setValue(max_speed)
-        self.view.OrientationValue.setValue(dir_dev)
-        self.view.RevolValue.setValue(revol)
-        self.view.MaxInterruptValue.setValue(max_interrupt/60)
+    def set_data(self, event):
+        self.view.WindMinValue.setValue(event.min_allowed_wind_speed)
+        self.view.WindMaxValue.setValue(event.max_allowed_wind_speed)
+        self.view.OrientationValue.setValue(event.max_wind_dir_dev)
+        self.view.RevolValue.setValue(event.flights_before_refly)
+        self.view.bib_start.setValue(event.bib_start)
+        self.view.MaxInterruptValue.setValue(event.max_interruption_time/60)
 
     def set_contest(self, contest):
         self.view.ChronoType.setCurrentIndex(0)
@@ -378,11 +383,12 @@ class WConfigCtrl(QObject):
         self.view.ContestList.setCurrentText(contest[0].name)
 
     def get_data(self):
-        self.wind_speed_min=self.view.WindMinValue.value()
-        self.wind_speed_max=self.view.WindMaxValue.value()
-        self.wind_orientation=self.view.OrientationValue.value()
-        self.interruption_time_max=self.view.MaxInterruptValue.value()
-        self.revol=self.view.RevolValue.value()
+        self.min_allowed_wind_speed = self.view.WindMinValue.value()
+        self.max_allowed_wind_speed = self.view.WindMaxValue.value()
+        self.max_wind_dir_dev = self.view.OrientationValue.value()
+        self.max_interruption_time = self.view.MaxInterruptValue.value()
+        self.flights_before_refly=self.view.RevolValue.value()
+        self.bib_start=self.view.bib_start.value()
         self.chrono_type=self.view.ChronoType.currentIndex()
         self.contest=self.view.ContestList.currentIndex()
 
@@ -470,6 +476,7 @@ class WSettings(QObject):
         self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
         self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
         self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
+        self.view.webserver.setChecked(ConfigReader.config.conf['run_webserver'])
 
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
@@ -480,7 +487,9 @@ class WSettings(QObject):
         ConfigReader.config.conf['fullscreen'] = self.view.fullscreen.isChecked()
         ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
         ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
+        ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
         ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
+
 
 class WPiCamPair(QObject):
     btn_cancel_sig = pyqtSignal()
