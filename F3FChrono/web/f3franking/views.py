@@ -166,7 +166,7 @@ def round_view_html(event_id, round_number):
         round_number = 'not valid'
 
     page = ResultPage(title=f3f_round.event.name + '\tRound : ' + round_number +
-                            '(id:' + str(f3f_round.round_number) + ')')
+                            '(id:' + str(f3f_round.round_number) + ')', event=f3f_round.event)
 
     best_runs = f3f_round.get_best_runs()
     best_runs_string = 'Best time : <br>'
