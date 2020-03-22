@@ -10,6 +10,10 @@ from F3FChrono.data.web.Link import Link
 from django.views.decorators.cache import never_cache
 import datetime
 
+@never_cache
+def is_alive(request):
+    return HttpResponse('<p>Hello world !</p>')
+
 
 @never_cache
 def index(request):
