@@ -30,7 +30,7 @@ def get_raspi_revision():
         pass
     return info
 
-def check_server_alive():
+def server_alive():
     try:
         request_url = 'http://127.0.0.1:8000/f3franking/is_alive'
         response = requests.post(request_url)
@@ -48,12 +48,15 @@ def main():
 
     webserver_process = None
 
-    if ConfigReader.config.conf['run_webserver'] and not check_server_alive():
-        print("Starting webserver ...")
-        manage_py_path = os.path.realpath('F3FChrono/web')
-        webserver_process = \
-            subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:8000'],
-                             shell=False)
+    if ConfigReader.config.conf['run_webserver']:
+        if server_alive():
+            print('Webserver already running.')
+        else:
+            print("Starting webserver ...")
+            manage_py_path = os.path.realpath('F3FChrono/web')
+            webserver_process = \
+                subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:8000'],
+                                 shell=False)
 
     print("...start")
 
