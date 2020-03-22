@@ -16,6 +16,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.webserver_process = webserver_process
         self.dao = dao
+        self.daoEvent = EventDAO()
         self.daoRound = RoundDAO()
         self.event = None
         self.chronodata = chronodata
@@ -73,6 +74,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].contest_sig.connect(self.contest_changed)
         self.controllers['config'].chrono_sig.connect(self.chronotype_changed)
         self.controllers['config'].btn_picampair_sig.connect(self.show_picampair)
+        self.controllers['config'].btn_random_sig.connect(self.random_bib_start)
+        self.controllers['config'].btn_day_1_sig.connect(self.bib_day_1)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.home_action)
         self.controllers['round'].btn_refly_sig.connect(self.refly)
@@ -175,14 +178,24 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.next_pilot()
         self.controllers['round'].wChronoCtrl.reset_ui()
 
+    def random_bib_start(self):
+        self.getcontextparameters(False)
+        self.event.random_bib()
+        self.controllers['config'].set_data(self.event)
+        self.getcontextparameters(True)
+
+    def bib_day_1(self):
+        self.getcontextparameters(False)
+        self.event.bib_day_1_compute()
+        self.controllers['config'].set_data(self.event)
+        self.getcontextparameters(True)
+
     def start(self):
-        self.event = self.dao.get(self.controllers['config'].view.ContestList.currentIndex(),\
-                                  fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
-        self.controllers['config'].get_data()
-        self.event.max_interruption_time=self.controllers['config'].interruption_time_max
-        self.event.max_wind_dir_dev=self.controllers['config'].wind_orientation
-        self.event.min_allowed_wind_speed=self.controllers['config'].wind_speed_min
-        self.event.max_allowed_wind_speed=self.controllers['config'].wind_speed_max
+        self.getcontextparameters(True)
+        if self.event:
+            del self.event
+        self.event = self.dao.get(self.controllers['config'].view.ContestList.currentIndex(),
+                    fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
 
         self.chronoHard.reset()
         self.chronodata.reset()
@@ -191,6 +204,18 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.show_chrono()
         self.controllers['round'].wChronoCtrl.reset_ui()
+
+    def getcontextparameters(self, updateBDD=False):
+        self.controllers['config'].get_data()
+        self.event.max_interruption_time=self.controllers['config'].max_interruption_time
+        self.event.min_allowed_wind_speed=self.controllers['config'].min_allowed_wind_speed
+        self.event.max_allowed_wind_speed=self.controllers['config'].max_allowed_wind_speed
+        self.event.max_wind_dir_dev=self.controllers['config'].max_wind_dir_dev
+        self.event.flights_before_refly=self.controllers['config'].flights_before_refly
+        self.event.bib_start=self.controllers['config'].bib_start
+        self.event.dayduration=self.controllers['config'].dayduration
+        if updateBDD:
+            self.daoEvent.update(self.event)
 
     def next_action(self):
         self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
@@ -253,12 +278,13 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.set_null_flight(True)
 
     def contest_changed(self):
-        self.event = self.dao.get(self.controllers['config'].view.ContestList.currentIndex())
+        if self.event:
+            self.getcontextparameters(True)
+            del self.event
+        self.event = self.dao.get(self.controllers['config'].view.ContestList.currentIndex(),
+                                  fetch_competitors=True, fetch_rounds=False, fetch_runs=False)
 
-        self.controllers['config'].set_data(self.event.min_allowed_wind_speed,
-                                            self.event.max_allowed_wind_speed,
-                                            self.event.max_wind_dir_dev,
-                                            self.event.max_interruption_time)
+        self.controllers['config'].set_data(self.event)
 
     def chronotype_changed(self):
         if (self.controllers['config'].view.ChronoType.currentIndex()==0):
@@ -316,7 +342,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         chrono.wind_direction=chronoHard.getWindDir()
         for lap in chronoHard.getLaps():
             chrono.add_lap_time(lap)
-
         print(chrono.to_string())
 
     '''def process_ui(self, caller, data, address):
@@ -351,7 +376,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             print('Kill process ' + str(self.webserver_process.pid))
             time.sleep(1)  # Wait for the process to be killed
             self.webserver_process.kill()
-
         exit()
 
 def main ():

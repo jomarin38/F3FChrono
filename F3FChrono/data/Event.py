@@ -4,6 +4,7 @@ import requests
 from datetime import datetime
 import os
 import scipy.stats as ss
+import random
 
 from F3FChrono.data.Pilot import Pilot
 from F3FChrono.data.Competitor import Competitor
@@ -27,6 +28,8 @@ class Event:
         self.max_wind_dir_dev = 45.0
         self.max_interruption_time = 30 * 60
         self.current_round = None
+        self.bib_start = 0
+        self.dayduration = 1
         self.flights_before_refly = 5
         self.f3x_vault_id = None
         self.number_of_valid_rounds = 0
@@ -121,7 +124,7 @@ class Event:
         return None
 
     def create_new_round(self, insert_database=False):
-        f3f_round = Round.new_round(self)
+        f3f_round = Round.new_round(self, self.bib_start)
         self.add_existing_round(f3f_round)
         if (insert_database):
             Round.round_dao.insert(f3f_round)
@@ -154,6 +157,14 @@ class Event:
 
     def get_flights_before_refly(self):
         return self.flights_before_refly
+
+    def random_bib(self):
+        self.bib_start = random.randrange(1, len(self.competitors), 1)
+
+    def bib_day_1_compute(self):
+        self.bib_start += int((len(self.competitors))/self.dayduration)
+        if self.bib_start>len(self.competitors):
+            self.bib_start=self.bib_start-len(self.competitors)
 
     def compute_ranking(self):
         for f3f_round in self.rounds:

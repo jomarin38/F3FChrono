@@ -19,8 +19,8 @@ class EventDAO(Dao):
 
     def get(self, event_id, fetch_competitors=False, fetch_rounds=False, fetch_runs=False):
         sql = 'SELECT event_id, begin_date, end_date, location, name, min_allowed_wind_speed, ' \
-              'max_allowed_wind_speed, max_wind_dir_dev, max_interruption_time, f3x_vault_id ' \
-              'FROM event WHERE event_id=%s'
+              'max_allowed_wind_speed, max_wind_dir_dev, max_interruption_time, bib_start, flights_before_refly, '\
+                'dayduration, f3x_vault_id FROM event WHERE event_id=%s'
         query_result = self._execute_query(sql, event_id)
         #Query should return only one row
         for row in query_result:
@@ -34,7 +34,10 @@ class EventDAO(Dao):
             result.max_allowed_wind_speed = row[6]
             result.max_wind_dir_dev = row[7]
             result.max_interruption_time = row[8]
-            result.f3x_vault_id = row[9]
+            result.bib_start = row[9]
+            result.flights_before_refly = row[10]
+            result.dayduration = row[11]
+            result.f3x_vault_id = row[12]
             if fetch_competitors:
                 EventDAO._fetch_competitors(result)
             if fetch_rounds:
@@ -69,14 +72,15 @@ class EventDAO(Dao):
         :param event:
         :return:
         """
-        sql = 'INSERT INTO event (begin_date, end_date, location, name, min_allowed_wind_speed, ' \
-              'max_allowed_wind_speed, max_wind_dir_dev, max_interruption_time, f3x_vault_id) VALUES ' \
-              '(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+        sql = 'INSERT INTO event (begin_date, end_date, location, name, min_allowed_wind_speed, '\
+                'max_allowed_wind_speed, max_wind_dir_dev, max_interruption_time, bib_start, flights_before_refly, '\
+                'dayduration, f3x_vault_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
 
         self._execute_insert(sql, event.begin_date.strftime('%Y-%m-%d %H:%M:%S'),
                              event.end_date.strftime('%Y-%m-%d %H:%M:%S'), event.location, event.name,
                              event.min_allowed_wind_speed, event.max_allowed_wind_speed, event.max_wind_dir_dev,
-                             event.max_interruption_time, event.f3x_vault_id)
+                             event.max_interruption_time, event.bib_start, event.flights_before_refly,
+                             event.dayduration, event.f3x_vault_id)
 
         sql = 'SELECT LAST_INSERT_ID()'
         query_result = self._execute_query(sql)
@@ -89,11 +93,12 @@ class EventDAO(Dao):
     def update(self, event):
         sql = 'UPDATE event SET begin_date=%s, end_date=%s, location=%s, name=%s, ' \
               'min_allowed_wind_speed=%s, max_allowed_wind_speed=%s, max_wind_dir_dev=%s, max_interruption_time=%s, ' \
-              'f3x_vault_id=%s WHERE event_id=%s'
+              'bib_start=%s, flights_before_refly=%s, dayduration=%s, f3x_vault_id=%s WHERE event_id=%s'
         self._execute_update(sql, event.begin_date.strftime('%Y-%m-%d %H:%M:%S'),
                              event.end_date.strftime('%Y-%m-%d %H:%M:%S'), event.location, event.name,
                              event.min_allowed_wind_speed, event.max_allowed_wind_speed, event.max_wind_dir_dev,
-                             event.max_interruption_time, event.f3x_vault_id, event.id)
+                             event.max_interruption_time, event.bib_start, event.flights_before_refly,
+                             event.dayduration, event.f3x_vault_id, event.id)
 
     def delete(self, event):
         #TODO: delete all related stuff in other tables

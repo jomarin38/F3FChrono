@@ -25,7 +25,7 @@ class RoundDAO(Dao):
               'FROM round r LEFT JOIN roundgroup rg ON r.event_id=rg.event_id AND r.round_number=rg.round_number ' \
               'WHERE r.event_id=%s AND r.round_number=%s'
         query_result = self._execute_query(sql, f3f_round.event.id, f3f_round.round_number)
-        fetched_f3f_round = Round.new_round(f3f_round.event, add_initial_group=False)
+        fetched_f3f_round = Round.new_round(f3f_round.event, f3f_round.event.bib_start, add_initial_group=False)
         fetched_f3f_round.event = f3f_round.event
         fetched_f3f_round.round_number = f3f_round.round_number
         for row in query_result:

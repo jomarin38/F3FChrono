@@ -20,7 +20,7 @@ class Round:
         self.valid = False
 
     @staticmethod
-    def new_round(event, add_initial_group=True):
+    def new_round(event, bib_start, add_initial_group=True):
         f3f_round = Round()
         f3f_round.event = event
         if event in Round.round_counters:

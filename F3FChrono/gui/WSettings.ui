@@ -141,7 +141,7 @@
        <item row="5" column="0">
         <widget class="QCheckBox" name="webserver">
          <property name="text">
-          <string>run web server</string>
+          <string>WebServer</string>
          </property>
         </widget>
        </item>
