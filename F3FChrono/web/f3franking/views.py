@@ -10,6 +10,10 @@ from F3FChrono.data.web.Link import Link
 from django.views.decorators.cache import never_cache
 import datetime
 
+@never_cache
+def is_alive(request):
+    return HttpResponse('<p>Hello world !</p>')
+
 
 @never_cache
 def index(request):
@@ -162,7 +166,7 @@ def round_view_html(event_id, round_number):
         round_number = 'not valid'
 
     page = ResultPage(title=f3f_round.event.name + '\tRound : ' + round_number +
-                            '(id:' + str(f3f_round.round_number) + ')')
+                            '(id:' + str(f3f_round.round_number) + ')', event=f3f_round.event)
 
     best_runs = f3f_round.get_best_runs()
     best_runs_string = 'Best time : <br>'

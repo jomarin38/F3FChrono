@@ -27,3 +27,32 @@
   background-color: #798686;
   color: white;
 }
+
+#header {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  font-size: 1.5em;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#header td, #header th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+#header tr:nth-child(even){background-color: #f2f2f2;}
+
+#header th a:hover {background-color: #ddd;}
+
+#header th {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  text-align: center;
+  background-color: #99ccff;
+  color: white;
+}
+
+#header th a {
+  display: block;
+}
