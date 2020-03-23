@@ -185,6 +185,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def bib_day_1(self):
         self.getcontextparameters(False)
+        if self.event:
+            del self.event
+        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentIndex(),
+                    fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
+
         self.event.bib_day_1_compute()
         self.controllers['config'].set_data(self.event)
         self.getcontextparameters(True)
@@ -278,7 +283,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def contest_changed(self):
         if self.event:
-            self.getcontextparameters(True)
+            self.getcontextparameters(updateBDD=True)
             del self.event
         self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentIndex(),
                                   fetch_competitors=True, fetch_rounds=False, fetch_runs=False)

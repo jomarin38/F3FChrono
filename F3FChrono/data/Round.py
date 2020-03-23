@@ -20,7 +20,7 @@ class Round:
         self.valid = False
 
     @staticmethod
-    def new_round(event, bib_start, add_initial_group=True):
+    def new_round(event, add_initial_group=True):
         f3f_round = Round()
         f3f_round.event = event
         if event in Round.round_counters:
@@ -32,9 +32,9 @@ class Round:
         if add_initial_group:
             f3f_round.groups.append(RoundGroup(f3f_round, 1))
 
-        for bib in range (bib_start, event.get_nb_competitors()+1):
+        for bib in range(event.bib_start, event.get_nb_competitors()+1):
             f3f_round._flight_order += [bib]
-        for bib in range (1, bib_start):
+        for bib in range(1, event.bib_start):
             f3f_round._flight_order += [bib]
         print(f3f_round._flight_order)
         '''f3f_round._flight_order +=[c for c in event.get_competitors()]'''

@@ -168,6 +168,9 @@ class Event:
         self.bib_start += int(self.get_nb_competitors()/self.dayduration)
         if self.bib_start>self.get_nb_competitors():
             self.bib_start=self.bib_start-self.get_nb_competitors()
+        round=self.get_current_round()
+        if not round.valid:
+            round.cancel_round()
 
     def compute_ranking(self):
         for f3f_round in self.rounds:
