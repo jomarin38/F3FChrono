@@ -120,7 +120,7 @@ class Ui_WSettings(object):
         self.label_2.setText(_translate("WSettings", "Min Voltage"))
         self.buzzernext.setText(_translate("WSettings", "Buzzer Next button"))
         self.closebtn.setText(_translate("WSettings", "Close Race Management"))
-        self.webserver.setText(_translate("WSettings", "web server"))
+        self.webserver.setText(_translate("WSettings", "WebServer"))
         self.btn_advanced_settings.setText(_translate("WSettings", "Advanced Settings"))
         self.btn_cancel.setText(_translate("WSettings", "Cancel"))
         self.btn_valid.setText(_translate("WSettings", "Valid"))
