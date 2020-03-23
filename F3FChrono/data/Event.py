@@ -152,6 +152,9 @@ class Event:
     def get_competitors(self):
         return self.competitors
 
+    def get_nb_competitors(self):
+        return len(self.competitors)
+
     def set_competitors(self, competitors):
         self.competitors = competitors
 
@@ -159,12 +162,12 @@ class Event:
         return self.flights_before_refly
 
     def random_bib(self):
-        self.bib_start = random.randrange(1, len(self.competitors), 1)
+        self.bib_start = random.randrange(1, self.get_nb_competitors(), 1)
 
     def bib_day_1_compute(self):
-        self.bib_start += int((len(self.competitors))/self.dayduration)
-        if self.bib_start>len(self.competitors):
-            self.bib_start=self.bib_start-len(self.competitors)
+        self.bib_start += int(self.get_nb_competitors()/self.dayduration)
+        if self.bib_start>self.get_nb_competitors():
+            self.bib_start=self.bib_start-self.get_nb_competitors()
 
     def compute_ranking(self):
         for f3f_round in self.rounds:

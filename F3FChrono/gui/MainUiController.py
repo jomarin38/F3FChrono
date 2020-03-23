@@ -11,12 +11,11 @@ from F3FChrono.chrono.GPIOPort import rpi_gpio
 
 class MainUiCtrl (QtWidgets.QMainWindow):
     close_signal = pyqtSignal()
-    def __init__(self, dao, chronodata, rpi, webserver_process):
+    def __init__(self, eventdao, chronodata, rpi, webserver_process):
         super().__init__()
 
         self.webserver_process = webserver_process
-        self.dao = dao
-        self.daoEvent = EventDAO()
+        self.daoEvent = eventdao
         self.daoRound = RoundDAO()
         self.event = None
         self.chronodata = chronodata
@@ -95,7 +94,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.show_config()
         self.MainWindow.show()
-        self.controllers['config'].set_contest(self.dao.get_list())
+        self.controllers['config'].set_contest(self.daoEvent.get_list())
         self.controllers['wind'].set_data(0, 0, 0)
 
     def show_config(self):
@@ -194,7 +193,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.getcontextparameters(True)
         if self.event:
             del self.event
-        self.event = self.dao.get(self.controllers['config'].view.ContestList.currentIndex(),
+        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentIndex(),
                     fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
 
         self.chronoHard.reset()
@@ -281,7 +280,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if self.event:
             self.getcontextparameters(True)
             del self.event
-        self.event = self.dao.get(self.controllers['config'].view.ContestList.currentIndex(),
+        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentIndex(),
                                   fetch_competitors=True, fetch_rounds=False, fetch_runs=False)
 
         self.controllers['config'].set_data(self.event)
