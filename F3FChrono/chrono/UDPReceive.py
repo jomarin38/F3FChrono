@@ -51,7 +51,7 @@ class udpreceive(QThread):
                     self.event_accu.emit(float(m[2]))
                     self.event_rssi.emit(int(m[3]), int(m[4]))
                 else:
-                    self.event_chrono.emit("udpreceive", data.decode("utf-8") , address[0])
+                    self.event_chrono.emit("udpreceive", data.decode("utf-8"), address[0])
             except socket.error as msg:
                 print ('udp receive error {}'.format(msg))
                 logging.warning('udp receive error {}'.format(msg))
