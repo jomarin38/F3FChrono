@@ -149,33 +149,41 @@ class ChronoRpi(ChronoHard):
     def handle_chrono_event(self, caller, data, address):
         self.buzzer_validated.emit()
         if ((self.status == chronoStatus.Launched or self.status == chronoStatus.InStart or
-             self.status == chronoStatus.InProgress) and caller == "udpreceive" or caller == "btnnext") and data.lower() == "event":
+             self.status == chronoStatus.InProgress) and caller == "udpreceive" or caller == "btnnext") \
+                and data.lower() == "event":
             self.__declareBase(address)
 
 
     def __declareBase (self, base):
+        print (base, self.status)
         now = time.time()
-        if (self.status==chronoStatus.InWait or self.status==chronoStatus.WaitLaunch or
-                self.status==chronoStatus.Launched):
+        if (self.status == chronoStatus.InWait or self.status == chronoStatus.WaitLaunch):
             self.set_status(self.status+1)
             return True
 
-        if (self.status==chronoStatus.Finished):
+        if (self.status == chronoStatus.Finished):
             self.run_validated.emit()
-
-        if (self.status==chronoStatus.InStart):
-            self.lastBaseChangeTime = now
-            self.startTime=datetime.now()
-            self.chronoLap.clear()
-            self.timelost.clear()
-            self.set_status(self.get_status()+1)
             return True
 
-        if (self.status==chronoStatus.InStart or self.status==chronoStatus.InProgress and (base!=self.lastBase or base=="btnnext")):
+        if (self.status == chronoStatus.Launched):
+            self.lastBase=base
+            self.set_status(self.status+1)
+            return True
+
+        if (self.status == chronoStatus.InStart and self.lastBase==base):
+            self.lastBaseChangeTime = now
+            self.startTime = datetime.now()
+            self.chronoLap.clear()
+            self.timelost.clear()
+            self.set_status(self.status+1)
+            self.lastBase = base
+            return True
+
+        if (self.status==chronoStatus.InProgress and (base!=self.lastBase or base=="btnnext")):
             elapsedTime = ((now- self.lastBaseChangeTime))
             self.lastBaseChangeTime = now
             self.lastDetectionTime = now
-
+            self.lastBase=base
             if (self.status==chronoStatus.InProgress):
                 self.chronoLap.append(elapsedTime)
                 self.timelost.append(0.0)
@@ -185,11 +193,6 @@ class ChronoRpi(ChronoHard):
                 self.endTime=datetime.now()
                 self.set_status(chronoStatus.Finished)
                 self.run_finished.emit(self.get_time())
-
-            if self.status==chronoStatus.InStart:
-                self.lastBase = ""
-            else:
-                self.lastBase = base
             return True
         elif self.getLapCount()>1:#Base declaration is the same
                 elapsedTime = ((now - self.lastDetectionTime))

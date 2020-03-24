@@ -135,8 +135,10 @@ class Event:
         self.rounds.append(f3f_round)
         if self.current_round is None:
             self.current_round = 0
+            self.current_round_display = 1
         else:
             self.current_round += 1
+            self.current_round_display += 1
 
     def register_pilot(self, pilot, bib_number, team=None):
         self.competitors[bib_number] = Competitor.register_pilot(self, bib_number, pilot, team)
