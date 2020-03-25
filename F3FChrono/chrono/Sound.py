@@ -71,11 +71,11 @@ class chronoQSound(QObject):
 
     def __init__(self):
         super().__init__()
-        self.sound=[]
+        self.soundbase=[]
         self.pathname=os.path.dirname(os.path.realpath('Sound/base0.wav'))
 
         for index in range(11):
-            self.sound.append(QSound(self.pathname+'/base'+str(index)+'.wav'))
+            self.soundbase.append(QSound(self.pathname+'/base'+str(index)+'.wav'))
         self.entry=QSound(self.pathname+'/entry.wav')
         self.penalty=QSound(self.pathname+'/penalty.wav')
         self.waitlaunch=QSound(self.pathname+'/start.wav')
@@ -99,7 +99,7 @@ class chronoQSound(QObject):
 
     def sound_base(self, index):
         if ConfigReader.config.conf['sound']:
-            self.sound[index].play()
+            self.soundbase[index].play()
             if self.soundstart_run:
                 self.waitstart.stop()
 
@@ -125,6 +125,14 @@ class chronoQSound(QObject):
             if self.soundstart_run:
                 self.waitlaunch.stop()
             self.soundstart_run=True
+
+    def stop_all(self):
+        self.waitlaunch.stop()
+        self.waitstart.stop()
+        self.entry.stop()
+        self.penalty.stop()
+        for sound in self.soundbase:
+            sound.stop()
 
 
 if __name__ == '__main__':
