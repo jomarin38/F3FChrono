@@ -14,13 +14,15 @@ EVENTMSG = "Event"
 https://github.com/jsh2134/iw_parse/
 '''
 class udpreceive(QThread):
-    def __init__(self, udpport, signal_chrono, signal_wind, signal_accu, signal_rssi):
+    def __init__(self, udpport, signal_chrono, signal_btnnext, signal_wind, signal_accu, signal_rssi):
         super().__init__()
         self.port = udpport
         self.event_chrono = signal_chrono
+        self.event_btn_next = signal_btnnext
         self.event_wind = signal_wind
         self.event_accu = signal_accu
         self.event_rssi = signal_rssi
+
 
         self.msg = ""
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -44,7 +46,10 @@ class udpreceive(QThread):
                 elif (m[0]=='simulate' and m[1]=='base'):
                     self.event_chrono.emit("udpreceive", m[3], m[2])
                 elif (m[0]=='simulate' and m[1]=='GPIO'):
-                    self.event_chrono.emit("udpreceive", 'event', m[2])
+                    if m[2].lower()=="btnnext":
+                        self.event_btn_next.emit(0)
+                    else:
+                        self.event_chrono.emit("udpreceive", 'event', m[2])
                 elif (m[0]=='simulate' and m[1]=='weather'):
                     self.event_wind.emit(int(m[3]), int(m[2]), bool(m[4]=='True'))
                 elif (m[0] == 'simulate' and m[1] == 'info'):

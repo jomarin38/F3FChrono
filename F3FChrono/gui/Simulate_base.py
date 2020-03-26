@@ -20,6 +20,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         self.ui.btn_send_B.clicked.connect(self.send_base_B)
         self.ui.btn_gpio_A.clicked.connect(self.send_gpio_A)
         self.ui.btn_gpio_B.clicked.connect(self.send_gpio_B)
+        self.ui.btn_next.clicked.connect(self.send_gpio_next)
         self.ui.btn_send_wind.clicked.connect(self.send_weather)
         self.udpbeep = udpbeep("255.255.255.255", 4445)
 
@@ -39,6 +40,8 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
 
     def send_gpio_B(self):
         self.udpbeep.sendData("simulate GPIO baseB")
+    def send_gpio_next(self):
+        self.udpbeep.sendData("simulate GPIO btnnext")
 
     def send_weather(self):
         if self.timerEvent.isActive() == False:
