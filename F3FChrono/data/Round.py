@@ -87,7 +87,7 @@ class Round:
         return self.get_current_competitor()
 
     def next_pilot_database(self):
-        nb_run=len(self.groups[len(self.groups)-1].runs)
+        nb_run=len(self.groups[-1].runs)
         #if self._current_competitor_index < len(self._flight_order) - 1:
         if  nb_run< len(self._flight_order):
             self._current_competitor_index = nb_run
