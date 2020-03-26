@@ -7,6 +7,7 @@ from F3FChrono.data.web.Header import Header
 from F3FChrono.data.web.Line import Line
 from F3FChrono.data.web.Cell import Cell
 from F3FChrono.data.web.Link import Link
+from F3FChrono.data.web.Utils import Utils
 from django.views.decorators.cache import never_cache
 import datetime
 
@@ -17,6 +18,8 @@ def is_alive(request):
 
 @never_cache
 def index(request):
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
 
     dao = EventDAO()
 
@@ -47,6 +50,8 @@ def index(request):
 
 @never_cache
 def event_view(request):
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
 
     event_id = request.GET.get('event_id')
 
@@ -149,6 +154,8 @@ def event_view_html(event_id):
 
 @never_cache
 def round_view(request):
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
 
     event_id = request.GET.get('event_id')
     round_number = request.GET.get('round_number')
