@@ -43,13 +43,15 @@ class udpreceive(QThread):
                     self.terminate()
                 elif (m[0]=='simulate' and m[1]=='base'):
                     self.event_chrono.emit("udpreceive", m[3], m[2])
+                elif (m[0]=='simulate' and m[1]=='GPIO'):
+                    self.event_chrono.emit("udpreceive", 'event', m[2])
                 elif (m[0]=='simulate' and m[1]=='weather'):
                     self.event_wind.emit(int(m[3]), int(m[2]), bool(m[4]=='True'))
                 elif (m[0] == 'simulate' and m[1] == 'info'):
                     self.event_accu.emit(float(m[2]))
                     self.event_rssi.emit(int(m[3]), int(m[4]))
                 else:
-                    self.event_chrono.emit("udpreceive", data.decode("utf-8") , address[0])
+                    self.event_chrono.emit("udpreceive", data.decode("utf-8"), address[0])
             except socket.error as msg:
                 print ('udp receive error {}'.format(msg))
                 logging.warning('udp receive error {}'.format(msg))

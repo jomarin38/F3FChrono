@@ -36,8 +36,7 @@ class Round:
             f3f_round._flight_order += [bib]
         for bib in range(1, event.bib_start):
             f3f_round._flight_order += [bib]
-        print(f3f_round._flight_order)
-        '''f3f_round._flight_order +=[c for c in event.get_competitors()]'''
+        #print(f3f_round._flight_order)
         return f3f_round
 
     def add_group(self, round_group):
@@ -88,8 +87,10 @@ class Round:
         return self.get_current_competitor()
 
     def next_pilot_database(self):
-        if self._current_competitor_index < len(self._flight_order) - 1:
-            self._current_competitor_index += 1
+        nb_run=len(self.groups[-1].runs)
+        #if self._current_competitor_index < len(self._flight_order) - 1:
+        if  nb_run< len(self._flight_order):
+            self._current_competitor_index = nb_run
         else:
             self.event.create_new_round(insert_database=True)
             self._current_competitor_index = 0

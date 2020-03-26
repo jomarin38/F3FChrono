@@ -160,6 +160,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def home_action(self):
         #print event data
         self.controllers['round'].wChronoCtrl.stoptime()
+        self.vocal.stop_all()
         print(self.event.to_string())
 
         self.show_config()
@@ -199,7 +200,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if self.event:
             del self.event
         self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentIndex(),
-                    fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
+                    fetch_competitors=True, fetch_rounds=True, fetch_runs=True, fetch_runs_lastround=True)
 
         self.chronoHard.reset()
         self.chronodata.reset()

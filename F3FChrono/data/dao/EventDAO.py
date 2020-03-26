@@ -17,7 +17,8 @@ class EventDAO(Dao):
             result.append(event)
         return result
 
-    def get(self, event_id, fetch_competitors=False, fetch_rounds=False, fetch_runs=False):
+    def get(self, event_id, fetch_competitors=False, fetch_rounds=False,
+            fetch_runs=False, fetch_runs_lastround=False):
         sql = 'SELECT event_id, begin_date, end_date, location, name, min_allowed_wind_speed, ' \
               'max_allowed_wind_speed, max_wind_dir_dev, max_interruption_time, bib_start, flights_before_refly, '\
                 'dayduration, f3x_vault_id FROM event WHERE event_id=%s'
@@ -41,7 +42,7 @@ class EventDAO(Dao):
             if fetch_competitors:
                 EventDAO._fetch_competitors(result)
             if fetch_rounds:
-                EventDAO._fetch_rounds(result, fetch_runs)
+                EventDAO._fetch_rounds(result, fetch_runs, fetch_runs_lastround)
             return result
         return None
 
@@ -50,11 +51,16 @@ class EventDAO(Dao):
         event.set_competitors(CompetitorDAO().get_list(event))
 
     @staticmethod
-    def _fetch_rounds(event, fetch_runs):
+    def _fetch_rounds(event, fetch_runs, fetch_runs_lastround):
         dao = RoundDAO()
         rounds = dao.get_list(event)
-        for f3f_round in rounds:
-            fetched_round = dao.get(f3f_round, fetch_runs)
+        nb_rounds = len (rounds)
+        for index, f3f_round in enumerate(rounds, 0):
+            if fetch_runs and fetch_runs_lastround :
+                local_fetch_run = (index==nb_rounds-1)
+                fetched_round = dao.get(f3f_round, local_fetch_run)
+            else:
+                fetched_round = dao.get(f3f_round, fetch_runs)
             event.add_existing_round(fetched_round)
         round_numbers = [f3f_round.round_number for f3f_round in rounds]
         if len(round_numbers) < 1:
