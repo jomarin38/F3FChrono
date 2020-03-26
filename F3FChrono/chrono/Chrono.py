@@ -33,11 +33,12 @@ class ChronoHard(QObject):
     accu_signal = pyqtSignal(float)
     rssi_signal = pyqtSignal(int, int)
 
-    def __init__(self):
+    def __init__(self, signal_btnnext):
         super().__init__()
         self.penalty = 0.0
         self.startTime=None
         self.endTime=None
+        self.signal_btnnext=signal_btnnext
         self.wind_signal.connect(self.wind_info)
         self.wind= collections.OrderedDict()
         self.reset_wind()
@@ -111,17 +112,17 @@ class ChronoHard(QObject):
 
 
 class ChronoRpi(ChronoHard):
-    def __init__(self):
-        super().__init__()
-        self.chronoLap=[]
-        self.timelost=[]
-        self.lastBase=-2
-        self.lastBaseChangeTime=0.0
-        self.lastDetectionTime=0.0
-        self.status=chronoStatus.InWait
+    def __init__(self, signal_btnnext):
+        super().__init__(signal_btnnext)
+        self.chronoLap = []
+        self.timelost = []
+        self.lastBase = -2
+        self.lastBaseChangeTime = 0.0
+        self.lastDetectionTime = 0.0
+        self.status = chronoStatus.InWait
         self.chrono_signal.connect(self.handle_chrono_event)
-        self.udpReceive=udpreceive(UDPPORT, self.chrono_signal, self.wind_signal, self.accu_signal, self.rssi_signal)
-        self.udpBeep=udpbeep(IPUDPBEEP, UDPPORT)
+        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.wind_signal, self.accu_signal, self.rssi_signal)
+        self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
 
     def __del__(self):
         self.udpBeep.terminate()
@@ -147,9 +148,10 @@ class ChronoRpi(ChronoHard):
 
 
     def handle_chrono_event(self, caller, data, address):
-        self.buzzer_validated.emit()
+        if not caller.lower()=="btnnext":
+            self.buzzer_validated.emit()
         if ((self.status == chronoStatus.Launched or self.status == chronoStatus.InStart or
-             self.status == chronoStatus.InProgress) and caller == "udpreceive" or caller == "btnnext") \
+             self.status == chronoStatus.InProgress) and caller.lower() == "udpreceive" or caller.lower() == "btnnext") \
                 and data.lower() == "event":
             self.__declareBase(address)
 
@@ -170,7 +172,7 @@ class ChronoRpi(ChronoHard):
             self.set_status(self.status+1)
             return True
 
-        if (self.status == chronoStatus.InStart and self.lastBase==base):
+        if (self.status == chronoStatus.InStart and (self.lastBase == "btnnext" or self.lastBase == base)):
             self.lastBaseChangeTime = now
             self.startTime = datetime.now()
             self.chronoLap.clear()
@@ -240,8 +242,8 @@ class ChronoRpi(ChronoHard):
         return (result)
 
 class ChronoArduino(ChronoHard):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, signal_btnnext):
+        super().__init__(signal_btnnext)
         print ("chronoArduino init")
 
     def reset(self):

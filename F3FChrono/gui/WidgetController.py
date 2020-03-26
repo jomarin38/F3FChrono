@@ -51,6 +51,9 @@ class WRoundCtrl(QObject):
         self.wPilotCtrl.show()
         self.wChronoCtrl.show()
 
+    def is_show(self):
+        return self.widget.isVisible()
+
     def hide(self):
         self.widget.hide()
         self.wPilotCtrl.hide()
@@ -99,6 +102,9 @@ class WWindCtrl():
         self.widget.show()
         self.view.Elapsedtime.setVisible(False)
         self.view.btn_clear.setVisible(False)
+
+    def is_show(self):
+        return self.widget.isVisible()
 
     def hide(self):
         self.widget.hide()
@@ -173,6 +179,9 @@ class WPilotCtrl():
     def show(self):
         self.widget.show()
 
+    def is_show(self):
+        return self.widget.isVisible()
+
     def hide(self):
         self.widget.hide()
 
@@ -241,6 +250,9 @@ class WChronoCtrl(QTimer):
 
     def hide(self):
         self.widget.hide()
+
+    def is_show(self):
+        return self.widget.isVisible()
 
     def set_status(self, status):
         self.view.Status.setText(self.statusText[status])
@@ -342,6 +354,9 @@ class WConfigCtrl(QObject):
     def show(self):
         self.widget.show()
 
+    def is_show(self):
+        return self.widget.isVisible()
+
     def hide(self):
         self.widget.hide()
 
@@ -414,6 +429,9 @@ class WSettingsAdvanced(QObject):
     def show(self):
         self.widget.show()
 
+    def is_show(self):
+        return self.widget.isVisible()
+
     def hide(self):
         self.widget.hide()
 
@@ -467,6 +485,9 @@ class WSettings(QObject):
     def show(self):
         self.widget.show()
 
+    def is_show(self):
+        return self.widget.isVisible()
+
     def hide(self):
         self.widget.hide()
 
@@ -517,6 +538,9 @@ class WPiCamPair(QObject):
 
     def show(self):
         self.widget.show()
+
+    def is_show(self):
+        return self.widget.isVisible()
 
     def hide(self):
         self.widget.hide()

@@ -11,6 +11,7 @@ from F3FChrono.chrono.GPIOPort import rpi_gpio
 
 class MainUiCtrl (QtWidgets.QMainWindow):
     close_signal = pyqtSignal()
+    signal_btnnext = pyqtSignal(int)
     def __init__(self, eventdao, chronodata, rpi, webserver_process):
         super().__init__()
 
@@ -19,13 +20,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.daoRound = RoundDAO()
         self.event = None
         self.chronodata = chronodata
-        self.chronoRpi=ChronoRpi()
-        self.chronoArduino=ChronoArduino()
+        self.chronoRpi=ChronoRpi(self.signal_btnnext)
+        self.chronoArduino=ChronoArduino(self.signal_btnnext)
         self.rpigpio=rpi_gpio(rpi, self.btn_next_action, self.btn_baseA, self.btn_baseB)
         self.chronoHard = self.chronoRpi
         self.base_test = -10
         self.vocal = chronoQSound()
 
+        self.signal_btnnext.connect(self.btn_next_action)
         self.chronoHard.status_changed.connect(self.slot_status_changed)
         self.chronoHard.lap_finished.connect(self.slot_lap_finished)
         self.chronoHard.run_finished.connect(self.slot_run_finished)
@@ -224,10 +226,12 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def next_action(self):
         self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
+        self.rpigpio.signal_buzzer_next.emit()
 
     def btn_next_action(self, port):
-        self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
-        self.rpigpio.signal_buzzer_next.emit()
+        if self.controllers['round'].is_show():
+            self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
+            self.rpigpio.signal_buzzer_next.emit()
 
     def btn_baseA(self, port):
         print("btn base A")
@@ -321,6 +325,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_run_finished(self, run_time):
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
+        self.rpigpio.signal_buzzer_end.emit()
         if ConfigReader.config.conf["voice"]:
             time.sleep(0.5)     #wait gui has been refresh otherwise the time is updated after vocal sound
             self.vocal.signal_time.emit(run_time)

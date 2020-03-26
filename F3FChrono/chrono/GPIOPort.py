@@ -157,11 +157,13 @@ def event_detected(port):
 
 class rpi_gpio(QObject):
     signal_buzzer = pyqtSignal()
+    signal_buzzer_end = pyqtSignal()
     signal_buzzer_next = pyqtSignal()
 
     def __init__(self, rpi, btn_next_action, btn_baseA, btn_baseB):
         super().__init__()
         self.signal_buzzer.connect(self.buzzer_fct)
+        self.signal_buzzer_end.connect(self.buzzer_end_fct)
         self.signal_buzzer_next.connect(self.buzzer_next_fct)
         self.buzzer = None
         self.buzzer_next = None
@@ -183,10 +185,17 @@ class rpi_gpio(QObject):
             self.buzzer.join()
 
     def buzzer_fct(self):
+        print("buzzer base")
         if self.buzzer != None:
             self.buzzer.event.set()
 
+    def buzzer_end_fct(self):
+        print("buzzer base end*3")
+        if self.buzzer != None:
+            self.buzzer.blink(3)
+
     def buzzer_next_fct(self):
+        print("buzzer next")
         if self.buzzer_next != None:
             self.buzzer_next.event.set()
 

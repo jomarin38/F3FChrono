@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(762, 172)
+        MainWindow.resize(839, 172)
         MainWindow.setMinimumSize(QtCore.QSize(0, 0))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -98,6 +98,9 @@ class Ui_MainWindow(object):
         self.btn_gpio_B.setObjectName("btn_gpio_B")
         self.verticalLayout_2.addWidget(self.btn_gpio_B)
         self.horizontalLayout.addLayout(self.verticalLayout_2)
+        self.btn_next = QtWidgets.QPushButton(self.centralwidget)
+        self.btn_next.setObjectName("btn_next")
+        self.horizontalLayout.addWidget(self.btn_next)
         self.line_2 = QtWidgets.QFrame(self.centralwidget)
         self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
@@ -262,6 +265,7 @@ class Ui_MainWindow(object):
         self.data_B.setText(_translate("MainWindow", "Event"))
         self.btn_send_B.setText(_translate("MainWindow", "Send UDP"))
         self.btn_gpio_B.setText(_translate("MainWindow", "GPIO Btn"))
+        self.btn_next.setText(_translate("MainWindow", "btn Next"))
         self.label_9.setText(_translate("MainWindow", "Info"))
         self.label_8.setText(_translate("MainWindow", "Speed\n"
 "(m/s)"))
