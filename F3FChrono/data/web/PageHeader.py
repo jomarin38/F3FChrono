@@ -1,13 +1,14 @@
 from F3FChrono.data.web.ResultTable import ResultTable
 from F3FChrono.data.web.Header import Header
 from F3FChrono.data.web.Link import Link
+from F3FChrono.data.web.Utils import Utils
 
 
 class PageHeader:
 
     def __init__(self, event=None, f3f_round=None):
 
-        self._base_url = 'http://127.0.0.1:8000/f3franking/'
+        self._base_url = 'http://'+Utils.get_ip()+':'+Utils.get_port_number()+'/f3franking/'
 
         self._table = ResultTable(title='', css_id='header')
         header = Header(name=Link('Back to events list', self._base_url))

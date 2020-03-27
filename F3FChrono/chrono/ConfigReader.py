@@ -60,7 +60,8 @@ default_config = \
     "fullscreen":False,
     "buzzer_valid":True,
     "buzzer_next_valid":True,
-    "run_webserver": False
+    "run_webserver": False,
+    "webserver_port" : 8000
 }
 
 def init():
@@ -68,6 +69,7 @@ def init():
     config=default_config
 
 class Configuration:
+
     def __init__(self, file_name=None):
         self.conf = default_config
         self.configFileName = file_name

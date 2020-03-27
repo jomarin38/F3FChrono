@@ -11,6 +11,7 @@ from F3FChrono.gui.MainUiController import MainUiCtrl
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.data.dao.EventDAO import EventDAO
 from F3FChrono.gui.Simulate_base import SimulateBase
+from F3FChrono.data.web.Utils import Utils
 
 def get_raspi_revision():
     rev_file = '/sys/firmware/devicetree/base/model'
@@ -32,7 +33,8 @@ def get_raspi_revision():
 
 def server_alive():
     try:
-        request_url = 'http://127.0.0.1:8000/f3franking/is_alive'
+        request_url = 'http://'+Utils.get_ip()+':'+\
+                      str(ConfigReader.config.conf['webserver_port'])+'/f3franking/is_alive'
         response = requests.post(request_url)
         return True
     except:
@@ -55,7 +57,8 @@ def main():
             print("Starting webserver ...")
             manage_py_path = os.path.realpath('F3FChrono/web')
             webserver_process = \
-                subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:8000'],
+                subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:'
+                                  +str(ConfigReader.config.conf['webserver_port'])],
                                  shell=False)
 
     print("...start")
