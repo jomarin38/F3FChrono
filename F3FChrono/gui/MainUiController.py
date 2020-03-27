@@ -12,6 +12,7 @@ from F3FChrono.chrono.GPIOPort import rpi_gpio
 class MainUiCtrl (QtWidgets.QMainWindow):
     close_signal = pyqtSignal()
     signal_btnnext = pyqtSignal(int)
+
     def __init__(self, eventdao, chronodata, rpi, webserver_process):
         super().__init__()
 

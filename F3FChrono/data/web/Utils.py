@@ -1,4 +1,6 @@
 import socket
+import requests
+from F3FChrono.chrono import ConfigReader
 
 
 class Utils:
@@ -25,3 +27,16 @@ class Utils:
     @staticmethod
     def get_port_number():
         return Utils._port_number
+
+    @staticmethod
+    def get_base_url():
+        return 'http://' + Utils.get_ip() + ':' + str(ConfigReader.config.conf['webserver_port']) + '/f3franking'
+
+    @staticmethod
+    def server_alive():
+        try:
+            request_url = Utils.get_base_url()+'/is_alive'
+            response = requests.post(request_url)
+            return True
+        except:
+            return False

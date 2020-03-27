@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'WSettings.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.2
+# Created by: PyQt5 UI code generator 5.13.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -80,6 +80,9 @@ class Ui_WSettings(object):
         self.webserver = QtWidgets.QCheckBox(WSettings)
         self.webserver.setObjectName("webserver")
         self.gridLayout_2.addWidget(self.webserver, 5, 0, 1, 1)
+        self.webserverUrl = QtWidgets.QLabel(WSettings)
+        self.webserverUrl.setObjectName("webserverUrl")
+        self.gridLayout_2.addWidget(self.webserverUrl, 5, 1, 1, 1)
         self.verticalLayout.addLayout(self.gridLayout_2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -121,6 +124,7 @@ class Ui_WSettings(object):
         self.buzzernext.setText(_translate("WSettings", "Buzzer Next button"))
         self.closebtn.setText(_translate("WSettings", "Close Race Management"))
         self.webserver.setText(_translate("WSettings", "WebServer"))
+        self.webserverUrl.setText(_translate("WSettings", "Not started"))
         self.btn_advanced_settings.setText(_translate("WSettings", "Advanced Settings"))
         self.btn_cancel.setText(_translate("WSettings", "Cancel"))
         self.btn_valid.setText(_translate("WSettings", "Valid"))

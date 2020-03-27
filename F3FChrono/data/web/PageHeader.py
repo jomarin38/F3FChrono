@@ -8,7 +8,7 @@ class PageHeader:
 
     def __init__(self, event=None, f3f_round=None):
 
-        self._base_url = 'http://'+Utils.get_ip()+':'+Utils.get_port_number()+'/f3franking/'
+        self._base_url = Utils.get_base_url()
 
         self._table = ResultTable(title='', css_id='header')
         header = Header(name=Link('Back to events list', self._base_url))
