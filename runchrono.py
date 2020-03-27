@@ -41,6 +41,7 @@ def main():
     webserver_process = None
 
     if ConfigReader.config.conf['run_webserver']:
+        Utils.set_port_number(ConfigReader.config.conf['webserver_port'])
         if Utils.server_alive():
             print('Webserver already running.')
         else:

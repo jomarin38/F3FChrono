@@ -30,7 +30,7 @@ class Utils:
 
     @staticmethod
     def get_base_url():
-        return 'http://' + Utils.get_ip() + ':' + str(ConfigReader.config.conf['webserver_port']) + '/f3franking'
+        return 'http://' + Utils.get_ip() + ':' + str(Utils.get_port_number()) + '/f3franking'
 
     @staticmethod
     def server_alive():
