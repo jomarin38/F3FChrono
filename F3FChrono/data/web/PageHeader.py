@@ -13,7 +13,7 @@ class PageHeader:
         self._table = ResultTable(title='', css_id='header')
         header = Header(name=Link('Back to events list', self._base_url))
         if event is not None:
-            header.add_cell(Link('Back to event view', self._base_url + 'event_view?event_id=' + str(event.id)))
+            header.add_cell(Link('Back to event view', self._base_url + '/event_view?event_id=' + str(event.id)))
         self._table.set_header(header)
 
     def to_html(self):
