@@ -2,7 +2,6 @@ import os
 import re
 import sys
 import subprocess
-import requests
 from time import sleep
 from argparse import ArgumentParser
 from PyQt5 import QtWidgets
@@ -31,15 +30,6 @@ def get_raspi_revision():
         pass
     return info
 
-def server_alive():
-    try:
-        request_url = 'http://'+Utils.get_ip()+':'+\
-                      str(ConfigReader.config.conf['webserver_port'])+'/f3franking/is_alive'
-        response = requests.post(request_url)
-        return True
-    except:
-        return False
-
 def main():
 
     #logging.basicConfig (filename="runchrono.log", level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
@@ -51,7 +41,8 @@ def main():
     webserver_process = None
 
     if ConfigReader.config.conf['run_webserver']:
-        if server_alive():
+        Utils.set_port_number(ConfigReader.config.conf['webserver_port'])
+        if Utils.server_alive():
             print('Webserver already running.')
         else:
             print("Starting webserver ...")

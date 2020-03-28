@@ -14,6 +14,7 @@ from F3FChrono.gui.WSettings_ui import Ui_WSettings
 from F3FChrono.gui.WSettingsAdvanced_ui import Ui_WSettingsAdvanced
 from F3FChrono.gui.WPicamPair_ui import Ui_WPicamPair
 from F3FChrono.chrono.Chrono import *
+from F3FChrono.data.web.Utils import Utils
 
 
 
@@ -483,6 +484,8 @@ class WSettings(QObject):
         return(self.widgetList)
 
     def show(self):
+        if Utils.server_alive():
+            self.view.webserverUrl.setText(Utils.get_base_url())
         self.widget.show()
 
     def is_show(self):
