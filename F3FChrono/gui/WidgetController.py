@@ -485,7 +485,7 @@ class WSettings(QObject):
 
     def show(self):
         if Utils.server_alive():
-            self.view.webserverUrl.setText('http://'+Utils.get_ip()+':'+str(Utils.get_port_number())+'/f3franking')
+            self.view.webserverUrl.setText(Utils.get_base_url())
         self.widget.show()
 
     def is_show(self):
