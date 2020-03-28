@@ -187,9 +187,10 @@ class Event:
                             competitor.update_jokers(f3f_round.valid_round_number, 0)
 
                         #Get penalties
-                        runs = group.runs[competitor]
-                        for run in runs:
-                            competitor.penalty += run.penalty
+                        if competitor in group.runs:
+                            runs = group.runs[competitor]
+                            for run in runs:
+                                competitor.penalty += run.penalty
 
                     bibs = sorted(self.competitors)
                     pilots_ranks = ss.rankdata([-self.competitors[bib].score_with_jokers(self.number_of_valid_rounds)
