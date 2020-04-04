@@ -54,7 +54,8 @@ ROOT_URLCONF = 'F3FChrono.web.webinterface.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.realpath('F3FChrono/web/administrator/templates'),
+                 os.path.realpath('administrator/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -117,4 +118,5 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = os.path.realpath('F3FChrono/web/f3franking/static')+'/'
+print('STATIC_URL = ' + STATIC_URL)

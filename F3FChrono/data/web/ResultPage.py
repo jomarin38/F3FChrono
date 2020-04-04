@@ -7,9 +7,9 @@ class ResultPage:
 
     css_string = None
 
-    def __init__(self, title=None, event=None, f3f_round=None):
+    def __init__(self, title=None, event=None, f3f_round=None, authenticated=False):
         self.title = title
-        self._header = PageHeader(event, f3f_round)
+        self._header = PageHeader(event, f3f_round, authenticated)
         self._tables = []
 
     def set_title(self, title):
