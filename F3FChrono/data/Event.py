@@ -113,6 +113,8 @@ class Event:
                     pilot_chrono.run_time = pilot_flight_time
                     f3f_round.handle_terminated_flight(competitor, pilot_chrono, pilot_penalty, pilot_flight_valid)
 
+            f3f_round.validate_round()
+
             print(f3f_round.to_string())
 
         return event
@@ -124,9 +126,9 @@ class Event:
         return None
 
     def create_new_round(self, insert_database=False):
-        f3f_round = Round.new_round(self, self.bib_start)
+        f3f_round = Round.new_round(self)
         self.add_existing_round(f3f_round)
-        if (insert_database):
+        if insert_database:
             Round.round_dao.insert(f3f_round)
 
         return f3f_round
