@@ -86,6 +86,56 @@ def load_from_f3x_vault(request):
         return HttpResponse('<p>Invalid parameters !')
 
 
+def load_from_scratch(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+    try:
+        csv_file = request.FILES["csv_file"]
+        event_name = request.POST["eventname"]
+        event_location = request.POST["eventlocation"]
+        event_start_date = request.POST["startdate"]
+        event_end_date = request.POST["enddate"]
+
+        event = Event.from_csv(event_name, event_location, event_start_date, event_end_date, csv_file)
+
+        event.id = EventDAO().insert(event)
+
+        for bib, competitor in event.get_competitors().items():
+            CompetitorDAO().insert(competitor)
+
+        return redirect('index')
+
+    except Exception as e:
+        return HttpResponse('<p>Invalid parameters !')
+
+
+def manage_event(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+
+    event = EventDAO().get(event_id=event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
+
+    page = ResultPage(title=event.name, authenticated=request.user.is_authenticated)
+
+    table = ResultTable(title='Pilots', css_id="ranking")
+    header = Header(name=Cell('Bib'))
+    header.add_cell(Cell('Name'))
+    table.set_header(header)
+
+    for competitor in sorted([competitor for bib, competitor in event.competitors.items()], key=lambda c: c.bib_number):
+        row = Line(name=Cell(str(competitor.bib_number)))
+        row.add_cell(Cell(competitor.pilot.to_string()))
+        table.add_line(row)
+    page.add_table(table)
+
+    return HttpResponse(page.to_html())
+
 @never_cache
 def index(request):
     if not request.user.is_authenticated:
@@ -113,7 +163,7 @@ def index(request):
 
     for event in events:
         fetched_event = dao.get(event.id)
-        row = Line(name=Link(fetched_event.name, 'event_view?event_id=' + str(fetched_event.id)))
+        row = Line(name=Link(fetched_event.name, 'manage_event?event_id=' + str(fetched_event.id)))
         row.add_cell(Cell(fetched_event.location))
         row.add_cell(Cell(str(fetched_event.begin_date)))
         row.add_cell(Cell(str(fetched_event.end_date)))

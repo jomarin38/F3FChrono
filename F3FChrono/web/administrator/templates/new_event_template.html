@@ -42,6 +42,25 @@ input[type=button], input[type=submit], input[type=reset] {
         <br/>
         <input type="submit" value="Load from F3X Vault !">
     </form>
+    <h1>Create new event from scratch</h1>
+    <form action="load_from_scratch" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="eventname_label">Event name : </label>
+        <input id="eventname_field" type="text" name="eventname" value="">
+        <br/>
+        <label for="event_location_label">Event location : </label>
+        <input id="event_location_field" type="text" name="eventlocation" value="">
+        <br/>
+        <label for="start_date_label">Start date (dd/mm/yy) : </label>
+        <input id="start_date_field" type="text" name="startdate" value="">
+        <br/>
+        <label for="end_date_label">End date (dd/mm/yy) : </label>
+        <input id="end_date_field" type="text" name="enddate" value="">
+        <br/>
+        <input type="file" name="csv_file" id="csv_file" required="True" class="form-control">
+        <br/>
+        <input type="submit" value="Create event !">
+    </form>
 </body>
 
 
