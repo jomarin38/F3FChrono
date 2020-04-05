@@ -36,6 +36,32 @@ class Event:
         self.first_joker_round_number = 4
         self.second_joker_round_number = 15
 
+
+    @staticmethod
+    def from_csv(event_name, event_location, begin_date, end_date, csv_file):
+        event = Event()
+
+        event.name = event_name
+        event.location = event_location
+
+        event.begin_date = datetime.strptime(begin_date.strip('\"'), '%d/%m/%y')
+        event.end_date = datetime.strptime(end_date.strip('\"'), '%d/%m/%y')
+
+        file_data = csv_file.read().decode("utf-8")
+
+        lines = file_data.split("\n")
+        next_bib_number = 1
+        for line in lines:
+            splitted_line = line.split(',')
+            if len(splitted_line)>=2:
+                pilot = Pilot(name=splitted_line[0].strip('\"'),
+                              first_name=splitted_line[1].strip('\"')
+                              )
+                event.register_pilot(pilot, next_bib_number)
+                next_bib_number += 1
+
+        return event
+
     @staticmethod
     def from_f3x_vault(login, password, contest_id, max_rounds=None):
         """
@@ -113,6 +139,8 @@ class Event:
                     pilot_chrono.run_time = pilot_flight_time
                     f3f_round.handle_terminated_flight(competitor, pilot_chrono, pilot_penalty, pilot_flight_valid)
 
+            f3f_round.validate_round()
+
             print(f3f_round.to_string())
 
         return event
@@ -124,9 +152,9 @@ class Event:
         return None
 
     def create_new_round(self, insert_database=False):
-        f3f_round = Round.new_round(self, self.bib_start)
+        f3f_round = Round.new_round(self)
         self.add_existing_round(f3f_round)
-        if (insert_database):
+        if insert_database:
             Round.round_dao.insert(f3f_round)
 
         return f3f_round

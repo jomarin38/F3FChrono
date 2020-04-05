@@ -18,5 +18,6 @@ from django.urls import include,path
 
 urlpatterns = [
     path('f3franking/', include('F3FChrono.web.f3franking.urls')),
+    path('administrator/', include('F3FChrono.web.administrator.urls')),
     path('admin/', admin.site.urls),
 ]

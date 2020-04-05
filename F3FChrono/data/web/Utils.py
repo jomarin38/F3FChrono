@@ -6,6 +6,7 @@ from F3FChrono.chrono import ConfigReader
 class Utils:
 
     _port_number = 8000
+    _protocol = 'http://'
 
     @staticmethod
     def get_ip():
@@ -30,7 +31,11 @@ class Utils:
 
     @staticmethod
     def get_base_url():
-        return 'http://' + Utils.get_ip() + ':' + str(Utils.get_port_number()) + '/f3franking'
+        return Utils._protocol + Utils.get_ip() + ':' + str(Utils.get_port_number()) + '/f3franking'
+
+    @staticmethod
+    def get_logout_url():
+        return Utils._protocol + Utils.get_ip() + ':' + str(Utils.get_port_number()) + '/administrator/logout_f3f_admin'
 
     @staticmethod
     def server_alive():
