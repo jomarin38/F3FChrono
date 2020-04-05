@@ -29,7 +29,7 @@ CREATE TABLE `chrono` (
   `run_time` double DEFAULT NULL,
   `min_wind_speed` double DEFAULT NULL,
   `max_wind_speed` double DEFAULT NULL,
-  'mean_wind_speed' double DEFAULT NULL,
+  `mean_wind_speed` double DEFAULT NULL,
   `wind_direction` double DEFAULT NULL,
   `start_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `end_date` timestamp NULL DEFAULT NULL,
@@ -104,6 +104,7 @@ CREATE TABLE `event` (
   `max_wind_dir_dev` double DEFAULT NULL,
   `max_interruption_time` double DEFAULT NULL,
   `bib_start` int(11) DEFAULT 0,
+  `flights_before_refly` int(11) DEFAULT 5,
   `dayduration` int(11) DEFAULT 1,
   `f3x_vault_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`event_id`)
@@ -116,7 +117,7 @@ CREATE TABLE `event` (
 
 LOCK TABLES `event` WRITE;
 /*!40000 ALTER TABLE `event` DISABLE KEYS */;
-INSERT INTO `event` VALUES (1,'2019-10-25 22:00:00','2019-10-26 22:00:00','Col des Faisses','',3,25,45,1800,0,1,1706);
+INSERT INTO `event` VALUES (1,'2019-10-25 22:00:00','2019-10-26 22:00:00','Col des Faisses','',3,25,45,1800,0,5,1,1706);
 /*!40000 ALTER TABLE `event` ENABLE KEYS */;
 UNLOCK TABLES;
 
