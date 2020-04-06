@@ -51,6 +51,7 @@ class arduino_com():
 
     def get_voltage(self):
         number=self.bus.read_i2c_block_data(self.addresschrono, 100, 3)
+        number.append((number[2]<<8 | number[1])*5/1024/0.354)
         return number
     
 if __name__=='__main__':
@@ -74,5 +75,5 @@ if __name__=='__main__':
         if cmdline=="reset\n":
             print("reset ", chrono.reset())
 
-        if cmdline=="voltage\n":
+        if cmdline=="v\n":
             print (chrono.get_voltage())
