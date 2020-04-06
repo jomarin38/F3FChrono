@@ -50,7 +50,8 @@ class arduino_com():
         return number
 
     def get_voltage(self):
-        print("get voltage")
+        number=self.bus.read_i2c_block_data(self.addresschrono, 100, 3)
+        return number
     
 if __name__=='__main__':
 
@@ -72,5 +73,6 @@ if __name__=='__main__':
                 print (i, lap)
         if cmdline=="reset\n":
             print("reset ", chrono.reset())
-    
 
+        if cmdline=="voltage\n":
+            print (chrono.get_voltage())

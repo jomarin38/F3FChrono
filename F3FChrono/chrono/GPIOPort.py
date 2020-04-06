@@ -10,11 +10,11 @@ def statusLED(port, on=True):
     enable the status led
     """
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(port,GPIO.OUT)
+    GPIO.setup(port, GPIO.OUT)
     if on:
-        GPIO.output(port,GPIO.HIGH)
+        GPIO.output(port, GPIO.HIGH)
     else:
-        GPIO.output(port,GPIO.LOW)
+        GPIO.output(port, GPIO.LOW)
 
 
 def addCallback(port, fctn, falling=True):
@@ -94,7 +94,7 @@ def event_detected(port):
     print("callback "+str(port))
 
 
-class gpioPort(threading.Thread):
+'''class gpioPort(threading.Thread):
     def __init__(self, port, duration=200., is_active_low=False, start_blinks=0):
         super(gpioPort, self).__init__()
         self.terminated = False
@@ -150,7 +150,7 @@ class gpioPort(threading.Thread):
         # GPIO.cleanup(self.port)
         GPIO.cleanup()
 
-
+'''
 def event_detected(port):
     print("callback " + str(port))
 

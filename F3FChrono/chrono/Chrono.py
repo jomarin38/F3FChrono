@@ -58,12 +58,6 @@ class ChronoHard(QObject):
     def getPenalty(self):
         return (self.penalty)
 
-    def get_status(self):
-        print("getstatus")
-
-    def set_status(self, status):
-        print("setstatus")
-
     def wind_info(self, speed, orientation, rain):
         print("wind_info")
         self.wind['speed_nb']+=1
@@ -109,25 +103,6 @@ class ChronoHard(QObject):
         self.wind['orientation_nb']=0
 
         self.wind['rain']=False
-
-
-class ChronoRpi(ChronoHard):
-    def __init__(self, signal_btnnext):
-        super().__init__(signal_btnnext)
-        self.chronoLap = []
-        self.timelost = []
-        self.lastBase = -2
-        self.lastBaseChangeTime = 0.0
-        self.lastDetectionTime = 0.0
-        self.status = chronoStatus.InWait
-        self.chrono_signal.connect(self.handle_chrono_event)
-        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.wind_signal, self.accu_signal, self.rssi_signal)
-        self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
-
-    def __del__(self):
-        self.udpBeep.terminate()
-        del self.udpBeep
-        del self.udpReceive
 
     def get_status(self):
         return self.status
@@ -241,19 +216,32 @@ class ChronoRpi(ChronoHard):
                 "rain : " + str(self.getRain()) + os.linesep
         return (result)
 
+class ChronoRpi(ChronoHard):
+    def __init__(self, signal_btnnext):
+        super().__init__(signal_btnnext)
+        self.chronoLap = []
+        self.timelost = []
+        self.lastBase = -2
+        self.lastBaseChangeTime = 0.0
+        self.lastDetectionTime = 0.0
+        self.status = chronoStatus.InWait
+        self.chrono_signal.connect(self.handle_chrono_event)
+        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.wind_signal, self.accu_signal, self.rssi_signal)
+        self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
+
+    def __del__(self):
+        self.udpBeep.terminate()
+        del self.udpBeep
+        del self.udpReceive
+
+
+
 class ChronoArduino(ChronoHard):
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
         print ("chronoArduino init")
 
-    def reset(self):
-        print ("chronoArduino reset")
 
-    def get_status(self):
-        print ("chronoArduino get_status")
-
-    def set_status(self):
-        print ("chronoArduino set_status")
 
 def main ():
 
