@@ -61,18 +61,18 @@ if __name__=='__main__':
     end=False
     while not end:
         cmdline=sys.stdin.readline()
-        if cmdline=="setstatus\n":
+        if cmdline=="s\n":
             print(chrono.set_status_launched())
-        if cmdline=="getstatus\n":
+        if cmdline=="g\n":
             print(chrono.get_status())
-        if cmdline=="gettime\n":
+        if cmdline=="t\n":
             nbLap = chrono.get_nbLap()
             print(nbLap)
             for i in range(0,nbLap[1]):
                 time.sleep(0.01)
                 lap = chrono.get_timeLap(i)
                 print (i, lap)
-        if cmdline=="reset\n":
+        if cmdline=="r\n":
             print("reset ", chrono.reset())
 
         if cmdline=="v\n":
