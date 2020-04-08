@@ -284,12 +284,9 @@ class ChronoArduino(ChronoHard, QTimer):
             self.arduino.get_data()
             self.arduino.get_data1()
             if self.arduino.status != self.status:
-                print ("get status : ", self.arduino.status)
                 self.status_changed.emit(self.arduino.status)
                 self.status = self.arduino.status
-                print("self.status : ", self.status)
             self.currentlap = self.arduino.nbLap
-            print ("current lap : ", self.currentlap)
             if self.currentlap != self.oldlap:
                 if self.currentlap<=10:
                     self.lap_finished.emit(self.currentlap, self.arduino.lap[self.currentlap-1])
@@ -299,7 +296,6 @@ class ChronoArduino(ChronoHard, QTimer):
 
             if self.voltageCount >= self.voltageDelay:
                 self.accu_signal.emit(self.arduino.voltage)
-                print ("voltage : ", self.arduino.voltage)
                 self.voltageCount = 0
             self.voltageCount += 100
 '''

@@ -44,48 +44,66 @@ class arduino_com():
             self.lap.append(0)
         
     def set_status(self, status):
-        if self.bus is not None:
-            self.checki2ctime()
-            self.bus.write_byte_data(self.addresschrono, 0, status)
-        else:
-            self.status=status
+        try :
+            if self.bus is not None:
+                self.checki2ctime()
+                self.bus.write_byte_data(self.addresschrono, 0, status)
+            else:
+                self.status=status
+        except IOError:
+            print("error I2C")
         return 0
 
     def set_buzzerTime(self, time):
-        if self.bus is not None:
-            self.checki2ctime()
-            self.bus.write_word_data(self.addresschrono, 1, time & 0xffff)
+        try:
+            if self.bus is not None:
+                self.checki2ctime()
+                self.bus.write_word_data(self.addresschrono, 1, time & 0xffff)
+        except IOError:
+            print("error I2C")
         return 0
 
     def reset(self):
-        if self.bus is not None:
-            self.checki2ctime()
-            number = self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
-            for lap in self.lap:
-                lap=0
+        try:
+            if self.bus is not None:
+                self.checki2ctime()
+                number = self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
+                for lap in self.lap:
+                    lap=0
+        except IOError:
+            print("error I2C")
         return 0
         
     def get_data(self):
-        if self.bus is not None:
-            self.checki2ctime()
-            number = self.bus.read_i2c_block_data(self.addresschrono, 2, 16)
+        try:
+            if self.bus is not None:
+                self.checki2ctime()
+                number = self.bus.read_i2c_block_data(self.addresschrono, 2, 16)
 
-            self.status = number[0]
-            self.voltage = (number[2] << 8 | number[1])*5/1024/self.voltageCoef
-            self.nbLap = number[3]
-            indexlap=0
-            for count in range(4,15,4):
-                self.lap[indexlap] = number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count]
-                indexlap+=1
+                self.status = number[0]
+                self.voltage = (number[2] << 8 | number[1])*5/1024/self.voltageCoef
+                self.nbLap = number[3]
+                indexlap=0
+                for count in range(4,15,4):
+                    self.lap[indexlap] = (number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count])/1000
+                    indexlap+=1
+        except IOError:
+            print("error I2C")
+        return 0
 
     def get_data1(self):
-        if self.bus is not None:
-            self.checki2ctime()
-            number = self.bus.read_i2c_block_data(self.addresschrono, 3, 28)
-            indexlap=3
-            for count in range(0,23,4):
-                self.lap[indexlap] = number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count]
-                indexlap+=1
+        try:
+            if self.bus is not None:
+                self.checki2ctime()
+                number = self.bus.read_i2c_block_data(self.addresschrono, 3, 28)
+                indexlap=3
+                for count in range(0,23,4):
+                    self.lap[indexlap] = (number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count])/1000
+                    indexlap+=1
+        except IOError:
+            print("error I2C")
+        return 0
+
     def get_time(self):
         time=0
         for count in self.lap:
