@@ -294,7 +294,7 @@ class ChronoArduino(ChronoHard, QTimer):
                 if self.currentlap<=10:
                     self.lap_finished.emit(self.currentlap, self.arduino.lap[self.currentlap-1])
                 if self.currentlap==10:
-                    self.run_finished.emit(self.)
+                    self.run_finished.emit(self.arduino.get_time())
                 self.oldlap = self.currentlap
 
             if self.voltageCount >= self.voltageDelay:
