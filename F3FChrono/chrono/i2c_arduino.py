@@ -61,7 +61,9 @@ class arduino_com():
         if self.bus is not None:
             self.checki2ctime()
             number = self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
-        return number[0]
+            for lap in self.lap:
+                lap=0
+        return 0
         
     def get_data(self):
         if self.bus is not None:
@@ -84,7 +86,11 @@ class arduino_com():
             for count in range(0,23,4):
                 self.lap[indexlap] = number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count]
                 indexlap+=1
-
+    def get_time(self):
+        time=0
+        for count in self.lap:
+            time+=count
+        return time
     '''    
     def get_nbLap(self):
         self.checki2ctime()
