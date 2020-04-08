@@ -5,6 +5,8 @@ import collections
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.chrono.UDPBeep import *
 from F3FChrono.chrono.UDPReceive import *
+from F3FChrono.chrono import ConfigReader
+from F3FChrono.chrono.i2c_arduino import arduino_com
 
 IPUDPBEEP = '255.255.255.255'
 UDPPORT = 4445
@@ -42,10 +44,9 @@ class ChronoHard(QObject):
         self.wind_signal.connect(self.wind_info)
         self.wind= collections.OrderedDict()
         self.reset_wind()
+        self.chronoLap = []
+        self.timelost = []
 
-
-    def reset(self):
-        print("reset")
 
     def addPenalty(self, value):
         self.penalty += value
@@ -219,8 +220,6 @@ class ChronoHard(QObject):
 class ChronoRpi(ChronoHard):
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
-        self.chronoLap = []
-        self.timelost = []
         self.lastBase = -2
         self.lastBaseChangeTime = 0.0
         self.lastDetectionTime = 0.0
@@ -236,11 +235,40 @@ class ChronoRpi(ChronoHard):
 
 
 
-class ChronoArduino(ChronoHard):
+class ChronoArduino(ChronoHard, QTimer):
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
         print ("chronoArduino init")
+        self.lapTimerEvent = QTimer()
+        self.lapTimerEvent.timeout.connect(self.runlaprequest)
+        self.lapTimerEvent.start(50)
+        self.currentlap = 0
+        self.oldlap = 0
+        self.status = chronoStatus.WaitLaunch
+        self.oldstatus = chronoStatus.WaitLaunch
+        self.voltage = 0
+        self.voltageDelay = 5000
+        self.voltageCount = 0
+        self.arduino = None
+        if ConfigReader.config.conf['arduino']:
+            self.arduino = arduino_com()
 
+    def runlaprequest(self):
+        if self.arduino is not None:
+            self.status = self.arduino.get_status()
+            if self.status != self.oldstatus:
+                self.status_changed.emit(self.status)
+                self.oldstatus = self.status
+
+            self.currentlap = self.arduino.get_nbLap()
+            if self.currentlap != self.oldlap:
+                self.lap_finished.emit(self.currentlap, self.arduino.get_timeLap(self.oldlap))
+                self.old_nb_lap = self.currentlap
+
+            if self.voltageCount >= self.voltageDelay:
+                self.accu_signal.emit(self.arduino.get_voltage())
+                self.voltageCount = 0
+            self.voltageCount += 50
 
 
 def main ():

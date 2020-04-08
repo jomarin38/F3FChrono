@@ -1,5 +1,6 @@
-import smbus
+#import smbus
 import time
+from datetime import datetime
 import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QTimer
@@ -17,78 +18,85 @@ class chronoStatus():
 #anemoaddress = 0x04
 chronoaddress = 0x05
 
-class arduino_com(QTimer):
-    def __init__(self, voltageCoef):
+class i2c_register():
+    setstatus = 0x01
+    setStatus_InStart = 0x01
+    getStatus = 0x02
+    getLapCount = 0x03
+    reset = 0x04
+    getTime = 0x10
+    getVoltage = 0x100
+    setBuzzerTime = 0x101
+
+class arduino_com():
+    def __init__(self):
         super().__init__()
         # for RPI version 1, use “bus = smbus.SMBus(0)”
         self.bus = smbus.SMBus(1)
         self.addresschrono = chronoaddress
-        self.data=[0]
-        self.voltageCoef = voltageCoef
-        self.lapTimerEvent = QTimer()
-        self.lapTimerEvent.timeout.connect(self.runlaprequest)
-        self.lapTimerEvent.start(50)
-        self.currentlap=0
-        self.oldlap=0
-        self.voltage=0
-        self.voltageDelay=5000
-        self.voltageCount=0
-        
-    def runlaprequest(self):
-        self.currentlap = self.get_nbLap()
-        if (self.currentlap!=self.oldlap):
-            print("lap ", self.oldlap, " : ", self.get_timeLap(self.oldlap))
-            time.sleep(0.01)
-            self.old_nb_lap=self.currentlap
-            
-        if (self.voltageCount>=self.voltageDelay):
-            time.sleep(0.01)
-            self.voltage=self.get_voltage()
-            print("volage : ", self.voltage)
-            self.voltageCount=0
-        
-        self.voltageCount+=50
-    
-    def set_status_inStart(self):
-        number=self.bus.read_i2c_block_data(self.addresschrono, 0, 2)
-        return number[1]
+        self.lastrequest=0
 
-    def set_status_launched(self):
-        number=self.bus.read_i2c_block_data(self.addresschrono, 0, 1)
-        return number[0]
- 
+    def set_status(self, status):
+        self.checki2ctime()
+        self.bus.write_byte_data(self.addresschrono, i2c_register.setstatus, status)
+
+        return 0
+
+    def set_buzzerTime(self, time):
+        self.checki2ctime()
+        self.bus.write_word_data(self.addresschrono, i2c_register.setBuzzerTime, time)
+        return 0
+
     def reset(self):
-        number=self.bus.read_i2c_block_data(self.addresschrono, 3, 1)
+        self.checki2ctime()
+        number = self.bus.read_i2c_block_data(self.addresschrono, i2c_register.reset, 1)
         return number[0]
         
     def get_status(self):
-        number=self.bus.read_i2c_block_data(self.addresschrono, 1, 2)
+        self.checki2ctime()
+        number = self.bus.read_i2c_block_data(self.addresschrono, i2c_register.getStatus, 2)
         return number[1]
         
+    def get_allLap(self):
+        self.checki2ctime()
+        nbLap = self.get_nbLap()
+        lap = []
+        for lapCount in range(0, nbLap-1):
+            lap.append(self.__get_timeLap(lapCount))
+        return lap
+
     def get_nbLap(self):
-        number=self.bus.read_i2c_block_data(self.addresschrono, 2, 2)
+        self.checki2ctime()
+        number=self.bus.read_i2c_block_data(self.addresschrono, i2c_register.getLapCount, 2)
         return number[1]
 
     def get_timeLap(self, lap):
-        number=[0,0]
-        lap=self.bus.read_i2c_block_data(self.addresschrono, 10+lap, 5)
-        number[0]=lap[0]
-        number[1]=(lap[4]<<24 | lap[3]<<16 | lap[2]<<8 | lap[1])
-        return number[1]
+        self.checki2ctime()
+        lap = self.bus.read_i2c_block_data(self.addresschrono, i2c_register.getTime+lap, 5)
+        return lap[4] << 24 | lap[3] << 16 | lap[2] << 8 | lap[1]
+
 
     def get_voltage(self):
-        number=self.bus.read_i2c_block_data(self.addresschrono, 100, 3)
-        
-        return (number[2]<<8 | number[1])*5/1024/self.voltageCoef
+        self.checki2ctime()
+        number = self.bus.read_i2c_block_data(self.addresschrono, i2c_register.getVoltage, 3)
+        return (number[2] << 8 | number[1])*5/1024/self.voltageCoef
+
+    def checki2ctime(self):
+        if (datetime.now()-self.lastrequest) > 0.01:
+            self.lastrequest=datetime.now()
+        else:
+            self.i2cdelay()
+
+    @staticmethod
+    def i2cdelay():
+        time.sleep(0.01)
     
 if __name__=='__main__':
 
     app = QApplication(sys.argv)
     print("Chrono Arduino I2C Mode")
     chrono=arduino_com(0.354)
-    sys.exit(app.exec())
-    
-'''    end=False
+    end=False
     while not end:
         cmdline=sys.stdin.readline()
         if cmdline=="s\n":
@@ -107,4 +115,3 @@ if __name__=='__main__':
 
         if cmdline=="v\n":
             print (chrono.get_voltage())
-'''

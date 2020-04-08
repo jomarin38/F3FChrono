@@ -60,9 +60,9 @@ class gpioPort(threading.Thread):
         self.start()
 
     def blink(self, numbers):
-        if (self.port == ConfigReader.Configuration.conf['buzzer'] and ConfigReader.Configuration.conf[
+        if (self.port == ConfigReader.config.conf['buzzer'] and ConfigReader.config.conf[
             'buzzer_valid'] or
-                self.port == ConfigReader.Configuration.conf['buzzer_next'] and ConfigReader.Configuration.conf[
+                self.port == ConfigReader.config.conf['buzzer_next'] and ConfigReader.config.conf[
                     'buzzer_next_valid']):
             for i in range(0,numbers):
                 GPIO.output(self.port,self.activate)
@@ -77,8 +77,8 @@ class gpioPort(threading.Thread):
         while not self.terminated:
             # wait until somebody throws an event
             if self.event.wait(1):
-                if (self.port==ConfigReader.Configuration.conf['buzzer'] and ConfigReader.Configuration.conf['buzzer_valid'] or
-                    self.port == ConfigReader.Configuration.conf['buzzer_next'] and ConfigReader.Configuration.conf[
+                if (self.port==ConfigReader.config.conf['buzzer'] and ConfigReader.config.conf['buzzer_valid'] or
+                    self.port == ConfigReader.config.conf['buzzer_next'] and config.Configuration.conf[
                         'buzzer_next_valid']):
                     # create rectangle signal on GPIO port
                     GPIO.output(self.port,self.activate)
