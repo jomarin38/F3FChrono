@@ -13,12 +13,12 @@
  "fullscreen": false,
  "ledA": 20,
  "ledB": 26,
- "run_webserver": true,
+ "run_webserver": false,
  "simulatemode": false,
  "sound": true,
  "udpport": 4445,
  "voice": false,
+ "voltage_coef": 0.354,
  "voltage_min": 9.9,
- "webserver_port": 8000,
- "voltage_coef" : 0.354
+ "webserver_port": 8000
 }

@@ -4,6 +4,7 @@ from datetime import datetime
 import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QTimer
+from F3FChrono.chrono import ConfigReader
 
 class chronoStatus():
     InWait=0
@@ -26,8 +27,12 @@ class i2c_register():
 class arduino_com():
     def __init__(self, voltageCoef):
         super().__init__()
-        # for RPI version 1, use “bus = smbus.SMBus(0)”
-        self.bus = smbus.SMBus(1)
+
+        self.bus=None
+        if ConfigReader.config.conf['arduino']:
+            # for RPI version 1, use “bus = smbus.SMBus(0)”
+            self.bus = smbus.SMBus(1)
+
         self.addresschrono = chronoaddress
         self.lastrequest=0.0
         self.voltageCoef=voltageCoef
@@ -39,41 +44,48 @@ class arduino_com():
             self.lap.append(0)
         
     def set_status(self, status):
-        self.checki2ctime()
-        self.bus.write_byte_data(self.addresschrono, 0, status)
-
+        if self.bus is not None:
+            self.checki2ctime()
+            self.bus.write_byte_data(self.addresschrono, 0, status)
+        else:
+            self.status=status
         return 0
 
     def set_buzzerTime(self, time):
-        self.checki2ctime()
-        self.bus.write_word_data(self.addresschrono, 1, time & 0xffff)
+        if self.bus is not None:
+            self.checki2ctime()
+            self.bus.write_word_data(self.addresschrono, 1, time & 0xffff)
         return 0
 
     def reset(self):
-        self.checki2ctime()
-        number = self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
+        if self.bus is not None:
+            self.checki2ctime()
+            number = self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
         return number[0]
         
     def get_data(self):
-        self.checki2ctime()
-        number = self.bus.read_i2c_block_data(self.addresschrono, 2, 16)
-        
-        self.status = number[0]
-        self.voltage = (number[2] << 8 | number[1])*5/1024/self.voltageCoef
-        self.nbLap = number[3]
-        indexlap=0
-        for count in range(4,15,4):
-            self.lap[indexlap] = number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count]
-            indexlap+=1
+        if self.bus is not None:
+            self.checki2ctime()
+            number = self.bus.read_i2c_block_data(self.addresschrono, 2, 16)
+
+            self.status = number[0]
+            self.voltage = (number[2] << 8 | number[1])*5/1024/self.voltageCoef
+            self.nbLap = number[3]
+            indexlap=0
+            for count in range(4,15,4):
+                self.lap[indexlap] = number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count]
+                indexlap+=1
 
     def get_data1(self):
-        self.checki2ctime()
-        number = self.bus.read_i2c_block_data(self.addresschrono, 3, 28)
-        indexlap=3
-        for count in range(0,23,4):
-            self.lap[indexlap] = number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count]
-            indexlap+=1
+        if self.bus is not None:
+            self.checki2ctime()
+            number = self.bus.read_i2c_block_data(self.addresschrono, 3, 28)
+            indexlap=3
+            for count in range(0,23,4):
+                self.lap[indexlap] = number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count]
+                indexlap+=1
 
+    '''    
     def get_nbLap(self):
         self.checki2ctime()
         number=self.bus.read_i2c_block_data(self.addresschrono, i2c_register.getLapCount, 2)
@@ -91,7 +103,7 @@ class arduino_com():
         print (number)
         voltage = (number[2] << 8 | number[1])*5/1024/self.voltageCoef
         return voltage
-
+    '''
     def checki2ctime(self):
         if (time.time()-self.lastrequest) < 0.02:
             self.i2cdelay()
