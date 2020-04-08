@@ -78,8 +78,7 @@ class gpioPort(threading.Thread):
             # wait until somebody throws an event
             if self.event.wait(1):
                 if (self.port==ConfigReader.config.conf['buzzer'] and ConfigReader.config.conf['buzzer_valid'] or
-                    self.port == ConfigReader.config.conf['buzzer_next'] and config.Configuration.conf[
-                        'buzzer_next_valid']):
+                    self.port == ConfigReader.config.conf['buzzer_next'] and ConfigReader.config.conf['buzzer_next_valid']):
                     # create rectangle signal on GPIO port
                     GPIO.output(self.port,self.activate)
                     sleep(self.duration/1000.0)

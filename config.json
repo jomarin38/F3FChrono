@@ -1,6 +1,6 @@
 {
  "anemometer": false,
- "arduino": false,
+ "arduino": true,
  "btn_baseA": 5,
  "btn_baseB": 6,
  "btn_next": 12,
@@ -19,5 +19,6 @@
  "udpport": 4445,
  "voice": false,
  "voltage_min": 9.9,
- "webserver_port": 8000
+ "webserver_port": 8000,
+ "voltage_coef" : 0.354
 }

@@ -28,16 +28,26 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.base_test = -10
         self.vocal = chronoQSound()
 
-        self.signal_btnnext.connect(self.btn_next_action)
-        self.chronoHard.status_changed.connect(self.slot_status_changed)
-        self.chronoHard.lap_finished.connect(self.slot_lap_finished)
-        self.chronoHard.run_finished.connect(self.slot_run_finished)
-        self.chronoHard.run_validated.connect(self.slot_run_validated)
-        self.chronoHard.wind_signal.connect(self.slot_wind_ui)
-        self.chronoHard.rssi_signal.connect(self.slot_rssi)
-        self.chronoHard.accu_signal.connect(self.slot_accu)
-        self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
         self.initUI()
+
+        self.signal_btnnext.connect(self.btn_next_action)
+        self.chronoRpi.status_changed.connect(self.slot_status_changed)
+        self.chronoRpi.lap_finished.connect(self.slot_lap_finished)
+        self.chronoRpi.run_finished.connect(self.slot_run_finished)
+        self.chronoRpi.run_validated.connect(self.slot_run_validated)
+        self.chronoRpi.wind_signal.connect(self.slot_wind_ui)
+        self.chronoRpi.rssi_signal.connect(self.slot_rssi)
+        self.chronoRpi.accu_signal.connect(self.slot_accu)
+        self.chronoRpi.buzzer_validated.connect(self.slot_buzzer)
+
+        self.chronoArduino.status_changed.connect(self.slot_status_changed)
+        self.chronoArduino.lap_finished.connect(self.slot_lap_finished)
+        self.chronoArduino.run_finished.connect(self.slot_run_finished)
+        self.chronoArduino.run_validated.connect(self.slot_run_validated)
+        self.chronoArduino.wind_signal.connect(self.slot_wind_ui)
+        self.chronoArduino.rssi_signal.connect(self.slot_rssi)
+        self.chronoArduino.accu_signal.connect(self.slot_accu)
+        self.chronoArduino.buzzer_validated.connect(self.slot_buzzer)
 
     def initUI(self):
         self.MainWindow = QtWidgets.QMainWindow()

@@ -123,13 +123,7 @@ class ChronoHard(QObject):
         self.reset_wind()
 
 
-    def handle_chrono_event(self, caller, data, address):
-        if not caller.lower()=="btnnext":
-            self.buzzer_validated.emit()
-        if ((self.status == chronoStatus.Launched or self.status == chronoStatus.InStart or
-             self.status == chronoStatus.InProgress) and caller.lower() == "udpreceive" or caller.lower() == "btnnext") \
-                and data.lower() == "event":
-            self.__declareBase(address)
+
 
 
     def __declareBase (self, base):
@@ -233,43 +227,75 @@ class ChronoRpi(ChronoHard):
         del self.udpBeep
         del self.udpReceive
 
-
+    def handle_chrono_event(self, caller, data, address):
+        if not caller.lower()=="btnnext":
+            self.buzzer_validated.emit()
+        if ((self.status == chronoStatus.Launched or self.status == chronoStatus.InStart or
+             self.status == chronoStatus.InProgress) and caller.lower() == "udpreceive" or caller.lower() == "btnnext") \
+                and data.lower() == "event":
+            self.__declareBase(address)
 
 class ChronoArduino(ChronoHard, QTimer):
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
         print ("chronoArduino init")
-        self.lapTimerEvent = QTimer()
-        self.lapTimerEvent.timeout.connect(self.runlaprequest)
-        self.lapTimerEvent.start(50)
-        self.currentlap = 0
+        self.chrono_signal.connect(self.handle_chrono_event)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timerEvent)
+        self.timer.start(500)
         self.oldlap = 0
-        self.status = chronoStatus.WaitLaunch
-        self.oldstatus = chronoStatus.WaitLaunch
+        self.status = 0
+        self.oldstatus = 0
         self.voltage = 0
         self.voltageDelay = 5000
         self.voltageCount = 0
         self.arduino = None
         if ConfigReader.config.conf['arduino']:
-            self.arduino = arduino_com()
+            self.arduino = arduino_com(ConfigReader.config.conf['voltage_coef'])
 
-    def runlaprequest(self):
+    def set_status(self, value):
+        print("set status", value)
+        if (self.status!=value):
+            self.arduino.setStatus(value)
+            self.status_changed.emit(self.get_status())
+        return self.status
+    
+    def handle_chrono_event(self, caller, data, address):
+        if not caller.lower()=="btnnext":
+            self.buzzer_validated.emit()
+        '''            
+        if (self.status == chronoStatus.Launched or self.status == chronoStatus.InStart or
+             self.status == chronoStatus.InProgress and caller.lower() == "btnnext") \
+                and data.lower() == "event":
+            self.set_status(self.get_status()+1)
+        '''
+        print("self.status", self.status)
+        if self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.Launched:
+            self.set_status(self.get_status()+1)
+            
+    def timerEvent(self):
         if self.arduino is not None:
-            self.status = self.arduino.get_status()
-            if self.status != self.oldstatus:
-                self.status_changed.emit(self.status)
-                self.oldstatus = self.status
-
-            self.currentlap = self.arduino.get_nbLap()
+            
+            self.arduino.get_data()
+            self.arduino.get_data1()
+            if self.arduino.status != self.status:
+                print ("get status : ", self.arduino.status)
+                self.status_changed.emit(self.arduino.status)
+                self.status = self.arduino.status
+                print("self.status : ", self.status)
+            self.currentlap = self.arduino.nbLap
+            print ("current lap : ", self.currentlap)
             if self.currentlap != self.oldlap:
-                self.lap_finished.emit(self.currentlap, self.arduino.get_timeLap(self.oldlap))
-                self.old_nb_lap = self.currentlap
+                if self.oldlap<9 and self.currentlap<9:
+                    self.lap_finished.emit(self.currentlap, self.arduino.lap[self.currentlap-1])
+                self.oldlap = self.currentlap
 
             if self.voltageCount >= self.voltageDelay:
-                self.accu_signal.emit(self.arduino.get_voltage())
+                self.accu_signal.emit(self.arduino.voltage)
+                print ("voltage : ", self.arduino.voltage)
                 self.voltageCount = 0
-            self.voltageCount += 50
-
+            self.voltageCount += 100
+'''
 
 def main ():
 
@@ -281,3 +307,4 @@ def main ():
 
 if __name__ == '__main__':
     main()
+'''

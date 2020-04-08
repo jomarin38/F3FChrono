@@ -160,7 +160,7 @@ class WWindCtrl():
         return cancelstr
 
     def set_voltage(self, voltage):
-        self.view.voltage.setText(str(voltage)+" V")
+        self.view.voltage.setText("{:0>3.1f}".format(voltage)+" V")
 
     def set_rssi(self, rssi1, rssi2):
         self.view.rssi.setText("rssi1, 2 : "+str(rssi1) + "%, "+str(rssi2)+"%")

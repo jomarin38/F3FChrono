@@ -1,4 +1,4 @@
-#import smbus
+import smbus
 import time
 from datetime import datetime
 import sys
@@ -19,51 +19,60 @@ class chronoStatus():
 chronoaddress = 0x05
 
 class i2c_register():
-    setstatus = 0x01
-    setStatus_InStart = 0x01
-    getStatus = 0x02
-    getLapCount = 0x03
-    reset = 0x04
-    getTime = 0x10
-    getVoltage = 0x100
+    getData = 0x00
+    reset = 0x01
     setBuzzerTime = 0x101
 
 class arduino_com():
-    def __init__(self):
+    def __init__(self, voltageCoef):
         super().__init__()
         # for RPI version 1, use “bus = smbus.SMBus(0)”
         self.bus = smbus.SMBus(1)
         self.addresschrono = chronoaddress
-        self.lastrequest=0
-
+        self.lastrequest=0.0
+        self.voltageCoef=voltageCoef
+        self.status=0
+        self.voltage=0.0
+        self.nbLap=0
+        self.lap=[]
+        for count in range(10):
+            self.lap.append(0)
+        
     def set_status(self, status):
         self.checki2ctime()
-        self.bus.write_byte_data(self.addresschrono, i2c_register.setstatus, status)
+        self.bus.write_byte_data(self.addresschrono, 0, status)
 
         return 0
 
     def set_buzzerTime(self, time):
         self.checki2ctime()
-        self.bus.write_word_data(self.addresschrono, i2c_register.setBuzzerTime, time)
+        self.bus.write_word_data(self.addresschrono, 1, time & 0xffff)
         return 0
 
     def reset(self):
         self.checki2ctime()
-        number = self.bus.read_i2c_block_data(self.addresschrono, i2c_register.reset, 1)
+        number = self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
         return number[0]
         
-    def get_status(self):
+    def get_data(self):
         self.checki2ctime()
-        number = self.bus.read_i2c_block_data(self.addresschrono, i2c_register.getStatus, 2)
-        return number[1]
+        number = self.bus.read_i2c_block_data(self.addresschrono, 2, 16)
         
-    def get_allLap(self):
+        self.status = number[0]
+        self.voltage = (number[2] << 8 | number[1])*5/1024/self.voltageCoef
+        self.nbLap = number[3]
+        indexlap=0
+        for count in range(4,15,4):
+            self.lap[indexlap] = number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count]
+            indexlap+=1
+
+    def get_data1(self):
         self.checki2ctime()
-        nbLap = self.get_nbLap()
-        lap = []
-        for lapCount in range(0, nbLap-1):
-            lap.append(self.__get_timeLap(lapCount))
-        return lap
+        number = self.bus.read_i2c_block_data(self.addresschrono, 3, 28)
+        indexlap=3
+        for count in range(0,23,4):
+            self.lap[indexlap] = number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count]
+            indexlap+=1
 
     def get_nbLap(self):
         self.checki2ctime()
@@ -79,37 +88,38 @@ class arduino_com():
     def get_voltage(self):
         self.checki2ctime()
         number = self.bus.read_i2c_block_data(self.addresschrono, i2c_register.getVoltage, 3)
-        return (number[2] << 8 | number[1])*5/1024/self.voltageCoef
+        print (number)
+        voltage = (number[2] << 8 | number[1])*5/1024/self.voltageCoef
+        return voltage
 
     def checki2ctime(self):
-        if (datetime.now()-self.lastrequest) > 0.01:
-            self.lastrequest=datetime.now()
-        else:
+        if (time.time()-self.lastrequest) < 0.02:
             self.i2cdelay()
+            
+        self.lastrequest=time.time()
 
     @staticmethod
     def i2cdelay():
-        time.sleep(0.01)
+        time.sleep(0.05)
     
 if __name__=='__main__':
 
-    app = QApplication(sys.argv)
     print("Chrono Arduino I2C Mode")
     chrono=arduino_com(0.354)
     end=False
     while not end:
         cmdline=sys.stdin.readline()
         if cmdline=="s\n":
-            print(chrono.set_status_launched())
+            print(chrono.set_status(1))
+            print(chrono.set_buzzerTime(5000))
         if cmdline=="g\n":
-            print(chrono.get_status())
+            chrono.get_data()
+            chrono.get_data1()
+            print (chrono.status, chrono.voltage, chrono.nbLap, chrono.lap)
+
         if cmdline=="t\n":
-            nbLap = chrono.get_nbLap()
+            nbLap = chrono.get_data1()
             print(nbLap)
-            for i in range(0,nbLap[1]):
-                time.sleep(0.01)
-                lap = chrono.get_timeLap(i)
-                print (i, lap)
         if cmdline=="r\n":
             print("reset ", chrono.reset())
 
