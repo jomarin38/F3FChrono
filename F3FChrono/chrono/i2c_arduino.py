@@ -1,6 +1,7 @@
 import smbus
 import time
 import sys
+from PyQt5 import QtWidgets, QtCore
 
 class chronoStatus():
     InWait=0
@@ -15,12 +16,29 @@ class chronoStatus():
 #anemoaddress = 0x04
 chronoaddress = 0x05
 
-class arduino_com():
-    def __init__(self):
+class arduino_com(QtCore.QTimer):
+    def __init__(self, voltageCoef):
+        super().__init__()
         # for RPI version 1, use “bus = smbus.SMBus(0)”
         self.bus = smbus.SMBus(1)
         self.addresschrono = chronoaddress
         self.data=[0]
+        self.voltageCoef = voltageCoef
+        self.timerEvent = QTimer()
+        self.timerEvent.timeout.connect(self.run)
+        self.timerEvent.start(100)
+        self.currentlap=0
+        self.oldlap=0;
+        self.voltage=0;
+
+    def run(self):
+        self.currentlap = self.get_nbLap()
+        if (self.currentlap!=self.oldlap):
+            print("lap ", self.oldlap, " : ", self.get_timeLap(self.oldlap))
+            self.old_nb_lap=self.currentlap
+
+        self.voltage=self.get_voltage()
+        print("volage : ", self.voltage)
 
     def set_status_inStart(self):
         number=self.bus.read_i2c_block_data(self.addresschrono, 0, 2)
@@ -51,13 +69,13 @@ class arduino_com():
 
     def get_voltage(self):
         number=self.bus.read_i2c_block_data(self.addresschrono, 100, 3)
-        number.append((number[2]<<8 | number[1])*5/1024/0.354)
+        number.append((number[2]<<8 | number[1])*5/1024/self.voltageCoef)
         return number
     
 if __name__=='__main__':
 
     print("Chrono Arduino I2C Mode")
-    chrono=arduino_com()
+    chrono=arduino_com(0,354)
     end=False
     while not end:
         cmdline=sys.stdin.readline()
