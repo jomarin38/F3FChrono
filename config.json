@@ -8,7 +8,7 @@
  "buzzer_duration": 300,
  "buzzer_next": 21,
  "buzzer_next_duration": 300,
- "buzzer_next_valid": true,
+ "buzzer_next_valid": false,
  "buzzer_valid": true,
  "fullscreen": false,
  "ledA": 20,

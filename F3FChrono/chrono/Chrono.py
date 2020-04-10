@@ -285,8 +285,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.reset_wind()
 
     def timerEvent(self):
-        if self.arduino is not None:
-            
+        if self.arduino is not None and sys.modules['fake_rpi'] is None:
             self.arduino.get_data()
             self.arduino.get_data1()
             if self.arduino.status != self.status:
@@ -303,7 +302,6 @@ class ChronoArduino(ChronoHard, QTimer):
             if abs(self.oldVoltage-self.arduino.voltage) > 0.1:
                 self.accu_signal.emit(self.arduino.voltage)
                 self.oldVoltage = self.arduino.voltage
-
 
     def start_timer(self):
         self.timer.start(ConfigReader.config.conf['i2c_refresh'])

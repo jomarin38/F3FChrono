@@ -324,7 +324,6 @@ class WConfigCtrl(QObject):
     contest_sig = pyqtSignal()
     chrono_sig = pyqtSignal()
     btn_settings_sig = pyqtSignal()
-    btn_picampair_sig = pyqtSignal()
     btn_random_sig = pyqtSignal()
     btn_day_1_sig = pyqtSignal()
     widgetList = []
@@ -345,7 +344,6 @@ class WConfigCtrl(QObject):
         self.view.ContestList.currentIndexChanged.connect(self.contest_sig.emit)
         self.view.ChronoType.currentIndexChanged.connect(self.chrono_sig.emit)
         self.view.btn_settings.clicked.connect(self.btn_settings_sig.emit)
-        self.view.picampaired.clicked.connect(self.btn_picampair_sig.emit)
         self.view.randombtn.clicked.connect(self.btn_random_sig.emit)
         self.view.day_1btn.clicked.connect(self.btn_day_1_sig.emit)
 

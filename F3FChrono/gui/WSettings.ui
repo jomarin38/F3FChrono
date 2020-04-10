@@ -21,18 +21,27 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="topMargin">
-    <number>3</number>
+    <number>1</number>
    </property>
    <property name="bottomMargin">
-    <number>3</number>
+    <number>1</number>
    </property>
-   <property name="verticalSpacing">
-    <number>6</number>
+   <property name="spacing">
+    <number>3</number>
    </property>
    <item row="0" column="0">
     <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>4</number>
+     </property>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="spacing">
+        <number>2</number>
+       </property>
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
        <item>
         <widget class="QLabel" name="label">
          <property name="font">
@@ -54,56 +63,59 @@
      </item>
      <item>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="1" column="1">
+       <property name="verticalSpacing">
+        <number>2</number>
+       </property>
+       <item row="2" column="1">
         <widget class="QCheckBox" name="fullscreen">
          <property name="text">
           <string>FullScreen</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QCheckBox" name="arduino">
          <property name="text">
           <string>ArduinoChrono</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QCheckBox" name="simulate_mode">
          <property name="text">
           <string>Simulate Mode</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <widget class="QCheckBox" name="anemometer">
          <property name="text">
           <string>Anemometer</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="QCheckBox" name="voice">
          <property name="text">
           <string>Voice</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QCheckBox" name="sound">
          <property name="text">
           <string>Sound</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QCheckBox" name="buzzer">
          <property name="text">
           <string>Buzzer</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
           <widget class="QDoubleSpinBox" name="voltagemin">
@@ -124,31 +136,73 @@
          </item>
         </layout>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="QCheckBox" name="buzzernext">
          <property name="text">
           <string>Buzzer Next button</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <widget class="QPushButton" name="closebtn">
          <property name="text">
           <string>Close Race Management</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QCheckBox" name="webserver">
          <property name="text">
           <string>WebServer</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="QLabel" name="webserverUrl">
          <property name="text">
           <string>Not started</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QPushButton" name="wbase_detect_btn">
+         <property name="text">
+          <string>Wireless bases detect</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="baseA_IP">
+           <property name="text">
+            <string>Base A : None</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="baseB_IP">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Base B : None</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="wbase_invert_btn">
+         <property name="text">
+          <string>Wireless bases invert</string>
          </property>
         </widget>
        </item>
