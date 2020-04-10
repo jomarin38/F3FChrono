@@ -285,7 +285,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.reset_wind()
 
     def timerEvent(self):
-        if self.arduino is not None and sys.modules['fake_rpi'] is None:
+        if self.arduino is not None and not ('fake_rpi' in sys.modules) :
             self.arduino.get_data()
             self.arduino.get_data1()
             if self.arduino.status != self.status:
