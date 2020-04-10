@@ -235,8 +235,8 @@ class ChronoRpi(ChronoHard):
                 self.set_status(chronoStatus.Finished)
                 self.run_finished.emit(self.get_time())
             return True
-        elif self.getLapCount()>1:#Base declaration is the same
-                elapsedTime = ((now - self.lastDetectionTime))
+        elif self.getLapCount() > 1:    #Base declaration is the same
+                elapsedTime = now - self.lastDetectionTime
                 self.lastDetectionTime = now
                 self.timelost[self.getLapCount() - 1] = self.timelost[self.getLapCount() - 1] + elapsedTime
 
@@ -245,7 +245,7 @@ class ChronoRpi(ChronoHard):
 class ChronoArduino(ChronoHard, QTimer):
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
-        print ("chronoArduino init")
+        print("chronoArduino init")
         self.chrono_signal.connect(self.handle_chrono_event)
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerEvent)
@@ -254,20 +254,19 @@ class ChronoArduino(ChronoHard, QTimer):
         self.status = 0
         self.oldstatus = 0
         self.voltage = 0
-        self.voltageDelay = 5000
-        self.voltageCount = 0
+        self.oldVoltage = 0
         self.arduino = arduino_com(ConfigReader.config.conf['voltage_coef'])
         self.start_timer()
 
     def set_status(self, value):
         print("set status", value)
-        if (self.status!=value):
+        if self.status != value:
             self.arduino.set_status(value)
             self.status_changed.emit(self.get_status())
         return self.status
     
     def handle_chrono_event(self, caller, data, address):
-        if not caller.lower()=="btnnext":
+        if not caller.lower() == "btnnext":
             self.buzzer_validated.emit()
         '''            
         if (self.status == chronoStatus.Launched or self.status == chronoStatus.InStart or
@@ -295,16 +294,16 @@ class ChronoArduino(ChronoHard, QTimer):
                 self.status = self.arduino.status
             self.currentlap = self.arduino.nbLap
             if self.currentlap != self.oldlap:
-                if self.currentlap<=10:
+                if self.currentlap <= 10:
                     self.lap_finished.emit(self.currentlap, self.arduino.lap[self.currentlap-1])
-                if self.currentlap==10:
+                if self.currentlap == 10:
                     self.run_finished.emit(self.arduino.get_time())
                 self.oldlap = self.currentlap
 
-            if self.voltageCount >= self.voltageDelay:
+            if abs(self.oldVoltage-self.arduino.voltage) > 0.1:
                 self.accu_signal.emit(self.arduino.voltage)
-                self.voltageCount = 0
-            self.voltageCount += 100
+                self.oldVoltage = self.arduino.voltage
+
 
     def start_timer(self):
         self.timer.start(ConfigReader.config.conf['i2c_refresh'])
