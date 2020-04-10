@@ -1,6 +1,9 @@
 # vim: set et sw=4 sts=4 fileencoding=utf-8:
 import threading
 from time import sleep
+
+
+
 import RPi.GPIO as GPIO
 from PyQt5.QtCore import QObject, pyqtSignal
 from F3FChrono.chrono import ConfigReader

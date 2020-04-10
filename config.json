@@ -1,6 +1,6 @@
 {
  "anemometer": false,
- "arduino": true,
+ "arduino": false,
  "btn_baseA": 5,
  "btn_baseB": 6,
  "btn_next": 12,
