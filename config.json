@@ -11,15 +11,15 @@
  "buzzer_next_valid": false,
  "buzzer_valid": true,
  "fullscreen": false,
+ "i2c_refresh": 200,
  "ledA": 20,
  "ledB": 26,
  "run_webserver": false,
- "simulatemode": true,
+ "simulatemode": false,
  "sound": true,
  "udpport": 4445,
  "voice": false,
  "voltage_coef": 0.354,
  "voltage_min": 9.9,
- "webserver_port": 8000,
- "i2c_refresh" : 100
+ "webserver_port": 8000
 }

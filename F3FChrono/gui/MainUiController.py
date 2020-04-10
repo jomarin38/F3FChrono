@@ -224,12 +224,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.rpigpio.signal_buzzer_next.emit()
 
     def btn_baseA(self, port):
-        print("btn base A")
-        self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseA")
+        if self.chronoHard == self.chronoRpi:
+            print("btn base A")
+            self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseA")
 
     def btn_baseB(self, port):
-        print("btn base B")
-        self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseB")
+        if self.chronoHard == self.chronoRpi:
+            print("btn base B")
+            self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseB")
 
     def handle_time_elapsed(self):
         print("time elapsed")

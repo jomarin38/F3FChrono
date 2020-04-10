@@ -20,11 +20,11 @@ class chronoStatus():
 chronoaddress = 0x05
 
 class i2c_register():
-    setStatus = 0x00
-    setBuzzerTime = 0x01
-    getData = 0x02
-    getData1 = 0x03
-    reset = 0x04
+    setStatus = 0
+    setBuzzerTime = 1
+    getData = 2
+    getData1 = 3
+    reset = 4
 
 
 class arduino_com():
@@ -44,10 +44,10 @@ class arduino_com():
         self.nbLap = 0
         self.lap = []
         for count in range(10):
-            self.lap.append(0)
+            self.lap.append(0.0)
         self._data = []
-        for count in range(32):
-            self._data.append(0)
+
+
         
     def set_status(self, status):
         self.__sendrequest__(self.addresschrono, i2c_register.setStatus, status, read=False)
@@ -61,7 +61,7 @@ class arduino_com():
         return 0
 
     def reset(self):
-        self.__sendrequest__(self.addresschrono, i2c_register.setBuzzerTime, time, read=False)
+        self.__sendrequest__(self.addresschrono, i2c_register.reset, 1, read=False)
 #        self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
         self.status=0
         self.nbLap=0
@@ -83,10 +83,10 @@ class arduino_com():
         return 0
 
     def get_data1(self):
-        self.__sendrequest__(self.addresschrono, i2c_register.getData1, nbdata=28, read=True)
+        self.__sendrequest__(self.addresschrono, i2c_register.getData1, nbdata=32, read=True)
 #        number = self.bus.read_i2c_block_data(self.addresschrono, 3, 28)
         indexlap = 3
-        for count in range(0, 23, 4):
+        for count in range(0, 27, 4):
             self.lap[indexlap] = (self._data[count+3] << 24 | self._data[count+2] << 16 | self._data[count+1] << 8 | self._data[count])/1000
             indexlap += 1
         return 0
@@ -111,10 +111,11 @@ class arduino_com():
                     if read:
                         self._data = self.bus.read_i2c_block_data(address, cmd, nbdata)
                     else:
+                        print(address, cmd, data)
                         self._data = self.bus.write_byte_data(address, cmd, data)
                     break
             except IOError:
-                print("error I2C")
+                print("error I2C", x)
 
         return 0
 
