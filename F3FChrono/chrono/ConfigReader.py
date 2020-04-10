@@ -62,7 +62,8 @@ default_config = \
     "buzzer_next_valid":True,
     "run_webserver": False,
     "webserver_port" : 8000,
-    "voltage_coef" : 0.354
+    "voltage_coef" : 0.354,
+    "i2c_refresh" : 100
 }
 
 def init():

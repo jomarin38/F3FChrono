@@ -20,9 +20,12 @@ class chronoStatus():
 chronoaddress = 0x05
 
 class i2c_register():
-    getData = 0x00
-    reset = 0x01
-    setBuzzerTime = 0x101
+    setStatus = 0x00
+    setBuzzerTime = 0x01
+    getData = 0x02
+    getData1 = 0x03
+    reset = 0x04
+
 
 class arduino_com():
     def __init__(self, voltageCoef):
@@ -34,74 +37,60 @@ class arduino_com():
             self.bus = smbus.SMBus(1)
 
         self.addresschrono = chronoaddress
-        self.lastrequest=0.0
-        self.voltageCoef=voltageCoef
-        self.status=0
-        self.voltage=0.0
-        self.nbLap=0
-        self.lap=[]
+        self.lastrequest = 0.0
+        self.voltageCoef = voltageCoef
+        self.status = 0
+        self.voltage = 0.0
+        self.nbLap = 0
+        self.lap = []
         for count in range(10):
             self.lap.append(0)
+        self._data = []
+        for count in range(32):
+            self._data.append(0)
         
     def set_status(self, status):
-        try :
-            if self.bus is not None:
-                self.checki2ctime()
-                self.bus.write_byte_data(self.addresschrono, 0, status)
-            else:
-                self.status=status
-        except IOError:
-            print("error I2C")
+        self.__sendrequest__(self.addresschrono, i2c_register.setStatus, status, read=False)
+#        self.bus.write_byte_data(self.addresschrono, 0, status)
+        self.status = status
         return 0
 
     def set_buzzerTime(self, time):
-        try:
-            if self.bus is not None:
-                self.checki2ctime()
-                self.bus.write_word_data(self.addresschrono, 1, time & 0xffff)
-        except IOError:
-            print("error I2C")
+        self.__sendrequest__(self.addresschrono, i2c_register.setBuzzerTime, time, read=False)
+#        self.bus.write_word_data(self.addresschrono, 1, time & 0xffff)
         return 0
 
     def reset(self):
-        try:
-            if self.bus is not None:
-                self.checki2ctime()
-                number = self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
-                for lap in self.lap:
-                    lap=0
-        except IOError:
-            print("error I2C")
+        self.__sendrequest__(self.addresschrono, i2c_register.setBuzzerTime, time, read=False)
+#        self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
+        self.status=0
+        self.nbLap=0
+        for lap in self.lap:
+            lap=0
         return 0
         
     def get_data(self):
-        try:
-            if self.bus is not None:
-                self.checki2ctime()
-                number = self.bus.read_i2c_block_data(self.addresschrono, 2, 16)
+        self.__sendrequest__(self.addresschrono, i2c_register.getData, nbdata=16, read=True)
+#       number = self.bus.read_i2c_block_data(self.addresschrono, 2, 16)
 
-                self.status = number[0]
-                self.voltage = (number[2] << 8 | number[1])*5/1024/self.voltageCoef
-                self.nbLap = number[3]
-                indexlap=0
-                for count in range(4,15,4):
-                    self.lap[indexlap] = (number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count])/1000
-                    indexlap+=1
-        except IOError:
-            print("error I2C")
+        if sys.modules['fake_rpi'] is None:
+            self.status = self._data[0]
+            self.voltage = (self._data[2] << 8 | self._data[1])*5/1024/self.voltageCoef
+            self.nbLap = self._data[3]
+            indexlap=0
+            for count in range(4,15,4):
+                self.lap[indexlap] = (self._data[count+3] << 24 | self._data[count+2] << 16 | self._data[count+1] << 8 | self._data[count])/1000
+                indexlap+=1
         return 0
 
     def get_data1(self):
-        try:
-            if self.bus is not None:
-                self.checki2ctime()
-                number = self.bus.read_i2c_block_data(self.addresschrono, 3, 28)
-                indexlap=3
-                for count in range(0,23,4):
-                    self.lap[indexlap] = (number[count+3] << 24 | number[count+2] << 16 | number[count+1] << 8 | number[count])/1000
-                    indexlap+=1
-        except IOError:
-            print("error I2C")
+        self.__sendrequest__(self.addresschrono, i2c_register.getData1, nbdata=28, read=True)
+#        number = self.bus.read_i2c_block_data(self.addresschrono, 3, 28)
+        if sys.modules['fake_rpi'] is None:
+            indexlap = 3
+            for count in range(0,23,4):
+                self.lap[indexlap] = (self._data[count+3] << 24 | self._data[count+2] << 16 | self._data[count+1] << 8 | self._data[count])/1000
+                indexlap += 1
         return 0
 
     def get_time(self):
@@ -109,35 +98,30 @@ class arduino_com():
         for count in self.lap:
             time+=count
         return time
-    '''    
-    def get_nbLap(self):
-        self.checki2ctime()
-        number=self.bus.read_i2c_block_data(self.addresschrono, i2c_register.getLapCount, 2)
-        return number[1]
 
-    def get_timeLap(self, lap):
-        self.checki2ctime()
-        lap = self.bus.read_i2c_block_data(self.addresschrono, i2c_register.getTime+lap, 5)
-        return lap[4] << 24 | lap[3] << 16 | lap[2] << 8 | lap[1]
-
-
-    def get_voltage(self):
-        self.checki2ctime()
-        number = self.bus.read_i2c_block_data(self.addresschrono, i2c_register.getVoltage, 3)
-        print (number)
-        voltage = (number[2] << 8 | number[1])*5/1024/self.voltageCoef
-        return voltage
-    '''
     def checki2ctime(self):
         if (time.time()-self.lastrequest) < 0.02:
-            self.i2cdelay()
+            time.sleep(0.05)
             
         self.lastrequest=time.time()
 
-    @staticmethod
-    def i2cdelay():
-        time.sleep(0.05)
-    
+    def __sendrequest__(self, address, cmd, data=None, nbdata=0, read=False):
+        for x in range (2):
+            try:
+                if self.bus is not None:
+                    self.checki2ctime()
+                    if read:
+                        self._data = self.bus.read_i2c_block_data(address, cmd, nbdata)
+                    else:
+                        self._data = self.bus.write_byte_data(address, cmd, data)
+                    break
+            except IOError:
+                print("error I2C")
+
+        return 0
+
+
+
 if __name__=='__main__':
 
     print("Chrono Arduino I2C Mode")

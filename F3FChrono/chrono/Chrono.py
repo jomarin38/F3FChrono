@@ -165,6 +165,12 @@ class ChronoHard(QObject):
                 "rain : " + str(self.getRain()) + os.linesep
         return (result)
 
+    def start_timer(self):
+        return 0
+
+    def stop_timer(self):
+        return 0
+
 class ChronoRpi(ChronoHard):
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
@@ -243,7 +249,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.chrono_signal.connect(self.handle_chrono_event)
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerEvent)
-        self.timer.start(500)
+
         self.oldlap = 0
         self.status = 0
         self.oldstatus = 0
@@ -251,6 +257,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.voltageDelay = 5000
         self.voltageCount = 0
         self.arduino = arduino_com(ConfigReader.config.conf['voltage_coef'])
+        self.start_timer()
 
     def set_status(self, value):
         print("set status", value)
@@ -275,7 +282,7 @@ class ChronoArduino(ChronoHard, QTimer):
 
     def reset(self):
         self.arduino.reset()
-        self.penalty=0.0
+        self.penalty = 0.0
         self.reset_wind()
 
     def timerEvent(self):
@@ -298,7 +305,13 @@ class ChronoArduino(ChronoHard, QTimer):
                 self.accu_signal.emit(self.arduino.voltage)
                 self.voltageCount = 0
             self.voltageCount += 100
-'''
+
+    def start_timer(self):
+        self.timer.start(ConfigReader.config.conf['i2c_refresh'])
+
+    def stop_timer(self):
+        self.timer.stop()
+''' 
 
 def main ():
 

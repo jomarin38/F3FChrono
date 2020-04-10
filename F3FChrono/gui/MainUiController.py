@@ -308,9 +308,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def chronotype_changed(self):
         if (self.controllers['config'].view.ChronoType.currentIndex()==0):
+            self.chronoHard.stop_timer()
             self.chronoHard = self.chronoRpi
         else:
             self.chronoHard = self.chronoArduino
+            self.chronoHard.start_timer()
         self.chronoHard.reset()
 
     def slot_status_changed(self, status):
