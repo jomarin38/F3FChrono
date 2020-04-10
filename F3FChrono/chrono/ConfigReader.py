@@ -63,7 +63,8 @@ default_config = \
     "run_webserver": False,
     "webserver_port" : 8000,
     "voltage_coef" : 0.354,
-    "i2c_refresh" : 100
+    "i2c_refresh" : 100, #time in ms
+    "rebound_btn_time" : 500 #time in ms
 }
 
 def init():

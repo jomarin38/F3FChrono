@@ -256,6 +256,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.voltage = 0
         self.oldVoltage = 0
         self.arduino = arduino_com(ConfigReader.config.conf['voltage_coef'])
+        self.arduino.set_RebundBtn (ConfigReader.config.conf['rebound_btn_time'])
         self.start_timer()
 
     def set_status(self, value):

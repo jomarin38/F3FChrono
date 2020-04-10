@@ -12,6 +12,7 @@
  "buzzer_valid": true,
  "fullscreen": false,
  "i2c_refresh": 200,
+ "rebound_btn_time":500,
  "ledA": 20,
  "ledB": 26,
  "run_webserver": false,

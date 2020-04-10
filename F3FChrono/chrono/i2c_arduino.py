@@ -22,9 +22,10 @@ chronoaddress = 0x05
 class i2c_register():
     setStatus = 0
     setBuzzerTime = 1
-    getData = 2
-    getData1 = 3
-    reset = 4
+    setRebundBtn = 2
+    reset = 3
+    getData = 4
+    getData1 = 5
 
 
 class arduino_com():
@@ -60,6 +61,9 @@ class arduino_com():
 #        self.bus.write_word_data(self.addresschrono, 1, time & 0xffff)
         return 0
 
+    def set_RebundBtn(self, time):
+        self.__sendrequest__(self.addresschrono, i2c_register.setRebundBtn, time, read=False)
+        return 0
     def reset(self):
         self.__sendrequest__(self.addresschrono, i2c_register.reset, 1, read=False)
 #        self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
