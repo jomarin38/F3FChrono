@@ -32,9 +32,11 @@ class Round:
         if add_initial_group:
             f3f_round.groups.append(RoundGroup(f3f_round, 1))
 
-        for bib in range(event.bib_start, event.get_nb_competitors()+1):
+        for bib in [bib_number for bib_number in sorted(event.competitors)
+                    if bib_number >= event.bib_start]:
             f3f_round._flight_order += [bib]
-        for bib in range(1, event.bib_start):
+        for bib in [bib_number for bib_number in sorted(event.competitors)
+                    if bib_number < event.bib_start]:
             f3f_round._flight_order += [bib]
         #print(f3f_round._flight_order)
         return f3f_round
