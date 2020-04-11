@@ -52,6 +52,14 @@ class Round:
         run.valid = valid
         self._add_run(run, insert_database)
 
+    def display_name(self):
+
+        if self.valid:
+            round_number = str(self.valid_round_number)
+        else:
+            round_number = 'not valid'
+
+        return 'Round ' + str(round_number)
 
     def handle_refly(self, penalty):
         run = Run()

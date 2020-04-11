@@ -123,14 +123,51 @@ def manage_event(request):
 
     page = ResultPage(title=event.name, authenticated=request.user.is_authenticated)
 
+    table = ResultTable(title='', css_id='ranking')
+
+    header = Header(name=Link('TODO : Delete event', 'delete_event'))
+    table.set_header(header)
+
+    page.add_table(table)
+
+    table = ResultTable(title='', css_id='ranking')
+
+    header = Header(name=Link('TODO : Export to F3X Vault', 'export_event_f3x_vault'))
+    table.set_header(header)
+
+    page.add_table(table)
+
     table = ResultTable(title='Pilots', css_id="ranking")
     header = Header(name=Cell('Bib'))
     header.add_cell(Cell('Name'))
+    header.add_cell(Cell(''))
+    header.add_cell(Cell(''))
     table.set_header(header)
 
     for competitor in sorted([competitor for bib, competitor in event.competitors.items()], key=lambda c: c.bib_number):
         row = Line(name=Cell(str(competitor.bib_number)))
-        row.add_cell(Cell(competitor.pilot.to_string()))
+        row.add_cell(Cell(competitor.display_name()))
+        row.add_cell(Link('TODO : Remove', 'remove_competitor?event_id='+str(event.id)+
+                          '&bib_number='+str(competitor.bib_number)))
+        row.add_cell(Link('TODO : Set not present', 'set_competitor_not_present?event_id='+str(event.id)+
+                          '&bib_number='+str(competitor.bib_number)))
+        table.add_line(row)
+    page.add_table(table)
+
+    table = ResultTable(title='Rounds', css_id="ranking")
+    header = Header(name=Cell('Round number'))
+    header.add_cell(Cell(''))
+    header.add_cell(Cell(''))
+    header.add_cell(Cell(''))
+    table.set_header(header)
+
+    for f3f_round in event.rounds:
+        row = Line(name=Cell(str(f3f_round.display_name())))
+        row.add_cell(Cell(competitor.display_name()))
+        row.add_cell(Link('TODO : Export to F3XVault', 'export_round_f3x_vault?event_id=' + str(event.id) +
+                          '&round_number='+str(f3f_round.round_number)))
+        row.add_cell(Link('TODO : Cancel Round', 'cancel_round?event_id=' + str(event.id) +
+                          '&round_number='+str(f3f_round.round_number)))
         table.add_line(row)
     page.add_table(table)
 
