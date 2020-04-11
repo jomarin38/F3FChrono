@@ -158,16 +158,21 @@ def manage_event(request):
         table.add_line(row)
     page.add_table(table)
 
+    table = ResultTable(title='', css_id='ranking')
+
+    header = Header(name=Link('TODO : Add new pilot', 'add_new_pilot'))
+    table.set_header(header)
+
+    page.add_table(table)
+
     table = ResultTable(title='Rounds', css_id="ranking")
     header = Header(name=Cell('Round number'))
-    header.add_cell(Cell(''))
     header.add_cell(Cell(''))
     header.add_cell(Cell(''))
     table.set_header(header)
 
     for f3f_round in event.rounds:
         row = Line(name=Cell(str(f3f_round.display_name())))
-        row.add_cell(Cell(competitor.display_name()))
         row.add_cell(Link('TODO : Export to F3XVault', 'export_round_f3x_vault?event_id=' + str(event.id) +
                           '&round_number='+str(f3f_round.round_number)))
         row.add_cell(Link('TODO : Cancel Round', 'cancel_round?event_id=' + str(event.id) +
