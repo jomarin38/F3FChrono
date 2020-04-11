@@ -280,6 +280,9 @@ class ChronoArduino(ChronoHard, QTimer):
                 or self.status == chronoStatus.InWait:
             self.set_status(self.get_status()+1)
 
+        if (self.status == chronoStatus.Finished):
+            self.run_validated.emit()
+
     def reset(self):
         self.arduino.reset()
         self.penalty = 0.0
