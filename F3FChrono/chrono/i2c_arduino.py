@@ -73,23 +73,24 @@ class arduino_com():
     def get_data(self):
         data = self.__sendrequest__(self.addresschrono, i2c_register.getData, nbdata=16, read=True)
 #       number = self.bus.read_i2c_block_data(self.addresschrono, 2, 16)
-
-        self.status = data[0]
-        self.voltage = (data[2] << 8 | data[1])*5/1024/self.voltageCoef
-        self.nbLap = data[3]
-        indexlap = 0
-        for count in range(4, 15, 4):
-            self.lap[indexlap] = (data[count+3] << 24 | data[count+2] << 16 | data[count+1] << 8 | data[count])/1000
-            indexlap += 1
+        if len(data) == 16:
+            self.status = data[0]
+            self.voltage = (data[2] << 8 | data[1])*5/1024/self.voltageCoef
+            self.nbLap = data[3]
+            indexlap = 0
+            for count in range(4, 15, 4):
+                self.lap[indexlap] = (data[count+3] << 24 | data[count+2] << 16 | data[count+1] << 8 | data[count])/1000
+                indexlap += 1
         return 0
 
     def get_data1(self):
         data = self.__sendrequest__(self.addresschrono, i2c_register.getData1, nbdata=32, read=True)
 #        number = self.bus.read_i2c_block_data(self.addresschrono, 3, 28)
-        indexlap = 3
-        for count in range(0, 27, 4):
-            self.lap[indexlap] = (data[count+3] << 24 | data[count+2] << 16 | data[count+1] << 8 | data[count])/1000
-            indexlap += 1
+        if len(data) == 32:
+            indexlap = 3
+            for count in range(0, 27, 4):
+                self.lap[indexlap] = (data[count+3] << 24 | data[count+2] << 16 | data[count+1] << 8 | data[count])/1000
+                indexlap += 1
         return 0
 
     def checki2ctime(self):
@@ -99,7 +100,7 @@ class arduino_com():
         self.lastrequest=time.time()
 
     def __sendrequest__(self, address, cmd, data=None, nbdata=0, read=False):
-        response=[]
+        response = []
         for x in range(2):
             try:
                 if self.bus is not None:
