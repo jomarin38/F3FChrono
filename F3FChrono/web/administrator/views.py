@@ -149,8 +149,12 @@ def manage_event(request):
         row.add_cell(Cell(competitor.display_name()))
         row.add_cell(Link('TODO : Remove', 'remove_competitor?event_id='+str(event.id)+
                           '&bib_number='+str(competitor.bib_number)))
-        row.add_cell(Link('TODO : Set not present', 'set_competitor_not_present?event_id='+str(event.id)+
-                          '&bib_number='+str(competitor.bib_number)))
+        if competitor.present:
+            row.add_cell(Link('Set not present', 'set_competitor_presence?event_id='+str(event.id)+
+                              '&bib_number='+str(competitor.bib_number)+'&present=0'))
+        else:
+            row.add_cell(Link('Set present', 'set_competitor_presence?event_id=' + str(event.id) +
+                              '&bib_number=' + str(competitor.bib_number)+'&present=1'))
         table.add_line(row)
     page.add_table(table)
 
@@ -172,6 +176,30 @@ def manage_event(request):
     page.add_table(table)
 
     return HttpResponse(page.to_html())
+
+
+def set_competitor_presence(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    bib_number = request.GET.get('bib_number')
+    present = bool(int(request.GET.get('present')))
+
+    event = EventDAO().get(event_id)
+
+    dao = CompetitorDAO()
+
+    competitor = dao.get(event, bib_number)
+
+    competitor.present = present
+
+    dao.update(competitor)
+
+    return manage_event(request)
+
 
 @never_cache
 def index(request):

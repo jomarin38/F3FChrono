@@ -10,5 +10,6 @@ urlpatterns = [
     path('load_from_f3x_vault', views.load_from_f3x_vault, name='load_from_f3x_vault'),
     path('load_from_scratch', views.load_from_scratch, name='load_from_scratch'),
     path('manage_event', views.manage_event, name='manage_event'),
+    path('set_competitor_presence', views.set_competitor_presence, name='set_competitor_presence'),
     path('sign_in', views.sign_in, name='sign_in')
 ]
