@@ -288,6 +288,10 @@ class ChronoArduino(ChronoHard, QTimer):
         self.chronoLap.clear()
         self.penalty = 0.0
         self.reset_wind()
+        self.currentlap=0
+        self.oldlap=0
+        self.oldstatus=0
+        
 
     def timerEvent(self):
         if self.arduino is not None and not ('fake_rpi' in sys.modules) :
