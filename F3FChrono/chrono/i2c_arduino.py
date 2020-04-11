@@ -107,7 +107,6 @@ class arduino_com():
                     if read:
                         response = self.bus.read_i2c_block_data(address, cmd, nbdata)
                     else:
-                        print(address, cmd, data)
                         response = self.bus.write_byte_data(address, cmd, data)
                     break
             except IOError:
