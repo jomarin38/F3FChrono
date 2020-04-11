@@ -6,7 +6,26 @@ from time import sleep
 from argparse import ArgumentParser
 from PyQt5 import QtWidgets
 
-if os.uname()[1] != 'raspberrypi':
+def get_raspi_revision():
+    rev_file = '/sys/firmware/devicetree/base/model'
+    info = { 'pi': '', 'model': '', 'rev': ''}
+    raspi = model = revision = ''
+    try:
+        fd = os.open(rev_file, os.O_RDONLY)
+        line = os.read(fd,256)
+        os.close(fd)
+        print (line)
+        m=re.split(r'\s', line.decode('utf-8'))
+        if m:
+            info['pi'] = m[3]
+            info['model'] = m[5]
+        return info
+    except:
+        pass
+    return info
+
+pi=get_raspi_revision()
+if pi['pi'] == '':
     # Replace libraries by fake ones
     import sys
     import fake_rpi
@@ -26,23 +45,7 @@ from F3FChrono.data.dao.EventDAO import EventDAO
 from F3FChrono.gui.Simulate_base import SimulateBase
 from F3FChrono.data.web.Utils import Utils
 
-def get_raspi_revision():
-    rev_file = '/sys/firmware/devicetree/base/model'
-    info = { 'pi': '', 'model': '', 'rev': ''}
-    raspi = model = revision = ''
-    try:
-        fd = os.open(rev_file, os.O_RDONLY)
-        line = os.read(fd,256)
-        os.close(fd)
-        print (line)
-        m=re.split(r'\s', line.decode('utf-8'))
-        if m:
-            info['pi'] = m[3]
-            info['model'] = m[5]
-        return info
-    except:
-        pass
-    return info
+
 
 def main():
 
