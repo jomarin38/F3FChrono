@@ -28,7 +28,7 @@ class Event:
         self.max_wind_dir_dev = 45.0
         self.max_interruption_time = 30 * 60
         self.current_round = None
-        self.bib_start = 0
+        self.bib_start = 1
         self.dayduration = 1
         self.flights_before_refly = 5
         self.f3x_vault_id = None
