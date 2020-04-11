@@ -285,6 +285,7 @@ class ChronoArduino(ChronoHard, QTimer):
 
     def reset(self):
         self.arduino.reset()
+        self.chronoLap.clear()
         self.penalty = 0.0
         self.reset_wind()
 
@@ -297,10 +298,11 @@ class ChronoArduino(ChronoHard, QTimer):
                 self.status = self.arduino.status
             self.currentlap = self.arduino.nbLap
             if self.currentlap != self.oldlap:
+                self.chronoLap.append(self.arduino.lap[self.currentlap-1])
                 if self.currentlap <= 10:
-                    self.lap_finished.emit(self.currentlap, self.arduino.lap[self.currentlap-1])
+                    self.lap_finished.emit(self.currentlap, self.chronoLap[-1])
                 if self.currentlap == 10:
-                    self.run_finished.emit(self.arduino.get_time())
+                    self.run_finished.emit(self.get_time())
                 self.oldlap = self.currentlap
 
             if abs(self.oldVoltage-self.arduino.voltage) > 0.1:
