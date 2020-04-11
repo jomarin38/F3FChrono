@@ -5,6 +5,20 @@ import subprocess
 from time import sleep
 from argparse import ArgumentParser
 from PyQt5 import QtWidgets
+
+if os.uname()[1] != 'raspberrypi':
+    # Replace libraries by fake ones
+    import sys
+    import fake_rpi
+
+    sys.modules['RPi'] = fake_rpi.RPi  # Fake RPi (GPIO)
+    sys.modules['RPi.GPIO'] = fake_rpi.RPi.GPIO # Fake GPIO
+    sys.modules['smbus'] = fake_rpi.smbus  # Fake smbus (I2C)
+    from fake_rpi import toggle_print
+
+    # by default it prints everything to std.error
+    toggle_print(False)  # turn on/off printing
+
 from F3FChrono.chrono import ConfigReader
 from F3FChrono.gui.MainUiController import MainUiCtrl
 from F3FChrono.data.Chrono import Chrono

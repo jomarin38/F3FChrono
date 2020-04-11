@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>273</height>
+    <height>306</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,13 +18,6 @@
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QPushButton" name="picampaired">
-         <property name="text">
-          <string>piCAMs + base buttons</string>
-         </property>
-        </widget>
-       </item>
        <item>
         <widget class="QPushButton" name="btn_settings">
          <property name="text">

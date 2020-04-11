@@ -160,7 +160,7 @@ class WWindCtrl():
         return cancelstr
 
     def set_voltage(self, voltage):
-        self.view.voltage.setText(str(voltage)+" V")
+        self.view.voltage.setText("{:0>3.1f}".format(voltage)+" V")
 
     def set_rssi(self, rssi1, rssi2):
         self.view.rssi.setText("rssi1, 2 : "+str(rssi1) + "%, "+str(rssi2)+"%")
@@ -324,7 +324,6 @@ class WConfigCtrl(QObject):
     contest_sig = pyqtSignal()
     chrono_sig = pyqtSignal()
     btn_settings_sig = pyqtSignal()
-    btn_picampair_sig = pyqtSignal()
     btn_random_sig = pyqtSignal()
     btn_day_1_sig = pyqtSignal()
     widgetList = []
@@ -345,7 +344,6 @@ class WConfigCtrl(QObject):
         self.view.ContestList.currentIndexChanged.connect(self.contest_sig.emit)
         self.view.ChronoType.currentIndexChanged.connect(self.chrono_sig.emit)
         self.view.btn_settings.clicked.connect(self.btn_settings_sig.emit)
-        self.view.picampaired.clicked.connect(self.btn_picampair_sig.emit)
         self.view.randombtn.clicked.connect(self.btn_random_sig.emit)
         self.view.day_1btn.clicked.connect(self.btn_day_1_sig.emit)
 

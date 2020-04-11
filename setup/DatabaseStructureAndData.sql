@@ -251,4 +251,7 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
+UPDATE `f3f_chrono`.`event` SET `name`='F3F Puy de Manse / Faisses 2019' WHERE `event_id`='1';
+UPDATE f3f_chrono.round SET valid=1 WHERE event_id=1 AND round_number<=20;
+
 -- Dump completed on 2019-11-26 22:16:43

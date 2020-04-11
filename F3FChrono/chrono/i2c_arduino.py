@@ -1,6 +1,7 @@
 import smbus
 import time
 import sys
+from F3FChrono.chrono import ConfigReader
 
 class chronoStatus():
     InWait=0
@@ -15,62 +16,127 @@ class chronoStatus():
 #anemoaddress = 0x04
 chronoaddress = 0x05
 
+class i2c_register():
+    setStatus = 0
+    setBuzzerTime = 1
+    setRebundBtn = 2
+    reset = 3
+    getData = 4
+    getData1 = 5
+
+
 class arduino_com():
-    def __init__(self):
-        # for RPI version 1, use “bus = smbus.SMBus(0)”
-        self.bus = smbus.SMBus(1)
+    def __init__(self, voltageCoef, rebundTimeBtn):
+        super().__init__()
+
+        self.bus=None
+        if ConfigReader.config.conf['arduino']:
+            # for RPI version 1, use “bus = smbus.SMBus(0)”
+            self.bus = smbus.SMBus(1)
+
         self.addresschrono = chronoaddress
-        self.data=[0]
+        self.lastrequest = 0.0
+        self.voltageCoef = voltageCoef
+        self.status = 0
+        self.voltage = 0.0
+        self.nbLap = 0
+        self.lap = []
+        for count in range(10):
+            self.lap.append(0.0)
+        self.set_RebundBtn(rebundTimeBtn)
 
-    def set_status_inStart(self):
-        number=self.bus.read_i2c_block_data(self.addresschrono, 0, 2)
-        return number
 
-    def set_status_launched(self):
-        number=self.bus.read_i2c_block_data(self.addresschrono, 0, 1)
-        return number
- 
+        
+    def set_status(self, status):
+        self.__sendrequest__(self.addresschrono, i2c_register.setStatus, status, read=False)
+#        self.bus.write_byte_data(self.addresschrono, 0, status)
+        self.status = status
+        return 0
+
+    def set_buzzerTime(self, time):
+        self.__sendrequest__(self.addresschrono, i2c_register.setBuzzerTime, time, read=False)
+#        self.bus.write_word_data(self.addresschrono, 1, time & 0xffff)
+        return 0
+
+    def set_RebundBtn(self, time):
+        self.__sendrequest__(self.addresschrono, i2c_register.setRebundBtn, time, read=False)
+        return 0
     def reset(self):
-        number=self.bus.read_i2c_block_data(self.addresschrono, 3, 1)
-        return number
+        self.__sendrequest__(self.addresschrono, i2c_register.reset, 1, read=False)
+#        self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
+        self.status = 0
+        self.nbLap = 0
+        for lap in self.lap:
+            lap=0
+        return 0
         
-    def get_status(self):
-        number=self.bus.read_i2c_block_data(self.addresschrono, 1, 2)
-        return number
-        
-    def get_nbLap(self):
-        number=self.bus.read_i2c_block_data(self.addresschrono, 2, 2)
-        return number
+    def get_data(self):
+        data = self.__sendrequest__(self.addresschrono, i2c_register.getData, nbdata=16, read=True)
+#       number = self.bus.read_i2c_block_data(self.addresschrono, 2, 16)
+        if len(data) == 16:
+            self.status = data[0]
+            self.voltage = (data[2] << 8 | data[1])*5/1024/self.voltageCoef
+            self.nbLap = data[3]
+            indexlap = 0
+            for count in range(4, 15, 4):
+                self.lap[indexlap] = (data[count+3] << 24 | data[count+2] << 16 | data[count+1] << 8 | data[count])/1000
+                indexlap += 1
+        return 0
 
-    def get_timeLap(self, lap):
-        number=[0,0]
-        lap=self.bus.read_i2c_block_data(self.addresschrono, 10+lap, 5)
-        number[0]=lap[0]
-        number[1]=(lap[4]<<24 | lap[3]<<16 | lap[2]<<8 | lap[1])
-        return number
+    def get_data1(self):
+        data = self.__sendrequest__(self.addresschrono, i2c_register.getData1, nbdata=32, read=True)
+#        number = self.bus.read_i2c_block_data(self.addresschrono, 3, 28)
+        if len(data) == 32:
+            indexlap = 3
+            for count in range(0, 27, 4):
+                self.lap[indexlap] = (data[count+3] << 24 | data[count+2] << 16 | data[count+1] << 8 | data[count])/1000
+                indexlap += 1
+        return 0
 
-    def get_voltage(self):
-        print("get voltage")
-    
-if __name__=='__main__':
+    def checki2ctime(self):
+        if (time.time()-self.lastrequest) < 0.02:
+            time.sleep(0.05)
+            
+        self.lastrequest=time.time()
+
+    def __sendrequest__(self, address, cmd, data=None, nbdata=0, read=False):
+        response = []
+        for x in range(2):
+            try:
+                if self.bus is not None:
+                    self.checki2ctime()
+                    if read:
+                        response = self.bus.read_i2c_block_data(address, cmd, nbdata)
+                    else:
+                        response = self.bus.write_byte_data(address, cmd, data)
+                    break
+            except IOError:
+                print("error I2C", x)
+
+        return response
+
+
+
+if __name__ == '__main__':
 
     print("Chrono Arduino I2C Mode")
-    chrono=arduino_com()
-    end=False
+    chrono = arduino_com(0.354)
+    end = False
     while not end:
-        cmdline=sys.stdin.readline()
-        if cmdline=="setstatus\n":
-            print(chrono.set_status_launched())
-        if cmdline=="getstatus\n":
-            print(chrono.get_status())
-        if cmdline=="gettime\n":
-            nbLap = chrono.get_nbLap()
-            print(nbLap)
-            for i in range(0,nbLap[1]):
-                time.sleep(0.01)
-                lap = chrono.get_timeLap(i)
-                print (i, lap)
-        if cmdline=="reset\n":
-            print("reset ", chrono.reset())
-    
+        cmdline = sys.stdin.readline()
+        if cmdline == "s\n":
+            print(chrono.set_status(1))
+            print(chrono.set_buzzerTime(5000))
+        if cmdline == "g\n":
+            chrono.get_data()
+            chrono.get_data1()
+            print(chrono.status, chrono.voltage, chrono.nbLap, chrono.lap)
 
+        if cmdline == "t\n":
+            nbLap = chrono.get_data1()
+            print(nbLap)
+        if cmdline == "r\n":
+            print("reset ", chrono.reset())
+
+        if cmdline == "v\n":
+            print(chrono.get_voltage())

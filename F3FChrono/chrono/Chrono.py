@@ -5,6 +5,8 @@ import collections
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.chrono.UDPBeep import *
 from F3FChrono.chrono.UDPReceive import *
+from F3FChrono.chrono import ConfigReader
+from F3FChrono.chrono.i2c_arduino import arduino_com
 
 IPUDPBEEP = '255.255.255.255'
 UDPPORT = 4445
@@ -42,10 +44,9 @@ class ChronoHard(QObject):
         self.wind_signal.connect(self.wind_info)
         self.wind= collections.OrderedDict()
         self.reset_wind()
+        self.chronoLap = []
+        self.timelost = []
 
-
-    def reset(self):
-        print("reset")
 
     def addPenalty(self, value):
         self.penalty += value
@@ -57,12 +58,6 @@ class ChronoHard(QObject):
 
     def getPenalty(self):
         return (self.penalty)
-
-    def get_status(self):
-        print("getstatus")
-
-    def set_status(self, status):
-        print("setstatus")
 
     def wind_info(self, speed, orientation, rain):
         print("wind_info")
@@ -110,25 +105,6 @@ class ChronoHard(QObject):
 
         self.wind['rain']=False
 
-
-class ChronoRpi(ChronoHard):
-    def __init__(self, signal_btnnext):
-        super().__init__(signal_btnnext)
-        self.chronoLap = []
-        self.timelost = []
-        self.lastBase = -2
-        self.lastBaseChangeTime = 0.0
-        self.lastDetectionTime = 0.0
-        self.status = chronoStatus.InWait
-        self.chrono_signal.connect(self.handle_chrono_event)
-        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.wind_signal, self.accu_signal, self.rssi_signal)
-        self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
-
-    def __del__(self):
-        self.udpBeep.terminate()
-        del self.udpBeep
-        del self.udpReceive
-
     def get_status(self):
         return self.status
 
@@ -147,6 +123,67 @@ class ChronoRpi(ChronoHard):
         self.reset_wind()
 
 
+
+
+
+
+    def getLastLapTime(self):
+        if self.getLapCount()>0:
+            return self.chronoLap[self.getLapCount()-1]
+        else:
+            return 0
+
+    def get_time(self):
+        time=0
+        for i in range(self.getLapCount()):
+            time=time+self.chronoLap[i]
+        return time
+
+    def getLaps(self):
+        return self.chronoLap
+
+    def getStartTime(self):
+        return self.startTime
+
+    def getEndTime(self):
+        return self.endTime
+
+    def getLapCount(self):
+        return len(self.chronoLap)
+
+    def to_string(self):
+        result=os.linesep+"Chrono Data : "+os.linesep+"\tStart Time : "+ str(self.startTime)+\
+               os.linesep+"\tEnd Time : "+str(self.endTime)+os.linesep+"\tRun Time : "+\
+               "{:0>6.3f}".format(self.get_time())+os.linesep+"\tLapTime : "
+        for lap in self.getLaps():
+            result+="{:0>6.3f}".format(lap)+","
+        result+=os.linesep+"\tPenalty : "+str(self.penalty)+os.linesep
+        result+="Wind Speed :"+os.linesep+"\tMean : "+"{:0>6.1f}".format(self.getMeanWindSpeed())+os.linesep+\
+                "\tMin : "+"{:0>6.1f}".format(self.getMinWindSpeed())+os.linesep+\
+                "\tMax : " + "{:0>6.1f}".format(self.getMaxWindSpeed()) + os.linesep +\
+                "Wind Orientation : " + "{:0>6.1f}".format(self.getMaxWindSpeed()) + os.linesep +\
+                "rain : " + str(self.getRain()) + os.linesep
+        return (result)
+
+
+
+
+class ChronoRpi(ChronoHard):
+    def __init__(self, signal_btnnext):
+        super().__init__(signal_btnnext)
+        self.lastBase = -2
+        self.lastBaseChangeTime = 0.0
+        self.lastDetectionTime = 0.0
+        self.status = chronoStatus.InWait
+        self.chrono_signal.connect(self.handle_chrono_event)
+        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.wind_signal, self.accu_signal, self.rssi_signal)
+        self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
+
+    def __del__(self):
+        self.udpBeep.terminate()
+        del self.udpBeep
+        del self.udpReceive
+
     def handle_chrono_event(self, caller, data, address):
         if not caller.lower()=="btnnext":
             self.buzzer_validated.emit()
@@ -154,7 +191,6 @@ class ChronoRpi(ChronoHard):
              self.status == chronoStatus.InProgress) and caller.lower() == "udpreceive" or caller.lower() == "btnnext") \
                 and data.lower() == "event":
             self.__declareBase(address)
-
 
     def __declareBase (self, base):
         print (base, self.status)
@@ -196,64 +232,82 @@ class ChronoRpi(ChronoHard):
                 self.set_status(chronoStatus.Finished)
                 self.run_finished.emit(self.get_time())
             return True
-        elif self.getLapCount()>1:#Base declaration is the same
-                elapsedTime = ((now - self.lastDetectionTime))
+        elif self.getLapCount() > 1:    #Base declaration is the same
+                elapsedTime = now - self.lastDetectionTime
                 self.lastDetectionTime = now
                 self.timelost[self.getLapCount() - 1] = self.timelost[self.getLapCount() - 1] + elapsedTime
 
         return False
 
-    def getLastLapTime(self):
-        if self.getLapCount()>0:
-            return self.chronoLap[self.getLapCount()-1]
-        else:
-            return 0
-
-    def get_time(self):
-        time=0
-        for i in range(self.getLapCount()):
-            time=time+self.chronoLap[i]
-        return time
-
-    def getLaps(self):
-        return self.chronoLap
-
-    def getStartTime(self):
-        return self.startTime
-
-    def getEndTime(self):
-        return self.endTime
-
-    def getLapCount(self):
-        return len(self.chronoLap)
-
-    def to_string(self):
-        result=os.linesep+"Chrono Data : "+os.linesep+"\tStart Time : "+ str(self.startTime)+\
-               os.linesep+"\tEnd Time : "+str(self.endTime)+os.linesep+"\tRun Time : "+\
-               "{:0>6.3f}".format(self.get_time())+os.linesep+"\tLapTime : "
-        for lap in self.getLaps():
-            result+="{:0>6.3f}".format(lap)+","
-        result+=os.linesep+"\tPenalty : "+str(self.penalty)+os.linesep
-        result+="Wind Speed :"+os.linesep+"\tMean : "+"{:0>6.1f}".format(self.getMeanWindSpeed())+os.linesep+\
-                "\tMin : "+"{:0>6.1f}".format(self.getMinWindSpeed())+os.linesep+\
-                "\tMax : " + "{:0>6.1f}".format(self.getMaxWindSpeed()) + os.linesep +\
-                "Wind Orientation : " + "{:0>6.1f}".format(self.getMaxWindSpeed()) + os.linesep +\
-                "rain : " + str(self.getRain()) + os.linesep
-        return (result)
-
-class ChronoArduino(ChronoHard):
+class ChronoArduino(ChronoHard, QTimer):
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
-        print ("chronoArduino init")
+        print("chronoArduino init")
+        self.chrono_signal.connect(self.handle_chrono_event)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timerEvent)
+        self.currentlap=0
+        self.oldlap = 0
+        self.status = 0
+        self.oldstatus = 0
+        self.voltage = 0
+        self.oldVoltage = 0
+        self.arduino = arduino_com(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'])
+        self.timer.start(ConfigReader.config.conf['i2c_refresh'])
+        self.arduinoState=False
+
+    def set_status(self, value):
+        if self.status != value:
+            self.arduino.set_status(value)
+            self.status_changed.emit(self.get_status())
+        return self.status
+    
+    def handle_chrono_event(self, caller, data, address):
+        if not caller.lower() == "btnnext":
+            self.buzzer_validated.emit()
+        if self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.Launched \
+                or self.status == chronoStatus.InWait:
+            self.set_status(self.get_status()+1)
+        if self.status == chronoStatus.Finished:
+            self.run_validated.emit()
 
     def reset(self):
-        print ("chronoArduino reset")
+        self.arduino.reset()
+        self.chronoLap.clear()
+        self.penalty = 0.0
+        self.reset_wind()
+        self.currentlap = 0
+        self.oldlap = 0
+        self.oldstatus = 0
 
-    def get_status(self):
-        print ("chronoArduino get_status")
+    def timerEvent(self):
+        if not ('fake_rpi' in sys.modules):
+            # used on rpi, update voltage measurements every time
+            self.arduino.get_data()
+            if abs(self.oldVoltage-self.arduino.voltage) > 0.1:
+                self.accu_signal.emit(self.arduino.voltage)
+                self.oldVoltage = self.arduino.voltage
 
-    def set_status(self):
-        print ("chronoArduino set_status")
+            #update chrono data only if you use µC chrono
+            if self.arduinoState:
+                self.arduino.get_data1()
+                if self.arduino.status != self.status:
+                    self.status_changed.emit(self.arduino.status)
+                    self.status = self.arduino.status
+                self.currentlap = self.arduino.nbLap
+                if self.currentlap != self.oldlap:
+                    self.chronoLap.append(self.arduino.lap[self.currentlap-1])
+                    if self.currentlap <= 10:
+                        self.lap_finished.emit(self.currentlap, self.chronoLap[-1])
+                    if self.currentlap == 10:
+                        self.run_finished.emit(self.get_time())
+                    self.oldlap = self.currentlap
+
+
+    def arduinoSetState(self, active):
+        self.arduinoState=active
+        return 0
+''' 
 
 def main ():
 
@@ -265,3 +319,4 @@ def main ():
 
 if __name__ == '__main__':
     main()
+'''

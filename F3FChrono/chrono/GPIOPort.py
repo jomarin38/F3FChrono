@@ -1,6 +1,9 @@
 # vim: set et sw=4 sts=4 fileencoding=utf-8:
 import threading
 from time import sleep
+
+
+
 import RPi.GPIO as GPIO
 from PyQt5.QtCore import QObject, pyqtSignal
 from F3FChrono.chrono import ConfigReader
@@ -10,11 +13,11 @@ def statusLED(port, on=True):
     enable the status led
     """
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(port,GPIO.OUT)
+    GPIO.setup(port, GPIO.OUT)
     if on:
-        GPIO.output(port,GPIO.HIGH)
+        GPIO.output(port, GPIO.HIGH)
     else:
-        GPIO.output(port,GPIO.LOW)
+        GPIO.output(port, GPIO.LOW)
 
 
 def addCallback(port, fctn, falling=True):
@@ -60,9 +63,9 @@ class gpioPort(threading.Thread):
         self.start()
 
     def blink(self, numbers):
-        if (self.port == ConfigReader.Configuration.conf['buzzer'] and ConfigReader.Configuration.conf[
+        if (self.port == ConfigReader.config.conf['buzzer'] and ConfigReader.config.conf[
             'buzzer_valid'] or
-                self.port == ConfigReader.Configuration.conf['buzzer_next'] and ConfigReader.Configuration.conf[
+                self.port == ConfigReader.config.conf['buzzer_next'] and ConfigReader.config.conf[
                     'buzzer_next_valid']):
             for i in range(0,numbers):
                 GPIO.output(self.port,self.activate)
@@ -77,9 +80,8 @@ class gpioPort(threading.Thread):
         while not self.terminated:
             # wait until somebody throws an event
             if self.event.wait(1):
-                if (self.port==ConfigReader.Configuration.conf['buzzer'] and ConfigReader.Configuration.conf['buzzer_valid'] or
-                    self.port == ConfigReader.Configuration.conf['buzzer_next'] and ConfigReader.Configuration.conf[
-                        'buzzer_next_valid']):
+                if (self.port==ConfigReader.config.conf['buzzer'] and ConfigReader.config.conf['buzzer_valid'] or
+                    self.port == ConfigReader.config.conf['buzzer_next'] and ConfigReader.config.conf['buzzer_next_valid']):
                     # create rectangle signal on GPIO port
                     GPIO.output(self.port,self.activate)
                     sleep(self.duration/1000.0)
@@ -94,7 +96,7 @@ def event_detected(port):
     print("callback "+str(port))
 
 
-class gpioPort(threading.Thread):
+'''class gpioPort(threading.Thread):
     def __init__(self, port, duration=200., is_active_low=False, start_blinks=0):
         super(gpioPort, self).__init__()
         self.terminated = False
@@ -150,7 +152,7 @@ class gpioPort(threading.Thread):
         # GPIO.cleanup(self.port)
         GPIO.cleanup()
 
-
+'''
 def event_detected(port):
     print("callback " + str(port))
 
