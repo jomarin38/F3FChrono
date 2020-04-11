@@ -281,24 +281,28 @@ class ChronoArduino(ChronoHard, QTimer):
         self.oldstatus = 0
 
     def timerEvent(self):
-        if self.arduinoState and not ('fake_rpi' in sys.modules):
+        if not ('fake_rpi' in sys.modules):
+            # used on rpi, update voltage measurements every time
             self.arduino.get_data()
-            self.arduino.get_data1()
-            if self.arduino.status != self.status:
-                self.status_changed.emit(self.arduino.status)
-                self.status = self.arduino.status
-            self.currentlap = self.arduino.nbLap
-            if self.currentlap != self.oldlap:
-                self.chronoLap.append(self.arduino.lap[self.currentlap-1])
-                if self.currentlap <= 10:
-                    self.lap_finished.emit(self.currentlap, self.chronoLap[-1])
-                if self.currentlap == 10:
-                    self.run_finished.emit(self.get_time())
-                self.oldlap = self.currentlap
-
             if abs(self.oldVoltage-self.arduino.voltage) > 0.1:
                 self.accu_signal.emit(self.arduino.voltage)
                 self.oldVoltage = self.arduino.voltage
+
+            #update chrono data only if you use µC chrono
+            if self.arduinoState:
+                self.arduino.get_data1()
+                if self.arduino.status != self.status:
+                    self.status_changed.emit(self.arduino.status)
+                    self.status = self.arduino.status
+                self.currentlap = self.arduino.nbLap
+                if self.currentlap != self.oldlap:
+                    self.chronoLap.append(self.arduino.lap[self.currentlap-1])
+                    if self.currentlap <= 10:
+                        self.lap_finished.emit(self.currentlap, self.chronoLap[-1])
+                    if self.currentlap == 10:
+                        self.run_finished.emit(self.get_time())
+                    self.oldlap = self.currentlap
+
 
     def arduinoSetState(self, active):
         self.arduinoState=active
