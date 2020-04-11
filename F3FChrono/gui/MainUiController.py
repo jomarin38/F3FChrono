@@ -321,7 +321,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         self.rpigpio.signal_buzzer_end.emit()
         if ConfigReader.config.conf["voice"]:
-            time.sleep(2)     #wait gui has been refresh otherwise the time is updated after vocal sound
             self.vocal.signal_time.emit(run_time)
 
     def slot_run_validated(self):
