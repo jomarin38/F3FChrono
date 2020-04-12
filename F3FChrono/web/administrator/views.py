@@ -63,8 +63,6 @@ def new_pilot_input(request):
 
     Utils.set_port_number(request.META['SERVER_PORT'])
 
-    event_id = request.GET['event_id']
-
     return render(request, 'new_pilot_template.html', {'event_id': request.GET.get('event_id')})
 
 
@@ -112,6 +110,28 @@ def register_new_pilot(request):
     CompetitorDAO().insert(competitor)
 
     return manage_event(request)
+
+
+def delete_event(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    return render(request, 'event_deletion_template.html', {'event_id': request.GET.get('event_id')})
+
+
+def do_delete_event(request):
+
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    EventDAO().delete(EventDAO().get(event_id))
+
+    return redirect('index')
 
 
 def load_from_f3x_vault(request):
@@ -183,7 +203,7 @@ def manage_event(request):
 
     table = ResultTable(title='', css_id='ranking')
 
-    header = Header(name=Link('TODO : Delete event', 'delete_event'))
+    header = Header(name=Link('Delete event', 'delete_event?event_id='+event_id))
     table.set_header(header)
 
     page.add_table(table)

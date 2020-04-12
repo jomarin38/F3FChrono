@@ -107,7 +107,26 @@ class EventDAO(Dao):
                              event.dayduration, event.f3x_vault_id, event.id)
 
     def delete(self, event):
-        #TODO: delete all related stuff in other tables
-        sql = 'DELETE FROM event WHERE event_id=%s'
+        #Get chrono ids to be deleted later
+        sql = 'SELECT chrono_id FROM f3f_chrono.run WHERE event_id=%s'
+        query_result = self._execute_query(sql, event.id)
+
+        sql = 'DELETE FROM f3f_chrono.run WHERE event_id=%s'
         self._execute_delete(sql, event.id)
 
+        #Should be made in one request if speed optimisation is needed
+        for row in query_result:
+            sql = 'DELETE FROM f3f_chrono.chrono WHERE chrono_id=%s'
+            self._execute_delete(sql, row[0])
+
+        sql = 'DELETE FROM f3f_chrono.roundgroup WHERE event_id=%s'
+        self._execute_delete(sql, event.id)
+
+        sql = 'DELETE FROM f3f_chrono.round WHERE event_id=%s'
+        self._execute_delete(sql, event.id)
+
+        sql = 'DELETE FROM f3f_chrono.competitor WHERE event_id=%s'
+        self._execute_delete(sql, event.id)
+
+        sql = 'DELETE FROM event WHERE event_id=%s'
+        self._execute_delete(sql, event.id)

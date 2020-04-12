@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+<style type="text/css">
+body {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+input {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+input:focus {
+  background-color: lightblue;
+}
+input[type=button], input[type=submit], input[type=reset] {
+  background-color: #ff5050;
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+    <h1>Are you sure you want to delete this event ?</h1>
+    <form action="do_delete_event?event_id={{event_id}}" method="post" >
+        {% csrf_token %}
+        <input type="submit" value="Delete !">
+    </form>
+    <a href="manage_event?event_id={{event_id}}">Cancel</a>
+</body>
+
+
+
+
