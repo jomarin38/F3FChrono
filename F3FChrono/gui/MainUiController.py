@@ -181,7 +181,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.getcontextparameters(False)
         if self.event:
             del self.event
-        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentIndex(),
+        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
                     fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
 
         self.event.bib_day_1_compute()
@@ -192,7 +192,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.getcontextparameters(True)
         if self.event:
             del self.event
-        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentIndex(),
+        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
                     fetch_competitors=True, fetch_rounds=True, fetch_runs=True, fetch_runs_lastround=True)
 
         self.chronoHard.reset()
@@ -287,7 +287,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if self.event:
             self.getcontextparameters(updateBDD=True)
             del self.event
-        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentIndex(),
+        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
                                   fetch_competitors=True, fetch_rounds=False, fetch_runs=False)
 
         self.controllers['config'].set_data(self.event)
