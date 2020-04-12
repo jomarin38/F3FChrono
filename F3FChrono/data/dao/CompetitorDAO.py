@@ -31,7 +31,7 @@ class CompetitorDAO(Dao):
         #Query should return only one row
         for row in query_result:
             pilot = Pilot(row[4], row[5], pilot_id=row[0], f3x_vault_id=row[8], fai_id=row[6], national_id=row[7])
-            return Competitor.register_pilot(event, bib_number, pilot, row[2], bool(row[3]))
+            return Competitor.register_pilot(event, int(bib_number), pilot, row[2], bool(row[3]))
         return None
 
     def insert(self, competitor):

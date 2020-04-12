@@ -10,6 +10,7 @@ from F3FChrono.data.Pilot import Pilot
 from F3FChrono.data.Competitor import Competitor
 from F3FChrono.data.Round import Round
 from F3FChrono.data.Chrono import Chrono
+from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
 
 
 class Event:
@@ -168,6 +169,22 @@ class Event:
 
     def register_pilot(self, pilot, bib_number, team=None):
         self.competitors[bib_number] = Competitor.register_pilot(self, bib_number, pilot, team)
+
+    def unregister_competitor(self, competitor, insert_database=True):
+        #This should be possible only if there was no valid flight for this competitor
+        if not self.has_run_competitor(competitor):
+            self.competitors.pop(competitor.bib_number)
+            if insert_database:
+                CompetitorDAO().delete(competitor)
+        else:
+            raise Exception('Too late to delete competitor ' + competitor.display_name() + ' because he flew already !')
+
+    def has_run_competitor(self, competitor):
+        res = False
+        for f3f_round in self.rounds:
+            res = res or f3f_round.has_run_competitor(competitor)
+
+        return res
 
     def get_current_round(self):
         if len(self.rounds) < 1:

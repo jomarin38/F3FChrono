@@ -147,8 +147,11 @@ def manage_event(request):
     for competitor in sorted([competitor for bib, competitor in event.competitors.items()], key=lambda c: c.bib_number):
         row = Line(name=Cell(str(competitor.bib_number)))
         row.add_cell(Cell(competitor.display_name()))
-        row.add_cell(Link('TODO : Remove', 'remove_competitor?event_id='+str(event.id)+
-                          '&bib_number='+str(competitor.bib_number)))
+        if not event.has_run_competitor(competitor):
+            row.add_cell(Link('Remove', 'remove_competitor?event_id='+str(event.id)+
+                              '&bib_number='+str(competitor.bib_number)))
+        else:
+            row.add_cell(Cell(''))
         if competitor.present:
             row.add_cell(Link('Set not present', 'set_competitor_presence?event_id='+str(event.id)+
                               '&bib_number='+str(competitor.bib_number)+'&present=0'))
@@ -205,6 +208,24 @@ def set_competitor_presence(request):
 
     return manage_event(request)
 
+
+def remove_competitor(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    bib_number = request.GET.get('bib_number')
+
+    event = EventDAO().get(event_id, fetch_competitors=True)
+
+    dao = CompetitorDAO()
+    competitor = dao.get(event, bib_number)
+
+    event.unregister_competitor(competitor, insert_database=True)
+
+    return manage_event(request)
 
 @never_cache
 def index(request):

@@ -144,7 +144,16 @@ class Round:
             Round.round_dao.update(self)
 
     def has_run(self):
-        return (self.groups[-1].has_run())
+        res = False
+        for f3f_group in self.groups:
+            res = res or f3f_group.has_run()
+        return res
+
+    def has_run_competitor(self, competitor):
+        res = False
+        for f3f_group in self.groups:
+            res = res or f3f_group.has_run_competitor(competitor)
+        return res
 
     def get_best_runs(self):
         result = []
