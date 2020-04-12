@@ -391,13 +391,13 @@ class WConfigCtrl(QObject):
         self.view.MaxInterruptValue.setValue(event.max_interruption_time/60)
         self.view.daydurationvalue.setValue(event.dayduration)
 
-    def set_contest(self, contest):
+    def set_contest(self, contest_list):
         self.view.ChronoType.setCurrentIndex(0)
         self.chrono_sig.emit()
-        for temp in contest:
-            self.view.ContestList.addItem(temp.name)
+        for contest in contest_list:
+            self.view.ContestList.addItem(contest.name, userData=contest)
 
-        self.view.ContestList.setCurrentText(contest[0].name)
+        self.view.ContestList.setCurrentIndex(1)
 
     def get_data(self):
         self.min_allowed_wind_speed = self.view.WindMinValue.value()

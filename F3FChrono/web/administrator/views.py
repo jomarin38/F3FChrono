@@ -17,6 +17,7 @@ from F3FChrono.data.web.Cell import Cell
 from F3FChrono.data.web.Link import Link
 from F3FChrono.data.web.Utils import Utils
 from F3FChrono.data.Event import Event
+from F3FChrono.data.Pilot import Pilot
 
 
 def sign_in(request):
@@ -54,6 +55,83 @@ def create_new_event(request):
     Utils.set_port_number(request.META['SERVER_PORT'])
 
     return render(request, 'new_event_template.html', {})
+
+
+def new_pilot_input(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    return render(request, 'new_pilot_template.html', {'event_id': request.GET.get('event_id')})
+
+
+def cancel_round(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET['event_id']
+    round_number = request.GET['round_number']
+
+    f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
+    f3f_round.do_cancel_round()
+
+    return manage_event(request)
+
+
+def register_new_pilot(request):
+
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    pilot_name = request.POST['pilotname']
+    pilot_first_name = request.POST['pilotfirstname']
+    pilot_fai_id = request.POST['pilotfaiid']
+    pilot_national_id = request.POST['pilotnationalid']
+    pilot_f3xvault_id = request.POST['pilotf3xvaultid']
+
+    event_id = request.GET.get('event_id')
+    event = EventDAO().get(event_id, fetch_competitors=True)
+
+    pilot = Pilot(name=pilot_name,
+                  first_name=pilot_first_name,
+                  f3x_vault_id=pilot_f3xvault_id,
+                  national_id=pilot_national_id,
+                  fai_id=pilot_fai_id
+                  )
+
+    bib_number = event.next_available_bib_number()
+
+    competitor = event.register_pilot(pilot, bib_number)
+    CompetitorDAO().insert(competitor)
+
+    return manage_event(request)
+
+
+def delete_event(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    return render(request, 'event_deletion_template.html', {'event_id': request.GET.get('event_id')})
+
+
+def do_delete_event(request):
+
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    EventDAO().delete(EventDAO().get(event_id))
+
+    return redirect('index')
 
 
 def load_from_f3x_vault(request):
@@ -123,18 +201,112 @@ def manage_event(request):
 
     page = ResultPage(title=event.name, authenticated=request.user.is_authenticated)
 
+    table = ResultTable(title='', css_id='ranking')
+
+    header = Header(name=Link('Delete event', 'delete_event?event_id='+event_id))
+    table.set_header(header)
+
+    page.add_table(table)
+
+    table = ResultTable(title='', css_id='ranking')
+
+    header = Header(name=Link('TODO : Export to F3X Vault', 'export_event_f3x_vault'))
+    table.set_header(header)
+
+    page.add_table(table)
+
     table = ResultTable(title='Pilots', css_id="ranking")
     header = Header(name=Cell('Bib'))
     header.add_cell(Cell('Name'))
+    header.add_cell(Cell(''))
+    header.add_cell(Cell(''))
     table.set_header(header)
 
     for competitor in sorted([competitor for bib, competitor in event.competitors.items()], key=lambda c: c.bib_number):
         row = Line(name=Cell(str(competitor.bib_number)))
-        row.add_cell(Cell(competitor.pilot.to_string()))
+        row.add_cell(Cell(competitor.display_name()))
+        if not event.has_run_competitor(competitor):
+            row.add_cell(Link('Remove', 'remove_competitor?event_id='+str(event.id)+
+                              '&bib_number='+str(competitor.bib_number)))
+        else:
+            row.add_cell(Cell(''))
+        if competitor.present:
+            row.add_cell(Link('Set not present', 'set_competitor_presence?event_id='+str(event.id)+
+                              '&bib_number='+str(competitor.bib_number)+'&present=0'))
+        else:
+            row.add_cell(Link('Set present', 'set_competitor_presence?event_id=' + str(event.id) +
+                              '&bib_number=' + str(competitor.bib_number)+'&present=1'))
+        table.add_line(row)
+    page.add_table(table)
+
+    table = ResultTable(title='', css_id='ranking')
+
+    header = Header(name=Link('Add new pilot', 'new_pilot_input?event_id='+event_id))
+    table.set_header(header)
+
+    page.add_table(table)
+
+    table = ResultTable(title='Rounds', css_id="ranking")
+    header = Header(name=Cell('Round number'))
+    header.add_cell(Cell(''))
+    header.add_cell(Cell(''))
+    table.set_header(header)
+
+    for f3f_round in event.rounds:
+        row = Line(name=Cell(str(f3f_round.display_name())))
+        row.add_cell(Link('TODO : Export to F3XVault', 'export_round_f3x_vault?event_id=' + str(event.id) +
+                          '&round_number='+str(f3f_round.round_number)))
+        if f3f_round.valid:
+            row.add_cell(Link('Cancel Round', 'cancel_round?event_id=' + str(event.id) +
+                              '&round_number='+str(f3f_round.round_number)))
+        else:
+            row.add_cell(Cell(''))
         table.add_line(row)
     page.add_table(table)
 
     return HttpResponse(page.to_html())
+
+
+def set_competitor_presence(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    bib_number = request.GET.get('bib_number')
+    present = bool(int(request.GET.get('present')))
+
+    event = EventDAO().get(event_id)
+
+    dao = CompetitorDAO()
+
+    competitor = dao.get(event, bib_number)
+
+    competitor.present = present
+
+    dao.update(competitor)
+
+    return manage_event(request)
+
+
+def remove_competitor(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    bib_number = request.GET.get('bib_number')
+
+    event = EventDAO().get(event_id, fetch_competitors=True)
+
+    dao = CompetitorDAO()
+    competitor = dao.get(event, bib_number)
+
+    event.unregister_competitor(competitor, insert_database=True)
+
+    return manage_event(request)
 
 @never_cache
 def index(request):

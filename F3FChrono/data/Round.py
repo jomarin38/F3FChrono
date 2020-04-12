@@ -52,6 +52,14 @@ class Round:
         run.valid = valid
         self._add_run(run, insert_database)
 
+    def display_name(self):
+
+        if self.valid:
+            round_number = str(self.valid_round_number)
+        else:
+            round_number = 'not valid'
+
+        return 'Round ' + str(round_number)
 
     def handle_refly(self, penalty):
         run = Run()
@@ -63,7 +71,7 @@ class Round:
                                   self.get_current_competitor().get_bib_number())
 
     def _add_run(self, run, insert_database=False):
-        #TODO : search in which group the run has to be added
+        # TODO : search in which group the run has to be added
         run.round_group = self.groups[-1]
         self.groups[-1].add_run(run, insert_database)
 
@@ -79,19 +87,36 @@ class Round:
     def set_current_competitor(self, competitor):
         self._current_competitor_index = self._flight_order.index(competitor.bib_number)
 
-    def next_pilot(self, insert_database=False):
+    def next_pilot(self, insert_database=False, visited_competitors=[]):
         if self._current_competitor_index < len(self._flight_order) - 1:
             self._current_competitor_index += 1
+            current_competitor = self.get_current_competitor()
+            current_round = self
         else:
             self.validate_round(insert_database)
-            self.event.create_new_round(insert_database)
-            self._current_competitor_index = 0
-        return self.get_current_competitor()
+            current_round = self.event.create_new_round(insert_database)
+            current_competitor = current_round.get_current_competitor()
+        if current_competitor.present:
+            return current_competitor
+        else:
+            if current_competitor not in visited_competitors:
+                # Give him a 0
+                current_round.set_null_flight(current_competitor)
+                visited_competitors.append(current_competitor)
+                return current_round.next_pilot(insert_database, visited_competitors)
+            else:
+                #In this case, nobody is set to present ...
+                return current_competitor
+
+    def set_null_flight(self, competitor):
+        self.handle_terminated_flight(
+            competitor,
+            Chrono(), 0, False, insert_database=True)
 
     def next_pilot_database(self):
-        nb_run=len(self.groups[-1].runs)
-        #if self._current_competitor_index < len(self._flight_order) - 1:
-        if  nb_run< len(self._flight_order):
+        nb_run = len(self.groups[-1].runs)
+        # if self._current_competitor_index < len(self._flight_order) - 1:
+        if nb_run < len(self._flight_order):
             self._current_competitor_index = nb_run
         else:
             self.event.create_new_round(insert_database=True)
@@ -99,12 +124,15 @@ class Round:
         return self.get_current_competitor()
 
     def cancel_round(self):
-        self.valid=False
-        self.valid_round_number=None
-        Round.round_dao.update(self)
+        self.do_cancel_round()
         self.event.create_new_round(insert_database=True)
         self._current_competitor_index = 0
         return self.get_current_competitor()
+
+    def do_cancel_round(self):
+        self.valid = False
+        self.valid_round_number = None
+        Round.round_dao.update(self)
 
     def validate_round(self, insert_database=False):
         self.valid = True
@@ -112,14 +140,23 @@ class Round:
             previous_round = Round.valid_round_counters[self.event]
         else:
             previous_round = 0
-        self.valid_round_number = previous_round+1
+        self.valid_round_number = previous_round + 1
         Round.valid_round_counters[self.event] = self.valid_round_number
         self.event.valid_rounds.append(self)
         if insert_database:
             Round.round_dao.update(self)
 
     def has_run(self):
-        return(self.groups[-1].has_run())
+        res = False
+        for f3f_group in self.groups:
+            res = res or f3f_group.has_run()
+        return res
+
+    def has_run_competitor(self, competitor):
+        res = False
+        for f3f_group in self.groups:
+            res = res or f3f_group.has_run_competitor(competitor)
+        return res
 
     def get_best_runs(self):
         result = []

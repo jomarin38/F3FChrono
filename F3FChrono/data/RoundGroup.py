@@ -34,6 +34,12 @@ class RoundGroup:
     def has_run(self):
         return len(self.runs)>0
 
+    def has_run_competitor(self, competitor):
+        if competitor in self.runs:
+            return len(self.runs[competitor]) > 0
+        else:
+            return False
+
     def to_string(self):
         result = ''
         for competitor in sorted(self.runs):

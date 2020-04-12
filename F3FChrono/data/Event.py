@@ -10,6 +10,7 @@ from F3FChrono.data.Pilot import Pilot
 from F3FChrono.data.Competitor import Competitor
 from F3FChrono.data.Round import Round
 from F3FChrono.data.Chrono import Chrono
+from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
 
 
 class Event:
@@ -28,7 +29,7 @@ class Event:
         self.max_wind_dir_dev = 45.0
         self.max_interruption_time = 30 * 60
         self.current_round = None
-        self.bib_start = 0
+        self.bib_start = 1
         self.dayduration = 1
         self.flights_before_refly = 5
         self.f3x_vault_id = None
@@ -145,6 +146,9 @@ class Event:
 
         return event
 
+    def next_available_bib_number(self):
+        return max(self.competitors.keys())+1
+
     def competitor_from_f3x_vault_id(self, f3x_vault_id):
         for key, competitor in self.competitors.items():
             if competitor.get_pilot().get_f3x_vault_id() == f3x_vault_id:
@@ -167,7 +171,25 @@ class Event:
             self.current_round += 1
 
     def register_pilot(self, pilot, bib_number, team=None):
-        self.competitors[bib_number] = Competitor.register_pilot(self, bib_number, pilot, team)
+        new_competitor = Competitor.register_pilot(self, bib_number, pilot, team)
+        self.competitors[bib_number] = new_competitor
+        return new_competitor
+
+    def unregister_competitor(self, competitor, insert_database=True):
+        #This should be possible only if there was no valid flight for this competitor
+        if not self.has_run_competitor(competitor):
+            self.competitors.pop(competitor.bib_number)
+            if insert_database:
+                CompetitorDAO().delete(competitor)
+        else:
+            raise Exception('Too late to delete competitor ' + competitor.display_name() + ' because he flew already !')
+
+    def has_run_competitor(self, competitor):
+        res = False
+        for f3f_round in self.rounds:
+            res = res or f3f_round.has_run_competitor(competitor)
+
+        return res
 
     def get_current_round(self):
         if len(self.rounds) < 1:

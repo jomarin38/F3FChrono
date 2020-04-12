@@ -10,5 +10,12 @@ urlpatterns = [
     path('load_from_f3x_vault', views.load_from_f3x_vault, name='load_from_f3x_vault'),
     path('load_from_scratch', views.load_from_scratch, name='load_from_scratch'),
     path('manage_event', views.manage_event, name='manage_event'),
+    path('set_competitor_presence', views.set_competitor_presence, name='set_competitor_presence'),
+    path('remove_competitor', views.remove_competitor, name='remove_competitor'),
+    path('new_pilot_input', views.new_pilot_input, name='new_pilot_input'),
+    path('register_new_pilot', views.register_new_pilot, name='register_new_pilot'),
+    path('cancel_round', views.cancel_round, name='cancel_round'),
+    path('delete_event', views.delete_event, name='delete_event'),
+    path('do_delete_event', views.do_delete_event, name='do_delete_event'),
     path('sign_in', views.sign_in, name='sign_in')
 ]

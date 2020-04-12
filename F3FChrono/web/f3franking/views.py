@@ -93,7 +93,7 @@ def event_view_html(event_id):
         header.add_cell(Cell('Points / 1000'))
         header.add_cell(Cell('Name'))
         for f3f_round in event.valid_rounds:
-            header.add_cell(Link('Round ' + str(f3f_round.valid_round_number),
+            header.add_cell(Link(f3f_round.display_name(),
                                  'round_view?event_id=' + str(event_id) +
                                  '&round_number=' + str(f3f_round.round_number)))
         table.set_header(header)
@@ -121,7 +121,7 @@ def event_view_html(event_id):
         header.add_cell(Cell('Name'))
         for f3f_round in event.rounds:
             if f3f_round.valid:
-                header.add_cell(Link('Round ' + str(f3f_round.valid_round_number),
+                header.add_cell(Link(f3f_round.display_name(),
                                      'round_view?event_id=' + str(event_id) +
                                      '&round_number=' + str(f3f_round.round_number)))
         table.set_header(header)
@@ -167,12 +167,7 @@ def round_view_html(event_id, round_number):
 
     f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
 
-    if f3f_round.valid:
-        round_number = str(f3f_round.valid_round_number)
-    else:
-        round_number = 'not valid'
-
-    page = ResultPage(title=f3f_round.event.name + '\tRound : ' + round_number +
+    page = ResultPage(title=f3f_round.event.name + '\t' + f3f_round.display_name() +
                             '(id:' + str(f3f_round.round_number) + ')', event=f3f_round.event)
 
     best_runs = f3f_round.get_best_runs()

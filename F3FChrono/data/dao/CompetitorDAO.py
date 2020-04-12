@@ -6,7 +6,7 @@ from F3FChrono.data.Pilot import Pilot
 class CompetitorDAO(Dao):
 
     def get_list(self, event):
-        sql = 'SELECT c.pilot_id, c.bib_number, c.team, p.name, p.first_name ' \
+        sql = 'SELECT c.pilot_id, c.bib_number, c.team, p.name, p.first_name, c.present ' \
               'FROM competitor c ' \
               'LEFT JOIN pilot p ON c.pilot_id=p.pilot_id ' \
               'WHERE event_id=%s'
@@ -16,11 +16,12 @@ class CompetitorDAO(Dao):
             bib_number = row[1]
             team = row[2]
             pilot = Pilot(row[3], row[4], pilot_id=row[0])
-            result[bib_number] = Competitor.register_pilot(event, bib_number, pilot, team)
+            present = bool(row[5])
+            result[bib_number] = Competitor.register_pilot(event, bib_number, pilot, team, present)
         return result
 
     def get(self, event, bib_number):
-        sql = 'SELECT c.pilot_id, c.bib_number, c.team, ' \
+        sql = 'SELECT c.pilot_id, c.bib_number, c.team, c.present, ' \
               'p.name, p.first_name, p.fai_id, p.national_id, p.f3x_vault_id ' \
               'FROM competitor c ' \
               'LEFT JOIN pilot p  ON c.pilot_id=p.pilot_id ' \
@@ -29,19 +30,21 @@ class CompetitorDAO(Dao):
         result = None
         #Query should return only one row
         for row in query_result:
-            pilot = Pilot(row[3], row[4], pilot_id=row[0], f3x_vault_id=row[7], fai_id=row[5], national_id=row[6])
-            return Competitor.register_pilot(event, bib_number, pilot, row[2])
+            pilot = Pilot(row[4], row[5], pilot_id=row[0], f3x_vault_id=row[8], fai_id=row[6], national_id=row[7])
+            return Competitor.register_pilot(event, int(bib_number), pilot, row[2], bool(row[3]))
         return None
 
     def insert(self, competitor):
         pilot_id = self._insert_or_update_pilot(competitor.pilot)
-        sql = 'INSERT INTO competitor (pilot_id, event_id, team, bib_number) VALUES (%s, %s, %s, %s)'
-        self._execute_insert(sql, pilot_id, competitor.event.id, competitor.team, competitor.bib_number)
+        sql = 'INSERT INTO competitor (pilot_id, event_id, team, bib_number, present) VALUES (%s, %s, %s, %s, %s)'
+        self._execute_insert(sql, pilot_id, competitor.event.id, competitor.team, competitor.bib_number,
+                             competitor.present)
 
     def update(self, competitor):
         pilot_id = self._insert_or_update_pilot(competitor.pilot)
-        sql = 'UPDATE competitor SET team=%s, bib_number=%s WHERE pilot_id=%s AND event_id=%s'
-        self._execute_update(sql, competitor.team, competitor.bib_number, pilot_id, competitor.event.id)
+        sql = 'UPDATE competitor SET team=%s, bib_number=%s, present=%s WHERE pilot_id=%s AND event_id=%s'
+        self._execute_update(sql, competitor.team, competitor.bib_number, competitor.present,
+                             pilot_id, competitor.event.id)
 
     def delete(self, competitor):
         #Delete only competitor object, pilot is not deleted

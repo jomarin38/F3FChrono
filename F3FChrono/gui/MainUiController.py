@@ -158,7 +158,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.show_config()
 
     def next_pilot(self, insert_database=False):
-        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot(insert_database),
+        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot(insert_database,
+                                                                                                visited_competitors=[]),
                                                       self.event.get_current_round())
         self.controllers['round'].wChronoCtrl.reset_ui()
 
@@ -180,7 +181,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.getcontextparameters(False)
         if self.event:
             del self.event
-        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentIndex(),
+        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
                     fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
 
         self.event.bib_day_1_compute()
@@ -191,12 +192,16 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.getcontextparameters(True)
         if self.event:
             del self.event
-        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentIndex(),
+        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
                     fetch_competitors=True, fetch_rounds=True, fetch_runs=True, fetch_runs_lastround=True)
 
         self.chronoHard.reset()
         self.chronodata.reset()
-        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor(),
+        current_competitor = self.event.get_current_round().get_current_competitor()
+        if not current_competitor.present:
+            self.event.get_current_round().set_null_flight(current_competitor)
+            current_competitor = self.event.get_current_round().next_pilot()
+        self.controllers['round'].wPilotCtrl.set_data(current_competitor,
                                                       self.event.get_current_round())
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.show_chrono()
@@ -282,7 +287,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if self.event:
             self.getcontextparameters(updateBDD=True)
             del self.event
-        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentIndex(),
+        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
                                   fetch_competitors=True, fetch_rounds=False, fetch_runs=False)
 
         self.controllers['config'].set_data(self.event)

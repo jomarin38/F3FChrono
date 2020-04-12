@@ -15,14 +15,16 @@ class Competitor:
         self.second_joker_round_number = None
         self.second_joker_score = None
         self.penalty = 0.0
+        self.present = True
 
     @staticmethod
-    def register_pilot(event, bib_number, pilot, team=None):
+    def register_pilot(event, bib_number, pilot, team=None, present=True):
         competitor = Competitor()
         competitor.event = event
         competitor.pilot = pilot
         competitor.bib_number = bib_number
         competitor.team = team
+        competitor.present = present
         return competitor
 
     def get_pilot(self):
