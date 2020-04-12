@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+<style type="text/css">
+body {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+input {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+input:focus {
+  background-color: lightblue;
+}
+input[type=button], input[type=submit], input[type=reset] {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+    <h1>Register new pilot fir this event :</h1>
+        <form action="register_new_pilot?event_id={{event_id}}" method="post" >
+        {% csrf_token %}
+        <label for="pilotname_label">Pilot Name : </label>
+        <input id="pilotname_field" type="text" name="pilotname" value="">
+        <br/>
+        <label for="pilotfirstname_label">Pilot Firstname : </label>
+        <input id="pilotfirstname_field" type="text" name="pilotfirstname" value="">
+        <br/>
+        <label for="pilotfaiid_label">Pilot FAI ID : </label>
+        <input id="pilotfaiid_field" type="text" name="pilotfaiid" value="">
+        <br/>
+        <label for="pilotnationalid_label">Pilot national ID : </label>
+        <input id="pilotnationalid_field" type="text" name="pilotnationalid" value="">
+        <br/>
+        <label for="pilotf3xvaultid_label">Pilot F3X Vault ID : </label>
+        <input id="pilotf3xvaultid_field" type="text" name="pilotf3xvaultid" value="">
+        <br/>
+        <input type="submit" value="Register !">
+    </form>
+</body>
+
+
+
+

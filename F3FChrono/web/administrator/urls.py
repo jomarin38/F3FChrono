@@ -12,5 +12,7 @@ urlpatterns = [
     path('manage_event', views.manage_event, name='manage_event'),
     path('set_competitor_presence', views.set_competitor_presence, name='set_competitor_presence'),
     path('remove_competitor', views.remove_competitor, name='remove_competitor'),
+    path('new_pilot_input', views.new_pilot_input, name='new_pilot_input'),
+    path('register_new_pilot', views.register_new_pilot, name='register_new_pilot'),
     path('sign_in', views.sign_in, name='sign_in')
 ]

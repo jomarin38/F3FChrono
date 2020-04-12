@@ -17,6 +17,7 @@ from F3FChrono.data.web.Cell import Cell
 from F3FChrono.data.web.Link import Link
 from F3FChrono.data.web.Utils import Utils
 from F3FChrono.data.Event import Event
+from F3FChrono.data.Pilot import Pilot
 
 
 def sign_in(request):
@@ -54,6 +55,48 @@ def create_new_event(request):
     Utils.set_port_number(request.META['SERVER_PORT'])
 
     return render(request, 'new_event_template.html', {})
+
+
+def new_pilot_input(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET['event_id']
+
+    return render(request, 'new_pilot_template.html', {'event_id': request.GET.get('event_id')})
+
+
+def register_new_pilot(request):
+
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    pilot_name = request.POST['pilotname']
+    pilot_first_name = request.POST['pilotfirstname']
+    pilot_fai_id = request.POST['pilotfaiid']
+    pilot_national_id = request.POST['pilotnationalid']
+    pilot_f3xvault_id = request.POST['pilotf3xvaultid']
+
+    event_id = request.GET.get('event_id')
+    event = EventDAO().get(event_id, fetch_competitors=True)
+
+    pilot = Pilot(name=pilot_name,
+                  first_name=pilot_first_name,
+                  f3x_vault_id=pilot_f3xvault_id,
+                  national_id=pilot_national_id,
+                  fai_id=pilot_fai_id
+                  )
+
+    bib_number = event.next_available_bib_number()
+
+    competitor = event.register_pilot(pilot, bib_number)
+    CompetitorDAO().insert(competitor)
+
+    return manage_event(request)
 
 
 def load_from_f3x_vault(request):
@@ -163,7 +206,7 @@ def manage_event(request):
 
     table = ResultTable(title='', css_id='ranking')
 
-    header = Header(name=Link('TODO : Add new pilot', 'add_new_pilot'))
+    header = Header(name=Link('Add new pilot', 'new_pilot_input?event_id='+event_id))
     table.set_header(header)
 
     page.add_table(table)

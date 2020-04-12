@@ -146,6 +146,9 @@ class Event:
 
         return event
 
+    def next_available_bib_number(self):
+        return max(self.competitors.keys())+1
+
     def competitor_from_f3x_vault_id(self, f3x_vault_id):
         for key, competitor in self.competitors.items():
             if competitor.get_pilot().get_f3x_vault_id() == f3x_vault_id:
@@ -168,7 +171,9 @@ class Event:
             self.current_round += 1
 
     def register_pilot(self, pilot, bib_number, team=None):
-        self.competitors[bib_number] = Competitor.register_pilot(self, bib_number, pilot, team)
+        new_competitor = Competitor.register_pilot(self, bib_number, pilot, team)
+        self.competitors[bib_number] = new_competitor
+        return new_competitor
 
     def unregister_competitor(self, competitor, insert_database=True):
         #This should be possible only if there was no valid flight for this competitor
