@@ -14,5 +14,6 @@ urlpatterns = [
     path('remove_competitor', views.remove_competitor, name='remove_competitor'),
     path('new_pilot_input', views.new_pilot_input, name='new_pilot_input'),
     path('register_new_pilot', views.register_new_pilot, name='register_new_pilot'),
+    path('cancel_round', views.cancel_round, name='cancel_round'),
     path('sign_in', views.sign_in, name='sign_in')
 ]

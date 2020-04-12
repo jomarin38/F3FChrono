@@ -68,6 +68,21 @@ def new_pilot_input(request):
     return render(request, 'new_pilot_template.html', {'event_id': request.GET.get('event_id')})
 
 
+def cancel_round(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET['event_id']
+    round_number = request.GET['round_number']
+
+    f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
+    f3f_round.do_cancel_round()
+
+    return manage_event(request)
+
+
 def register_new_pilot(request):
 
     if not request.user.is_authenticated:
@@ -221,8 +236,11 @@ def manage_event(request):
         row = Line(name=Cell(str(f3f_round.display_name())))
         row.add_cell(Link('TODO : Export to F3XVault', 'export_round_f3x_vault?event_id=' + str(event.id) +
                           '&round_number='+str(f3f_round.round_number)))
-        row.add_cell(Link('TODO : Cancel Round', 'cancel_round?event_id=' + str(event.id) +
-                          '&round_number='+str(f3f_round.round_number)))
+        if f3f_round.valid:
+            row.add_cell(Link('Cancel Round', 'cancel_round?event_id=' + str(event.id) +
+                              '&round_number='+str(f3f_round.round_number)))
+        else:
+            row.add_cell(Cell(''))
         table.add_line(row)
     page.add_table(table)
 

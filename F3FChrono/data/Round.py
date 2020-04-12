@@ -124,12 +124,15 @@ class Round:
         return self.get_current_competitor()
 
     def cancel_round(self):
-        self.valid = False
-        self.valid_round_number = None
-        Round.round_dao.update(self)
+        self.do_cancel_round()
         self.event.create_new_round(insert_database=True)
         self._current_competitor_index = 0
         return self.get_current_competitor()
+
+    def do_cancel_round(self):
+        self.valid = False
+        self.valid_round_number = None
+        Round.round_dao.update(self)
 
     def validate_round(self, insert_database=False):
         self.valid = True
