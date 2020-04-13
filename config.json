@@ -9,7 +9,7 @@
  "buzzer_next": 21,
  "buzzer_next_duration": 300,
  "buzzer_next_valid": false,
- "buzzer_valid": true,
+ "buzzer_valid": false,
  "fullscreen": false,
  "i2c_refresh": 200,
  "ledA": 20,

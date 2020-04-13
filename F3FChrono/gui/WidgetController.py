@@ -25,10 +25,10 @@ class WRoundCtrl(QObject):
     btn_cancel_flight_sig = pyqtSignal()
     widgetList = []
 
-    def __init__(self, name, parent):
+    def __init__(self, name, parent, vocal_elapsedTime_sig):
         super().__init__()
         self.wPilotCtrl = WPilotCtrl("PilotCtrl", parent)
-        self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent)
+        self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent, vocal_elapsedTime_sig)
         self.wBtnCtrl = Ui_WChronoBtn()
         self.name = name
         self.parent = parent
@@ -198,7 +198,7 @@ class WChronoCtrl(QTimer):
     btn_clear_penalty_sig = pyqtSignal()
     time_elapsed_sig = pyqtSignal()
 
-    def __init__(self, name, parent):
+    def __init__(self, name, parent, vocal_elapsedTime_sig):
         super().__init__()
 
         self.view = Ui_WChrono()
@@ -215,6 +215,7 @@ class WChronoCtrl(QTimer):
         self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
         self.statusText.append(_translate("chronoStatus_Finished", "Finished"))
 
+        self.vocal_elapsedTime_sig = vocal_elapsedTime_sig
         #initialize labels for lap time
         self.lap = []
         #initialize labels for status
@@ -260,13 +261,14 @@ class WChronoCtrl(QTimer):
 
     def set_laptime(self, laptime):
         #self.view.Time_label.setText("{:0>6.3f}".format(time)
-        print ("current lap : "+str(self.current_lap))
+        print("current lap : "+str(self.current_lap))
         if self.current_lap<len(self.lap):
-            self.lap[self.current_lap].setText("{:d} : {:0>6.2f}".format(self.current_lap+1, laptime))
+            self.lap[self.current_lap].setText("{:d} : {:0>6.1f}".format(self.current_lap+1, laptime))
             self.current_lap += 1
 
-    def set_finaltime(self, time):
-        self.view.Time_label.setText("{:0>6.2f}".format(time))
+    def set_finaltime(self, data_time):
+        print("Widget chrono set final time : ", time.time())
+        self.view.Time_label.setText("{:0>6.2f}".format(data_time))
 
     def reset_ui(self):
         #self.view.Time_label.setText("{:0>6.3f}".format(0.0))
@@ -278,23 +280,35 @@ class WChronoCtrl(QTimer):
         self.set_penalty_value(0)
         self.set_null_flight(False)
 
-    def settime(self, setTime, count_up, starttimer=True):
-        self.time=setTime
+    def settime(self, settime, count_up, starttimer=True):
+        self.time = settime
         self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000))
-        self.time_up=count_up
-        self.startTime=time.time()
-        if(starttimer):
+        self.time_up = count_up
+        self.startTime = time.time()
+        if starttimer:
             self.timerEvent.start(self.duration)
 
     def stoptime(self):
         self.timerEvent.stop()
 
     def run(self):
-        if (self.time_up==True):
+        if self.time_up:
             self.view.Time_label.setText("{:0>6.2f}".format(time.time() - self.startTime))
         else:
             self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000 - (time.time()-self.startTime)))
-            if(self.time / 1000 - (time.time()-self.startTime))<0:
+            timeval = self.time / 1000 - (time.time()-self.startTime)
+            if timeval >= 29.98:
+                self.vocal_elapsedTime_sig.emit('30s')
+            if 26 <= timeval <= 26.01:
+                self.vocal_elapsedTime_sig.emit('25s')
+            if 21 <= timeval <= 21.01:
+                self.vocal_elapsedTime_sig.emit('20s')
+            if 16 <= timeval <= 16.01:
+                self.vocal_elapsedTime_sig.emit('15s')
+            if 12 <= timeval <= 12.01:
+                self.vocal_elapsedTime_sig.emit('10s')
+            if timeval < 0:
+                self.vocal_elapsedTime_sig.emit('end')
                 self.time_elapsed_sig.emit()
 
     def penalty_100(self):
@@ -306,7 +320,7 @@ class WChronoCtrl(QTimer):
     def clear_penalty(self):
         self.btn_clear_penalty_sig.emit()
 
-    def set_penalty_value(self,value):
+    def set_penalty_value(self, value):
         self.view.penalty_value.setText(str(value))
 
     def null_flight(self):
