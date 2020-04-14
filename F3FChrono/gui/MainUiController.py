@@ -149,8 +149,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settingsadvanced'].get_data()
         ConfigReader.config.write('config.json')
         self.show_config()
-        self.vocal.loadwav(ConfigReader.config.conf['sound'],\
-                                  ConfigReader.config.conf['voice'], ConfigReader.config.conf['buzzer_valid'])
+        self.vocal.loadwav(ConfigReader.config.conf['sound'],
+                           ConfigReader.config.conf['voice'],
+                           ConfigReader.config.conf['buzzer_valid'])
+        self.chronoArduino.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
 
     def home_action(self):
         #print event data
@@ -318,7 +320,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         print("Main UI Controller slot run finished : ", time.time())
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
-        self.rpigpio.signal_buzzer_end.emit()
+        if self.chronoHard == self.chronoRpi:
+            self.rpigpio.signal_buzzer_end.emit()
         if ConfigReader.config.conf["voice"]:
             #time.sleep(0.5)     #wait gui has been refresh otherwise the time is updated after vocal sound
             self.vocal.signal_time.emit(run_time)
