@@ -26,7 +26,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.rpigpio=rpi_gpio(rpi, self.btn_next_action, self.btn_baseA, self.btn_baseB)
         self.chronoHard = self.chronoRpi
         self.base_test = -10
-        self.vocal = chronoQSound()
+        self.vocal = chronoQSound(ConfigReader.config.conf['sound'],\
+                                  ConfigReader.config.conf['voice'], ConfigReader.config.conf['buzzer_valid'])
 
         self.initUI()
 
@@ -64,7 +65,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers = collections.OrderedDict()
 
         self.controllers['config'] = WConfigCtrl("panel Config", self.ui.centralwidget)
-        self.controllers['round'] = WRoundCtrl("panel Chrono", self.ui.centralwidget)
+        self.controllers['round'] = WRoundCtrl("panel Chrono", self.ui.centralwidget, self.vocal.signal_elapsedTime)
         self.controllers['settings'] = WSettings("panel Settings", self.ui.centralwidget)
         self.controllers['settingsadvanced'] = WSettingsAdvanced("panel SettingsAdvanced", self.ui.centralwidget)
         self.controllers['wind'] = WWindCtrl("panel Wind", self.ui.centralwidget)
@@ -148,6 +149,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settingsadvanced'].get_data()
         ConfigReader.config.write('config.json')
         self.show_config()
+        self.vocal.loadwav(ConfigReader.config.conf['sound'],
+                           ConfigReader.config.conf['voice'],
+                           ConfigReader.config.conf['buzzer_valid'])
+        self.chronoArduino.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
 
     def home_action(self):
         #print event data
@@ -239,12 +244,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseB")
 
     def handle_time_elapsed(self):
-        print("time elapsed")
-        if self.chronoHard.get_status()==chronoStatus.WaitLaunch:
-            self.vocal.signal_penalty.emit()
-            self.controllers['round'].wChronoCtrl.stoptime()
-            self.vocal.signal_waitlaunch_stop.emit()
-
         if self.chronoHard.get_status()==chronoStatus.Launched or self.chronoHard.get_status()==chronoStatus.InStart:
             self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
 
@@ -304,12 +303,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_status_changed(self, status):
         self.controllers['round'].wChronoCtrl.set_status(status)
         if (status==chronoStatus.WaitLaunch):
-            self.vocal.signal_waitlaunch.emit()
-            time.sleep(0.7)
             self.controllers['round'].wChronoCtrl.settime(30000, False)
         if (status == chronoStatus.Launched):
-            self.vocal.signal_waitstart.emit()
-            time.sleep(1)
             self.controllers['round'].wChronoCtrl.settime(30000, False)
         if (status==chronoStatus.InStart):
             self.vocal.signal_entry.emit()
@@ -322,9 +317,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.vocal.signal_base.emit(lap)
 
     def slot_run_finished(self, run_time):
+        print("Main UI Controller slot run finished : ", time.time())
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
-        self.rpigpio.signal_buzzer_end.emit()
+        if self.chronoHard == self.chronoRpi:
+            self.rpigpio.signal_buzzer_end.emit()
         if ConfigReader.config.conf["voice"]:
             #time.sleep(0.5)     #wait gui has been refresh otherwise the time is updated after vocal sound
             self.vocal.signal_time.emit(run_time)

@@ -254,8 +254,12 @@ class ChronoArduino(ChronoHard, QTimer):
         self.oldVoltage = 0
         self.arduino = arduino_com(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'])
         self.timer.start(ConfigReader.config.conf['i2c_refresh'])
+        self.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
         self.arduinoState=False
 
+    def set_buzzer_time(self, time):
+        self.arduino.set_buzzerTime (time)
+        
     def set_status(self, value):
         if self.status != value:
             self.arduino.set_status(value)
@@ -267,6 +271,7 @@ class ChronoArduino(ChronoHard, QTimer):
             self.buzzer_validated.emit()
         if self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.Launched \
                 or self.status == chronoStatus.InWait:
+            print ("handle chrono event : ", self.status)
             self.set_status(self.get_status()+1)
         if self.status == chronoStatus.Finished:
             self.run_validated.emit()
