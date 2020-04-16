@@ -255,7 +255,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if self.chronoHard.get_status() == chronoStatus.InStart:
             self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
             self.slot_buzzer()
-            
+
     def slot_buzzer(self):
         self.rpigpio.signal_buzzer.emit()
 
