@@ -9,7 +9,8 @@ class chronoStatus():
     Launched=2
     InStart=3
     InProgress=4
-    Finished=5
+    WaitAltitude=5
+    Finished=6
     
 
 # This is the address we setup in the Arduino Program
@@ -17,12 +18,12 @@ class chronoStatus():
 chronoaddress = 0x05
 
 class i2c_register():
-    setStatus = 0
-    setBuzzerTime = 1
-    setRebundBtn = 2
-    reset = 3
-    getData = 4
-    getData1 = 5
+    setStatus = 1
+    setBuzzerTime = 2
+    setRebundBtn = 3
+    reset = 4
+    getData = 5
+    getData1 = 6
 
 
 class arduino_com():
@@ -51,6 +52,7 @@ class arduino_com():
         self.__sendrequest__(self.addresschrono, i2c_register.setStatus, status, read=False)
 #        self.bus.write_byte_data(self.addresschrono, 0, status)
         self.status = status
+        print ("I2CSet_Status : ", self.status)
         return 0
 
     def set_buzzerTime(self, time):
@@ -76,7 +78,8 @@ class arduino_com():
         if len(data) == 16:
             self.status = data[0]
             self.voltage = (data[2] << 8 | data[1])*5/1024/self.voltageCoef
-            self.nbLap = data[3]
+            if data[3]<11:
+                self.nbLap = data[3]
             indexlap = 0
             for count in range(4, 15, 4):
                 self.lap[indexlap] = (data[count+3] << 24 | data[count+2] << 16 | data[count+1] << 8 | data[count])/1000

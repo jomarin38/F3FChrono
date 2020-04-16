@@ -22,7 +22,8 @@ class chronoStatus():
     Launched=2
     InStart=3
     InProgress=4
-    Finished=5
+    WaitAltitude=5
+    Finished=6
 
 class ChronoHard(QObject):
     status_changed = pyqtSignal(int)
@@ -281,7 +282,10 @@ class ChronoArduino(ChronoHard, QTimer):
                 or self.status == chronoStatus.InWait or self.status==chronoStatus.InStart:
             print ("handle chrono event : ", self.status)
             self.set_status(self.get_status()+1)
+        
+        print(self.status)
         if self.status == chronoStatus.Finished:
+            print("emit run validated")
             self.run_validated.emit()
 
     def reset(self):

@@ -243,6 +243,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseB")
 
     def handle_time_elapsed(self):
+        print ("time elapsed")
         if self.chronoHard.get_status() == chronoStatus.WaitLaunch:
            self.vocal.signal_penalty.emit()
            self.controllers['round'].wChronoCtrl.stoptime()
@@ -335,6 +336,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.vocal.signal_time.emit(run_time)
 
     def slot_run_validated(self):
+        print("run validated")
         self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
         self.event.get_current_round().handle_terminated_flight(
             self.event.get_current_round().get_current_competitor(),

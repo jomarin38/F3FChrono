@@ -213,6 +213,7 @@ class WChronoCtrl(QTimer):
         self.statusText.append(_translate("chronoStatus_Launched", "Launched"))
         self.statusText.append(_translate("chronoStatus_InStart", "In Start"))
         self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
+        self.statusText.append(_translate("chronoStatus_WaitAltitude", "Wait Altitude"))
         self.statusText.append(_translate("chronoStatus_Finished", "Finished"))
 
         self.vocal_elapsedTime_sig = vocal_elapsedTime_sig
