@@ -34,6 +34,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.signal_btnnext.connect(self.btn_next_action)
         self.chronoRpi.status_changed.connect(self.slot_status_changed)
         self.chronoRpi.lap_finished.connect(self.slot_lap_finished)
+        self.chronoRpi.altitude_finished.connect(self.slot_altitude_finished)
         self.chronoRpi.run_finished.connect(self.slot_run_finished)
         self.chronoRpi.run_validated.connect(self.slot_run_validated)
         self.chronoRpi.wind_signal.connect(self.slot_wind_ui)
@@ -249,16 +250,16 @@ class MainUiCtrl (QtWidgets.QMainWindow):
            self.controllers['round'].wChronoCtrl.stoptime()
 
         if self.chronoHard.get_status() == chronoStatus.Launched:
-            self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
-            self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
-            self.slot_buzzer()
+            print("handle time elapsed status Launched")
+            self.chronoHard.chrono_signal.emit("btnnext", "event", "baseA")
+            self.chronoHard.chrono_signal.emit("btnnext", "event", "baseA")
 
         if self.chronoHard.get_status() == chronoStatus.InStart:
-            self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
-            self.slot_buzzer()
+            print("handle time elapsed status InStart")
+            self.chronoHard.chrono_signal.emit("btnnext", "event", "baseA")
 
     def slot_buzzer(self):
-        self.rpigpio.signal_buzzer.emit()
+        self.rpigpio.signal_buzzer.emit(1)
 
     def penalty_100(self):
         #print("penalty event 100")
@@ -323,6 +324,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def slot_lap_finished (self, lap, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
+        if self.chronoHard == self.chronoRpi:
+            if lap<9:
+                self.rpigpio.signal_buzzer.emit(1)
+            if lap==9:
+                self.rpigpio.signal_buzzer.emit(2)
         self.vocal.signal_base.emit(lap)
 
     def slot_run_finished(self, run_time):
@@ -330,10 +336,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         if self.chronoHard == self.chronoRpi:
-            self.rpigpio.signal_buzzer_end.emit()
+            self.rpigpio.signal_buzzer.emit(3)
         if ConfigReader.config.conf["voice"]:
             #time.sleep(0.5)     #wait gui has been refresh otherwise the time is updated after vocal sound
             self.vocal.signal_time.emit(run_time)
+
+    def slot_altitude_finished(self):
+        if self.chronoHard == self.chronoRpi:
+            self.rpigpio.signal_buzzer.emit(3)
 
     def slot_run_validated(self):
         print("run validated")
