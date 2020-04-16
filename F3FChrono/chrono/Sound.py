@@ -23,6 +23,7 @@ class chronoQSound(QObject):
         self.soundbase = []
 
         self.elapsedtime = collections.OrderedDict()
+        self.elapsedtime_play = collections.OrderedDict()
         self.loadwav(playsound, playvoice, buzzer)
         self.signal_elapsedTime.connect(self.sound_elapsedTime)
         self.signal_entry.connect(self.sound_entry)
@@ -60,6 +61,7 @@ class chronoQSound(QObject):
         self.elapsedtime['10s'] = QSound(pathname+'/start/10s.wav')
         self.elapsedtime['all'] = QSound(pathname+'/start/startall.wav')
 
+
     def sound_time(self, time):
         if (self.play_voice):
             if (platform.system()=='Linux'):
@@ -69,9 +71,6 @@ class chronoQSound(QObject):
     def sound_base(self, index):
         if self.play_sound and self.soundbase[index] is not None:
             self.soundbase[index].play()
-            for sound in self.elapsedtime:
-                if not self.elapsedtime[sound].isFinished():
-                    self.elapsedtime[sound].stop()
 
     def sound_entry(self):
         if self.play_sound and self.entry is not None:
@@ -83,17 +82,18 @@ class chronoQSound(QObject):
 
     def sound_elapsedTime(self, cmd):
         if self.play_sound:
-            if cmd != 'end':
+            if cmd != 'end' and self.elapsedtime[cmd].isFinished():
                 print('play sound : '+cmd)
                 self.elapsedtime[cmd].play()
-            else:
-                for sound in self.elapsedtime:
-                    self.elapsedtime[sound].stop()
+            if cmd == 'end':
+                self.stop_elapsedTime()
 
-
-    def stop_all(self):
+    def stop_elapsedTime(self):
         for sound in self.elapsedtime:
             self.elapsedtime[sound].stop()
+
+    def stop_all(self):
+        self.stop_elapsedTime ()
         if self.entry is not None:
             self.entry.stop()
         if self.penalty is not None:

@@ -230,8 +230,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def btn_next_action(self, port):
         if self.controllers['round'].is_show():
-            self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
-            self.rpigpio.signal_buzzer_next.emit()
+            self.next_action()
 
     def btn_baseA(self, port):
         if self.chronoHard == self.chronoRpi:
@@ -244,10 +243,19 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseB")
 
     def handle_time_elapsed(self):
-        if self.chronoHard.get_status()==chronoStatus.Launched or self.chronoHard.get_status()==chronoStatus.InStart:
+        if self.chronoHard.get_status() == chronoStatus.WaitLaunch:
+           self.vocal.signal_penalty.emit()
+           self.controllers['round'].wChronoCtrl.stoptime()
+
+        if self.chronoHard.get_status() == chronoStatus.Launched:
             self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
+            self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
+            self.slot_buzzer()
 
-
+        if self.chronoHard.get_status() == chronoStatus.InStart:
+            self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
+            self.slot_buzzer()
+            
     def slot_buzzer(self):
         self.rpigpio.signal_buzzer.emit()
 

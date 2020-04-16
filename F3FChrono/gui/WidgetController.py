@@ -287,6 +287,7 @@ class WChronoCtrl(QTimer):
         self.startTime = time.time()
         if starttimer:
             self.timerEvent.start(self.duration)
+            self.vocal_elapsedTime_sig.emit('end')
 
     def stoptime(self):
         self.timerEvent.stop()
@@ -297,15 +298,15 @@ class WChronoCtrl(QTimer):
         else:
             self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000 - (time.time()-self.startTime)))
             timeval = self.time / 1000 - (time.time()-self.startTime)
-            if timeval >= 29.98:
+            if timeval >= 29.8:
                 self.vocal_elapsedTime_sig.emit('30s')
-            if 26 <= timeval <= 26.01:
+            if 25.9 <= timeval <= 26.1:
                 self.vocal_elapsedTime_sig.emit('25s')
-            if 21 <= timeval <= 21.01:
+            if 20.9 <= timeval <= 21.1:
                 self.vocal_elapsedTime_sig.emit('20s')
-            if 16 <= timeval <= 16.01:
+            if 15.9 <= timeval <= 16.1:
                 self.vocal_elapsedTime_sig.emit('15s')
-            if 12 <= timeval <= 12.01:
+            if 10.9 <= timeval <= 11.1:
                 self.vocal_elapsedTime_sig.emit('10s')
             if timeval < 0:
                 self.vocal_elapsedTime_sig.emit('end')
