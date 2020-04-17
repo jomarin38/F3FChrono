@@ -22,7 +22,8 @@ class chronoStatus():
     Launched=2
     InStart=3
     InProgress=4
-    Finished=5
+    WaitAltitude=5
+    Finished=6
 
 class ChronoHard(QObject):
     status_changed = pyqtSignal(int)
@@ -34,7 +35,8 @@ class ChronoHard(QObject):
     wind_signal = pyqtSignal(int, int, bool)
     accu_signal = pyqtSignal(float)
     rssi_signal = pyqtSignal(int, int)
-
+    altitude_finished = pyqtSignal()
+    
     def __init__(self, signal_btnnext):
         super().__init__()
         self.penalty = 0.0
@@ -175,9 +177,12 @@ class ChronoRpi(ChronoHard):
         self.lastBaseChangeTime = 0.0
         self.lastDetectionTime = 0.0
         self.status = chronoStatus.InWait
+        self.startAltitude = 0.0
         self.chrono_signal.connect(self.handle_chrono_event)
         self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.wind_signal, self.accu_signal, self.rssi_signal)
         self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timerEvent)
 
     def __del__(self):
         self.udpBeep.terminate()
@@ -185,13 +190,16 @@ class ChronoRpi(ChronoHard):
         del self.udpReceive
 
     def handle_chrono_event(self, caller, data, address):
-        if not caller.lower()=="btnnext":
+        if not caller.lower() == "btnnext" and not self.status == chronoStatus.InProgress:
             self.buzzer_validated.emit()
         if ((self.status == chronoStatus.Launched or self.status == chronoStatus.InStart or
              self.status == chronoStatus.InProgress) and caller.lower() == "udpreceive" or caller.lower() == "btnnext") \
                 and data.lower() == "event":
             self.__declareBase(address)
 
+    def timerEvent(self):
+        self.__declareBase("Altitude")
+        
     def __declareBase (self, base):
         print (base, self.status)
         now = time.time()
@@ -199,16 +207,22 @@ class ChronoRpi(ChronoHard):
             self.set_status(self.status+1)
             return True
 
+        if (self.status == chronoStatus.WaitAltitude and now>=(self.startAltitude+5.0)):
+            self.altitude_finished.emit()
+            self.set_status(self.status+1)
+            self.timer.stop()
+            return True
+
         if (self.status == chronoStatus.Finished):
             self.run_validated.emit()
             return True
 
-        if (self.status == chronoStatus.Launched):
+        if (self.status == chronoStatus.Launched and (base == "btnnext" or base == "baseA")):
             self.lastBase=base
             self.set_status(self.status+1)
             return True
 
-        if (self.status == chronoStatus.InStart and (self.lastBase == "btnnext" or self.lastBase == base)):
+        if (self.status == chronoStatus.InStart and (base == "btnnext" or base == "baseA")):
             self.lastBaseChangeTime = now
             self.startTime = datetime.now()
             self.chronoLap.clear()
@@ -229,8 +243,10 @@ class ChronoRpi(ChronoHard):
 
             if (self.getLapCount()==10):
                 self.endTime=datetime.now()
-                self.set_status(chronoStatus.Finished)
+                self.set_status(chronoStatus.WaitAltitude)
+                self.startAltitude = now
                 self.run_finished.emit(self.get_time())
+                self.timer.start(100)
             return True
         elif self.getLapCount() > 1:    #Base declaration is the same
                 elapsedTime = now - self.lastDetectionTime
@@ -255,6 +271,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.arduino = arduino_com(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'])
         self.timer.start(ConfigReader.config.conf['i2c_refresh'])
         self.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
+        self.reset()
         self.arduinoState=False
 
     def set_buzzer_time(self, time):
@@ -262,18 +279,28 @@ class ChronoArduino(ChronoHard, QTimer):
         
     def set_status(self, value):
         if self.status != value:
+            print ("set_status : ", value)
             self.arduino.set_status(value)
+            self.status = value
+            print ("set_status : ", self.get_status())
             self.status_changed.emit(self.get_status())
+            
+        return self.status
+    
+    def get_status(self):
         return self.status
     
     def handle_chrono_event(self, caller, data, address):
         if not caller.lower() == "btnnext":
             self.buzzer_validated.emit()
         if self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.Launched \
-                or self.status == chronoStatus.InWait:
+                or self.status == chronoStatus.InWait or self.status==chronoStatus.InStart:
             print ("handle chrono event : ", self.status)
             self.set_status(self.get_status()+1)
+        
+        print(self.status)
         if self.status == chronoStatus.Finished:
+            print("emit run validated")
             self.run_validated.emit()
 
     def reset(self):
