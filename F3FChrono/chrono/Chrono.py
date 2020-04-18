@@ -317,6 +317,8 @@ class ChronoArduino(ChronoHard, QTimer):
         if caller.lower() == "btnnext" and data == "event" and address == "baseA" and\
                 (self.status == chronoStatus.InStart or self.status == chronoStatus.Launched):
             self.arduino.event_BaseA()
+        if caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
+            self.run_validated.emit()
 
     def reset(self):
         self.arduino.reset()
