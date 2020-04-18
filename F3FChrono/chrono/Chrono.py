@@ -28,6 +28,7 @@ class chronoStatus():
 
 class ChronoHard(QObject):
     status_changed = pyqtSignal(int)
+    run_started = pyqtSignal()
     lap_finished = pyqtSignal(int, float)
     run_finished = pyqtSignal(float)
     run_validated = pyqtSignal()
@@ -232,6 +233,7 @@ class ChronoRpi(ChronoHard):
             self.timelost.clear()
             self.set_status(self.status+1)
             self.lastBase = base
+            self.run_started.emit()
             return True
 
         if self.status==chronoStatus.InProgressA and (base == "baseA" or base == "btnnext"):
@@ -282,6 +284,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.oldstatus = 0
         self.voltage = 0
         self.oldVoltage = 0
+        self.runstarted = False
         self.arduino = arduino_com(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'])
         self.timer.start(ConfigReader.config.conf['i2c_refresh'])
         self.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
@@ -307,10 +310,12 @@ class ChronoArduino(ChronoHard, QTimer):
     def handle_chrono_event(self, caller, data, address):
         if not caller.lower() == "btnnext":
             self.buzzer_validated.emit()
-        if caller.lower()=="btnnext" and (self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.InWait):
-            print ("handle chrono event : ", self.status)
+        if caller.lower() == "btnnext" and \
+                (self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.InWait):
+            print("handle chrono event : ", self.status)
             self.set_status(self.get_status()+1)
-        if caller.lower()=="btnnext" and address.lower()=="baseA" and (self.status==chronoStatus.InStart or self.status == chronoStatus.Launched):
+        if caller.lower() == "btnnext" and data == "event" and address == "baseA" and\
+                (self.status == chronoStatus.InStart or self.status == chronoStatus.Launched):
             self.arduino.event_BaseA()
 
         if self.status == chronoStatus.Finished:
@@ -325,6 +330,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.currentlap = 0
         self.oldlap = 0
         self.oldstatus = 0
+        self.runstarted = False
 
     def timerEvent(self):
         if not ('fake_rpi' in sys.modules):
@@ -337,6 +343,10 @@ class ChronoArduino(ChronoHard, QTimer):
             #update chrono data only if you use µC chrono
             if self.arduinoState:
                 self.arduino.get_data1()
+                if self.status == chronoStatus.InStart and self.arduino.status == chronoStatus.InProgressB and \
+                        self.runstarted == False:
+                    self.run_started.emit()
+                    self.runstarted = True;
                 if self.arduino.status != self.status:
                     self.status_changed.emit(self.arduino.status)
                     self.status = self.arduino.status

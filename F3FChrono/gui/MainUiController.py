@@ -33,6 +33,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.signal_btnnext.connect(self.btn_next_action)
         self.chronoRpi.status_changed.connect(self.slot_status_changed)
+        self.chronoRpi.run_started.connect(self.slot_run_started)
         self.chronoRpi.lap_finished.connect(self.slot_lap_finished)
         self.chronoRpi.altitude_finished.connect(self.slot_altitude_finished)
         self.chronoRpi.run_finished.connect(self.slot_run_finished)
@@ -43,6 +44,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoRpi.buzzer_validated.connect(self.slot_buzzer)
 
         self.chronoArduino.status_changed.connect(self.slot_status_changed)
+        self.chronoArduino.run_started.connect(self.slot_run_started)
         self.chronoArduino.lap_finished.connect(self.slot_lap_finished)
         self.chronoArduino.run_finished.connect(self.slot_run_finished)
         self.chronoArduino.run_validated.connect(self.slot_run_validated)
@@ -323,7 +325,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.vocal.signal_entry.emit()
         if (status == chronoStatus.InProgressA or status == chronoStatus.InProgressB):
             self.vocal.signal_base.emit(0)
-            self.controllers['round'].wChronoCtrl.settime(0, True)
+
+    def slot_run_started(self):
+        self.controllers['round'].wChronoCtrl.settime(0, True)
 
     def slot_lap_finished (self, lap, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
