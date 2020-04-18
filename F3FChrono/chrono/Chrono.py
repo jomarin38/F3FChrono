@@ -318,10 +318,6 @@ class ChronoArduino(ChronoHard, QTimer):
                 (self.status == chronoStatus.InStart or self.status == chronoStatus.Launched):
             self.arduino.event_BaseA()
 
-        if self.status == chronoStatus.Finished:
-            print("emit run validated")
-            self.run_validated.emit()
-
     def reset(self):
         self.arduino.reset()
         self.chronoLap.clear()
@@ -343,8 +339,8 @@ class ChronoArduino(ChronoHard, QTimer):
             #update chrono data only if you use µC chrono
             if self.arduinoState:
                 self.arduino.get_data1()
-                if self.status == chronoStatus.InStart and self.arduino.status == chronoStatus.InProgressB and \
-                        self.runstarted == False:
+                if (self.status == chronoStatus.Launched or self.status == chronoStatus.InStart) and\
+                        self.arduino.status == chronoStatus.InProgressB and self.runstarted == False:
                     self.run_started.emit()
                     self.runstarted = True;
                 if self.arduino.status != self.status:
