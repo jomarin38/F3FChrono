@@ -307,12 +307,12 @@ class ChronoArduino(ChronoHard, QTimer):
     def handle_chrono_event(self, caller, data, address):
         if not caller.lower() == "btnnext":
             self.buzzer_validated.emit()
-        if self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.Launched \
-                or self.status == chronoStatus.InWait or self.status==chronoStatus.InStart:
+        if caller.lower()=="btnnect" and (self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.InWait):
             print ("handle chrono event : ", self.status)
             self.set_status(self.get_status()+1)
-        
-        print(self.status)
+        if caller.lower()=="btnnext" and address.lower()=="baseA" and (self.status==chronoStatus.InStart or self.status == chronoStatus.Launched):
+            self.arduino.event_BaseA()
+            
         if self.status == chronoStatus.Finished:
             print("emit run validated")
             self.run_validated.emit()

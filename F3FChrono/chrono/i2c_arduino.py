@@ -21,9 +21,10 @@ class i2c_register():
     setStatus = 1
     setBuzzerTime = 2
     setRebundBtn = 3
-    reset = 4
-    getData = 5
-    getData1 = 6
+    eventBaseA = 4
+    reset = 5
+    getData = 6
+    getData1 = 7
 
 
 class arduino_com():
@@ -63,6 +64,11 @@ class arduino_com():
     def set_RebundBtn(self, time):
         self.__sendrequest__(self.addresschrono, i2c_register.setRebundBtn, time, read=False)
         return 0
+
+    def event_BaseA(self):
+        self.__sendrequest__(self.addresschrono, i2c_register.eventBaseA, time, read=False)
+        return 0
+
     def reset(self):
         self.__sendrequest__(self.addresschrono, i2c_register.reset, 1, read=False)
 #        self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
