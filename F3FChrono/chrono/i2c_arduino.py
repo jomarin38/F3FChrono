@@ -50,10 +50,10 @@ class arduino_com():
 
         
     def set_status(self, status):
-        self.__sendrequest__(self.addresschrono, i2c_register.setStatus, status, read=False)
+        print("I2CSet_Status : ", self.__sendrequest__(self.addresschrono, i2c_register.setStatus, status, read=False))
 #        self.bus.write_byte_data(self.addresschrono, 0, status)
         self.status = status
-        print ("I2CSet_Status : ", self.status)
+
         return 0
 
     def set_buzzerTime(self, time):
