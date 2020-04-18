@@ -157,6 +157,7 @@ class Event:
 
     def create_new_round(self, insert_database=False):
         f3f_round = Round.new_round(self)
+        f3f_round.set_flight_order_from_scratch()
         self.add_existing_round(f3f_round)
         if insert_database:
             Round.round_dao.insert(f3f_round)

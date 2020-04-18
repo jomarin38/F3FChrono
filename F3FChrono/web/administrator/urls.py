@@ -17,5 +17,7 @@ urlpatterns = [
     path('cancel_round', views.cancel_round, name='cancel_round'),
     path('delete_event', views.delete_event, name='delete_event'),
     path('do_delete_event', views.do_delete_event, name='do_delete_event'),
+    path('manage_round', views.manage_round, name='manage_round'),
+    path('give_refly', views.give_refly, name='give_refly'),
     path('sign_in', views.sign_in, name='sign_in')
 ]

@@ -32,17 +32,33 @@ class Round:
         if add_initial_group:
             f3f_round.groups.append(RoundGroup(f3f_round, 1))
 
-        for bib in [bib_number for bib_number in sorted(event.competitors)
-                    if bib_number >= event.bib_start]:
-            f3f_round._flight_order += [bib]
-        for bib in [bib_number for bib_number in sorted(event.competitors)
-                    if bib_number < event.bib_start]:
-            f3f_round._flight_order += [bib]
-        #print(f3f_round._flight_order)
         return f3f_round
 
     def add_group(self, round_group):
         self.groups.append(round_group)
+
+    def get_serialized_flight_order(self):
+        res = ''
+        for bib_number in self._flight_order:
+            res += str(bib_number) + ','
+        return res.rstrip(',')
+
+    def get_flight_order(self):
+        return self._flight_order
+
+    def set_flight_order_from_db(self, serialized_flight_order):
+        splitted_line = serialized_flight_order.split(',')
+        self._flight_order.clear()
+        for str_bib_number in splitted_line:
+            self._flight_order.append(int(str_bib_number))
+
+    def set_flight_order_from_scratch(self):
+        for bib in [bib_number for bib_number in sorted(self.event.competitors)
+                    if bib_number >= self.event.bib_start]:
+            self._flight_order += [bib]
+        for bib in [bib_number for bib_number in sorted(self.event.competitors)
+                    if bib_number < self.event.bib_start]:
+            self._flight_order += [bib]
 
     def handle_terminated_flight(self, competitor, chrono, penalty, valid, insert_database=False):
         run = Run()
@@ -67,8 +83,11 @@ class Round:
         run.penalty = penalty
         run.valid = False
         self._add_run(run)
+        self.give_refly(self.get_current_competitor())
+
+    def give_refly(self, competitor):
         self._flight_order.insert(self._current_competitor_index + self.event.get_flights_before_refly() + 1,
-                                  self.get_current_competitor().get_bib_number())
+                                  competitor.get_bib_number())
 
     def _add_run(self, run, insert_database=False):
         # TODO : search in which group the run has to be added
@@ -85,7 +104,8 @@ class Round:
         return self.event.get_competitor(self._flight_order[self._current_competitor_index])
 
     def set_current_competitor(self, competitor):
-        self._current_competitor_index = self._flight_order.index(competitor.bib_number)
+        self._current_competitor_index = self._current_competitor_index + \
+                                        self._flight_order[self._current_competitor_index:].index(competitor.bib_number)
 
     def next_pilot(self, insert_database=False, visited_competitors=[]):
         if self._current_competitor_index < len(self._flight_order) - 1:
@@ -158,8 +178,20 @@ class Round:
             res = res or f3f_group.has_run_competitor(competitor)
         return res
 
+    def get_valid_run(self, competitor):
+        valid_run = None
+        for f3f_group in self.groups:
+            valid_run = f3f_group.get_valid_run(competitor)
+        return valid_run
+
     def get_best_runs(self):
         result = []
         for group in self.groups:
             result.append(group.get_best_run())
         return result
+
+    def get_penalty(self, competitor):
+        penalty = 0
+        for group in self.groups:
+            penalty += group.get_penalty(competitor)
+        return penalty
