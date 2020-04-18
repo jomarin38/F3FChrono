@@ -321,7 +321,7 @@ class ChronoArduino(ChronoHard, QTimer):
             self.run_validated.emit()
 
     def reset(self):
-        self.arduino.reset()
+        self.arduino.resetChrono()
         self.chronoLap.clear()
         self.penalty = 0.0
         self.reset_wind()
