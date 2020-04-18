@@ -3,16 +3,6 @@ import time
 import sys
 from F3FChrono.chrono import ConfigReader
 
-class chronoStatus():
-    InWait=0
-    WaitLaunch=1
-    Launched=2
-    InStart=3
-    InProgress=4
-    WaitAltitude=5
-    Finished=6
-    
-
 # This is the address we setup in the Arduino Program
 #anemoaddress = 0x04
 chronoaddress = 0x05
@@ -23,8 +13,9 @@ class i2c_register():
     setRebundBtn = 3
     eventBaseA = 4
     reset = 5
-    getData = 6
-    getData1 = 7
+    reboot = 6
+    getData = 7
+    getData1 = 8
 
 
 class arduino_com():
@@ -45,6 +36,7 @@ class arduino_com():
         self.lap = []
         for count in range(10):
             self.lap.append(0.0)
+        self.reboot()
         self.set_RebundBtn(rebundTimeBtn)
 
 
@@ -69,13 +61,19 @@ class arduino_com():
         self.__sendrequest__(self.addresschrono, i2c_register.eventBaseA, 0, read=False)
         return 0
 
-    def reset(self):
+    def resetChrono(self):
         self.__sendrequest__(self.addresschrono, i2c_register.reset, 1, read=False)
 #        self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
         self.status = 0
         self.nbLap = 0
         for lap in self.lap:
-            lap=0
+            lap = 0
+        return 0
+
+    def reboot(self):
+        self.__sendrequest__(self.addresschrono, i2c_register.reboot, 0, read=False)
+        #        self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
+        time.sleep(0.2)
         return 0
         
     def get_data(self):
@@ -110,7 +108,7 @@ class arduino_com():
 
     def __sendrequest__(self, address, cmd, data=None, nbdata=0, read=False):
         response = []
-        for x in range(2):
+        for x in range(5):
             try:
                 if self.bus is not None:
                     self.checki2ctime()
