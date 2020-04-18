@@ -187,6 +187,7 @@ class Ui_WConfig(object):
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 
         self.retranslateUi(WConfig)
+        self.ChronoType.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(WConfig)
 
     def retranslateUi(self, WConfig):

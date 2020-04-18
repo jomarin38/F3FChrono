@@ -103,9 +103,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].btn_quitapp_sig.connect(self.shutdown_app)
         self.controllers['settingsadvanced'].btn_settings_sig.connect(self.show_settings)
 
+
         self.show_config()
         self.MainWindow.show()
         self.controllers['config'].set_contest(self.daoEvent.get_list())
+        self.controllers['config'].view.ChronoType.setCurrentIndex(1)
         self.controllers['wind'].set_data(0, 0, 0)
 
     def show_config(self):
@@ -246,8 +248,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def handle_time_elapsed(self):
         print ("time elapsed")
         if self.chronoHard.get_status() == chronoStatus.WaitLaunch:
-           self.vocal.signal_penalty.emit()
-           self.controllers['round'].wChronoCtrl.stoptime()
+            self.vocal.signal_penalty.emit()
+            self.controllers['round'].wChronoCtrl.stoptime()
+            self.chronoHard.set_status(chronoStatus.InWait)
 
         if self.chronoHard.get_status() == chronoStatus.Launched:
             print("handle time elapsed status Launched")

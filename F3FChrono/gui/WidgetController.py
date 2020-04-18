@@ -213,6 +213,7 @@ class WChronoCtrl(QTimer):
         self.statusText.append(_translate("chronoStatus_Launched", "Launched"))
         self.statusText.append(_translate("chronoStatus_InStart", "In Start"))
         self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
+        self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
         self.statusText.append(_translate("chronoStatus_WaitAltitude", "Wait Altitude"))
         self.statusText.append(_translate("chronoStatus_Finished", "Finished"))
 
@@ -258,7 +259,8 @@ class WChronoCtrl(QTimer):
         return self.widget.isVisible()
 
     def set_status(self, status):
-        self.view.Status.setText(self.statusText[status])
+        if status < len(self.statusText):
+            self.view.Status.setText(self.statusText[status])
 
     def set_laptime(self, laptime):
         #self.view.Time_label.setText("{:0>6.3f}".format(time)

@@ -30,7 +30,7 @@ class arduino_com():
     def __init__(self, voltageCoef, rebundTimeBtn):
         super().__init__()
 
-        self.bus=None
+        self.bus = None
         if ConfigReader.config.conf['arduino']:
             # for RPI version 1, use “bus = smbus.SMBus(0)”
             self.bus = smbus.SMBus(1)
