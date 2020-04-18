@@ -66,7 +66,7 @@ class arduino_com():
         return 0
 
     def event_BaseA(self):
-        self.__sendrequest__(self.addresschrono, i2c_register.eventBaseA, time, read=False)
+        self.__sendrequest__(self.addresschrono, i2c_register.eventBaseA, 0, read=False)
         return 0
 
     def reset(self):
