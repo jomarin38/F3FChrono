@@ -353,7 +353,8 @@ class ChronoArduino(ChronoHard, QTimer):
                     self.chronoLap.append(self.arduino.lap[self.currentlap-1])
                     if self.currentlap <= 10:
                         self.lap_finished.emit(self.currentlap, self.chronoLap[-1])
-                    if self.currentlap == 10:
+                    if self.currentlap == 10 and (self.arduino.status == chronoStatus.InProgressA or
+                                                  self.arduino.status == chronoStatus.WaitAltitude):
                         self.run_finished.emit(self.get_time())
                     self.oldlap = self.currentlap
 
