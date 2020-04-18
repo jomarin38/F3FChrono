@@ -321,7 +321,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['round'].wChronoCtrl.settime(30000, False)
         if (status==chronoStatus.InStart):
             self.vocal.signal_entry.emit()
-        if (status == chronoStatus.InProgress):
+        if (status == chronoStatus.InProgressA or status == chronoStatus.InProgressB):
             self.vocal.signal_base.emit(0)
             self.controllers['round'].wChronoCtrl.settime(0, True)
 
