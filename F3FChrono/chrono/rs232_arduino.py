@@ -12,7 +12,7 @@ class rs232_arduino (threading.Thread):
                  run_finished, accu_sig):
         super().__init__()
         self.bus=serial.Serial(port='/dev/ttyS0', baudrate = 57600, parity=serial.PARITY_NONE,
-                                 stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=0.1)
+                                 stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=0.2)
         print(self.bus)
 
         self.status_changed_sig = status_changed
