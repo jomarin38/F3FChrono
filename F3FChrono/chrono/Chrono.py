@@ -304,6 +304,9 @@ class ChronoArduino(ChronoHard):
     def reset(self):
         self.arduino.reset()
 
+    def set_buzzer_time(self, time):
+        self.arduino.set_buzzerTime(time)
+
 
 
 ''' 
