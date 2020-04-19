@@ -1,4 +1,4 @@
-from smbus2 import smbus
+from smbus2 import SMBus
 import time
 import sys
 import threading
@@ -29,7 +29,7 @@ class arduino_com():
         self.bus = None
         if ConfigReader.config.conf['arduino']:
             # for RPI version 1, use “bus = smbus.SMBus(0)”
-            self.bus = smbus.SMBus(1)
+            self.bus = SMBus(1)
 
         self.addresschrono = chronoaddress
         self.lastrequest = 0.0
