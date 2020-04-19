@@ -49,12 +49,12 @@ class rs232_arduino (threading.Thread):
                     if data[0] == "lap":
                         if 1 <= int(data[1]) <= 10:
                             self.lap_finished_sig.emit(int(data[1])-1, int(data[int(data[1])+1])/1000)
-                        '''if int(data[1]) == 10:
-                            tmp=0.0
+                        if int(data[1]) == 10:
+                            '''tmp=0.0
                             for i in range(2, data[1]+1, 2):
                                 tmp+=int(data[i])/1000
-                            self.run_finished_sig.emit(tmp)
-                        '''
+                            '''
+                            self.run_finished_sig.emit(10)
                     if data[0] == "voltage":
                         self.accu_sig.emit(int(data[1])*5/1024/self.voltageCoef)
 
