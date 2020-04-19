@@ -293,7 +293,7 @@ class ChronoArduino(ChronoHard):
             self.buzzer_validated.emit()
 
         if caller.lower() == "btnnext" and \
-                (status == chronoStatus.WaitLaunch or status == chronoStatus.InWait):
+                (self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.InWait):
             self.set_status(self.status+1)
         if caller.lower() == "btnnext" and data == "event" and address == "baseA" and\
                 (self.status == chronoStatus.InStart or self.status == chronoStatus.Launched):
