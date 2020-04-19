@@ -279,7 +279,7 @@ class ChronoArduino(ChronoHard):
         self.chrono_signal.connect(self.handle_chrono_event)
         self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'],
                                    ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
-                                     self.lap_finished, self.run_finished, self.accu_signal)
+                                     self.lap_finished, self.run_finished, self.altitude_finished, self.accu_signal)
         self.reset()
         self.status = 0
         self.status_changed.connect(self.slot_status)
