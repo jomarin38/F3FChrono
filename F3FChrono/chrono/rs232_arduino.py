@@ -28,8 +28,8 @@ class rs232_arduino (threading.Thread):
         self.voltageCoef = voltageCoef
         self.terminated = False
         self.event = threading.Thread(target = self.receive)
-        self.event.start()
         self.event.daemon = True
+        self.event.start()
 
     def receive(self):
         while not self.terminated:
