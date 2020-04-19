@@ -185,6 +185,8 @@ class ChronoRpi(ChronoHard):
         self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerEvent)
+        self.status=0
+        self.status_changed.connect(self.slot_status)
 
     def __del__(self):
         self.udpBeep.terminate()
@@ -200,6 +202,9 @@ class ChronoRpi(ChronoHard):
             and caller.lower() == "udpreceive" or caller.lower() == "btnnext") \
                 and data.lower() == "event":
             self.__declareBase(address)
+
+    def slot_status(self, status):
+        self.status=status
 
     def timerEvent(self):
         self.__declareBase("Altitude")
