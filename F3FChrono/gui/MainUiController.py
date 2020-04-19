@@ -325,8 +325,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['round'].wChronoCtrl.settime(30000, False)
         if (status==chronoStatus.InStart):
             self.vocal.signal_entry.emit()
-        if (status == chronoStatus.InProgressA or status == chronoStatus.InProgressB):
-            self.vocal.signal_base.emit(0)
+        #if (status == chronoStatus.InProgressA or status == chronoStatus.InProgressB):
+        #    self.vocal.signal_base.emit(0)
 
     def slot_run_started(self):
         self.controllers['round'].wChronoCtrl.settime(0, True)
