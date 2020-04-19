@@ -25,7 +25,6 @@ enum chronoStatus {
 };
 
 typedef struct {
-  byte runStatus;
   byte lapCount;
   unsigned long lap[10];
   unsigned long time1;
@@ -34,26 +33,10 @@ typedef struct {
   unsigned long startaltitudetime;
 } chronoStr;
 
-enum i2c_request {
-  setStatus = 1,
-  setBuzzerTime,
-  setRebundBtn,
-  eventBaseA,
-  resetChrono,
-  reboot,
-  getData,
-  getData1
-};
-
 typedef struct {
-  byte data[10];
-  byte nbData;
-} i2cReceiveStr;
+  byte runStatus;
+}chronoStatusStr;
 
-typedef struct {
-  byte data[30];
-  byte nbData;
-} i2cSendStr;
 
 typedef struct{
   char data_read[100];
@@ -90,8 +73,7 @@ typedef struct {
 
 
 volatile chronoStr chrono = {0}, chrono_old = {0};
-volatile i2cReceiveStr i2cReceive = {0};
-volatile i2cSendStr i2cSend = {0};
+volatile chronoStatusStr chronostatus, chronostatus_old;
 volatile serialStr serial;
 volatile baseEventStr baseA = {0}, baseB = {0};
 volatile analogStr accu = {0};
@@ -104,10 +86,8 @@ volatile byte temp = 0;
 void(* resetFunc) (void) = 0;//declare reset function at address 0
 void baseA_Interrupt(void);
 void baseB_Interrupt(void);
-void sendData(void);
-void receiveData(int byteCount);
 void baseCheck(byte base);
-void debugRun(void);
+void RS232Run(void);
 void analogRun(void);
 void buzzerRun(buzzerStr *data);
 void buzzerSet(buzzerStr *data, byte nb);
@@ -119,10 +99,9 @@ void setup() {
   memset (&debug, 0, sizeof(debug));
   memset (&chrono, 0, sizeof(chrono));
   memset (&chrono_old, 0, sizeof(chrono_old));
+  memset (&chronostatus, 0, sizeof(chronostatus));
+  memset (&chronostatus_old, 0, sizeof(chronostatus_old));
 
-  //Initialize I2C link as slave with Rpi
-  memset (&i2cReceive, 0, sizeof(i2cReceive));
-  memset (&i2cSend, 0, sizeof(i2cSend));
   memset (&buzzer, 0, sizeof(buzzer));
   memset (&led, 0, sizeof(led));
   memset (&accu, 0, sizeof(accu));
@@ -155,12 +134,6 @@ void setup() {
   pinMode(baseB.Pin, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(baseB.Pin), baseB_Interrupt, FALLING);
 
-  Wire.begin(SLAVE_ADDRESS);
-  // define callbacks for i2c communication
-  Wire.onReceive(receiveData);
-  Wire.onRequest(sendData);
-
-  //Only for debug
   Serial.begin(57600);
   while (!Serial) {
     delay(100);
@@ -170,22 +143,28 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  debugRun();
+  RS232Run();
   analogRun();
   buzzerRun(&buzzer);
-  if (chrono.runStatus == WaitAltitude) {
+  if (chronostatus.runStatus == WaitAltitude) {
     baseCheck(0);
   }
   delay (LOOPDELAY);
 }
 
 
-void debugRun(void) {
+void RS232Run(void) {
+  //check if status changed
+  temp = memcmp (&chronostatus, &chronostatus_old, sizeof(chronostatus));
+  if (temp != 0){
+    Serial.print("status,");
+    Serial.println(chronostatus.runStatus);
+    memcpy(&chronostatus_old, &chronostatus, sizeof(chronostatus));
+  }
+  //check if lap changed
   temp = memcmp (&chrono, &chrono_old, sizeof(chrono));
   if (temp != 0){
-    Serial.print("s");
-    Serial.print(chrono.runStatus);
-    Serial.print(",");
+    Serial.print("lap,");
     Serial.print(chrono.lapCount);
     for (i = 0; i < chrono.lapCount; i++) {
       Serial.print(",");
@@ -194,9 +173,9 @@ void debugRun(void) {
     Serial.println("");
     memcpy(&chrono_old, &chrono, sizeof(chrono));
   }
+  //Process serial request
   if (serial.data_available) {
     char tmp = serial.data_read[0];
-    Serial.println(tmp);
     if (tmp=='t'){
       buzzer.Time=0;
       for (i=1; i<serial.nb_data-1; i++){
@@ -204,60 +183,55 @@ void debugRun(void) {
       }
       led.Time = buzzer.Time;
       Serial.println(buzzer.Time);
-    }else if (tmp=='l'){
-      Serial.print("Lap count : ");
-      Serial.println(chrono.lapCount);
-      for (i = 0; i < chrono.lapCount; i++) {
-        Serial.print("Lap : ");
-        Serial.println(i);
-        Serial.println((float)chrono.lap[i] / 1000);
-      }
     }else if (tmp=='d'){
       led.Cmd = -1;
-      Serial.println("buzzer :");
-      Serial.print("cmd ");
-      Serial.println(buzzer.Cmd);
-      Serial.print("time ");
-      Serial.println(buzzer.Time);
-      Serial.print("state ");
-      Serial.println(buzzer.State);
-      Serial.println("led : ");
-      Serial.print("cmd ");
-      Serial.println(led.Cmd);
-      Serial.print("time ");
-      Serial.println(led.Time);
-      Serial.print("state ");
+      Serial.print("buzzer,");
+      Serial.print("cmd,");
+      Serial.print(buzzer.Cmd);
+      Serial.print(",time,");
+      Serial.print(buzzer.Time);
+      Serial.print(",state,");
+      Serial.print(buzzer.State);
+      Serial.print(",led,");
+      Serial.print("cmd,");
+      Serial.print(led.Cmd);
+      Serial.print(",time,");
+      Serial.print(led.Time);
+      Serial.print(",state,");
       Serial.println(led.State);
     }else if (tmp=='s'){
-      chrono.runStatus=byte(serial.data_read[1]-'0');
-      String data ="status : ";
-      data+= chrono.runStatus;
-      Serial.println(data);
+      chronostatus.runStatus=byte(serial.data_read[1]-'0');
     }else if (tmp=='b'){
-      Serial.println("base A :");
-      Serial.print("rebund time : ");
-      Serial.println(baseA.rebundBtn_time);
-      Serial.print("nb interrrupt : ");
-      Serial.println(baseA.nbInterrupt);
-      Serial.println("base B :");
-      Serial.print("rebund time : ");
-      Serial.println(baseA.rebundBtn_time);
-      Serial.print("nb interrrupt : ");
-      Serial.println(baseB.nbInterrupt);
-    }else if (tmp=='v'){
-      Serial.print("voltage : ");
-      Serial.println(accu.rawData);
-    }else if (tmp=='r'){
       baseA.rebundBtn_time=0;
       for (i=1; i<serial.nb_data-1; i++){
         baseA.rebundBtn_time = baseA.rebundBtn_time*10+(int)(serial.data_read[i]-'0');
       }
       baseB.rebundBtn_time = baseA.rebundBtn_time;
+      Serial.print("base A,");
+      Serial.print("rebund time,");
+      Serial.print(baseA.rebundBtn_time);
+      Serial.print(",nb interrrupt,");
+      Serial.print(baseA.nbInterrupt);
+      Serial.print(",base B,");
+      Serial.print(",rebund time,");
+      Serial.print(baseA.rebundBtn_time);
+      Serial.print(",nb interrrupt,");
+      Serial.println(baseB.nbInterrupt);
+    }else if (tmp=='v'){
+      Serial.print("voltage,");
+      Serial.println(accu.rawData);
+    }else if (tmp=='r'){
+      memset(&chronostatus, 0, sizeof(chronostatus));
+      memset(&chrono, 0, sizeof(chrono));
+      Serial.println("reset");
+    }else if (tmp=='e'){
+      baseCheck(baseA.Pin);
+      Serial.println("force baseA");
     }
     
-  memset(&serial, 0, sizeof(serial));
-  buzzerRun(&led);
+    memset(&serial, 0, sizeof(serial));
   }
+  buzzerRun(&led);
 }
 
 void serialEvent(){
@@ -320,59 +294,6 @@ void buzzerSet(buzzerStr *data, byte nb)
   }
 }
 
-// callback for received data
-void receiveData(int byteCount) {
-  memset(&i2cReceive, 0, sizeof(i2cReceive));
-  while (Wire.available() and i2cReceive.nbData < sizeof (i2cReceive.data)) {
-    i2cReceive.data[i2cReceive.nbData] = Wire.read();
-    i2cReceive.nbData++;
-  }
-
-  switch (i2cReceive.data[0]) {
-    case setStatus:
-      chrono.runStatus = i2cReceive.data[1];
-      break;
-    case eventBaseA:
-      baseCheck(BASEAPIN);
-      break;
-    case setBuzzerTime:
-      buzzer.Time = (i2cReceive.data[1] & 0xff) | ((i2cReceive.data[2] << 8) & 0xff00);
-      break;
-    case setRebundBtn:
-      baseA.rebundBtn_time = (i2cReceive.data[1] & 0xff) | ((i2cReceive.data[2] << 8) & 0xff00);
-      baseB.rebundBtn_time = (i2cReceive.data[1] & 0xff) | ((i2cReceive.data[2] << 8) & 0xff00);
-      break;
-    case resetChrono:
-      memset(&chrono, 0, sizeof(chronoStr));
-      break;
-    case reboot:
-      resetFunc();
-      break;
-    default:
-      break;
-  }
-}
-
-// callback for sending data
-void sendData() {
-  memset(&i2cSend, 0, sizeof(i2cSend));
-  switch (i2cReceive.data[0]) {
-    case getData:
-      i2cSend.data[0] = chrono.runStatus;
-      memcpy(&i2cSend.data[1], &accu.rawData, 2);
-      i2cSend.data[3] = chrono.lapCount;
-      memcpy(&i2cSend.data[4], chrono.lap, 12);
-      i2cSend.nbData = 32;
-      break;
-    case getData1:
-      memcpy(i2cSend.data, &chrono.lap[3], 32);
-      i2cSend.nbData = 32;
-      break;
-    default:
-      break;
-  }
-  Wire.write((byte *)i2cSend.data, i2cSend.nbData);
-}
 
 void baseA_Interrupt(void) {
   if ((baseA.old_event + baseA.rebundBtn_time) < millis()) {
@@ -391,10 +312,10 @@ void baseB_Interrupt(void) {
 }
 
 void baseCheck(byte base) {
-  switch (chrono.runStatus) {
+  switch (chronostatus.runStatus) {
     case Launched :
       if (BASEAPIN == base) {
-        chrono.runStatus = InStart;
+        chronostatus.runStatus = InStart;
         buzzerSet(&buzzer, 1);
       }
       break;
@@ -404,7 +325,7 @@ void baseCheck(byte base) {
         chrono.time1 = millis();
         chrono.oldtime = chrono.time1;
         chrono.lapCount=0;
-        chrono.runStatus = InProgressB;
+        chronostatus.runStatus = InProgressB;
       }
       break;
     case InProgressA:
@@ -416,11 +337,11 @@ void baseCheck(byte base) {
         chrono.oldtime = chrono.time1;
         buzzer.Cmd = 1;
         if (chrono.lapCount >= 10) {
-          chrono.runStatus = WaitAltitude;
+          chronostatus.runStatus = WaitAltitude;
           chrono.startaltitudetime = millis();
           buzzerSet(&buzzer, 3);
         } else {
-          chrono.runStatus = InProgressB;
+          chronostatus.runStatus = InProgressB;
         }
       }
       break;
@@ -430,7 +351,7 @@ void baseCheck(byte base) {
         chrono.lap[chrono.lapCount] = chrono.time1 - chrono.oldtime;
         chrono.oldtime = chrono.time1;
         chrono.lapCount++;
-        chrono.runStatus = InProgressA;
+        chronostatus.runStatus = InProgressA;
         if (chrono.lapCount == 9) {
           buzzerSet(&buzzer, 2);
         }else{
@@ -445,7 +366,7 @@ void baseCheck(byte base) {
     case WaitAltitude:
       if ((chrono.startaltitudetime + 5000) < millis()) {
         buzzer.Cmd = 3;
-        chrono.runStatus = Finished;
+        chronostatus.runStatus = Finished;
       }
       break;
     default:

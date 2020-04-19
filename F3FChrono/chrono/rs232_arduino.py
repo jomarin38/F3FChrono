@@ -1,17 +1,13 @@
 import serial
 import sys
-import threading
-import time
+from PyQt5.QtCore import QThread
 
-
-class arduino_com:
-    lock = threading.Lock()
+class rs232_arduino (QThread):
     def __init__(self, voltageCoef, rebundTimeBtn):
         super().__init__()
 
         self.bus = serial.Serial(port='/dev/ttyS0', baudrate = 57600, parity=serial.PARITY_NONE,
                                  stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=1)
-        print(self.bus)
         
         self.lastrequest = 0.0
         self.voltageCoef = voltageCoef
@@ -22,8 +18,22 @@ class arduino_com:
         self.nb_data = 32
         for count in range(10):
             self.lap.append(0.0)
+        self.start()
 
-    def debug (self):
+    def run(self):
+        while(not self.isFinished()):
+        # wait until somebody throws an event
+            try:
+                if self.bus.in_waiting()>0:
+                    data = self.bus.readlines()
+                    print (data)
+            except serial.SerialException as e:
+                return None
+            except TypeError as e:
+                self.bus.close()
+                return None
+
+    def debug(self):
         self.bus.write("d.".encode())
         for i in range(10):
             print(self.bus.readline())

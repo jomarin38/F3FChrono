@@ -19,7 +19,7 @@ class i2c_register():
     getData1 = 8
 
 
-class arduino_com():
+class i2c_arduino():
 
     lock = threading.Lock()
 
