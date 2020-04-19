@@ -31,6 +31,7 @@ class rs232_arduino (threading.Thread):
         self.event = threading.Thread(target = self.receive)
         self.event.daemon = True
         self.event.start()
+        self.inRun=False
 
     def receive(self):
         while not self.terminated:
@@ -41,8 +42,11 @@ class rs232_arduino (threading.Thread):
                     if data[0] == "status":
                         self.status = int(data[1])
                         self.status_changed_sig.emit(self.status)
+                        if self.status == Chrono.chronoStatus.InWait:
+                            self.inRun=False
                         if self.status == Chrono.chronoStatus.InProgressB or self.status == Chrono.chronoStatus.InProgressA:
                             self.run_started_sig.emit()
+                            self.inRun=True
                         if self.status == Chrono.chronoStatus.Finished:
                             self.wait_alt_sig.emit()
                     if data[0] == "lap":
