@@ -2,9 +2,11 @@ import os
 import re
 import sys
 import subprocess
-from time import sleep
+import time
+
 from argparse import ArgumentParser
 from PyQt5 import QtWidgets
+import os.path
 
 def get_raspi_revision():
     rev_file = '/sys/firmware/devicetree/base/model'
@@ -53,7 +55,7 @@ def main():
     pi=get_raspi_revision()
     if(pi['pi']!=''):
         print("warm-up 2 seconds...")
-        sleep(2.0)
+        time.sleep(2.0)
 
     webserver_process = None
 
@@ -77,6 +79,14 @@ def main():
 
     app = QtWidgets.QApplication(sys.argv)
     ui=MainUiCtrl(dao, chronodata, rpi=pi['pi'], webserver_process=webserver_process)
+
+    if not os.path.isfile('voltage_log.txt'):
+        MainUiCtrl.startup_time = time.time()
+    else:
+        with open("voltage_log.txt", "r") as file:
+            first_line = file.readline()
+            MainUiCtrl.startup_time = float(first_line.split(',')[0])
+
 
     #launched simulate mode
     if (ConfigReader.config.conf['simulatemode']):

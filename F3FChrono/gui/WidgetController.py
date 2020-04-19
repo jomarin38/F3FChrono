@@ -161,6 +161,11 @@ class WWindCtrl():
 
     def set_voltage(self, voltage):
         self.view.voltage.setText("{:0>3.1f}".format(voltage)+" V")
+        f = open("voltage_log.txt", "a+")
+        from F3FChrono.gui.MainUiController import MainUiCtrl
+        f.write(str(MainUiCtrl.startup_time)+','+str((time.time()-MainUiCtrl.startup_time)/60.0) +
+                ',' + str(voltage)+'\n')
+        f.close()
 
     def set_rssi(self, rssi1, rssi2):
         self.view.rssi.setText("rssi1, 2 : "+str(rssi1) + "%, "+str(rssi2)+"%")
