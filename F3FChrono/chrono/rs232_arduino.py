@@ -29,6 +29,7 @@ class rs232_arduino (threading.Thread):
         self.terminated = False
         self.event = threading.Thread(target = self.receive)
         self.event.start()
+        self.event.daemon = True
 
     def receive(self):
         while not self.terminated:
@@ -106,7 +107,7 @@ class rs232_arduino (threading.Thread):
 
     def stop(self):
         self.terminated = True
-        self.event.join(timeout=1)
+        self.event.join(timeout=1.0)
 
 if __name__ == '__main__':
 
