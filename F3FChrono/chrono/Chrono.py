@@ -285,7 +285,7 @@ class ChronoArduino(ChronoHard):
         self.status_changed.connect(self.slot_status)
 
     def slot_status(self, status):
-        print("handle status : "+status)
+        print("handle status : ", status)
         self.status=status
 
     def handle_chrono_event(self, caller, data, address):
