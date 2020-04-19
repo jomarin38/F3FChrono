@@ -40,23 +40,22 @@ class rs232_arduino (threading.Thread):
                     data = self.bus.readline().decode().split(',')
                     print(data)
                     if data[0] == "status":
-                        self.status = data[1]
-                        print (self.status, data[1])
+                        self.status = int(data[1])
                         self.status_changed_sig.emit(self.status)
                         if self.status == Chrono.chronoStatus.InProgressB or self.status == Chrono.chronoStatus.InProgressA:
                             self.run_started_sig.emit()
                         if self.status == Chrono.chronoStatus.WaitAltitude:
                             self.run_finished_sig.emit()
                     if data[0] == "lap":
-                        if 1 <= data[1] <= 10:
-                            self.lap_finished_sig.emit(data[1]-1, data[data[1]+1]/1000)
-                        if data[1] == 10:
+                        if 1 <= int(data[1]) <= 10:
+                            self.lap_finished_sig.emit(int(data[1])-1, int(data[int(data[1])+1])/1000)
+                        if int(data[1]) == 10:
                             tmp=0.0
                             for i in range (2, data[1]+1, 2):
-                                tmp+=data[i]/1000
+                                tmp+=int(data[i])/1000
                             self.run_finished_sig.emit(tmp)
                     if data[0] == "voltage":
-                        self.accu_sig.emit(data[1]*5/1024/self.voltageCoef)
+                        self.accu_sig.emit(int(data[1])*5/1024/self.voltageCoef)
 
             except serial.SerialException as e:
                 print("serial exception")
