@@ -272,7 +272,7 @@ class ChronoRpi(ChronoHard):
                 self.timelost[self.getLapCount() - 1] = self.timelost[self.getLapCount() - 1] + elapsedTime
                 return False
 
-class ChronoArduino(ChronoHard):
+class ChronoArduino(ChronoHard, QTimer):
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
         print("chronoArduino init")
@@ -280,10 +280,16 @@ class ChronoArduino(ChronoHard):
         self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'],
                                    ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
                                      self.lap_finished, self.run_finished, self.altitude_finished, self.accu_signal)
+        self.timer = Qtimer()
+        self.timer.timeout.connect(self.event_voltage)
+        self.timer.start(10)
         self.reset()
         self.status = 0
         self.status_changed.connect(self.slot_status)
 
+    def event_voltage(self):
+        self.arduino.get_voltage()
+        
     def slot_status(self, status):
         print("handle status : ", status)
         self.status=status
