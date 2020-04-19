@@ -46,41 +46,54 @@ class arduino_com():
 
         
     def set_status(self, status):
+        arduino_com.lock.acquire()
         print("I2CSet_Status : ", self.__sendrequest__(self.addresschrono, i2c_register.setStatus, status, read=False))
 #        self.bus.write_byte_data(self.addresschrono, 0, status)
         self.status = status
+        arduino_com.lock.release()
 
         return 0
 
     def set_buzzerTime(self, time):
+        arduino_com.lock.acquire()
         self.__sendrequest__(self.addresschrono, i2c_register.setBuzzerTime, time, read=False)
 #        self.bus.write_word_data(self.addresschrono, 1, time & 0xffff)
+        arduino_com.lock.release()
         return 0
 
     def set_RebundBtn(self, time):
+        arduino_com.lock.acquire()
         self.__sendrequest__(self.addresschrono, i2c_register.setRebundBtn, time, read=False)
+        arduino_com.lock.release()
         return 0
 
     def event_BaseA(self):
+        arduino_com.lock.acquire()
         self.__sendrequest__(self.addresschrono, i2c_register.eventBaseA, 0, read=False)
+        arduino_com.lock.release()
         return 0
 
     def resetChrono(self):
+        arduino_com.lock.acquire()
         self.__sendrequest__(self.addresschrono, i2c_register.reset, 1, read=False)
 #        self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
         self.status = 0
         self.nbLap = 0
         for lap in self.lap:
             lap = 0
+        arduino_com.lock.release()
         return 0
 
     def reboot(self):
+        arduino_com.lock.acquire()
         self.__sendrequest__(self.addresschrono, i2c_register.reboot, 0, read=False)
         #        self.bus.read_i2c_block_data(self.addresschrono, 4, 1)
         time.sleep(0.2)
+        arduino_com.lock.release()
         return 0
         
     def get_data(self):
+        arduino_com.lock.acquire()
         data = self.__sendrequest__(self.addresschrono, i2c_register.getData, nbdata=16, read=True)
 #       number = self.bus.read_i2c_block_data(self.addresschrono, 2, 16)
         if len(data) == 16:
@@ -92,9 +105,11 @@ class arduino_com():
             for count in range(4, 15, 4):
                 self.lap[indexlap] = (data[count+3] << 24 | data[count+2] << 16 | data[count+1] << 8 | data[count])/1000
                 indexlap += 1
+        arduino_com.lock.release()
         return 0
 
     def get_data1(self):
+        arduino_com.lock.acquire()
         data = self.__sendrequest__(self.addresschrono, i2c_register.getData1, nbdata=32, read=True)
 #        number = self.bus.read_i2c_block_data(self.addresschrono, 3, 28)
         if len(data) == 32:
@@ -102,6 +117,7 @@ class arduino_com():
             for count in range(0, 27, 4):
                 self.lap[indexlap] = (data[count+3] << 24 | data[count+2] << 16 | data[count+1] << 8 | data[count])/1000
                 indexlap += 1
+        arduino_com.lock.release()
         return 0
 
     def checki2ctime(self):
@@ -111,7 +127,7 @@ class arduino_com():
         self.lastrequest=time.time()
 
     def __sendrequest__(self, address, cmd, data=None, nbdata=0, read=False):
-        arduino_com.lock.acquire()
+
         response = []
         for x in range(5):
             try:
@@ -124,7 +140,6 @@ class arduino_com():
                     break
             except IOError:
                 print("error I2C", x)
-        arduino_com.lock.release()
         return response
 
 
