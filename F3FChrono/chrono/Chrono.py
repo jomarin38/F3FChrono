@@ -289,7 +289,7 @@ class ChronoArduino(ChronoHard, QTimer):
 
     def event_voltage(self):
         self.arduino.get_voltage()
-        
+
     def slot_status(self, status):
         print("handle status : ", status)
         self.status=status
