@@ -195,3 +195,21 @@ class Round:
         for group in self.groups:
             penalty += group.get_penalty(competitor)
         return penalty
+
+    def give_penalty(self, competitor, penalty):
+        f3f_run = self.get_valid_run(competitor)
+        if f3f_run is None:
+            runs = []
+            for group in self.groups:
+                runs_in_group = group.runs[competitor]
+                if runs_in_group is not None:
+                    runs += runs_in_group
+            if len(runs) > 0:
+                f3f_run = runs[0]
+            else:
+                raise Exception('Can t give penalty to a pilot that did not flew')
+
+        if penalty == 0:
+            f3f_run.penalty = 0
+        else:
+            f3f_run.penalty += penalty

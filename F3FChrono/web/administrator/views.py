@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -79,7 +79,7 @@ def cancel_round(request):
     f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
     f3f_round.do_cancel_round()
 
-    return manage_event(request)
+    return HttpResponseRedirect('manage_event?event_id='+event_id)
 
 
 def register_new_pilot(request):
@@ -110,7 +110,7 @@ def register_new_pilot(request):
     competitor = event.register_pilot(pilot, bib_number)
     CompetitorDAO().insert(competitor)
 
-    return manage_event(request)
+    return HttpResponseRedirect('manage_event?event_id='+event_id)
 
 
 def delete_event(request):
@@ -366,7 +366,7 @@ def give_refly(request):
 
     RoundDAO().update(f3f_round)
 
-    return manage_round(request)
+    return HttpResponseRedirect('manage_round?event_id='+event_id+'&round_number='+round_number)
 
 
 def give_zero(request):
@@ -391,7 +391,7 @@ def give_zero(request):
 
     RoundDAO().update(f3f_round)
 
-    return manage_round(request)
+    return HttpResponseRedirect('manage_round?event_id='+event_id+'&round_number='+round_number)
 
 
 def give_penalty(request):
@@ -411,16 +411,11 @@ def give_penalty(request):
 
     competitor = event.competitors[int(bib_number)]
 
-    f3f_run = f3f_round.get_valid_run(competitor)
-
-    if penalty==0:
-        f3f_run.penalty = 0
-    else:
-        f3f_run.penalty += penalty
+    f3f_round.give_penalty(competitor, penalty)
 
     RoundDAO().update(f3f_round)
 
-    return manage_round(request)
+    return HttpResponseRedirect('manage_round?event_id='+event_id+'&round_number='+round_number)
 
 
 def set_competitor_presence(request):
@@ -443,7 +438,7 @@ def set_competitor_presence(request):
 
     dao.update(competitor)
 
-    return manage_event(request)
+    return HttpResponseRedirect('manage_event?event_id='+event_id)
 
 
 def remove_competitor(request):
@@ -462,7 +457,7 @@ def remove_competitor(request):
 
     event.unregister_competitor(competitor, insert_database=True)
 
-    return manage_event(request)
+    return HttpResponseRedirect('manage_event?event_id='+event_id)
 
 @never_cache
 def index(request):
