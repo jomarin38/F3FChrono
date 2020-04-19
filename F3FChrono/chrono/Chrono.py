@@ -286,7 +286,6 @@ class ChronoArduino(ChronoHard, QTimer):
         self.reset()
         self.status = 0
         self.status_changed.connect(self.slot_status)
-        self.arduino.get_voltage()
 
     def event_voltage(self):
         self.arduino.get_voltage()

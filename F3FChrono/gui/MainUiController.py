@@ -53,6 +53,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoArduino.rssi_signal.connect(self.slot_rssi)
         self.chronoArduino.accu_signal.connect(self.slot_accu)
         self.chronoArduino.buzzer_validated.connect(self.slot_buzzer)
+        self.chronoArduino.event_voltage()
 
     def initUI(self):
         self.MainWindow = QtWidgets.QMainWindow()
