@@ -280,7 +280,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'],
                                    ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
                                      self.lap_finished, self.run_finished, self.altitude_finished, self.accu_signal)
-        self.timer = Qtimer()
+        self.timer = QTimer()
         self.timer.timeout.connect(self.event_voltage)
         self.timer.start(10)
         self.reset()
