@@ -1,6 +1,7 @@
 import smbus
 import time
 import sys
+import threading
 from F3FChrono.chrono import ConfigReader
 
 # This is the address we setup in the Arduino Program
@@ -19,6 +20,9 @@ class i2c_register():
 
 
 class arduino_com():
+
+    lock = threading.Lock()
+
     def __init__(self, voltageCoef, rebundTimeBtn):
         super().__init__()
 
@@ -107,6 +111,7 @@ class arduino_com():
         self.lastrequest=time.time()
 
     def __sendrequest__(self, address, cmd, data=None, nbdata=0, read=False):
+        arduino_com.lock.acquire()
         response = []
         for x in range(5):
             try:
@@ -119,7 +124,7 @@ class arduino_com():
                     break
             except IOError:
                 print("error I2C", x)
-
+        arduino_com.lock.release()
         return response
 
 
