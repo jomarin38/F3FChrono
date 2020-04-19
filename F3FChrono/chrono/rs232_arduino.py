@@ -117,8 +117,8 @@ class rs232_arduino (threading.Thread):
         self.event.join(timeout=1.0)
 
     def check_request_time(self):
-        if (time.time() - self.lastrequest) < 0.2:
-            time.sleep(0.2)
+        if (time.time() - self.lastrequest) < 0.1:
+            time.sleep(0.1)
         self.lastrequest = time.time()
 
 if __name__ == '__main__':
