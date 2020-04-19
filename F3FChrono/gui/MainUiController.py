@@ -258,7 +258,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if self.chronoHard.get_status() == chronoStatus.Launched:
             print("handle time elapsed status Launched")
             self.chronoHard.chrono_signal.emit("btnnext", "event", "baseA")
-            time.sleep(0.1)
             self.chronoHard.chrono_signal.emit("btnnext", "event", "baseA")
 
         if self.chronoHard.get_status() == chronoStatus.InStart:

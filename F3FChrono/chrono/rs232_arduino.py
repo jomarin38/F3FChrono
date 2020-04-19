@@ -67,36 +67,42 @@ class rs232_arduino (threading.Thread):
             time.sleep(0.01)
 
     def debug(self):
+        self.check_request_time()
         self.bus.write("d.".encode())
         for i in range(nbline):
             print(self.bus.readline())
         
     def set_status(self, status):
+        self.check_request_time()
         self.bus.write(("s"+str(status)+".").encode())
 
         return 0
 
     def set_buzzerTime(self, time):
+        self.check_request_time()
         self.bus.write(("t"+str(time)+".").encode())
         print(self.bus.readline().decode().split(','))
         return 0
 
     def set_RebundBtn(self, time):
+        self.check_request_time()
         self.bus.write(("b"+str(time)+".").encode())
         print(self.bus.readline().decode().split(','))
         return 0
 
     def event_BaseA(self):
+        self.check_request_time()
         self.bus.write(("e.").encode())
         print("arduino event e.")
         return 0
 
     def reset(self):
+        self.check_request_time()
         self.bus.write(("r.").encode())
         return 0
     def get_voltage(self):
         self.bus.write(("v.").encode())
-        
+        self.check_request_time()
         return 0
 
     def readlines(self):
@@ -108,6 +114,11 @@ class rs232_arduino (threading.Thread):
     def stop(self):
         self.terminated = True
         self.event.join(timeout=1.0)
+
+    def check_request_time(self):
+        if (time.time() - self.lastrequest) < 0.2:
+            time.sleep(0.3)
+        self.lastrequest = time.time()
 
 if __name__ == '__main__':
 
