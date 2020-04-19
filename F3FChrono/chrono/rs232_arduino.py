@@ -45,8 +45,9 @@ class rs232_arduino (threading.Thread):
                         if self.status == Chrono.chronoStatus.InWait:
                             self.inRun=False
                         if self.status == Chrono.chronoStatus.InProgressB or self.status == Chrono.chronoStatus.InProgressA:
-                            self.run_started_sig.emit()
-                            self.inRun=True
+                            if not self.inRun:
+                                self.run_started_sig.emit()
+                                self.inRun=True
                         if self.status == Chrono.chronoStatus.Finished:
                             self.wait_alt_sig.emit()
                     if data[0] == "lap":
