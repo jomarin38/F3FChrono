@@ -1,4 +1,4 @@
-from smbus2 import SMBus
+from smbus2 import smbus
 import time
 import sys
 import threading
