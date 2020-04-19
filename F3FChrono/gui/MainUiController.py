@@ -405,6 +405,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         event.accept()
 
     def shutdown_app(self):
+        self.chronoArduino.stop()
         if self.webserver_process is not None:
             print('Kill process ' + str(self.webserver_process.pid))
             time.sleep(1)  # Wait for the process to be killed

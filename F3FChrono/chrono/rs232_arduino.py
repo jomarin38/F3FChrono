@@ -30,12 +30,8 @@ class rs232_arduino (threading.Thread):
         self.event = threading.Thread(target = self.receive)
         self.event.start()
 
-    def __del__(self):
-        self.terminated=True
-        self.event.join()
-
     def receive(self):
-        while 1:
+        while not self.terminated:
             try:
                 if self.bus.inWaiting()>0:
                     data = self.bus.readline().decode().split(',')
@@ -90,7 +86,7 @@ class rs232_arduino (threading.Thread):
 
     def event_BaseA(self):
         self.bus.write(("e.").encode())
-
+        print("arduino event e.")
         return 0
 
     def reset(self):
@@ -106,8 +102,10 @@ class rs232_arduino (threading.Thread):
 
     def get_status(self):
         return self.status
-        
 
+    def stop(self):
+        self.terminated = True
+        self.event.join(timeout=1)
 
 if __name__ == '__main__':
 
