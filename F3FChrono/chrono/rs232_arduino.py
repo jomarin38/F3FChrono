@@ -22,6 +22,7 @@ class rs232_arduino (threading.Thread):
         self.wait_alt_sig = wait_alt_sig
         self.accu_sig = accu_sig
         self.status=0
+        self.lastrequest=0.0;
         self.set_RebundBtn(rebundTimeBtn)
         self.set_buzzerTime(buzzerTime)
         self.lastrequest = 0.0
@@ -30,7 +31,6 @@ class rs232_arduino (threading.Thread):
         self.event = threading.Thread(target = self.receive)
         self.event.daemon = True
         self.event.start()
-        self.lastrequest=0.0;
 
     def receive(self):
         while not self.terminated:
