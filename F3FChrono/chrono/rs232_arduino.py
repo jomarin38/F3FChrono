@@ -3,29 +3,28 @@ import sys
 import time
 from PyQt5.QtCore import QTimer
 import threading
-nbline=2
+from F3FChrono.chrono import Chrono
 
 
 
 class rs232_arduino (threading.Thread):
-    def __init__(self, voltageCoef, rebundTimeBtn):
+    def __init__(self, voltageCoef, rebundTimeBtn, buzzerTime, status_changed, run_started, lap_finished,
+                 run_finished, accu_sig):
         super().__init__()
         self.bus=serial.Serial(port='/dev/ttyS0', baudrate = 57600, parity=serial.PARITY_NONE,
                                  stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=0.05)
         print(self.bus)
 
-
+        self.status_changed_sig = status_changed
+        self.run_started_sig = run_started
+        self.lap_finished_sig = lap_finished
+        self.run_finished_sig = run_finished
+        self.accu_sig = accu_sig
+        self.status=0
         self.set_RebundBtn(rebundTimeBtn)
-        self.set_buzzerTime(300)
+        self.set_buzzerTime(buzzerTime)
         self.lastrequest = 0.0
         self.voltageCoef = voltageCoef
-        self.status = 0
-        self.voltage = 0.0
-        self.nbLap = 0
-        self.lap = []
-        self.nb_data = 32
-        for count in range(10):
-            self.lap.append(0.0)
         self.terminated = False
         self.event = threading.Thread(target = self.receive)
         self.event.start()
@@ -36,10 +35,24 @@ class rs232_arduino (threading.Thread):
                 if self.bus.inWaiting()>0:
                     data = self.bus.readline().decode().split(',')
                     print(data)
-                    if data[0]=="status":
-                        print("status"+data[1])
-                    if data[0]=="lap":
-                        print("nb lap"+data[1])
+                    if data[0] == "status":
+                        self.status=data[1]
+                        self.status_changed_sig.emit(self.status)
+                        if self.status == chronoStatus.InProgressB or self.status == chronoStatus.InProgressA:
+                            self.run_started_sig.emit()
+                        if self.status == chronoStatus.WaitAltitude:
+                            self.run_finished_sig.emit()
+                    if data[0] == "lap":
+                        if 1 <= data[1] <= 10:
+                            self.lap_finished_sig.emit(data[1]-1, data[data[1]+1]/1000)
+                        if data[1] == 10:
+                            tmp=0.0
+                            for i in range (2, data[1]+1, 2):
+                                tmp+=data[i]/1000
+                            self.run_finished_sig.emit(tmp)
+                    if data[0] == "voltage":
+                        self.accu_sig.emit(data[1]*5/1024/self.voltageCoef)
+
             except serial.SerialException as e:
                 print("serial exception")
                 return None
@@ -85,6 +98,9 @@ class rs232_arduino (threading.Thread):
 
     def readlines(self):
         print(self.bus.readlines())
+
+    def get_status(self):
+        return self.status
         
 
 

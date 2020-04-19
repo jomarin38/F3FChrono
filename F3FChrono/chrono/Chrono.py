@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.chrono.UDPBeep import *
 from F3FChrono.chrono.UDPReceive import *
 from F3FChrono.chrono import ConfigReader
-from F3FChrono.chrono.i2c_arduino import arduino_com
+from F3FChrono.chrono.rs232_arduino import rs232_arduino
 
 IPUDPBEEP = '255.255.255.255'
 UDPPORT = 4445
@@ -271,97 +271,35 @@ class ChronoRpi(ChronoHard):
                 self.timelost[self.getLapCount() - 1] = self.timelost[self.getLapCount() - 1] + elapsedTime
                 return False
 
-class ChronoArduino(ChronoHard, QTimer):
+class ChronoArduino(ChronoHard):
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
         print("chronoArduino init")
         self.chrono_signal.connect(self.handle_chrono_event)
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.timerEvent)
-        self.currentlap=0
-        self.oldlap = 0
-        self.status = 0
-        self.oldstatus = 0
-        self.voltage = 0
-        self.oldVoltage = 0
-        self.runstarted = False
-        self.arduino = arduino_com(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'])
-        self.timer.start(ConfigReader.config.conf['i2c_refresh'])
-        self.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
+        self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'],
+                                   self.ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.runstarted,
+                                     self.lap_finished, self.run_finished, self.accu_signal)
         self.reset()
-        self.arduinoState=False
 
-    def set_buzzer_time(self, time):
-        self.arduino.set_buzzerTime (time)
-        
-    def set_status(self, value):
-        if self.status != value:
-            print ("set_status : ", value)
-            self.arduino.set_status(value)
-            self.status = value
-            print ("set_status : ", self.get_status())
-            self.status_changed.emit(self.get_status())
-            
-        return self.status
-    
-    def get_status(self):
-        return self.status
-    
+
     def handle_chrono_event(self, caller, data, address):
         if not caller.lower() == "btnnext":
             self.buzzer_validated.emit()
+        status = self.arduino.get_status()
         if caller.lower() == "btnnext" and \
-                (self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.InWait):
-            print("handle chrono event : ", self.status)
-            self.set_status(self.get_status()+1)
+                (status == chronoStatus.WaitLaunch or status == chronoStatus.InWait):
+            self.set_status(status+1)
         if caller.lower() == "btnnext" and data == "event" and address == "baseA" and\
-                (self.status == chronoStatus.InStart or self.status == chronoStatus.Launched):
+                (status == chronoStatus.InStart or status == chronoStatus.Launched):
             self.arduino.event_BaseA()
-        if caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
+        if caller.lower() == "btnnext" and status == chronoStatus.Finished:
             self.run_validated.emit()
 
     def reset(self):
-        self.arduino.resetChrono()
-        self.chronoLap.clear()
-        self.penalty = 0.0
-        self.reset_wind()
-        self.currentlap = 0
-        self.oldlap = 0
-        self.oldstatus = 0
-        self.runstarted = False
-
-    def timerEvent(self):
-        if not ('fake_rpi' in sys.modules):
-            # used on rpi, update voltage measurements every time
-            self.arduino.get_data()
-            if abs(self.oldVoltage-self.arduino.voltage) > 0.1:
-                self.accu_signal.emit(self.arduino.voltage)
-                self.oldVoltage = self.arduino.voltage
-
-            #update chrono data only if you use µC chrono
-            if self.arduinoState:
-                self.arduino.get_data1()
-                if (self.status == chronoStatus.Launched or self.status == chronoStatus.InStart) and\
-                        self.arduino.status == chronoStatus.InProgressB and self.runstarted == False:
-                    self.run_started.emit()
-                    self.runstarted = True;
-                if self.arduino.status != self.status:
-                    self.status_changed.emit(self.arduino.status)
-                    self.status = self.arduino.status
-                self.currentlap = self.arduino.nbLap
-                if self.currentlap != self.oldlap:
-                    self.chronoLap.append(self.arduino.lap[self.currentlap-1])
-                    if self.currentlap <= 10:
-                        self.lap_finished.emit(self.currentlap, self.chronoLap[-1])
-                    if self.currentlap == 10 and (self.arduino.status == chronoStatus.InProgressA or
-                                                  self.arduino.status == chronoStatus.WaitAltitude):
-                        self.run_finished.emit(self.get_time())
-                    self.oldlap = self.currentlap
+        self.arduino.reset()
 
 
-    def arduinoSetState(self, active):
-        self.arduinoState=active
-        return 0
+
 ''' 
 
 def main ():

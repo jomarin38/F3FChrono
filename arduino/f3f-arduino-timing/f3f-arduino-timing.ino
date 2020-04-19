@@ -34,7 +34,7 @@ typedef struct {
 } chronoStr;
 
 typedef struct {
-  byte runStatus;
+  int runStatus;
 }chronoStatusStr;
 
 
@@ -73,8 +73,8 @@ typedef struct {
 
 
 volatile chronoStr chrono = {0}, chrono_old = {0};
-volatile chronoStatusStr chronostatus, chronostatus_old;
 volatile serialStr serial;
+volatile chronoStatusStr chronostatus, chronostatus_old;
 volatile baseEventStr baseA = {0}, baseB = {0};
 volatile analogStr accu = {0};
 volatile buzzerStr buzzer = {0};
@@ -83,8 +83,7 @@ volatile debugStr debug = {0};
 volatile unsigned int i = 0;
 volatile byte temp = 0;
 
-void(* resetFunc) (void) = 0;//declare reset function at address 0
-void baseA_Interrupt(void);
+/*void baseA_Interrupt(void);
 void baseB_Interrupt(void);
 void baseCheck(byte base);
 void RS232Run(void);
@@ -92,7 +91,7 @@ void analogRun(void);
 void buzzerRun(buzzerStr *data);
 void buzzerSet(buzzerStr *data, byte nb);
 void baseCheck(byte base);
-
+*/
 // the setup function runs once when you press reset or power the board
 void setup() {
   //Initialize chrono var.
@@ -158,7 +157,8 @@ void RS232Run(void) {
   temp = memcmp (&chronostatus, &chronostatus_old, sizeof(chronostatus));
   if (temp != 0){
     Serial.print("status,");
-    Serial.println(chronostatus.runStatus);
+    Serial.print(chronostatus.runStatus);
+    Serial.println(",");
     memcpy(&chronostatus_old, &chronostatus, sizeof(chronostatus));
   }
   //check if lap changed
@@ -170,7 +170,7 @@ void RS232Run(void) {
       Serial.print(",");
       Serial.print(chrono.lap[i]);
     }
-    Serial.println("");
+    Serial.println(",");
     memcpy(&chrono_old, &chrono, sizeof(chrono));
   }
   //Process serial request
@@ -182,7 +182,8 @@ void RS232Run(void) {
         buzzer.Time = buzzer.Time*10+(int)(serial.data_read[i]-'0');
       }
       led.Time = buzzer.Time;
-      Serial.println(buzzer.Time);
+      Serial.print(buzzer.Time);
+      Serial.println(",");
     }else if (tmp=='d'){
       led.Cmd = -1;
       Serial.print("buzzer,");
@@ -198,7 +199,8 @@ void RS232Run(void) {
       Serial.print(",time,");
       Serial.print(led.Time);
       Serial.print(",state,");
-      Serial.println(led.State);
+      Serial.print(led.State);
+      Serial.println(",");
     }else if (tmp=='s'){
       chronostatus.runStatus=byte(serial.data_read[1]-'0');
     }else if (tmp=='b'){
@@ -212,21 +214,25 @@ void RS232Run(void) {
       Serial.print(baseA.rebundBtn_time);
       Serial.print(",nb interrrupt,");
       Serial.print(baseA.nbInterrupt);
-      Serial.print(",base B,");
+      Serial.print(",base B");
       Serial.print(",rebund time,");
       Serial.print(baseA.rebundBtn_time);
       Serial.print(",nb interrrupt,");
-      Serial.println(baseB.nbInterrupt);
+      Serial.print(baseB.nbInterrupt);
+      Serial.println(",");
     }else if (tmp=='v'){
       Serial.print("voltage,");
-      Serial.println(accu.rawData);
+      Serial.print(accu.rawData);
+      Serial.println(",");
     }else if (tmp=='r'){
       memset(&chronostatus, 0, sizeof(chronostatus));
       memset(&chrono, 0, sizeof(chrono));
-      Serial.println("reset");
+      Serial.print("reset");
+      Serial.println(",");
     }else if (tmp=='e'){
       baseCheck(baseA.Pin);
-      Serial.println("force baseA");
+      Serial.print("force baseA");
+      Serial.println(",");
     }
     
     memset(&serial, 0, sizeof(serial));
@@ -239,8 +245,6 @@ void serialEvent(){
     if (serial.data_available==false){
       serial.data_read[serial.nb_data]=(char)Serial.read();
       if (serial.data_read[serial.nb_data]=='.'){
-        Serial.print("data available : ");
-        Serial.println((char*)serial.data_read);
         serial.data_available=true;
       }
       serial.nb_data++;
@@ -312,65 +316,48 @@ void baseB_Interrupt(void) {
 }
 
 void baseCheck(byte base) {
-  switch (chronostatus.runStatus) {
-    case Launched :
-      if (BASEAPIN == base) {
-        chronostatus.runStatus = InStart;
-        buzzerSet(&buzzer, 1);
-      }
-      break;
-    case InStart:
-      if (BASEAPIN == base) {
-        buzzerSet(&buzzer, 1);
-        chrono.time1 = millis();
-        chrono.oldtime = chrono.time1;
-        chrono.lapCount=0;
-        chronostatus.runStatus = InProgressB;
-      }
-      break;
-    case InProgressA:
-      if (base == BASEAPIN) {
-        chrono.time1 = millis();
-        chrono.lap[chrono.lapCount] = chrono.time1 - chrono.oldtime;
-        chrono.lapCount++;
-
-        chrono.oldtime = chrono.time1;
-        buzzer.Cmd = 1;
-        if (chrono.lapCount >= 10) {
-          chronostatus.runStatus = WaitAltitude;
-          chrono.startaltitudetime = millis();
-          buzzerSet(&buzzer, 3);
-        } else {
-          chronostatus.runStatus = InProgressB;
-        }
-      }
-      break;
-    case InProgressB:
-      if (base == BASEBPIN) {
-        chrono.time1 = millis();
-        chrono.lap[chrono.lapCount] = chrono.time1 - chrono.oldtime;
-        chrono.oldtime = chrono.time1;
-        chrono.lapCount++;
-        chronostatus.runStatus = InProgressA;
-        if (chrono.lapCount == 9) {
-          buzzerSet(&buzzer, 2);
-        }else{
-          buzzerSet(&buzzer, 1);
-        }
-      }else{
-        if (base == BASEAPIN and chrono.lapCount==0){
-          buzzerSet(&buzzer, 1);
-        }
-      }
-      break;
-    case WaitAltitude:
-      if ((chrono.startaltitudetime + 5000) < millis()) {
-        buzzer.Cmd = 3;
-        chronostatus.runStatus = Finished;
-      }
-      break;
-    default:
-        buzzerSet(&buzzer, 1);
-      break;
+  if (chronostatus.runStatus==Launched and BASEAPIN == base) {
+    chronostatus.runStatus = InStart;
+    buzzerSet(&buzzer, 1);
+  }else if (chronostatus.runStatus==InStart and BASEAPIN == base) {
+    buzzerSet(&buzzer, 1);
+    chrono.time1 = millis();
+    chrono.oldtime = chrono.time1;
+    chrono.lapCount=0;
+    chronostatus.runStatus = InProgressB;
+  }else if (chronostatus.runStatus==InProgressA and base == BASEAPIN) {
+    chrono.time1 = millis();
+    chrono.lap[chrono.lapCount] = chrono.time1 - chrono.oldtime;
+    chrono.lapCount++;
+  
+    chrono.oldtime = chrono.time1;
+    buzzer.Cmd = 1;
+    if (chrono.lapCount >= 10) {
+      chronostatus.runStatus = WaitAltitude;
+      chrono.startaltitudetime = millis();
+      buzzerSet(&buzzer, 3);
+    } else {
+      chronostatus.runStatus = InProgressB;
+    }
+  }else if (chronostatus.runStatus==InProgressB and base == BASEBPIN) {
+    chrono.time1 = millis();
+    chrono.lap[chrono.lapCount] = chrono.time1 - chrono.oldtime;
+    chrono.oldtime = chrono.time1;
+    chrono.lapCount++;
+    chronostatus.runStatus = InProgressA;
+    if (chrono.lapCount == 9) {
+      buzzerSet(&buzzer, 2);
+    }else{
+      buzzerSet(&buzzer, 1);
+    }
+  }else if (chronostatus.runStatus==InProgressB and base == BASEAPIN and chrono.lapCount==0){
+    buzzerSet(&buzzer, 1);
+  }else if (chronostatus.runStatus==WaitAltitude and (chrono.startaltitudetime + 5000) < millis()) {
+    buzzer.Cmd = 3;
+    chronostatus.runStatus = Finished;
+  }else{
+    if (base == BASEAPIN or base == BASEBPIN){
+      buzzerSet(&buzzer, 1);
+    }
   }
 }

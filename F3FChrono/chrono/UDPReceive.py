@@ -27,7 +27,7 @@ class udpreceive(QThread):
         self.msg = ""
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.bind (('', self.port))
+        self.sock.bind(('', self.port))
         self.start()
 
     def __del__(self):
