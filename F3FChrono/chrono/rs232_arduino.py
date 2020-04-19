@@ -31,6 +31,7 @@ class rs232_arduino (threading.Thread):
 
     def __del__(self):
         self.terminated=True
+        self.event.join()
 
     def receive(self):
         while 1:
