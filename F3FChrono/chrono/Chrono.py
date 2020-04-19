@@ -185,8 +185,6 @@ class ChronoRpi(ChronoHard):
         self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerEvent)
-        self.status=0
-        self.status_changed.connect(self.slot_status)
 
     def __del__(self):
         self.udpBeep.terminate()
@@ -203,8 +201,6 @@ class ChronoRpi(ChronoHard):
                 and data.lower() == "event":
             self.__declareBase(address)
 
-    def slot_status(self, status):
-        self.status=status
 
     def timerEvent(self):
         self.__declareBase("Altitude")
@@ -285,7 +281,11 @@ class ChronoArduino(ChronoHard):
                                    ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
                                      self.lap_finished, self.run_finished, self.accu_signal)
         self.reset()
+        self.status = 0
+        self.status_changed.connect(self.slot_status)
 
+    def slot_status(self, status):
+        self.status=status
 
     def handle_chrono_event(self, caller, data, address):
         if not caller.lower() == "btnnext":
