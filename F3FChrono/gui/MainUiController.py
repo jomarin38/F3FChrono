@@ -315,6 +315,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard.reset()
 
     def slot_status_changed(self, status):
+        print ("slot status", status)
         self.controllers['round'].wChronoCtrl.set_status(status)
         if (status==chronoStatus.WaitLaunch):
             self.controllers['round'].wChronoCtrl.settime(30000, False)
