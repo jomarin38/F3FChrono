@@ -103,6 +103,7 @@ class rs232_arduino (threading.Thread):
         return 0
     def get_voltage(self):
         self.bus.write(("v.").encode())
+        print("arduino request voltage")
         return 0
 
     def readlines(self):

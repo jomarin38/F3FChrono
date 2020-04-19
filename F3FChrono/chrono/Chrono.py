@@ -282,12 +282,13 @@ class ChronoArduino(ChronoHard, QTimer):
                                      self.lap_finished, self.run_finished, self.altitude_finished, self.accu_signal)
         self.timer = QTimer()
         self.timer.timeout.connect(self.event_voltage)
-        self.timer.start(10)
+        self.timer.start(1000)
         self.reset()
         self.status = 0
         self.status_changed.connect(self.slot_status)
 
     def event_voltage(self):
+        print ("event voltage")
         self.arduino.get_voltage()
 
     def slot_status(self, status):
