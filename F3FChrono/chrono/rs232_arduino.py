@@ -29,6 +29,9 @@ class rs232_arduino (threading.Thread):
         self.event = threading.Thread(target = self.receive)
         self.event.start()
 
+    def __del__(self):
+        self.terminated=True
+
     def receive(self):
         while 1:
             try:
