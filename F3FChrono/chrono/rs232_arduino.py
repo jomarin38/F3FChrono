@@ -50,7 +50,7 @@ class rs232_arduino (threading.Thread):
                             tmp=0.
                             for i in range(2, int(data[1])+1):
                                 tmp+=int(data[i])/1000
-                                print("lap time : ", int(data[i]/1000), i)
+                                print("lap time : ", int(data[i])/1000, i)
                             self.run_finished_sig.emit(tmp)
                     if data[0] == "voltage":
                         self.accu_sig.emit(int(data[1])*5/1024/self.voltageCoef)
