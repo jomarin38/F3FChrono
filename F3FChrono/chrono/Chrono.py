@@ -296,7 +296,10 @@ class ChronoArduino(ChronoHard):
                 (self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.InWait):
             self.arduino.set_status(self.status+1)
         if caller.lower() == "btnnext" and data == "event" and address == "baseA" and\
-                (self.status == chronoStatus.InStart or self.status == chronoStatus.Launched):
+                self.status == chronoStatus.InStart:
+            self.arduino.set_status(self.status + 1)
+        if caller.lower() == "btnnext" and data == "event" and address == "baseA" and \
+                self.status == chronoStatus.Launched:
             print("demande event base A")
             self.arduino.event_BaseA()
         if caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
