@@ -40,7 +40,8 @@ class rs232_arduino (threading.Thread):
                     data = self.bus.readline().decode().split(',')
                     print(data)
                     if data[0] == "status":
-                        self.status=data[1]
+                        self.status = data[1]
+                        print (self.status, data[1])
                         self.status_changed_sig.emit(self.status)
                         if self.status == Chrono.chronoStatus.InProgressB or self.status == Chrono.chronoStatus.InProgressA:
                             self.run_started_sig.emit()
