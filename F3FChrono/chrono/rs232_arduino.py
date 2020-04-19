@@ -38,9 +38,9 @@ class rs232_arduino (threading.Thread):
                     if data[0] == "status":
                         self.status=data[1]
                         self.status_changed_sig.emit(self.status)
-                        if self.status == chronoStatus.InProgressB or self.status == chronoStatus.InProgressA:
+                        if self.status == Chrono.chronoStatus.InProgressB or self.status == Chrono.chronoStatus.InProgressA:
                             self.run_started_sig.emit()
-                        if self.status == chronoStatus.WaitAltitude:
+                        if self.status == Chrono.chronoStatus.WaitAltitude:
                             self.run_finished_sig.emit()
                     if data[0] == "lap":
                         if 1 <= data[1] <= 10:
