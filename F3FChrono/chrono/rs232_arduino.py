@@ -1,14 +1,22 @@
 import serial
 import sys
-from PyQt5.QtCore import QThread
+import time
+from PyQt5.QtCore import QTimer
+import threading
+nbline=2
 
-class rs232_arduino (QThread):
+
+
+class rs232_arduino (threading.Thread):
     def __init__(self, voltageCoef, rebundTimeBtn):
         super().__init__()
+        self.bus=serial.Serial(port='/dev/ttyS0', baudrate = 57600, parity=serial.PARITY_NONE,
+                                 stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=0.05)
+        print(self.bus)
 
-        self.bus = serial.Serial(port='/dev/ttyS0', baudrate = 57600, parity=serial.PARITY_NONE,
-                                 stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=1)
-        
+
+        self.set_RebundBtn(rebundTimeBtn)
+        self.set_buzzerTime(300)
         self.lastrequest = 0.0
         self.voltageCoef = voltageCoef
         self.status = 0
@@ -18,69 +26,72 @@ class rs232_arduino (QThread):
         self.nb_data = 32
         for count in range(10):
             self.lap.append(0.0)
-        self.start()
+        self.terminated = False
+        self.event = threading.Thread(target = self.receive)
+        self.event.start()
 
-    def run(self):
-        while(not self.isFinished()):
-        # wait until somebody throws an event
+    def receive(self):
+        while 1:
             try:
-                if self.bus.in_waiting()>0:
-                    data = self.bus.readlines()
-                    print (data)
+                if self.bus.inWaiting()>0:
+                    data = self.bus.readline().decode().split(',')
+                    print(data)
+                    if data[0]=="status":
+                        print("status"+data[1])
+                    if data[0]=="lap":
+                        print("nb lap"+data[1])
             except serial.SerialException as e:
+                print("serial exception")
                 return None
             except TypeError as e:
+                print("bus close")
                 self.bus.close()
+                self.bus = None
                 return None
+            time.sleep(0.01)
 
     def debug(self):
         self.bus.write("d.".encode())
-        for i in range(10):
+        for i in range(nbline):
             print(self.bus.readline())
         
     def set_status(self, status):
         self.bus.write(("s"+str(status)+".").encode())
-        for i in range(4):
-            print(self.bus.readline())
-        #        self.bus.write_byte_data(self.addresschrono, 0, status)
-        self.status = status
 
         return 0
 
     def set_buzzerTime(self, time):
         self.bus.write(("t"+str(time)+".").encode())
-        for i in range(4):
-            print(self.bus.readline())
+        print(self.bus.readline().decode().split(','))
         return 0
 
     def set_RebundBtn(self, time):
         self.bus.write(("b"+str(time)+".").encode())
-        for i in range(4):
-            print(self.bus.readline())
+        print(self.bus.readline().decode().split(','))
         return 0
 
     def event_BaseA(self):
         self.bus.write(("e.").encode())
-        for i in range(4):
-            print(self.bus.readline())
+
         return 0
 
-    def resetChrono(self):
+    def reset(self):
         self.bus.write(("r.").encode())
-        for i in range(4):
-            print(self.bus.readline())
         return 0
-        self.status = 0
-        self.nbLap = 0
-        for lap in self.lap:
-            lap = 0
+    def get_voltage(self):
+        self.bus.write(("v.").encode())
+        
         return 0
+
+    def readlines(self):
+        print(self.bus.readlines())
+        
 
 
 if __name__ == '__main__':
 
     print("Chrono Arduino RS232 Mode")
-    chrono = arduino_com(0.354, 500)
+    chrono = rs232_arduino(0.354, 500)
     end = False
     while not end:
         cmdline = sys.stdin.readline()
@@ -103,3 +114,5 @@ if __name__ == '__main__':
 
         if cmdline == "v\n":
             print(chrono.get_voltage())
+        if cmdline == "a\n":
+            print(chrono.readlines())
