@@ -285,19 +285,20 @@ class ChronoArduino(ChronoHard):
         self.status_changed.connect(self.slot_status)
 
     def slot_status(self, status):
+        print("handle status : "+status)
         self.status=status
 
     def handle_chrono_event(self, caller, data, address):
         if not caller.lower() == "btnnext":
             self.buzzer_validated.emit()
-        status = self.arduino.get_status()
+
         if caller.lower() == "btnnext" and \
                 (status == chronoStatus.WaitLaunch or status == chronoStatus.InWait):
-            self.set_status(status+1)
+            self.set_status(self.status+1)
         if caller.lower() == "btnnext" and data == "event" and address == "baseA" and\
-                (status == chronoStatus.InStart or status == chronoStatus.Launched):
+                (self.status == chronoStatus.InStart or self.status == chronoStatus.Launched):
             self.arduino.event_BaseA()
-        if caller.lower() == "btnnext" and status == chronoStatus.Finished:
+        if caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
             self.run_validated.emit()
 
     def reset(self):
