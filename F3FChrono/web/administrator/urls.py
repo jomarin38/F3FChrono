@@ -19,5 +19,7 @@ urlpatterns = [
     path('do_delete_event', views.do_delete_event, name='do_delete_event'),
     path('manage_round', views.manage_round, name='manage_round'),
     path('give_refly', views.give_refly, name='give_refly'),
+    path('give_penalty', views.give_penalty, name='give_penalty'),
+    path('give_zero', views.give_zero, name='give_zero'),
     path('sign_in', views.sign_in, name='sign_in')
 ]

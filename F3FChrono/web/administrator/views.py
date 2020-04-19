@@ -314,13 +314,13 @@ def manage_round(request):
         row.add_cell(Cell(str(round_group.get_penalty(competitor))))
         row.add_cell(Link('Refly', 'give_refly?event_id='+str(event_id)+'&round_number='+str(round_number)+
                           '&bib_number='+str(competitor.bib_number)))
-        row.add_cell(Link('TODO : Give 0', 'give_zero?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+        row.add_cell(Link('Give 0', 'give_zero?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
                           '&bib_number=' + str(competitor.bib_number)))
-        row.add_cell(Link('TODO : Give 100 penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+        row.add_cell(Link('Give 100 penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
                           '&bib_number=' + str(competitor.bib_number)+'&penalty=100'))
-        row.add_cell(Link('TODO : Give 1000 penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+        row.add_cell(Link('Give 1000 penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
                           '&bib_number=' + str(competitor.bib_number)+'&penalty=1000'))
-        row.add_cell(Link('TODO : Cancel penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+        row.add_cell(Link('Cancel penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
                           '&bib_number=' + str(competitor.bib_number)+'&penalty=0'))
         table.add_line(row)
 
@@ -363,6 +363,60 @@ def give_refly(request):
     f3f_run.valid = False
 
     f3f_round.give_refly(competitor)
+
+    RoundDAO().update(f3f_round)
+
+    return manage_round(request)
+
+
+def give_zero(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    round_number = request.GET.get('round_number')
+    bib_number = request.GET.get('bib_number')
+
+    event = EventDAO().get(event_id, fetch_competitors=True)
+
+    f3f_round = RoundDAO().get_from_ids(event.id, round_number, fetch_runs=True)
+
+    competitor = event.competitors[int(bib_number)]
+
+    f3f_run = f3f_round.get_valid_run(competitor)
+
+    f3f_run.valid = False
+
+    RoundDAO().update(f3f_round)
+
+    return manage_round(request)
+
+
+def give_penalty(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    round_number = request.GET.get('round_number')
+    bib_number = request.GET.get('bib_number')
+    penalty = int(request.GET.get('penalty'))
+
+    event = EventDAO().get(event_id, fetch_competitors=True)
+
+    f3f_round = RoundDAO().get_from_ids(event.id, round_number, fetch_runs=True)
+
+    competitor = event.competitors[int(bib_number)]
+
+    f3f_run = f3f_round.get_valid_run(competitor)
+
+    if penalty==0:
+        f3f_run.penalty = 0
+    else:
+        f3f_run.penalty += penalty
 
     RoundDAO().update(f3f_round)
 
