@@ -34,7 +34,7 @@ class rs232_arduino (threading.Thread):
         self.inRun=False
 
     @staticmethod
-    def get_serial_port():
+    def get_raspi_revision():
         rev_file = '/sys/firmware/devicetree/base/model'
         info = {'pi': '', 'model': '', 'rev': ''}
         raspi = model = revision = ''
@@ -47,8 +47,14 @@ class rs232_arduino (threading.Thread):
             if m:
                 info['pi'] = m[3]
                 info['model'] = m[5]
+            return info
         except:
             pass
+        return info
+
+    @staticmethod
+    def get_serial_port():
+        info = rs232_arduino.get_raspi_revision()
 
         if info['pi'] == '':
             return '/dev/ttyUSB0'
