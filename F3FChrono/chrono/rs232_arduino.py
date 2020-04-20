@@ -47,7 +47,6 @@ class rs232_arduino (threading.Thread):
             if m:
                 info['pi'] = m[3]
                 info['model'] = m[5]
-            return info
         except:
             pass
 
