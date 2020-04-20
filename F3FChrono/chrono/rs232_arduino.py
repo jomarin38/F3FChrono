@@ -1,3 +1,6 @@
+import os
+import re
+
 import serial
 import sys
 import time
