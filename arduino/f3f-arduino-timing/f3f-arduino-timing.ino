@@ -12,6 +12,8 @@ const byte BUZZERPIN = 12;
 const byte LOOPDELAY = 100;
 const int BUZZERTIME = 300;
 const int LEDTIME = 300;
+const int REBUNDTIME = 500;
+const int VOLTAGE_TIME = 2000;
 
 enum chronoStatus {
   InWait = 0,
@@ -62,8 +64,11 @@ typedef struct {
 typedef struct {
   int readTime;
   int count;
-  int rawData;
   byte Pin;
+  int data[10];
+  byte index;
+  int sum;
+  int rawData;
 } analogStr;
 
 typedef struct {
@@ -82,6 +87,7 @@ volatile buzzerStr led = {0};
 volatile debugStr debug = {0};
 volatile unsigned int i = 0;
 volatile byte temp = 0;
+volatile byte reset = true;
 
 /*void baseA_Interrupt(void);
 void baseB_Interrupt(void);
@@ -92,6 +98,8 @@ void buzzerRun(buzzerStr *data);
 void buzzerSet(buzzerStr *data, byte nb);
 void baseCheck(byte base);
 */
+void(* resetFunc) (void) = 0;
+
 // the setup function runs once when you press reset or power the board
 void setup() {
   //Initialize chrono var.
@@ -113,15 +121,15 @@ void setup() {
   led.Pin = LED_BUILTIN;
 
   accu.Pin = VOLTAGEPIN;
-  accu.readTime = 2000;
+  accu.readTime = VOLTAGE_TIME;
   accu.rawData= 900; //Initalize @12V for the first measurements
   
   memset (&baseA, 0, sizeof(baseA));
-  baseA.rebundBtn_time = 200;
+  baseA.rebundBtn_time = REBUNDTIME;
   baseA.Pin = BASEAPIN;
 
   memset (&baseB, 0, sizeof(baseB));
-  baseB.rebundBtn_time = 200;
+  baseB.rebundBtn_time = REBUNDTIME;
   baseB.Pin = BASEBPIN;
 
   // initialize digital pin LED_BUILTIN and buzzer PIN as an output.
@@ -136,7 +144,7 @@ void setup() {
   Serial.begin(57600);
   while (!Serial) {
     delay(100);
-    Serial.println("F3F timer connected");
+    Serial.println("F3FChrono,");
   }
 }
 
@@ -153,25 +161,21 @@ void loop() {
 
 
 void RS232Run(void) {
+  if (reset){
+    reset=false;
+    printreset();
+  }
   //check if status changed
   temp = memcmp (&chronostatus, &chronostatus_old, sizeof(chronostatus));
   if (temp != 0){
-    Serial.print("status,");
-    Serial.print(chronostatus.runStatus);
-    Serial.println(",");
+    printstatus();
     memcpy(&chronostatus_old, &chronostatus, sizeof(chronostatus));
   }
   //check if lap changed
   temp = memcmp (&chrono, &chrono_old, sizeof(chrono));
   if (temp != 0){
-    Serial.print("lap,");
-    Serial.print(chrono.lapCount);
-    for (i = 0; i < chrono.lapCount; i++) {
-      Serial.print(",");
-      Serial.print(chrono.lap[i]);
-    }
-    Serial.println(",");
     memcpy(&chrono_old, &chrono, sizeof(chrono));
+    printchrono();
   }
   //Process serial request
   if (serial.data_available) {
@@ -182,57 +186,30 @@ void RS232Run(void) {
         buzzer.Time = buzzer.Time*10+(int)(serial.data_read[i]-'0');
       }
       led.Time = buzzer.Time;
-      Serial.print(buzzer.Time);
-      Serial.println(",");
+      printbuzzer();
     }else if (tmp=='d'){
-      led.Cmd = -1;
-      Serial.print("buzzer,");
-      Serial.print("cmd,");
-      Serial.print(buzzer.Cmd);
-      Serial.print(",time,");
-      Serial.print(buzzer.Time);
-      Serial.print(",state,");
-      Serial.print(buzzer.State);
-      Serial.print(",led,");
-      Serial.print("cmd,");
-      Serial.print(led.Cmd);
-      Serial.print(",time,");
-      Serial.print(led.Time);
-      Serial.print(",state,");
-      Serial.print(led.State);
-      Serial.println(",");
+      printdebug();
     }else if (tmp=='s'){
       chronostatus.runStatus=byte(serial.data_read[1]-'0');
+      printstatus();
     }else if (tmp=='b'){
       baseA.rebundBtn_time=0;
       for (i=1; i<serial.nb_data-1; i++){
         baseA.rebundBtn_time = baseA.rebundBtn_time*10+(int)(serial.data_read[i]-'0');
       }
       baseB.rebundBtn_time = baseA.rebundBtn_time;
-      Serial.print("base A,");
-      Serial.print("rebund time,");
-      Serial.print(baseA.rebundBtn_time);
-      Serial.print(",nb interrrupt,");
-      Serial.print(baseA.nbInterrupt);
-      Serial.print(",base B");
-      Serial.print(",rebund time,");
-      Serial.print(baseA.rebundBtn_time);
-      Serial.print(",nb interrrupt,");
-      Serial.print(baseB.nbInterrupt);
-      Serial.println(",");
+      printbase();
     }else if (tmp=='v'){
-      Serial.print("voltage,");
-      Serial.print(accu.rawData);
-      Serial.println(",");
+      printvoltage();
     }else if (tmp=='r'){
       memset(&chronostatus, 0, sizeof(chronostatus));
       memset(&chrono, 0, sizeof(chrono));
-      Serial.print("reset");
-      Serial.println(",");
+      printresetchrono();
     }else if (tmp=='e'){
       baseCheck(baseA.Pin);
-      Serial.print("force baseA");
-      Serial.println(",");
+      printforcebaseA();
+    }else if (tmp=='k'){
+      resetFunc();
     }
     
     memset(&serial, 0, sizeof(serial));
@@ -244,7 +221,7 @@ void serialEvent(){
   while (Serial.available()){
     if (serial.data_available==false){
       serial.data_read[serial.nb_data]=(char)Serial.read();
-      if (serial.data_read[serial.nb_data]=='.'){
+      if (serial.data_read[serial.nb_data]=='\n'){
         serial.data_available=true;
       }
       serial.nb_data++;
@@ -254,11 +231,22 @@ void serialEvent(){
 void analogRun(void)
 {
   if (accu.count > accu.readTime) {
-    accu.rawData = analogRead(accu.Pin);
+    accu.rawData = analogMean(analogRead(accu.Pin));
     accu.count = 0;
   } else {
     accu.count += LOOPDELAY;
   }
+}
+
+int analogMean(int data){
+  accu.sum-=accu.data[accu.index];
+  accu.sum+=data;
+  accu.data[accu.index]=data;
+  accu.index++;
+  if (accu.index>(sizeof(accu.data)/sizeof(int)-1)){
+    accu.index=0;
+  }
+  return(accu.sum/(sizeof(accu.data)/sizeof(int)));  
 }
 
 void buzzerRun(buzzerStr *data) {
@@ -355,9 +343,86 @@ void baseCheck(byte base) {
   }else if (chronostatus.runStatus==WaitAltitude and (chrono.startaltitudetime + 5000) < millis()) {
     buzzer.Cmd = 3;
     chronostatus.runStatus = Finished;
-  }else{
-    if (base == BASEAPIN or base == BASEBPIN){
+  }else if (base == BASEAPIN or base == BASEBPIN){
       buzzerSet(&buzzer, 1);
-    }
   }
+}
+
+void printbuzzer(void){
+    Serial.print("buzzertime,");
+    Serial.print(buzzer.Time);
+    Serial.println(",");
+}
+
+void printbase(void){
+    Serial.print("baseA,");
+    Serial.print("rebundtime,");
+    Serial.print(baseA.rebundBtn_time);
+    Serial.print(",nbinterrrupt,");
+    Serial.print(baseA.nbInterrupt);
+    Serial.print(",baseB");
+    Serial.print(",rebundtime,");
+    Serial.print(baseA.rebundBtn_time);
+    Serial.print(",nbinterrrupt,");
+    Serial.print(baseB.nbInterrupt);
+    Serial.println(",");
+}
+
+void printstatus(void){
+  Serial.print("status,");
+  Serial.print(chronostatus.runStatus);
+  Serial.println(",");
+}
+
+void printchrono(void){
+  Serial.print("lap,");
+  Serial.print(chrono.lapCount);
+  for (i = 0; i < chrono.lapCount; i++) {
+    Serial.print(",");
+    Serial.print(chrono.lap[i]);
+  }
+  Serial.println(",");
+}
+
+void printreset(void){
+  Serial.println("resetµc,F3F,Chrono,available,");
+}
+
+void printvoltage(void){
+  Serial.print("voltage,");
+  Serial.print(accu.rawData);
+  Serial.println(",");
+}
+
+void printresetchrono(void){
+  Serial.print("reset");
+  Serial.println(",");
+}
+
+void printforcebaseA(void){
+  Serial.print("force baseA");
+  Serial.println(",");
+}
+void printdebug(void){
+    printstatus();
+    printchrono();
+    printbase();
+    printvoltage();
+    led.Cmd = -1;
+    Serial.print("buzzer,");
+    Serial.print("cmd,");
+    Serial.print(buzzer.Cmd);
+    Serial.print(",time,");
+    Serial.print(buzzer.Time);
+    Serial.print(",state,");
+    Serial.print(buzzer.State);
+    Serial.print(",led,");
+    Serial.print("cmd,");
+    Serial.print(led.Cmd);
+    Serial.print(",time,");
+    Serial.print(led.Time);
+    Serial.print(",state,");
+    Serial.print(led.State);
+    Serial.println(",");
+    
 }
