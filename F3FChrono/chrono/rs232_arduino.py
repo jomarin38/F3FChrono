@@ -68,23 +68,23 @@ class rs232_arduino (QObject):
     def slot_arduino_reset(self):
         self.set_RebundBtn(self.rebundTime)
         self.set_buzzerTime(self.buzzerTime)
-        self.debug()
+        #self.debug()
 
     def receive(self):
         while not self.terminated:
             try:
-                if self.bus.inWaiting()>0:
+                if self.bus.inWaiting() > 0:
                     data = self.bus.readline().decode().split(',')
                     print(data)
                     if data[0] == "status":
                         self.status = int(data[1])
                         self.status_changed_sig.emit(self.status)
                         if self.status == Chrono.chronoStatus.InWait:
-                            self.inRun=False
+                            self.inRun = False
                         if self.status == Chrono.chronoStatus.InProgressB or self.status == Chrono.chronoStatus.InProgressA:
                             if not self.inRun:
                                 self.run_started_sig.emit()
-                                self.inRun=True
+                                self.inRun = True
                         if self.status == Chrono.chronoStatus.Finished:
                             self.wait_alt_sig.emit()
                     if data[0] == "lap":
@@ -93,8 +93,7 @@ class rs232_arduino (QObject):
                         if int(data[1]) == 10:
                             tmp=0.
                             for i in range(2, int(data[1])+2):
-                                tmp+=int(data[i])/1000
-                                print("lap time : ", int(data[i])/1000, i)
+                                tmp += int(data[i])/1000
                             self.run_finished_sig.emit(tmp)
                     if data[0] == "voltage":
                         self.accu_sig.emit(int(data[1])*5/1024/self.voltageCoef)

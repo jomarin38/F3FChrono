@@ -13,8 +13,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_WConfig(object):
     def setupUi(self, WConfig):
         WConfig.setObjectName("WConfig")
-        WConfig.resize(480, 306)
+        WConfig.resize(480, 290)
         self.gridLayout = QtWidgets.QGridLayout(WConfig)
+        self.gridLayout.setContentsMargins(-1, 1, -1, 3)
+        self.gridLayout.setSpacing(3)
         self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>559</width>
+    <width>475</width>
     <height>25</height>
    </rect>
   </property>
@@ -35,6 +35,41 @@
    <property name="spacing">
     <number>0</number>
    </property>
+   <item row="0" column="1">
+    <widget class="QLabel" name="voltage">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>75</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>35</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>12.6 V</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="2">
     <widget class="QLabel" name="WindInfo">
      <property name="sizePolicy">
@@ -58,20 +93,8 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="voltage">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>35</width>
-       <height>16777215</height>
-      </size>
-     </property>
+   <item row="0" column="3">
+    <widget class="QLabel" name="Elapsedtime">
      <property name="font">
       <font>
        <pointsize>9</pointsize>
@@ -80,10 +103,7 @@
       </font>
      </property>
      <property name="text">
-      <string>12.6 V</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <string>Elapsed time : </string>
      </property>
     </widget>
    </item>
@@ -100,31 +120,23 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="3">
-    <widget class="QLabel" name="Elapsedtime">
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Elapsed time : </string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
+   <item row="0" column="0">
     <widget class="QLabel" name="rssi">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>65</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="maximumSize">
       <size>
-       <width>120</width>
+       <width>35</width>
        <height>16777215</height>
       </size>
      </property>
@@ -136,7 +148,7 @@
       </font>
      </property>
      <property name="text">
-      <string>rssi1, 2 : 90%, 95%</string>
+      <string>90%, 90%</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

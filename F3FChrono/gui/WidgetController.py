@@ -94,7 +94,9 @@ class WWindCtrl():
         self.rules['starttime'] = datetime.now()
         self.rules['time(s)'] = time.time()
         self.rules['detected'] = False
-        self.rules['alarm']=False
+        self.rules['alarm'] = False
+        self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
+        self.windstylesheet = "background-color:rgba( 255, 255, 255, 0% );"
 
     def get_widget(self):
         return(self.widgetList)
@@ -118,21 +120,21 @@ class WWindCtrl():
         self.view.WindInfo.setText('Wind : '+str(speed)+'m/s, Angle : '+str(angle)+'°'+', '+strrain)
         self.rules['dir'] = angle
         self.rules['speed'] = speed
-        self.rules['rain']=rain
+        self.rules['rain'] = rain
 
     def check_rules(self, limit_angle, speed_min, speed_max, time_limit):
         if abs(self.rules['dir']) > limit_angle or self.rules['speed'] < speed_min or self.rules['speed'] > speed_max \
                 or self.rules['rain']:
-            if self.rules['detected']==False:
+            if self.rules['detected'] == False:
                 self.rules['starttime'] = datetime.now()
                 self.rules['time(s)'] = time.time()
-                self.rules['detected']=True
+                self.rules['detected'] = True
             else:
-                if ((time.time()-self.rules['time(s)'])>20):
-                    self.view.WindInfo.setStyleSheet('color: red')
+                if ((time.time()-self.rules['time(s)']) > 20):
+                    self.view.WindInfo.setStyleSheet('background-color:red;')
                     self.view.Elapsedtime.setVisible(True)
-                    if (time.time()-self.rules['time(s)'])>(time_limit*60):
-                        self.view.Elapsedtime.setStyleSheet('color: red')
+                    if (time.time()-self.rules['time(s)']) > (time_limit*60):
+                        self.view.Elapsedtime.setStyleSheet('background-color:red;')
                         self.view.btn_clear.setVisible(True)
                         self.rules['alarm']=True
 
@@ -141,10 +143,10 @@ class WWindCtrl():
                                 +self.cancelroundtostr())
 
         else:
-            self.view.WindInfo.setStyleSheet('color: black')
+            self.view.WindInfo.setStyleSheet('background-color:rgba( 255, 255, 255, 0% );')
             self.rules['detected']=False
             if not self.rules['alarm']:
-                self.view.Elapsedtime.setStyleSheet('color: black')
+                self.view.Elapsedtime.setStyleSheet('background-color:rgba( 255, 255, 255, 0% );')
                 self.view.Elapsedtime.setVisible(False)
 
     def clear_alarm(self):
@@ -161,15 +163,16 @@ class WWindCtrl():
 
     def set_voltage(self, voltage):
         self.view.voltage.setText("{:0>3.1f}".format(voltage)+" V")
-        f = open("voltage_log.txt", "a+")
-        from F3FChrono.gui.MainUiController import MainUiCtrl
-        f.write(str(MainUiCtrl.startup_time)+','+str((time.time()-MainUiCtrl.startup_time)/60.0) +
-                ',' + str(voltage)+'\n')
-        f.close()
+        if voltage <= ConfigReader.config.conf['voltage_min'] and\
+                self.voltagestylesheet == "background-color:rgba( 255, 255, 255, 0% );":
+            self.voltagestylesheet = "background-color:red;"
+            self.view.voltage.setStyleSheet(self.voltagestylesheet)
+        elif voltage > ConfigReader.config.conf['voltage_min'] and self.voltagestylesheet == "background-color:red;":
+            self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
+            self.view.voltage.setStyleSheet(self.voltagestylesheet)
 
     def set_rssi(self, rssi1, rssi2):
-        self.view.rssi.setText("rssi1, 2 : "+str(rssi1) + "%, "+str(rssi2)+"%")
-
+        self.view.rssi.setText(str(rssi1) + "%, "+str(rssi2)+"%")
 
 class WPilotCtrl():
     def __init__(self, name, parent):

@@ -349,29 +349,29 @@ void baseCheck(byte base) {
   }else if (chronostatus.runStatus==WaitAltitude and (chrono.startaltitudetime + 5000) < millis()) {
     buzzer.Cmd = 3;
     chronostatus.runStatus = Finished;
-  }else if (base == BASEAPIN or base == BASEBPIN){
+  }else if ((chronostatus.runStatus==InWait or chronostatus.runStatus==Finished) and (base == BASEAPIN or base == BASEBPIN)){
       buzzerSet(&buzzer, 1);
   }
 }
 
 void printbuzzer(void){
-    Serial.print("buzzertime,");
-    Serial.print(buzzer.Time);
-    Serial.println(",");
+  Serial.print("buzzertime,");
+  Serial.print(buzzer.Time);
+  Serial.println(",");
 }
 
 void printbase(void){
-    Serial.print("baseA,");
-    Serial.print("rebundtime,");
-    Serial.print(baseA.rebundBtn_time);
-    Serial.print(",nbinterrrupt,");
-    Serial.print(baseA.nbInterrupt);
-    Serial.print(",baseB");
-    Serial.print(",rebundtime,");
-    Serial.print(baseA.rebundBtn_time);
-    Serial.print(",nbinterrrupt,");
-    Serial.print(baseB.nbInterrupt);
-    Serial.println(",");
+  Serial.print("baseA,");
+  Serial.print("rebundtime,");
+  Serial.print(baseA.rebundBtn_time);
+  Serial.print(",nbinterrrupt,");
+  Serial.print(baseA.nbInterrupt);
+  Serial.print(",baseB");
+  Serial.print(",rebundtime,");
+  Serial.print(baseA.rebundBtn_time);
+  Serial.print(",nbinterrrupt,");
+  Serial.print(baseB.nbInterrupt);
+  Serial.println(",");
 }
 
 void printstatus(void){
@@ -410,25 +410,24 @@ void printforcebaseA(void){
   Serial.println(",");
 }
 void printdebug(void){
-    printstatus();
-    printchrono();
-    printbase();
-    printvoltage();
-    led.Cmd = -1;
-    Serial.print("buzzer,");
-    Serial.print("cmd,");
-    Serial.print(buzzer.Cmd);
-    Serial.print(",time,");
-    Serial.print(buzzer.Time);
-    Serial.print(",state,");
-    Serial.print(buzzer.State);
-    Serial.print(",led,");
-    Serial.print("cmd,");
-    Serial.print(led.Cmd);
-    Serial.print(",time,");
-    Serial.print(led.Time);
-    Serial.print(",state,");
-    Serial.print(led.State);
-    Serial.println(",");
-    
+  printstatus();
+  printchrono();
+  printbase();
+  printvoltage();
+  led.Cmd = -1;
+  Serial.print("buzzer,");
+  Serial.print("cmd,");
+  Serial.print(buzzer.Cmd);
+  Serial.print(",time,");
+  Serial.print(buzzer.Time);
+  Serial.print(",state,");
+  Serial.print(buzzer.State);
+  Serial.print(",led,");
+  Serial.print("cmd,");
+  Serial.print(led.Cmd);
+  Serial.print(",time,");
+  Serial.print(led.Time);
+  Serial.print(",state,");
+  Serial.print(led.State);
+  Serial.println(",");
 }
