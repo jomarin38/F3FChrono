@@ -68,6 +68,7 @@ class rs232_arduino (QObject):
     def slot_arduino_reset(self):
         self.set_RebundBtn(self.rebundTime)
         self.set_buzzerTime(self.buzzerTime)
+        self.debug()
 
     def receive(self):
         while not self.terminated:
@@ -88,7 +89,7 @@ class rs232_arduino (QObject):
                             self.wait_alt_sig.emit()
                     if data[0] == "lap":
                         if 1 <= int(data[1]) <= 10:
-                            self.lap_finished_sig.emit(int(data[1])-1, int(data[int(data[1])+1])/1000)
+                            self.lap_finished_sig.emit(int(data[1]), int(data[int(data[1])+1])/1000)
                         if int(data[1]) == 10:
                             tmp=0.
                             for i in range(2, int(data[1])+2):
@@ -157,7 +158,7 @@ class rs232_arduino (QObject):
         self.event.join(timeout=1.0)
 
     def check_request_time(self):
-        if (time.time() - self.lastrequest) < 0.05:
+        if (time.time() - self.lastrequest) < 0.1:
             time.sleep(0.1)
         self.lastrequest = time.time()
 

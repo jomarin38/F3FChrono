@@ -41,7 +41,7 @@ typedef struct {
 
 
 typedef struct{
-  char data_read[100];
+  char data_read[10];
   byte nb_data;
   byte data_available;
 }serialStr;
@@ -143,9 +143,10 @@ void setup() {
 
   Serial.begin(57600);
   while (!Serial) {
-    delay(100);
-    Serial.println("F3FChrono,");
+    delay(100);  
   }
+  Serial.println("F3FChrono,setup,end");
+
 }
 
 // the loop function runs over and over again forever
@@ -224,8 +225,13 @@ void serialEvent(){
       if (serial.data_read[serial.nb_data]=='\n'){
         serial.data_available=true;
       }
-      serial.nb_data++;
-    }    
+      if (serial.nb_data<sizeof (serial.data_read)/sizeof(char)){
+        serial.nb_data++;        
+      }else{
+        serial.nb_data=0;
+      }
+    }
+        
   }  
 }
 void analogRun(void)

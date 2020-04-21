@@ -277,6 +277,10 @@ class ChronoArduino(ChronoHard, QTimer):
         super().__init__(signal_btnnext)
         print("chronoArduino init")
         self.chrono_signal.connect(self.handle_chrono_event)
+        self.lap_finished.connect(self.handle_lap_finished)
+        self.run_started.connect(self.handle_run_started)
+        self.run_finished.connect(self.handle_run_finished)
+
         self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'],
                                    ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
                                      self.lap_finished, self.run_finished, self.altitude_finished, self.accu_signal)
@@ -311,8 +315,19 @@ class ChronoArduino(ChronoHard, QTimer):
         if caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
             self.run_validated.emit()
 
+    def handle_run_started(self):
+        self.startTime = datetime.now()
+
+    def handle_lap_finished(self, lap, time):
+        self.chronoLap.append(time)
+
+    def handle_run_finished(self, time):
+        self.endTime = datetime.now()
+
     def reset(self):
         self.arduino.reset()
+        self.chronoLap.clear()
+        self.reset_wind()
 
     def set_buzzer_time(self, time):
         self.arduino.set_buzzerTime(time)
