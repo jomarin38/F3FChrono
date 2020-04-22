@@ -207,8 +207,13 @@ void RS232Run(void) {
       memset(&chrono, 0, sizeof(chrono));
       printresetchrono();
     }else if (tmp=='e'){
-      baseCheck(baseA.Pin);
-      printforcebaseA();
+      if (serial.data_read[1]=='a'){
+        baseCheck(baseA.Pin);
+        printforcebaseA();
+      }else if (serial.data_read[1]=='b'){
+        baseCheck(baseB.Pin);
+        printforcebaseB();
+      }
     }else if (tmp=='k'){
       resetFunc();
     }
@@ -409,6 +414,12 @@ void printforcebaseA(void){
   Serial.print("force baseA");
   Serial.println(",");
 }
+
+void printforcebaseB(void){
+  Serial.print("force baseB");
+  Serial.println(",");
+}
+
 void printdebug(void){
   printstatus();
   printchrono();

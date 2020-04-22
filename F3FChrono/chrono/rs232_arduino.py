@@ -130,9 +130,9 @@ class rs232_arduino (QObject):
         self.bus.write(("b"+str(time)+"\n").encode())
         return 0
 
-    def event_BaseA(self):
+    def event_Base(self, base='a'):
         self.check_request_time()
-        self.bus.write(("e\n").encode())
+        self.bus.write(("e"+base+"\n").encode())
         return 0
 
     def kill_aduino(self):

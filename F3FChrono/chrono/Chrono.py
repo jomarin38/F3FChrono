@@ -50,6 +50,8 @@ class ChronoHard(QObject):
         self.reset_wind()
         self.chronoLap = []
         self.timelost = []
+        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.wind_signal, self.accu_signal, self.rssi_signal)
+        self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
 
 
     def addPenalty(self, value):
@@ -126,11 +128,6 @@ class ChronoHard(QObject):
         self.penalty=0.0
         self.reset_wind()
 
-
-
-
-
-
     def getLastLapTime(self):
         if self.getLapCount()>0:
             return self.chronoLap[self.getLapCount()-1]
@@ -155,6 +152,9 @@ class ChronoHard(QObject):
     def getLapCount(self):
         return len(self.chronoLap)
 
+    def set_ipbase(self, baseA, baseB):
+        self.udpReceive.set_ipbase(baseA, baseB)
+
     def to_string(self):
         result=os.linesep+"Chrono Data : "+os.linesep+"\tStart Time : "+ str(self.startTime)+\
                os.linesep+"\tEnd Time : "+str(self.endTime)+os.linesep+"\tRun Time : "+\
@@ -171,7 +171,73 @@ class ChronoHard(QObject):
 
 
 
+class ChronoArduino(ChronoHard, QTimer):
+    def __init__(self, signal_btnnext):
+        super().__init__(signal_btnnext)
+        print("chronoArduino init")
+        self.chrono_signal.connect(self.handle_chrono_event)
+        self.lap_finished.connect(self.handle_lap_finished)
+        self.run_started.connect(self.handle_run_started)
+        self.run_finished.connect(self.handle_run_finished)
 
+        self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'],
+                                   ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
+                                     self.lap_finished, self.run_finished, self.altitude_finished, self.accu_signal)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.event_voltage)
+        self.timer.start(30000)
+        self.reset()
+        self.status = 0
+        self.status_changed.connect(self.slot_status)
+
+    def event_voltage(self):
+        self.arduino.get_voltage()
+
+    def slot_status(self, status):
+        print("handle status : ", status)
+        self.status=status
+
+    def handle_chrono_event(self, caller, data, address):
+        if not caller.lower() == "btnnext":
+            self.buzzer_validated.emit()
+
+        if caller.lower() == "btnnext" and \
+                (self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.InWait):
+            self.arduino.set_status(self.status+1)
+        if caller.lower() == "btnnext" and data == "event" and address == "baseA" and\
+                self.status == chronoStatus.InStart:
+            self.arduino.set_status(self.status + 1)
+        if (caller.lower() == "btnnext" or caller.lower()=="udpreceive") and data == "event" and address == "baseA":
+            print("demande event base A")
+            self.arduino.event_Base('a')
+        if (caller.lower() == "btnnext" or caller.lower()=="udpreceive") and data == "event" and address == "baseB":
+            print("demande event base B")
+            self.arduino.event_Base('b')
+        if caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
+            self.run_validated.emit()
+
+    def handle_run_started(self):
+        self.startTime = datetime.now()
+
+    def handle_lap_finished(self, lap, time):
+        self.chronoLap.append(time)
+
+    def handle_run_finished(self, time):
+        self.endTime = datetime.now()
+
+    def reset(self):
+        self.arduino.reset()
+        self.chronoLap.clear()
+        self.reset_wind()
+
+    def set_buzzer_time(self, time):
+        self.arduino.set_buzzerTime(time)
+
+    def stop(self):
+        self.arduino.stop()
+
+
+'''
 class ChronoRpi(ChronoHard):
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
@@ -204,7 +270,7 @@ class ChronoRpi(ChronoHard):
 
     def timerEvent(self):
         self.__declareBase("Altitude")
-        
+
     def __declareBase (self, base):
         print (base, self.status)
         now = time.time()
@@ -271,82 +337,16 @@ class ChronoRpi(ChronoHard):
                 self.lastDetectionTime = now
                 self.timelost[self.getLapCount() - 1] = self.timelost[self.getLapCount() - 1] + elapsedTime
                 return False
+'''
 
-class ChronoArduino(ChronoHard, QTimer):
-    def __init__(self, signal_btnnext):
-        super().__init__(signal_btnnext)
-        print("chronoArduino init")
-        self.chrono_signal.connect(self.handle_chrono_event)
-        self.lap_finished.connect(self.handle_lap_finished)
-        self.run_started.connect(self.handle_run_started)
-        self.run_finished.connect(self.handle_run_finished)
-
-        self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'],
-                                   ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
-                                     self.lap_finished, self.run_finished, self.altitude_finished, self.accu_signal)
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.event_voltage)
-        self.timer.start(30000)
-        self.reset()
-        self.status = 0
-        self.status_changed.connect(self.slot_status)
-
-    def event_voltage(self):
-        self.arduino.get_voltage()
-
-    def slot_status(self, status):
-        print("handle status : ", status)
-        self.status=status
-
-    def handle_chrono_event(self, caller, data, address):
-        if not caller.lower() == "btnnext":
-            self.buzzer_validated.emit()
-
-        if caller.lower() == "btnnext" and \
-                (self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.InWait):
-            self.arduino.set_status(self.status+1)
-        if caller.lower() == "btnnext" and data == "event" and address == "baseA" and\
-                self.status == chronoStatus.InStart:
-            self.arduino.set_status(self.status + 1)
-        if caller.lower() == "btnnext" and data == "event" and address == "baseA" and \
-                self.status == chronoStatus.Launched:
-            print("demande event base A")
-            self.arduino.event_BaseA()
-        if caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
-            self.run_validated.emit()
-
-    def handle_run_started(self):
-        self.startTime = datetime.now()
-
-    def handle_lap_finished(self, lap, time):
-        self.chronoLap.append(time)
-
-    def handle_run_finished(self, time):
-        self.endTime = datetime.now()
-
-    def reset(self):
-        self.arduino.reset()
-        self.chronoLap.clear()
-        self.reset_wind()
-
-    def set_buzzer_time(self, time):
-        self.arduino.set_buzzerTime(time)
-
-    def stop(self):
-        self.arduino.stop()
-
-
-
-''' 
 
 def main ():
 
     print ('Chrono Test')
-    chronoRpi=ChronoRpi()
-    chronoRpi.reset()
-    chronoRpi.chrono_signal.emit("test","test1","test2")
+    chrono=ChronoArduino()
+    chrono.reset()
+    chrono.chrono_signal.emit("test","test1","test2")
 
 
 if __name__ == '__main__':
     main()
-'''

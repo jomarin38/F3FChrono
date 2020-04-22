@@ -22,10 +22,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.daoRound = RoundDAO()
         self.event = None
         self.chronodata = chronodata
-        self.chronoRpi=ChronoRpi(self.signal_btnnext)
-        self.chronoArduino=ChronoArduino(self.signal_btnnext)
-        self.rpigpio=rpi_gpio(rpi, self.btn_next_action, self.btn_baseA, self.btn_baseB)
-        self.chronoHard = self.chronoRpi
+        self.chronoHard = ChronoArduino(self.signal_btnnext)
+        self.rpigpio=rpi_gpio(rpi, self.btn_next_action, None, None)
         self.base_test = -10
         self.vocal = chronoQSound(ConfigReader.config.conf['sound'],\
                                   ConfigReader.config.conf['voice'], ConfigReader.config.conf['buzzer_valid'])
@@ -33,27 +31,17 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.initUI()
 
         self.signal_btnnext.connect(self.btn_next_action)
-        self.chronoRpi.status_changed.connect(self.slot_status_changed)
-        self.chronoRpi.run_started.connect(self.slot_run_started)
-        self.chronoRpi.lap_finished.connect(self.slot_lap_finished)
-        self.chronoRpi.altitude_finished.connect(self.slot_altitude_finished)
-        self.chronoRpi.run_finished.connect(self.slot_run_finished)
-        self.chronoRpi.run_validated.connect(self.slot_run_validated)
-        self.chronoRpi.wind_signal.connect(self.slot_wind_ui)
-        self.chronoRpi.rssi_signal.connect(self.slot_rssi)
-        self.chronoRpi.accu_signal.connect(self.slot_accu)
-        self.chronoRpi.buzzer_validated.connect(self.slot_buzzer)
 
-        self.chronoArduino.status_changed.connect(self.slot_status_changed)
-        self.chronoArduino.run_started.connect(self.slot_run_started)
-        self.chronoArduino.lap_finished.connect(self.slot_lap_finished)
-        self.chronoArduino.run_finished.connect(self.slot_run_finished)
-        self.chronoArduino.run_validated.connect(self.slot_run_validated)
-        self.chronoArduino.wind_signal.connect(self.slot_wind_ui)
-        self.chronoArduino.rssi_signal.connect(self.slot_rssi)
-        self.chronoArduino.accu_signal.connect(self.slot_accu)
-        self.chronoArduino.buzzer_validated.connect(self.slot_buzzer)
-        self.chronoArduino.event_voltage()
+        self.chronoHard.status_changed.connect(self.slot_status_changed)
+        self.chronoHard.run_started.connect(self.slot_run_started)
+        self.chronoHard.lap_finished.connect(self.slot_lap_finished)
+        self.chronoHard.run_finished.connect(self.slot_run_finished)
+        self.chronoHard.run_validated.connect(self.slot_run_validated)
+        self.chronoHard.wind_signal.connect(self.slot_wind_ui)
+        self.chronoHard.rssi_signal.connect(self.slot_rssi)
+        self.chronoHard.accu_signal.connect(self.slot_accu)
+        self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
+        self.chronoHard.event_voltage()
 
     def initUI(self):
         self.MainWindow = QtWidgets.QMainWindow()
@@ -89,7 +77,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].btn_settings_sig.connect(self.set_show_settings)
         self.controllers['config'].btn_next_sig.connect(self.start)
         self.controllers['config'].contest_sig.connect(self.contest_changed)
-        self.controllers['config'].chrono_sig.connect(self.chronotype_changed)
         self.controllers['config'].btn_random_sig.connect(self.random_bib_start)
         self.controllers['config'].btn_day_1_sig.connect(self.bib_day_1)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
@@ -105,13 +92,13 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].btn_cancel_sig.connect(self.show_config)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
         self.controllers['settings'].btn_quitapp_sig.connect(self.shutdown_app)
+        self.controllers['settings'].set_udp_sig(self.chronoHard.chrono_signal)
         self.controllers['settingsadvanced'].btn_settings_sig.connect(self.show_settings)
 
 
         self.show_config()
         self.MainWindow.show()
         self.controllers['config'].set_contest(self.daoEvent.get_list())
-        self.controllers['config'].view.ChronoType.setCurrentIndex(1)
         self.controllers['wind'].set_data(0, 0, 0)
 
     def show_config(self):
@@ -159,7 +146,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.vocal.loadwav(ConfigReader.config.conf['sound'],
                            ConfigReader.config.conf['voice'],
                            ConfigReader.config.conf['buzzer_valid'])
-        self.chronoArduino.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
+        self.chronoHard.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
+        self.chronoHard.set_ipbase(self.controllers['settings'].get_ipbaseA(), self.controllers['settings'].get_ipbaseB())
 
     def home_action(self):
         #print event data
@@ -239,16 +227,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if self.controllers['round'].is_show():
             self.next_action()
 
-    def btn_baseA(self, port):
-        if self.chronoHard == self.chronoRpi:
-            print("btn base A")
-            self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseA")
-
-    def btn_baseB(self, port):
-        if self.chronoHard == self.chronoRpi:
-            print("btn base B")
-            self.chronoHard.chrono_signal.emit("udpreceive", "event", "baseB")
-
     def handle_time_elapsed(self):
         print ("time elapsed")
         if self.chronoHard.get_status() == chronoStatus.WaitLaunch:
@@ -310,13 +288,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.controllers['config'].set_data(self.event)
 
-    def chronotype_changed(self):
-        if (self.controllers['config'].view.ChronoType.currentIndex()==0):
-            self.chronoHard = self.chronoRpi
-        else:
-            self.chronoHard = self.chronoArduino
-        self.chronoHard.reset()
-
     def slot_status_changed(self, status):
         print ("slot status", status)
         self.controllers['round'].wChronoCtrl.set_status(status)
@@ -334,26 +305,18 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def slot_lap_finished (self, lap, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
-        if self.chronoHard == self.chronoRpi:
-            if lap<9:
-                self.rpigpio.signal_buzzer.emit(1)
-            if lap==9:
-                self.rpigpio.signal_buzzer.emit(2)
         self.vocal.signal_base.emit(lap)
 
     def slot_run_finished(self, run_time):
         print("Main UI Controller slot run finished : ", time.time())
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
-        if self.chronoHard == self.chronoRpi:
-            self.rpigpio.signal_buzzer.emit(3)
         if ConfigReader.config.conf["voice"]:
             #time.sleep(0.5)     #wait gui has been refresh otherwise the time is updated after vocal sound
             self.vocal.signal_time.emit(run_time)
 
     def slot_altitude_finished(self):
-        if self.chronoHard == self.chronoRpi:
-            self.rpigpio.signal_buzzer.emit(3)
+        print("slot altitude")
 
     def slot_run_validated(self):
         print("run validated")
@@ -413,7 +376,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         event.accept()
 
     def shutdown_app(self):
-        self.chronoArduino.stop()
+        self.chronoHard.stop()
         if self.webserver_process is not None:
             print('Kill process ' + str(self.webserver_process.pid))
             time.sleep(1)  # Wait for the process to be killed

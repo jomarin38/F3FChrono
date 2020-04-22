@@ -362,13 +362,10 @@ class WConfigCtrl(QObject):
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
-        self.piCamA_config=False
-        self.piCamB_config = False
 
         # Event connect
         self.view.StartBtn.clicked.connect(self.btn_next)
         self.view.ContestList.currentIndexChanged.connect(self.contest_sig.emit)
-        self.view.ChronoType.currentIndexChanged.connect(self.chrono_sig.emit)
         self.view.btn_settings.clicked.connect(self.btn_settings_sig.emit)
         self.view.randombtn.clicked.connect(self.btn_random_sig.emit)
         self.view.day_1btn.clicked.connect(self.btn_day_1_sig.emit)
@@ -385,26 +382,6 @@ class WConfigCtrl(QObject):
     def hide(self):
         self.widget.hide()
 
-    def btn_piCamA(self):
-        self.piCamA_config=True
-        self.set_piCamA("Wait Detection")
-
-    def set_piCamA(self, value):
-        self.view.PICamA_Value.setText(value)
-
-    def is_piCamA_onConfig(self):
-        return (self.piCamA_config)
-
-    def btn_piCamB(self):
-        self.piCamB_config=True
-        self.set_piCamB("Wait Detection")
-
-    def set_piCamB(self, value):
-        self.view.PICamB_Value.setText(value)
-
-    def is_piCamB_onConfig(self):
-        return (self.piCamB_config)
-
     def btn_next(self):
         self.btn_next_sig.emit()
 
@@ -418,7 +395,6 @@ class WConfigCtrl(QObject):
         self.view.daydurationvalue.setValue(event.dayduration)
 
     def set_contest(self, contest_list):
-        self.view.ChronoType.setCurrentIndex(0)
         self.chrono_sig.emit()
         for contest in contest_list:
             self.view.ContestList.addItem(contest.name, userData=contest)
@@ -433,12 +409,11 @@ class WConfigCtrl(QObject):
         self.flights_before_refly=self.view.RevolValue.value()
         self.bib_start=self.view.bib_start.value()
         self.dayduration=self.view.daydurationvalue.value()
-        self.chrono_type=self.view.ChronoType.currentIndex()
         self.contest=self.view.ContestList.currentIndex()
 
 class WSettingsAdvanced(QObject):
     btn_settings_sig = pyqtSignal()
-    widgetList=[]
+    widgetList = []
     def __init__(self, name, parent):
         super().__init__()
         self.view = Ui_WSettingsAdvanced()
@@ -500,9 +475,12 @@ class WSettings(QObject):
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
         self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
-        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
-        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self.view.wbase_detect_btn.clicked.connect(self.base_detect)
+        self.view.wbase_invert_btn.clicked.connect(self.base_invert)
+        self.view.btn_cancel.clicked.connect(self.btn_cancel)
+        self.view.btn_valid.clicked.connect(self.btn_valid)
         self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
+        self.udp_sig = None
 
     def get_widget(self):
         return(self.widgetList)
@@ -542,6 +520,44 @@ class WSettings(QObject):
         ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
         ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
         ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
+
+    def btn_cancel(self):
+        if self.udp_sig is not None:
+            self.udp_sig.disconnect(self.slot_udp)
+        self.btn_cancel_sig.emit()
+
+    def btn_valid(self):
+        if self.udp_sig is not None:
+            self.udp_sig.disconnect(self.slot_udp)
+        self.btn_valid_sig.emit()
+
+    def set_udp_sig(self, udp_sig):
+        self.udp_sig = udp_sig
+
+    def base_detect(self):
+        if self.udp_sig is not None:
+            self.udp_sig.connect(self.slot_udp)
+            self.view.baseA_IP.setText("None")
+            self.view.baseB_IP.setText("None")
+
+    def slot_udp(self, caller, data, address):
+        print(caller, data, address)
+        if caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseA_IP.toPlainText() == "None":
+            self.view.baseA_IP.setText(address)
+        elif caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseB_IP.toPlainText() == "None" and\
+                address != self.view.baseA_IP.toPlainText():
+            self.view.baseB_IP.setText(address)
+
+    def base_invert(self):
+        tmp=self.view.baseA_IP.toPlainText()
+        self.view.baseA_IP.setText(self.view.baseB_IP.toPlainText())
+        self.view.baseB_IP.setText(tmp)
+
+    def get_ipbaseA(self):
+        return self.view.baseA_IP.toPlainText()
+
+    def get_ipbaseB(self):
+        return self.view.baseB_IP.toPlainText()
 
 
 class WPiCamPair(QObject):
