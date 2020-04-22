@@ -192,6 +192,9 @@ void RS232Run(void) {
       printdebug();
     }else if (tmp=='s'){
       chronostatus.runStatus=byte(serial.data_read[1]-'0');
+       if (chronostatus.runStatus==InProgressA) {
+        buzzerSet(&buzzer, 1);
+       }
       printstatus();
     }else if (tmp=='b'){
       baseA.rebundBtn_time=0;
