@@ -4,7 +4,7 @@ import time
 import logging
 import re
 
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, pyqtSignal
 
 
 INITMSG = "Init"
@@ -14,6 +14,10 @@ EVENTMSG = "Event"
 https://github.com/jsh2134/iw_parse/
 '''
 class udpreceive(QThread):
+    ipbaseclear_sig = pyqtSignal()
+    ipinvert_sig = pyqtSignal()
+    ipset_sig = pyqtSignal(str, str)
+
     def __init__(self, udpport, signal_chrono, signal_btnnext, signal_wind, signal_accu, signal_rssi):
         super().__init__()
         self.port = udpport
@@ -24,6 +28,9 @@ class udpreceive(QThread):
         self.event_rssi = signal_rssi
         self.ipbaseA = ""
         self.ipbaseB = ""
+        self.ipbaseclear_sig.connect(self.clear_ipbase)
+        self.ipinvert_sig.connect(self.invert_ipbase)
+        self.ipset_sig.connect(self.set_ipbase)
 
 
         self.msg = ""
@@ -39,6 +46,15 @@ class udpreceive(QThread):
         self.ipbaseA = baseA
         self.ipbaseB = baseB
         print("baseA : ", baseA, "baseB : ", baseB)
+
+    def clear_ipbase(self):
+        self.ipbaseA = ""
+        self.ipbaseB = ""
+
+    def invert_ipbase(self):
+        tmp = self.ipbaseB
+        self.ipbaseB = self.ipbaseA
+        self.ipbaseA = tmp
 
     def run(self):
         while(not self.isFinished()):
@@ -66,7 +82,12 @@ class udpreceive(QThread):
                     self.event_accu.emit(float(m[2]))
                     self.event_rssi.emit(int(m[3]), int(m[4]))
                 else:
-                    self.event_chrono.emit("udpreceive", data.decode("utf-8"), address[0])
+                    base = address[0]
+                    if base == self.ipbaseA:
+                        base = "baseA"
+                    elif base == self.ipbaseB:
+                        base = "baseB"
+                    self.event_chrono.emit("udpreceive", data.decode("utf-8").lower(), base)
             except socket.error as msg:
                 print ('udp receive error {}'.format(msg))
                 logging.warning('udp receive error {}'.format(msg))

@@ -92,8 +92,12 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].btn_cancel_sig.connect(self.show_config)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
         self.controllers['settings'].btn_quitapp_sig.connect(self.shutdown_app)
-        self.controllers['settings'].set_udp_sig(self.chronoHard.chrono_signal)
+        self.controllers['settings'].set_udp_sig(self.chronoHard.chrono_signal,
+                                                 self.chronoHard.udpReceive.ipset_sig,
+                                                 self.chronoHard.udpReceive.ipbaseclear_sig,
+                                                 self.chronoHard.udpReceive.ipinvert_sig)
         self.controllers['settingsadvanced'].btn_settings_sig.connect(self.show_settings)
+
 
 
         self.show_config()
@@ -147,7 +151,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                            ConfigReader.config.conf['voice'],
                            ConfigReader.config.conf['buzzer_valid'])
         self.chronoHard.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
-        self.chronoHard.set_ipbase(self.controllers['settings'].get_ipbaseA(), self.controllers['settings'].get_ipbaseB())
 
     def home_action(self):
         #print event data

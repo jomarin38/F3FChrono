@@ -153,9 +153,6 @@ class ChronoHard(QObject):
     def getLapCount(self):
         return len(self.chronoLap)
 
-    def set_ipbase(self, baseA, baseB):
-        self.udpReceive.set_ipbase(baseA, baseB)
-
     def to_string(self):
         result=os.linesep+"Chrono Data : "+os.linesep+"\tStart Time : "+ str(self.startTime)+\
                os.linesep+"\tEnd Time : "+str(self.endTime)+os.linesep+"\tRun Time : "+\

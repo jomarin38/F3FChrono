@@ -482,6 +482,11 @@ class WSettings(QObject):
         self.view.btn_valid.clicked.connect(self.btn_valid)
         self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
         self.udp_sig = None
+        self.ipset_sig = None
+        self.ipbaseclear_sig = None
+        self.udp_sig_connected = False
+        self.ipbaseinvert_sig = None
+
 
     def get_widget(self):
         return(self.widgetList)
@@ -523,23 +528,38 @@ class WSettings(QObject):
         ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
 
     def btn_cancel(self):
-        if self.udp_sig is not None:
+
+        if self.udp_sig is not None and self.udp_sig_connected:
             self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            if self.udp_sig is not None:
+                self.ipbaseclear_sig.emit()
+                self.view.baseA_IP.setText("None")
+                self.view.baseB_IP.setText("None")
         self.btn_cancel_sig.emit()
 
     def btn_valid(self):
-        if self.udp_sig is not None:
+        if self.udp_sig is not None and self.udp_sig_connected:
             self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+        if self.ipset_sig is not None:
+            self.ipset_sig.emit(self.get_ipbaseA(), self.get_ipbaseB())
         self.btn_valid_sig.emit()
 
-    def set_udp_sig(self, udp_sig):
-        self.udp_sig = udp_sig
+    def set_udp_sig(self, udp, set, clear, invert):
+        self.udp_sig = udp
+        self.ipset_sig = set
+        self.ipbaseclear_sig = clear
+        self.ipbaseinvert_sig = invert
 
     def base_detect(self):
-        if self.udp_sig is not None:
+        if self.udp_sig is not None and self.ipbaseclear_sig is not None:
             self.udp_sig.connect(self.slot_udp)
+            self.ipbaseclear_sig.emit()
             self.view.baseA_IP.setText("None")
             self.view.baseB_IP.setText("None")
+            self.udp_sig_connected = True
+
 
     def slot_udp(self, caller, data, address):
         print(caller, data, address)
@@ -550,9 +570,10 @@ class WSettings(QObject):
             self.view.baseB_IP.setText(address)
 
     def base_invert(self):
-        tmp=self.view.baseA_IP.toPlainText()
-        self.view.baseA_IP.setText(self.view.baseB_IP.toPlainText())
-        self.view.baseB_IP.setText(tmp)
+        if self.ipbaseinvert_sig is not None:
+            tmp=self.view.baseA_IP.toPlainText()
+            self.view.baseA_IP.setText(self.view.baseB_IP.toPlainText())
+            self.view.baseB_IP.setText(tmp)
 
     def get_ipbaseA(self):
         return self.view.baseA_IP.toPlainText()

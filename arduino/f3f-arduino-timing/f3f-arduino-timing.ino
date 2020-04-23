@@ -320,7 +320,7 @@ void baseB_Interrupt(void) {
 }
 
 void baseCheck(byte base) {
-  int time1=0;
+  unsigned long time1=0;
   if (chronostatus.runStatus==Launched and BASEAPIN == base) {
     chronostatus.runStatus = InStart;
     buzzerSet(&buzzer, 1);
@@ -330,7 +330,6 @@ void baseCheck(byte base) {
   }else if (chronostatus.runStatus==InStart and BASEAPIN == base) {
     buzzerSet(&buzzer, 1);
     chronostart();
-    chrono.lapCount=0;
     chronostatus.runStatus = InProgressB;
   }else if (chronostatus.runStatus==InProgressA and base == BASEAPIN) {
     time1 = millis();
@@ -349,7 +348,14 @@ void baseCheck(byte base) {
   }else if (chronostatus.runStatus==InProgressB and base == BASEBPIN) {
     time1 = millis();
     chrono.lap[chrono.lapCount] = time1 - chrono.oldtime;
-    chrono.oldtime = time1;
+    /*Serial.print("chronoInProgressB,lapCount ");
+    Serial.print(chrono.lapCount);
+    Serial.print(",oldtime ");
+    Serial.print(chrono.oldtime);
+    Serial.print(",time1 ");
+    Serial.print(time1);
+    Serial.println(",");
+    */chrono.oldtime = time1;
     chrono.lapCount++;
     chronostatus.runStatus = InProgressA;
     if (chrono.lapCount == 9) {
@@ -357,8 +363,6 @@ void baseCheck(byte base) {
     }else{
       buzzerSet(&buzzer, 1);
     }
-  }else if (chronostatus.runStatus==InProgressB and base == BASEAPIN and chrono.lapCount==0){
-    buzzerSet(&buzzer, 1);
   }else if (chronostatus.runStatus==WaitAltitude and (chrono.startaltitudetime + 5000) < millis()) {
     buzzer.Cmd = 3;
     chronostatus.runStatus = Finished;
@@ -372,7 +376,9 @@ void chronostart(void){
     chrono.starttime=millis();
     chrono.started=true;
     chrono.oldtime=chrono.starttime;
+    //Serial.println("chrono started,");
   }
+  chrono.lapCount=0;
 }
 
 void printbuzzer(void){
