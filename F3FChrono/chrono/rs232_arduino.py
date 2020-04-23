@@ -85,7 +85,8 @@ class rs232_arduino (QObject):
                         if self.status == Chrono.chronoStatus.InProgressB or self.status == Chrono.chronoStatus.InProgressA:
                             if not self.inRun:
                                 self.run_started_sig.emit()
-                                self.inRun = True
+                                self.set_inRun()
+
                         if self.status == Chrono.chronoStatus.Finished:
                             self.wait_alt_sig.emit()
                     if data[0] == "lap":
@@ -110,6 +111,9 @@ class rs232_arduino (QObject):
                 self.bus = None
                 return None
             time.sleep(0.01)
+
+    def set_inRun(self):
+        self.inRun = True
 
     def debug(self):
         self.check_request_time()

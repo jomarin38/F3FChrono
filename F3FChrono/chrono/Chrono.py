@@ -217,6 +217,7 @@ class ChronoArduino(ChronoHard, QTimer):
 
     def handle_run_started(self):
         self.startTime = datetime.now()
+        self.arduino.set_inRun ()
 
     def handle_lap_finished(self, lap, time):
         self.chronoLap.append(time)
