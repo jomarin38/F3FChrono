@@ -236,13 +236,12 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         if self.chronoHard.get_status() == chronoStatus.Launched:
             print("handle time elapsed status Launched")
-            self.chronoHard.chrono_signal.emit("btnnext", "event", "baseA")
-            self.chronoHard.chrono_signal.emit("btnnext", "event", "baseA")
+            self.chronoHard.set_status(chronoStatus.Late)
             self.controllers['round'].wChronoCtrl.stoptime()
 
         if self.chronoHard.get_status() == chronoStatus.InStart:
             print("handle time elapsed status InStart")
-            self.chronoHard.chrono_signal.emit("btnnext", "event", "baseA")
+            self.chronoHard.set_status(chronoStatus.InProgressA)
             self.controllers['round'].wChronoCtrl.stoptime()
 
     def slot_buzzer(self):

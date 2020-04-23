@@ -19,6 +19,7 @@ enum chronoStatus {
   InWait = 0,
   WaitLaunch,
   Launched,
+  Late,
   InStart,
   InProgressA,
   InProgressB,
@@ -28,8 +29,8 @@ enum chronoStatus {
 
 typedef struct {
   byte lapCount;
+  byte started;
   unsigned long lap[10];
-  unsigned long time1;
   unsigned long oldtime;
   unsigned long starttime;
   unsigned long startaltitudetime;
@@ -192,7 +193,8 @@ void RS232Run(void) {
       printdebug();
     }else if (tmp=='s'){
       chronostatus.runStatus=byte(serial.data_read[1]-'0');
-       if (chronostatus.runStatus==InProgressA) {
+       if (chronostatus.runStatus==InProgressA || chronostatus.runStatus==Late) {
+        chronostart();
         buzzerSet(&buzzer, 1);
        }
       printstatus();
@@ -318,21 +320,24 @@ void baseB_Interrupt(void) {
 }
 
 void baseCheck(byte base) {
+  int time1=0;
   if (chronostatus.runStatus==Launched and BASEAPIN == base) {
+    chronostatus.runStatus = InStart;
+    buzzerSet(&buzzer, 1);
+  }else if (chronostatus.runStatus==Late and BASEAPIN == base){
     chronostatus.runStatus = InStart;
     buzzerSet(&buzzer, 1);
   }else if (chronostatus.runStatus==InStart and BASEAPIN == base) {
     buzzerSet(&buzzer, 1);
-    chrono.time1 = millis();
-    chrono.oldtime = chrono.time1;
+    chronostart();
     chrono.lapCount=0;
     chronostatus.runStatus = InProgressB;
   }else if (chronostatus.runStatus==InProgressA and base == BASEAPIN) {
-    chrono.time1 = millis();
-    chrono.lap[chrono.lapCount] = chrono.time1 - chrono.oldtime;
+    time1 = millis();
+    chrono.lap[chrono.lapCount] = time1 - chrono.oldtime;
     chrono.lapCount++;
   
-    chrono.oldtime = chrono.time1;
+    chrono.oldtime = time1;
     buzzer.Cmd = 1;
     if (chrono.lapCount >= 10) {
       chronostatus.runStatus = WaitAltitude;
@@ -342,9 +347,9 @@ void baseCheck(byte base) {
       chronostatus.runStatus = InProgressB;
     }
   }else if (chronostatus.runStatus==InProgressB and base == BASEBPIN) {
-    chrono.time1 = millis();
-    chrono.lap[chrono.lapCount] = chrono.time1 - chrono.oldtime;
-    chrono.oldtime = chrono.time1;
+    time1 = millis();
+    chrono.lap[chrono.lapCount] = time1 - chrono.oldtime;
+    chrono.oldtime = time1;
     chrono.lapCount++;
     chronostatus.runStatus = InProgressA;
     if (chrono.lapCount == 9) {
@@ -359,6 +364,14 @@ void baseCheck(byte base) {
     chronostatus.runStatus = Finished;
   }else if ((chronostatus.runStatus==InWait or chronostatus.runStatus==Finished) and (base == BASEAPIN or base == BASEBPIN)){
       buzzerSet(&buzzer, 1);
+  }
+}
+
+void chronostart(void){
+  if (chrono.started==false){
+    chrono.starttime=millis();
+    chrono.started=true;
+    chrono.oldtime=chrono.starttime;
   }
 }
 

@@ -219,6 +219,7 @@ class WChronoCtrl(QTimer):
         self.statusText.append(_translate("chronoStatus_WaitNewRun", "Wait New Run"))
         self.statusText.append(_translate("chronoStatus_WaitToLaunch", "Wait To Launch"))
         self.statusText.append(_translate("chronoStatus_Launched", "Launched"))
+        self.statusText.append(_translate("chronoStatus_Launched", "30s reached"))
         self.statusText.append(_translate("chronoStatus_InStart", "In Start"))
         self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
         self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))

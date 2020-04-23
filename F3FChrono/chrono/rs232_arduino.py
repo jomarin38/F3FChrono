@@ -68,6 +68,7 @@ class rs232_arduino (QObject):
     def slot_arduino_reset(self):
         self.set_RebundBtn(self.rebundTime)
         self.set_buzzerTime(self.buzzerTime)
+        self.debug()
         #self.debug()
 
     def receive(self):
