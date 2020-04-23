@@ -21,6 +21,7 @@ enum chronoStatus {
   Launched,
   Late,
   InStart,
+  InStart_Late,
   InProgressA,
   InProgressB,
   WaitAltitude,
@@ -193,7 +194,7 @@ void RS232Run(void) {
       printdebug();
     }else if (tmp=='s'){
       chronostatus.runStatus=byte(serial.data_read[1]-'0');
-       if (chronostatus.runStatus==InProgressA || chronostatus.runStatus==Late) {
+       if (chronostatus.runStatus==InStart_Late || chronostatus.runStatus==Late) {
         chronostart();
         buzzerSet(&buzzer, 1);
        }
@@ -325,12 +326,15 @@ void baseCheck(byte base) {
     chronostatus.runStatus = InStart;
     buzzerSet(&buzzer, 1);
   }else if (chronostatus.runStatus==Late and BASEAPIN == base){
-    chronostatus.runStatus = InStart;
+    chronostatus.runStatus = InStart_Late;
     buzzerSet(&buzzer, 1);
   }else if (chronostatus.runStatus==InStart and BASEAPIN == base) {
     buzzerSet(&buzzer, 1);
     chronostart();
     chronostatus.runStatus = InProgressB;
+  }else if (chronostatus.runStatus==InStart_Late and BASEAPIN == base){
+    chronostatus.runStatus = InProgressB;
+    buzzerSet(&buzzer, 1);
   }else if (chronostatus.runStatus==InProgressA and base == BASEAPIN) {
     time1 = millis();
     chrono.lap[chrono.lapCount] = time1 - chrono.oldtime;

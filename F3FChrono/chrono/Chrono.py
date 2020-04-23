@@ -22,10 +22,11 @@ class chronoStatus():
     Launched = 2
     Late = 3
     InStart = 4
-    InProgressA = 5
-    InProgressB = 6
-    WaitAltitude = 7
-    Finished = 8
+    InStartLate = 5
+    InProgressA = 6
+    InProgressB = 7
+    WaitAltitude = 8
+    Finished = 9
 
 class ChronoHard(QObject):
     status_changed = pyqtSignal(int)
