@@ -207,8 +207,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wPilotCtrl.set_data(current_competitor,
                                                       self.event.get_current_round())
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
-        self.show_chrono()
+        self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False)
         self.controllers['round'].wChronoCtrl.reset_ui()
+        self.show_chrono()
+
 
     def getcontextparameters(self, updateBDD=False):
         self.controllers['config'].get_data()
@@ -296,9 +298,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         print ("slot status", status)
         self.controllers['round'].wChronoCtrl.set_status(status)
         if (status==chronoStatus.WaitLaunch):
-            self.controllers['round'].wChronoCtrl.settime(30000, False)
+            self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False)
         if (status == chronoStatus.Launched):
-            self.controllers['round'].wChronoCtrl.settime(30000, False)
+            self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launched_time'], False)
         if (status==chronoStatus.InStart):
             self.vocal.signal_entry.emit()
         #if (status == chronoStatus.InProgressA or status == chronoStatus.InProgressB):
@@ -331,7 +333,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard.reset()
         self.chronodata = Chrono()
         self.next_pilot(insert_database=True)
-        self.controllers['round'].wChronoCtrl.settime(30000, False, False)
+        self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False)
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
 
     @staticmethod

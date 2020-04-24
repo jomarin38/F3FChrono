@@ -14,6 +14,7 @@ const int BUZZERTIME = 300;
 const int LEDTIME = 300;
 const int REBUNDTIME = 500;
 const int VOLTAGE_TIME = 2000;
+const float VERSION = 0.9;
 
 enum chronoStatus {
   InWait = 0,
@@ -147,8 +148,8 @@ void setup() {
   while (!Serial) {
     delay(100);  
   }
-  Serial.println("F3FChrono,setup,end");
-
+  Serial.print("F3FChrono,setup,version : ");
+  Serial.println(VERSION);
 }
 
 // the loop function runs over and over again forever
