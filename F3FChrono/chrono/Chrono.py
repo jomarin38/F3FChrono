@@ -116,12 +116,6 @@ class ChronoHard(QObject):
     def get_status(self):
         return self.status
 
-    def set_status(self, value):
-        if (self.status!=value):
-            self.status=value
-            self.status_changed.emit(self.get_status())
-        return self.status
-
     def reset(self):
         self.chronoLap.clear()
         self.timelost.clear()
@@ -182,19 +176,21 @@ class ChronoArduino(ChronoHard, QTimer):
         self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'],
                                    ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
                                      self.lap_finished, self.run_finished, self.altitude_finished, self.accu_signal)
+        self.status_changed.connect(self.slot_status)
         self.timer = QTimer()
         self.timer.timeout.connect(self.event_voltage)
         self.timer.start(30000)
         self.reset()
-        self.status = 0
-        self.status_changed.connect(self.slot_status)
+
+    def slot_status(self, status):
+        self.status = status
 
     def event_voltage(self):
         self.arduino.get_voltage()
 
-    def slot_status(self, status):
-        print("handle status : ", status)
-        self.status=status
+    def set_status(self, value):
+        if (self.status != value):
+            self.arduino.set_status(value)
 
     def handle_chrono_event(self, caller, data, address):
         if not caller.lower() == "btnnext":

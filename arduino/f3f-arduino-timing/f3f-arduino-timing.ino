@@ -194,10 +194,10 @@ void RS232Run(void) {
       printdebug();
     }else if (tmp=='s'){
       chronostatus.runStatus=byte(serial.data_read[1]-'0');
-       if (chronostatus.runStatus==InStart_Late || chronostatus.runStatus==Late) {
+      if (chronostatus.runStatus==InStart_Late or chronostatus.runStatus==Late) {
         chronostart();
         buzzerSet(&buzzer, 1);
-       }
+      }
       printstatus();
     }else if (tmp=='b'){
       baseA.rebundBtn_time=0;
@@ -268,7 +268,7 @@ int analogMean(int data){
 
 void buzzerRun(buzzerStr *data) {
   if (data->Cmd != 0) {
-    if (data->State == true & data->Count <= data->Time) {
+    if (data->State == true and data->Count <= data->Time) {
       digitalWrite(data->Pin, HIGH);
       data->Count += LOOPDELAY;
       if (data->Count >= data->Time) {
@@ -276,7 +276,7 @@ void buzzerRun(buzzerStr *data) {
         data->Count = 0;
       }
     }
-    if (data->State == false & data->Count <= data->Time) {
+    if (data->State == false and data->Count <= data->Time) {
       digitalWrite(data->Pin, LOW);
       data->Count += LOOPDELAY;
       if (data->Count >= data->Time) {
@@ -380,7 +380,7 @@ void chronostart(void){
     chrono.starttime=millis();
     chrono.started=true;
     chrono.oldtime=chrono.starttime;
-    //Serial.println("chrono started,");
+    Serial.println("chrono started,");
   }
   chrono.lapCount=0;
 }
