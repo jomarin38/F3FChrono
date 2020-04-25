@@ -175,9 +175,11 @@ class rpi_gpio(QObject):
             # btn_next callback
             addCallback(ConfigReader.config.conf['btn_next'], btn_next_action, False)
             # btn_baseA
-            addCallback(ConfigReader.config.conf['btn_baseA'], btn_baseA, False)
+            if btn_baseA is not None:
+                addCallback(ConfigReader.config.conf['btn_baseA'], btn_baseA, False)
             # btn_baseB
-            addCallback(ConfigReader.config.conf['btn_baseB'], btn_baseB, False)
+            if btn_baseB is not None:
+                addCallback(ConfigReader.config.conf['btn_baseB'], btn_baseB, False)
 
     def __del__(self):
         if self.buzzer != None:

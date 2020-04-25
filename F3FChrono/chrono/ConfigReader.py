@@ -64,7 +64,10 @@ default_config = \
     "webserver_port" : 8000,
     "voltage_coef" : 0.354,
     "i2c_refresh" : 100, #time in ms
-    "rebound_btn_time" : 500 #time in ms
+    "rebound_btn_time" : 500, #time in ms
+    "Launch_time" : 12000,
+    "Launched_time" : 12000,
+    "langage" : "French"
 }
 
 def init():

@@ -94,7 +94,9 @@ class WWindCtrl():
         self.rules['starttime'] = datetime.now()
         self.rules['time(s)'] = time.time()
         self.rules['detected'] = False
-        self.rules['alarm']=False
+        self.rules['alarm'] = False
+        self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
+        self.windstylesheet = "background-color:rgba( 255, 255, 255, 0% );"
 
     def get_widget(self):
         return(self.widgetList)
@@ -118,21 +120,21 @@ class WWindCtrl():
         self.view.WindInfo.setText('Wind : '+str(speed)+'m/s, Angle : '+str(angle)+'°'+', '+strrain)
         self.rules['dir'] = angle
         self.rules['speed'] = speed
-        self.rules['rain']=rain
+        self.rules['rain'] = rain
 
     def check_rules(self, limit_angle, speed_min, speed_max, time_limit):
         if abs(self.rules['dir']) > limit_angle or self.rules['speed'] < speed_min or self.rules['speed'] > speed_max \
                 or self.rules['rain']:
-            if self.rules['detected']==False:
+            if self.rules['detected'] == False:
                 self.rules['starttime'] = datetime.now()
                 self.rules['time(s)'] = time.time()
-                self.rules['detected']=True
+                self.rules['detected'] = True
             else:
-                if ((time.time()-self.rules['time(s)'])>20):
-                    self.view.WindInfo.setStyleSheet('color: red')
+                if ((time.time()-self.rules['time(s)']) > 20):
+                    self.view.WindInfo.setStyleSheet('background-color:red;')
                     self.view.Elapsedtime.setVisible(True)
-                    if (time.time()-self.rules['time(s)'])>(time_limit*60):
-                        self.view.Elapsedtime.setStyleSheet('color: red')
+                    if (time.time()-self.rules['time(s)']) > (time_limit*60):
+                        self.view.Elapsedtime.setStyleSheet('background-color:red;')
                         self.view.btn_clear.setVisible(True)
                         self.rules['alarm']=True
 
@@ -141,10 +143,10 @@ class WWindCtrl():
                                 +self.cancelroundtostr())
 
         else:
-            self.view.WindInfo.setStyleSheet('color: black')
+            self.view.WindInfo.setStyleSheet('background-color:rgba( 255, 255, 255, 0% );')
             self.rules['detected']=False
             if not self.rules['alarm']:
-                self.view.Elapsedtime.setStyleSheet('color: black')
+                self.view.Elapsedtime.setStyleSheet('background-color:rgba( 255, 255, 255, 0% );')
                 self.view.Elapsedtime.setVisible(False)
 
     def clear_alarm(self):
@@ -161,10 +163,16 @@ class WWindCtrl():
 
     def set_voltage(self, voltage):
         self.view.voltage.setText("{:0>3.1f}".format(voltage)+" V")
+        if voltage <= ConfigReader.config.conf['voltage_min'] and\
+                self.voltagestylesheet == "background-color:rgba( 255, 255, 255, 0% );":
+            self.voltagestylesheet = "background-color:red;"
+            self.view.voltage.setStyleSheet(self.voltagestylesheet)
+        elif voltage > ConfigReader.config.conf['voltage_min'] and self.voltagestylesheet == "background-color:red;":
+            self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
+            self.view.voltage.setStyleSheet(self.voltagestylesheet)
 
     def set_rssi(self, rssi1, rssi2):
-        self.view.rssi.setText("rssi1, 2 : "+str(rssi1) + "%, "+str(rssi2)+"%")
-
+        self.view.rssi.setText(str(rssi1) + "%, "+str(rssi2)+"%")
 
 class WPilotCtrl():
     def __init__(self, name, parent):
@@ -211,7 +219,10 @@ class WChronoCtrl(QTimer):
         self.statusText.append(_translate("chronoStatus_WaitNewRun", "Wait New Run"))
         self.statusText.append(_translate("chronoStatus_WaitToLaunch", "Wait To Launch"))
         self.statusText.append(_translate("chronoStatus_Launched", "Launched"))
+        self.statusText.append(_translate("chronoStatus_L30s_reached", "30s reached"))
         self.statusText.append(_translate("chronoStatus_InStart", "In Start"))
+        self.statusText.append(_translate("chronoStatus_I30s_reached", "In Start 30s reached"))
+        self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
         self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
         self.statusText.append(_translate("chronoStatus_WaitAltitude", "Wait Altitude"))
         self.statusText.append(_translate("chronoStatus_Finished", "Finished"))
@@ -258,7 +269,8 @@ class WChronoCtrl(QTimer):
         return self.widget.isVisible()
 
     def set_status(self, status):
-        self.view.Status.setText(self.statusText[status])
+        if status < len(self.statusText):
+            self.view.Status.setText(self.statusText[status])
 
     def set_laptime(self, laptime):
         #self.view.Time_label.setText("{:0>6.3f}".format(time)
@@ -352,13 +364,10 @@ class WConfigCtrl(QObject):
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
-        self.piCamA_config=False
-        self.piCamB_config = False
 
         # Event connect
         self.view.StartBtn.clicked.connect(self.btn_next)
         self.view.ContestList.currentIndexChanged.connect(self.contest_sig.emit)
-        self.view.ChronoType.currentIndexChanged.connect(self.chrono_sig.emit)
         self.view.btn_settings.clicked.connect(self.btn_settings_sig.emit)
         self.view.randombtn.clicked.connect(self.btn_random_sig.emit)
         self.view.day_1btn.clicked.connect(self.btn_day_1_sig.emit)
@@ -375,26 +384,6 @@ class WConfigCtrl(QObject):
     def hide(self):
         self.widget.hide()
 
-    def btn_piCamA(self):
-        self.piCamA_config=True
-        self.set_piCamA("Wait Detection")
-
-    def set_piCamA(self, value):
-        self.view.PICamA_Value.setText(value)
-
-    def is_piCamA_onConfig(self):
-        return (self.piCamA_config)
-
-    def btn_piCamB(self):
-        self.piCamB_config=True
-        self.set_piCamB("Wait Detection")
-
-    def set_piCamB(self, value):
-        self.view.PICamB_Value.setText(value)
-
-    def is_piCamB_onConfig(self):
-        return (self.piCamB_config)
-
     def btn_next(self):
         self.btn_next_sig.emit()
 
@@ -408,7 +397,6 @@ class WConfigCtrl(QObject):
         self.view.daydurationvalue.setValue(event.dayduration)
 
     def set_contest(self, contest_list):
-        self.view.ChronoType.setCurrentIndex(0)
         self.chrono_sig.emit()
         for contest in contest_list:
             self.view.ContestList.addItem(contest.name, userData=contest)
@@ -423,12 +411,11 @@ class WConfigCtrl(QObject):
         self.flights_before_refly=self.view.RevolValue.value()
         self.bib_start=self.view.bib_start.value()
         self.dayduration=self.view.daydurationvalue.value()
-        self.chrono_type=self.view.ChronoType.currentIndex()
         self.contest=self.view.ContestList.currentIndex()
 
 class WSettingsAdvanced(QObject):
     btn_settings_sig = pyqtSignal()
-    widgetList=[]
+    widgetList = []
     def __init__(self, name, parent):
         super().__init__()
         self.view = Ui_WSettingsAdvanced()
@@ -490,9 +477,17 @@ class WSettings(QObject):
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
         self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
-        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
-        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self.view.wbase_detect_btn.clicked.connect(self.base_detect)
+        self.view.wbase_invert_btn.clicked.connect(self.base_invert)
+        self.view.btn_cancel.clicked.connect(self.btn_cancel)
+        self.view.btn_valid.clicked.connect(self.btn_valid)
         self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
+        self.udp_sig = None
+        self.ipset_sig = None
+        self.ipbaseclear_sig = None
+        self.udp_sig_connected = False
+        self.ipbaseinvert_sig = None
+
 
     def get_widget(self):
         return(self.widgetList)
@@ -532,6 +527,60 @@ class WSettings(QObject):
         ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
         ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
         ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
+
+    def btn_cancel(self):
+
+        if self.udp_sig is not None and self.udp_sig_connected:
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            if self.udp_sig is not None:
+                self.ipbaseclear_sig.emit()
+                self.view.baseA_IP.setText("None")
+                self.view.baseB_IP.setText("None")
+        self.btn_cancel_sig.emit()
+
+    def btn_valid(self):
+        if self.udp_sig is not None and self.udp_sig_connected:
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+        if self.ipset_sig is not None:
+            self.ipset_sig.emit(self.get_ipbaseA(), self.get_ipbaseB())
+        self.btn_valid_sig.emit()
+
+    def set_udp_sig(self, udp, set, clear, invert):
+        self.udp_sig = udp
+        self.ipset_sig = set
+        self.ipbaseclear_sig = clear
+        self.ipbaseinvert_sig = invert
+
+    def base_detect(self):
+        if self.udp_sig is not None and self.ipbaseclear_sig is not None:
+            self.udp_sig.connect(self.slot_udp)
+            self.ipbaseclear_sig.emit()
+            self.view.baseA_IP.setText("None")
+            self.view.baseB_IP.setText("None")
+            self.udp_sig_connected = True
+
+
+    def slot_udp(self, caller, data, address):
+        print(caller, data, address)
+        if caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseA_IP.toPlainText() == "None":
+            self.view.baseA_IP.setText(address)
+        elif caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseB_IP.toPlainText() == "None" and\
+                address != self.view.baseA_IP.toPlainText():
+            self.view.baseB_IP.setText(address)
+
+    def base_invert(self):
+        if self.ipbaseinvert_sig is not None:
+            tmp=self.view.baseA_IP.toPlainText()
+            self.view.baseA_IP.setText(self.view.baseB_IP.toPlainText())
+            self.view.baseB_IP.setText(tmp)
+
+    def get_ipbaseA(self):
+        return self.view.baseA_IP.toPlainText()
+
+    def get_ipbaseB(self):
+        return self.view.baseB_IP.toPlainText()
 
 
 class WPiCamPair(QObject):

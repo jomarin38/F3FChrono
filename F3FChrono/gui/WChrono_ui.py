@@ -21,7 +21,7 @@ class Ui_WChrono(object):
         WChrono.setSizePolicy(sizePolicy)
         WChrono.setInputMethodHints(QtCore.Qt.ImhNone)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(WChrono)
-        self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_3.setContentsMargins(3, 1, 3, 1)
         self.horizontalLayout_3.setSpacing(0)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.verticalLayout = QtWidgets.QVBoxLayout()
