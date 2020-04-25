@@ -88,6 +88,7 @@ class Round:
     def give_refly(self, competitor):
         self._flight_order.insert(self._current_competitor_index + self.event.get_flights_before_refly() + 1,
                                   competitor.get_bib_number())
+        RoundDAO().update(self)
 
     def _add_run(self, run, insert_database=False):
         # TODO : search in which group the run has to be added

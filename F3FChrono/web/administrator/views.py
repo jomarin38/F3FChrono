@@ -364,8 +364,6 @@ def give_refly(request):
 
     f3f_round.give_refly(competitor)
 
-    RoundDAO().update(f3f_round)
-
     return HttpResponseRedirect('manage_round?event_id='+event_id+'&round_number='+round_number)
 
 
