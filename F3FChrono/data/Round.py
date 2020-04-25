@@ -93,6 +93,7 @@ class Round:
         # TODO : search in which group the run has to be added
         run.round_group = self.groups[-1]
         self.groups[-1].add_run(run, insert_database)
+        self.set_current_competitor(run.competitor)
 
     def to_string(self):
         result = os.linesep + 'Round number ' + str(self.round_number) + os.linesep
@@ -106,6 +107,9 @@ class Round:
     def set_current_competitor(self, competitor):
         self._current_competitor_index = self._current_competitor_index + \
                                         self._flight_order[self._current_competitor_index:].index(competitor.bib_number)
+
+    def set_flight_order_index(self, index):
+        self._current_competitor_index = index
 
     def next_pilot(self, insert_database=False, visited_competitors=[]):
         if self._current_competitor_index < len(self._flight_order) - 1:
