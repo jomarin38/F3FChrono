@@ -138,8 +138,14 @@ class Round:
             competitor,
             Chrono(), 0, False, insert_database=True)
 
+    def number_of_performed_runs(self):
+        result = 0
+        for bib_number, runs_list in self.groups[-1].runs.items():
+            result += len(runs_list)
+        return result
+
     def next_pilot_database(self):
-        nb_run = len(self.groups[-1].runs)
+        nb_run = self.number_of_performed_runs()
         # if self._current_competitor_index < len(self._flight_order) - 1:
         if nb_run < len(self._flight_order):
             self._current_competitor_index = nb_run

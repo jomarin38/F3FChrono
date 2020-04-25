@@ -360,7 +360,9 @@ def give_refly(request):
 
     f3f_run = f3f_round.get_valid_run(competitor)
 
-    f3f_run.valid = False
+    if f3f_run is not None:
+        #If there is no valid flight, just add the pilot in the waiting list
+        f3f_run.valid = False
 
     f3f_round.give_refly(competitor)
 
