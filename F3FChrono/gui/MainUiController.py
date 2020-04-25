@@ -169,7 +169,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def refly(self):
         #TODO : get penalty value if any
-        self.event.get_current_round().handle_refly(0)
+        self.event.get_current_round().handle_refly(0, insert_database=True)
         self.chronoHard.reset()
         self.chronodata.reset()
         self.next_pilot()

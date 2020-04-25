@@ -77,12 +77,12 @@ class Round:
 
         return 'Round ' + str(round_number)
 
-    def handle_refly(self, penalty):
+    def handle_refly(self, penalty, insert_database=False):
         run = Run()
         run.competitor = self.get_current_competitor()
         run.penalty = penalty
         run.valid = False
-        self._add_run(run)
+        self._add_run(run, insert_database=insert_database)
         self.give_refly(self.get_current_competitor())
 
     def give_refly(self, competitor):
