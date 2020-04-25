@@ -25,7 +25,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard = ChronoArduino(self.signal_btnnext)
         self.rpigpio=rpi_gpio(rpi, self.btn_next_action, None, None)
         self.base_test = -10
-        self.vocal = chronoQSound(ConfigReader.config.conf['sound'],\
+        self.vocal = chronoQSound(ConfigReader.config.conf['langage'], ConfigReader.config.conf['sound'],\
                                   ConfigReader.config.conf['voice'], ConfigReader.config.conf['buzzer_valid'])
 
         self.initUI()

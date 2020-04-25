@@ -101,7 +101,6 @@ class rs232_arduino (QObject):
                         self.accu_sig.emit(int(data[1])*5/1024/self.voltageCoef)
                     if data[0] == "resetµc":
                         self.reset_arduino_sig.emit()
-
             except serial.SerialException as e:
                 print("serial exception")
                 return None
@@ -110,7 +109,7 @@ class rs232_arduino (QObject):
                 self.bus.close()
                 self.bus = None
                 return None
-            time.sleep(0.01)
+            time.sleep(0.002)
 
     def set_inRun(self):
         self.inRun = True

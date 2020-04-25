@@ -23,6 +23,7 @@
  "voltage_coef": 0.354,
  "voltage_min": 9.9,
  "webserver_port": 8000,
- "Launch_time" : 12000,
- "Launched_time" : 12000
+ "Launch_time" : 30000,
+ "Launched_time" : 30000,
+ "langage" : "French"
 }

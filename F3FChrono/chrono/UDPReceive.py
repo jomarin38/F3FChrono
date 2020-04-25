@@ -77,7 +77,7 @@ class udpreceive(QThread):
                         self.event_btn_next.emit(0)
 
                 elif (m[0]=='simulate' and m[1]=='weather'):
-                    self.event_wind.emit(int(m[3]), int(m[2]), bool(m[4]=='True'))
+                    self.event_wind.emit(int(m[3]), int(m[2]), bool(m[4] == 'True'))
                 elif (m[0] == 'simulate' and m[1] == 'info'):
                     self.event_accu.emit(float(m[2]))
                     self.event_rssi.emit(int(m[3]), int(m[4]))
