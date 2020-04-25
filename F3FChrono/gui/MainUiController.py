@@ -147,7 +147,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settingsadvanced'].get_data()
         ConfigReader.config.write('config.json')
         self.show_config()
-        self.vocal.loadwav(ConfigReader.config.conf['sound'],
+        self.vocal.loadwav(ConfigReader.config.conf['langage'],
+                           ConfigReader.config.conf['sound'],
                            ConfigReader.config.conf['voice'],
                            ConfigReader.config.conf['buzzer_valid'])
         self.chronoHard.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])

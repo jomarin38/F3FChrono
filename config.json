@@ -1,4 +1,6 @@
 {
+ "Launch_time": 30000,
+ "Launched_time": 30000,
  "anemometer": false,
  "arduino": true,
  "btn_baseA": 5,
@@ -10,20 +12,18 @@
  "buzzer_next_duration": 300,
  "buzzer_next_valid": false,
  "buzzer_valid": true,
- "fullscreen": false,
+ "fullscreen": true,
  "i2c_refresh": 100,
+ "langage": "French",
  "ledA": 20,
  "ledB": 26,
  "rebound_btn_time": 200,
  "run_webserver": true,
- "simulatemode": true,
+ "simulatemode": false,
  "sound": true,
  "udpport": 4445,
  "voice": false,
  "voltage_coef": 0.354,
  "voltage_min": 9.9,
- "webserver_port": 8000,
- "Launch_time" : 30000,
- "Launched_time" : 30000,
- "langage" : "French"
+ "webserver_port": 8000
 }
