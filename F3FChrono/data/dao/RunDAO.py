@@ -122,7 +122,11 @@ class RunDAO(Dao):
         sql = 'UPDATE run SET competitor_id=%s, event_id=%s, chrono_id=%s, penalty=%s, valid=%s, round_number=%s, ' \
               'group_number=%s ' \
               'WHERE run_id=%s'
-        self._execute_update(sql, run.competitor.pilot.id, run.round_group.round.event.id, run.chrono.id, run.penalty,
+        if run.chrono is not None:
+            chrono_id = run.chrono.id
+        else:
+            chrono_id = None
+        self._execute_update(sql, run.competitor.pilot.id, run.round_group.round.event.id, chrono_id, run.penalty,
                              run.valid, run.round_group.round.round_number, run.round_group.group_number, run.id)
 
     def delete(self, run):
