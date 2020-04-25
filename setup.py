@@ -21,7 +21,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
      ],
     install_requires=[
-        'pandas', 'requests', 'pymysql', 'Django'
+        'pandas', 'requests', 'pymysql', 'Django', 'fake_rpi', 'pyserial', 'scipy'
     ]
 
  )
