@@ -225,6 +225,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.arduino.reset()
         self.chronoLap.clear()
         self.reset_wind()
+        self.clearPenalty()
 
     def set_buzzer_time(self, time):
         self.arduino.set_buzzerTime(time)
