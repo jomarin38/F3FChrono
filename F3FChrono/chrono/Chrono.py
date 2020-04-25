@@ -54,6 +54,7 @@ class ChronoHard(QObject):
         self.timelost = []
         self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.wind_signal, self.accu_signal, self.rssi_signal)
         self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
+        self.valid = True
 
 
     def addPenalty(self, value):
@@ -120,9 +121,10 @@ class ChronoHard(QObject):
         self.chronoLap.clear()
         self.timelost.clear()
         self.set_status(chronoStatus.InWait)
-        self.lastBase=-2
-        self.penalty=0.0
+        self.lastBase = -2
+        self.penalty = 0.0
         self.reset_wind()
+        self.valid = True
 
     def getLastLapTime(self):
         if self.getLapCount()>0:
@@ -226,6 +228,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.chronoLap.clear()
         self.reset_wind()
         self.clearPenalty()
+        self.valid = True
 
     def set_buzzer_time(self, time):
         self.arduino.set_buzzerTime(time)

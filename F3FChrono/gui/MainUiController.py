@@ -282,6 +282,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def null_flight(self):
         self.chronoHard.set_status(chronoStatus.Finished)
+        self.chronoHard.valid = False
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['round'].wChronoCtrl.set_null_flight(True)
@@ -330,7 +331,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
         self.event.get_current_round().handle_terminated_flight(
             self.event.get_current_round().get_current_competitor(),
-            self.chronodata, self.chronoHard.getPenalty(), True, insert_database=True)
+            self.chronodata, self.chronoHard.getPenalty(), self.chronoHard.valid, insert_database=True)
         self.chronoHard.reset()
         self.chronodata = Chrono()
         self.next_pilot(insert_database=True)
