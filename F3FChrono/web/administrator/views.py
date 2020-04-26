@@ -293,9 +293,15 @@ def export_round_f3x_vault(request):
         f3x_username = request.POST["username"]
         f3x_password = request.POST["password"]
 
-        f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
+        #We must fetch full event to get correct valid round number
+        event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
+        requested_f3f_round = None
+        for f3f_round in event.rounds:
+            if f3f_round.valid_round_number:
+                requested_f3f_round = f3f_round
 
-        f3f_round.export_to_f3x_vault(f3x_username, f3x_password)
+        if requested_f3f_round is not None:
+            requested_f3f_round.export_to_f3x_vault(f3x_username, f3x_password)
 
     return HttpResponseRedirect('manage_event?event_id=' + event_id)
 

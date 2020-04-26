@@ -231,24 +231,36 @@ class Round:
 
     def export_to_f3x_vault(self, login, password):
         for group in self.groups:
-            for competitor, runs_list in group.runs.items():
-                for run in runs_list:
-                    if run.valid:
-                        #Fetch full competitor object to get f3x_vault_id
-                        fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
-                        request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
-                                      '&password=' + password + \
-                                      '&function=postScore&event_id=' + str(self.event.f3x_vault_id) + \
-                                      '&pilot_id=' + str(fetched_competitor.get_pilot().f3x_vault_id) + \
-                                      '&round=' + str(self.valid_round_number) + \
-                                      '&seconds=' + str(run.get_flight_time()) + \
-                                      '&penalty=' + str(run.penalty)
-                        request_url += '&sub1=' + str(0.0)
-                        for i in range(0,10):
-                            request_url += '&sub'+str(i+2)+'=' + str(run.chrono.get_lap_time(i))
-                        response = requests.post(request_url)
-                        print(request_url)
-                        pass
+            for bib_number, competitor in self.event.competitors.items():
+                fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
+                valid_run = group.get_valid_run(fetched_competitor)
+                #TODO : compute global penalty for this round
+                if valid_run is not None:
+                    request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
+                                  '&password=' + password + \
+                                  '&function=postScore&event_id=' + str(self.event.f3x_vault_id) + \
+                                  '&pilot_id=' + str(fetched_competitor.get_pilot().f3x_vault_id) + \
+                                  '&round=' + str(self.valid_round_number) + \
+                                  '&seconds=' + str(valid_run.get_flight_time()) + \
+                                  '&penalty=' + str(valid_run.penalty)
+                    request_url += '&sub1=' + str(0.0)
+                    for i in range(0, 10):
+                        request_url += '&sub' + str(i + 2) + '=' + str(valid_run.chrono.get_lap_time(i))
+                else:
+                    #Competitor did not finish its run (or even did not start it !)
+                    request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
+                                  '&password=' + password + \
+                                  '&function=postScore&event_id=' + str(self.event.f3x_vault_id) + \
+                                  '&pilot_id=' + str(fetched_competitor.get_pilot().f3x_vault_id) + \
+                                  '&round=' + str(self.valid_round_number) + \
+                                  '&seconds=' + str(0.0) + \
+                                  '&penalty=' + str(0.0)
+                    request_url += '&sub1=' + str(0.0)
+                    for i in range(0, 10):
+                        request_url += '&sub' + str(i + 2) + '=' + str(0.0)
+                    request_url += '&dnf=' + str(True)
+                response = requests.post(request_url)
+
         #Update event score status
         valid_integer_code = 0
         if self.valid:
