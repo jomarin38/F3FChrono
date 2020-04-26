@@ -265,10 +265,13 @@ class Event:
                             for run in runs:
                                 competitor.penalty += run.penalty
 
-
     def to_string(self):
-        result=os.linesep+"Event : "+self.name+os.linesep
-        for round in self.rounds:
-            if (round!=None):
-                result+=round.to_string()
-        return(result)
+        result = os.linesep+"Event : "+self.name+os.linesep
+        for f3f_round in self.rounds:
+            if f3f_round is not None:
+                result += f3f_round.to_string()
+        return result
+
+    def export_to_f3x_vault(self, login, password):
+        for f3f_round in self.rounds:
+            f3f_round.export_to_f3x_vault(login, password)

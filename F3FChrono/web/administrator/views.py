@@ -211,7 +211,7 @@ def manage_event(request):
 
     table = ResultTable(title='', css_id='ranking')
 
-    header = Header(name=Link('TODO : Export to F3X Vault', 'export_event_f3x_vault'))
+    header = Header(name=Link('Export to F3X Vault', 'login_to_export_event_f3x_vault?event_id='+event_id))
     table.set_header(header)
 
     page.add_table(table)
@@ -298,6 +298,36 @@ def export_round_f3x_vault(request):
         f3f_round.export_to_f3x_vault(f3x_username, f3x_password)
 
     return HttpResponseRedirect('manage_event?event_id=' + event_id)
+
+
+def login_to_export_event_f3x_vault(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    return render(request, 'event_f3x_vault_export_template.html',
+                  {'event_id': request.GET.get('event_id')})
+
+
+def export_event_f3x_vault(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+
+    if ('username' in request.POST) and ('password' in request.POST):
+
+        f3x_username = request.POST["username"]
+        f3x_password = request.POST["password"]
+
+        event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
+        event.export_to_f3x_vault(f3x_username, f3x_password)
+
+    return HttpResponseRedirect('manage_event?event_id=' + event_id)
+
 
 def manage_round(request):
     if not request.user.is_authenticated:
