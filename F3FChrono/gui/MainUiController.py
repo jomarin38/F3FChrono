@@ -292,7 +292,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.getcontextparameters(updateBDD=True)
             del self.event
         self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
-                                  fetch_competitors=True, fetch_rounds=False, fetch_runs=False)
+                                  fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
 
         self.controllers['config'].set_data(self.event)
 

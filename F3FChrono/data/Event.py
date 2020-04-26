@@ -11,6 +11,7 @@ from F3FChrono.data.Competitor import Competitor
 from F3FChrono.data.Round import Round
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
+from F3FChrono.data.dao.RoundDAO import RoundDAO
 
 
 class Event:
@@ -214,6 +215,11 @@ class Event:
 
     def random_bib(self):
         self.bib_start = random.randrange(1, self.get_nb_competitors(), 1)
+        #Update flying order of current round if no runs were registered
+        f3f_round = self.get_current_round()
+        if f3f_round is not None and not f3f_round.has_run():
+            f3f_round.set_flight_order_from_scratch()
+            RoundDAO().update(f3f_round)
 
     def bib_day_1_compute(self):
         self.bib_start += int(self.get_nb_competitors()/self.dayduration)

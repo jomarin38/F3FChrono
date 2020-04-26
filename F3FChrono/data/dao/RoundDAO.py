@@ -64,7 +64,10 @@ class RoundDAO(Dao):
             fetched_run = dao.get(run.id, run.round_group)
             round_group.add_run(fetched_run)
         #Warning : will not work if different groups are present ... maybe
-        round_group.round.set_flight_order_index(len(runs)-1)
+        if len(runs)>0:
+            round_group.round.set_flight_order_index(len(runs)-1)
+        else:
+            round_group.round.set_flight_order_index(0)
 
     def insert(self, f3f_round):
         sql = 'INSERT INTO round (round_number, event_id, valid, flight_order) VALUES (%s, %s, %s, %s)'

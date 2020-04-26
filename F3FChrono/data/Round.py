@@ -2,7 +2,10 @@ import os
 from F3FChrono.data.Run import Run
 from F3FChrono.data.RoundGroup import RoundGroup
 from F3FChrono.data.Chrono import Chrono
+from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
 from F3FChrono.data.dao.RoundDAO import RoundDAO
+import requests
+
 
 class Round:
 
@@ -53,6 +56,7 @@ class Round:
             self._flight_order.append(int(str_bib_number))
 
     def set_flight_order_from_scratch(self):
+        self._flight_order.clear()
         for bib in [bib_number for bib_number in sorted(self.event.competitors)
                     if bib_number >= self.event.bib_start]:
             self._flight_order += [bib]
@@ -224,3 +228,38 @@ class Round:
             f3f_run.penalty = 0
         else:
             f3f_run.penalty += penalty
+
+    def export_to_f3x_vault(self, login, password):
+        for group in self.groups:
+            for competitor, runs_list in group.runs.items():
+                for run in runs_list:
+                    if run.valid:
+                        #Fetch full competitor object to get f3x_vault_id
+                        fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
+                        request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
+                                      '&password=' + password + \
+                                      '&function=postScore&event_id=' + str(self.event.f3x_vault_id) + \
+                                      '&pilot_id=' + str(fetched_competitor.get_pilot().f3x_vault_id) + \
+                                      '&round=' + str(self.valid_round_number) + \
+                                      '&seconds=' + str(run.get_flight_time()) + \
+                                      '&penalty=' + str(run.penalty)
+                        response = requests.post(request_url)
+                        print(request_url)
+                        pass
+        #Update event score status
+        valid_integer_code = 0
+        if self.valid:
+            valid_integer_code = 1
+        request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
+                      '&password=' + password + \
+                      '&function=updateEventRoundStatus&event_id=' + str(self.event.f3x_vault_id) + \
+                      '&round_number=' + str(self.valid_round_number) + \
+                      '&event_round_score_status=' + str(valid_integer_code)
+        response = requests.post(request_url)
+
+
+
+
+
+
+

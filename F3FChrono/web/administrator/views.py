@@ -256,7 +256,7 @@ def manage_event(request):
     for f3f_round in event.rounds:
         row = Line(name=Link(str(f3f_round.display_name()), 'manage_round?event_id=' +
                              str(event.id)+'&round_number='+str(f3f_round.round_number)))
-        row.add_cell(Link('TODO : Export to F3XVault', 'export_round_f3x_vault?event_id=' + str(event.id) +
+        row.add_cell(Link('Export to F3XVault', 'login_to_export_round_f3x_vault?event_id=' + str(event.id) +
                           '&round_number='+str(f3f_round.round_number)))
         if f3f_round.valid:
             row.add_cell(Link('Cancel Round', 'cancel_round?event_id=' + str(event.id) +
@@ -268,6 +268,36 @@ def manage_event(request):
 
     return HttpResponse(page.to_html())
 
+
+def login_to_export_round_f3x_vault(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    return render(request, 'round_f3x_vault_export_template.html',
+                  {'event_id': request.GET.get('event_id'), 'round_number': request.GET.get('round_number')})
+
+
+def export_round_f3x_vault(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    round_number = request.GET.get('round_number')
+
+    if ('username' in request.POST) and ('password' in request.POST):
+
+        f3x_username = request.POST["username"]
+        f3x_password = request.POST["password"]
+
+        f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
+
+        f3f_round.export_to_f3x_vault(f3x_username, f3x_password)
+
+    return HttpResponseRedirect('manage_event?event_id=' + event_id)
 
 def manage_round(request):
     if not request.user.is_authenticated:
