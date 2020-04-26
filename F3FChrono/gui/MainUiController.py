@@ -169,7 +169,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def refly(self):
         #TODO : get penalty value if any
-        self.event.get_current_round().handle_refly(0)
+        self.event.get_current_round().handle_refly(0, insert_database=True)
         self.chronoHard.reset()
         self.chronodata.reset()
         self.next_pilot()
@@ -282,6 +282,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def null_flight(self):
         self.chronoHard.set_status(chronoStatus.Finished)
+        self.chronoHard.valid = False
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['round'].wChronoCtrl.set_null_flight(True)
@@ -291,7 +292,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.getcontextparameters(updateBDD=True)
             del self.event
         self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
-                                  fetch_competitors=True, fetch_rounds=False, fetch_runs=False)
+                                  fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
 
         self.controllers['config'].set_data(self.event)
 
@@ -330,7 +331,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
         self.event.get_current_round().handle_terminated_flight(
             self.event.get_current_round().get_current_competitor(),
-            self.chronodata, self.chronoHard.getPenalty(), True, insert_database=True)
+            self.chronodata, self.chronoHard.getPenalty(), self.chronoHard.valid, insert_database=True)
         self.chronoHard.reset()
         self.chronodata = Chrono()
         self.next_pilot(insert_database=True)

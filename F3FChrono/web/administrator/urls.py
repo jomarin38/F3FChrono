@@ -17,5 +17,15 @@ urlpatterns = [
     path('cancel_round', views.cancel_round, name='cancel_round'),
     path('delete_event', views.delete_event, name='delete_event'),
     path('do_delete_event', views.do_delete_event, name='do_delete_event'),
+    path('manage_round', views.manage_round, name='manage_round'),
+    path('give_refly', views.give_refly, name='give_refly'),
+    path('give_penalty', views.give_penalty, name='give_penalty'),
+    path('give_zero', views.give_zero, name='give_zero'),
+    path('export_round_f3x_vault', views.export_round_f3x_vault, name='export_round_f3x_vault'),
+    path('login_to_export_round_f3x_vault', views.login_to_export_round_f3x_vault,
+         name='login_to_export_round_f3x_vault'),
+    path('export_event_f3x_vault', views.export_event_f3x_vault, name='export_event_f3x_vault'),
+    path('login_to_export_event_f3x_vault', views.login_to_export_event_f3x_vault,
+         name='login_to_export_event_f3x_vault'),
     path('sign_in', views.sign_in, name='sign_in')
 ]

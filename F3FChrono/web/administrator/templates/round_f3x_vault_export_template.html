@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+<style type="text/css">
+body {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+input {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+input:focus {
+  background-color: lightblue;
+}
+input[type=button], input[type=submit], input[type=reset] {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+    <h1>Please provide F3X Vault credentials :</h1>
+        <form action="export_round_f3x_vault?event_id={{event_id}}&round_number={{round_number}}" method="post" >
+        {% csrf_token %}
+        <label for="username_label">F3X Vault username : </label>
+        <input id="username_field" type="text" name="username" value="">
+        <br/>
+        <label for="password_label">F3X Vault Password : </label>
+        <input id="password_field" type="password" name="password" value="">
+        <br/>
+        <input type="submit" value="Export to F3X Vault !">
+    </form>
+</body>
+
+
+
+

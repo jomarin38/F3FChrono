@@ -413,6 +413,7 @@ class WConfigCtrl(QObject):
         self.dayduration=self.view.daydurationvalue.value()
         self.contest=self.view.ContestList.currentIndex()
 
+
 class WSettingsAdvanced(QObject):
     btn_settings_sig = pyqtSignal()
     widgetList = []

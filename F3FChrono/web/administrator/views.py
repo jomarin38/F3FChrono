@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -18,6 +18,7 @@ from F3FChrono.data.web.Link import Link
 from F3FChrono.data.web.Utils import Utils
 from F3FChrono.data.Event import Event
 from F3FChrono.data.Pilot import Pilot
+from F3FChrono.data.Round import Round
 
 
 def sign_in(request):
@@ -78,7 +79,7 @@ def cancel_round(request):
     f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
     f3f_round.do_cancel_round()
 
-    return manage_event(request)
+    return HttpResponseRedirect('manage_event?event_id='+event_id)
 
 
 def register_new_pilot(request):
@@ -109,7 +110,7 @@ def register_new_pilot(request):
     competitor = event.register_pilot(pilot, bib_number)
     CompetitorDAO().insert(competitor)
 
-    return manage_event(request)
+    return HttpResponseRedirect('manage_event?event_id='+event_id)
 
 
 def delete_event(request):
@@ -210,7 +211,7 @@ def manage_event(request):
 
     table = ResultTable(title='', css_id='ranking')
 
-    header = Header(name=Link('TODO : Export to F3X Vault', 'export_event_f3x_vault'))
+    header = Header(name=Link('Export to F3X Vault', 'login_to_export_event_f3x_vault?event_id='+event_id))
     table.set_header(header)
 
     page.add_table(table)
@@ -253,8 +254,9 @@ def manage_event(request):
     table.set_header(header)
 
     for f3f_round in event.rounds:
-        row = Line(name=Cell(str(f3f_round.display_name())))
-        row.add_cell(Link('TODO : Export to F3XVault', 'export_round_f3x_vault?event_id=' + str(event.id) +
+        row = Line(name=Link(str(f3f_round.display_name()), 'manage_round?event_id=' +
+                             str(event.id)+'&round_number='+str(f3f_round.round_number)))
+        row.add_cell(Link('Export to F3XVault', 'login_to_export_round_f3x_vault?event_id=' + str(event.id) +
                           '&round_number='+str(f3f_round.round_number)))
         if f3f_round.valid:
             row.add_cell(Link('Cancel Round', 'cancel_round?event_id=' + str(event.id) +
@@ -265,6 +267,221 @@ def manage_event(request):
     page.add_table(table)
 
     return HttpResponse(page.to_html())
+
+
+def login_to_export_round_f3x_vault(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    return render(request, 'round_f3x_vault_export_template.html',
+                  {'event_id': request.GET.get('event_id'), 'round_number': request.GET.get('round_number')})
+
+
+def export_round_f3x_vault(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    round_number = request.GET.get('round_number')
+
+    if ('username' in request.POST) and ('password' in request.POST):
+
+        f3x_username = request.POST["username"]
+        f3x_password = request.POST["password"]
+
+        #We must fetch full event to get correct valid round number
+        event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
+        requested_f3f_round = None
+        for f3f_round in event.rounds:
+            if f3f_round.valid_round_number:
+                requested_f3f_round = f3f_round
+
+        if requested_f3f_round is not None:
+            requested_f3f_round.export_to_f3x_vault(f3x_username, f3x_password)
+
+    return HttpResponseRedirect('manage_event?event_id=' + event_id)
+
+
+def login_to_export_event_f3x_vault(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    return render(request, 'event_f3x_vault_export_template.html',
+                  {'event_id': request.GET.get('event_id')})
+
+
+def export_event_f3x_vault(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+
+    if ('username' in request.POST) and ('password' in request.POST):
+
+        f3x_username = request.POST["username"]
+        f3x_password = request.POST["password"]
+
+        event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
+        event.export_to_f3x_vault(f3x_username, f3x_password)
+
+    return HttpResponseRedirect('manage_event?event_id=' + event_id)
+
+
+def manage_round(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    round_number = request.GET.get('round_number')
+
+    f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
+
+    page = ResultPage(title=f3f_round.event.name + '\t' + f3f_round.display_name() +
+                            '(id:' + str(f3f_round.round_number) + ')', event=f3f_round.event)
+
+    best_runs = f3f_round.get_best_runs()
+    best_runs_string = 'Best time : <br>'
+
+    for run in best_runs:
+        if run is not None:
+            best_runs_string += run.to_string()
+
+    table = ResultTable(title=best_runs_string, css_id='ranking')
+    header = Header(name=Cell('Bib'))
+    header.add_cell(Cell('Name'))
+    header.add_cell(Cell('Flight time'))
+    header.add_cell(Cell('Score'))
+    header.add_cell(Cell('Penalty'))
+    header.add_cell(Cell(''))
+    header.add_cell(Cell(''))
+    header.add_cell(Cell(''))
+    header.add_cell(Cell(''))
+    header.add_cell(Cell(''))
+    table.set_header(header)
+
+    # Later loop on rounds and round groups
+    round_group = f3f_round.groups[0]
+    round_group.compute_scores()
+    for competitor in sorted(round_group.runs):
+        row = Line(name=Cell(str(competitor.bib_number)))
+        row.add_cell(Cell(competitor.pilot.to_string()))
+        row.add_cell(Cell(round_group.run_value_as_string(competitor)))
+        row.add_cell(Cell(str(round_group.run_score_as_string(competitor))))
+        row.add_cell(Cell(str(round_group.get_penalty(competitor))))
+        row.add_cell(Link('Refly', 'give_refly?event_id='+str(event_id)+'&round_number='+str(round_number)+
+                          '&bib_number='+str(competitor.bib_number)))
+        row.add_cell(Link('Give 0', 'give_zero?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+                          '&bib_number=' + str(competitor.bib_number)))
+        row.add_cell(Link('Give 100 penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+                          '&bib_number=' + str(competitor.bib_number)+'&penalty=100'))
+        row.add_cell(Link('Give 1000 penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+                          '&bib_number=' + str(competitor.bib_number)+'&penalty=1000'))
+        row.add_cell(Link('Cancel penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+                          '&bib_number=' + str(competitor.bib_number)+'&penalty=0'))
+        table.add_line(row)
+
+    page.add_table(table)
+
+    table = ResultTable(title='Flight order', css_id='ranking')
+    header = Header(name=Cell('Bib'))
+    header.add_cell(Cell('Name'))
+    table.set_header(header)
+
+    for bib_number in f3f_round.get_flight_order():
+        row = Line(name=Cell(str(bib_number)))
+        row.add_cell(Cell(f3f_round.event.competitors[bib_number].display_name()))
+        table.add_line(row)
+
+    page.add_table(table)
+
+    result = page.to_html()
+    return HttpResponse(result)
+
+
+def give_refly(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    round_number = request.GET.get('round_number')
+    bib_number = request.GET.get('bib_number')
+
+    event = EventDAO().get(event_id, fetch_competitors=True)
+
+    f3f_round = RoundDAO().get_from_ids(event.id, round_number, fetch_runs=True)
+
+    competitor = event.competitors[int(bib_number)]
+
+    f3f_run = f3f_round.get_valid_run(competitor)
+
+    if f3f_run is not None:
+        #If there is no valid flight, just add the pilot in the waiting list
+        f3f_run.valid = False
+
+    f3f_round.give_refly(competitor)
+
+    return HttpResponseRedirect('manage_round?event_id='+event_id+'&round_number='+round_number)
+
+
+def give_zero(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    round_number = request.GET.get('round_number')
+    bib_number = request.GET.get('bib_number')
+
+    event = EventDAO().get(event_id, fetch_competitors=True)
+
+    f3f_round = RoundDAO().get_from_ids(event.id, round_number, fetch_runs=True)
+
+    competitor = event.competitors[int(bib_number)]
+
+    f3f_run = f3f_round.get_valid_run(competitor)
+
+    f3f_run.valid = False
+
+    RoundDAO().update(f3f_round)
+
+    return HttpResponseRedirect('manage_round?event_id='+event_id+'&round_number='+round_number)
+
+
+def give_penalty(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    round_number = request.GET.get('round_number')
+    bib_number = request.GET.get('bib_number')
+    penalty = int(request.GET.get('penalty'))
+
+    event = EventDAO().get(event_id, fetch_competitors=True)
+
+    f3f_round = RoundDAO().get_from_ids(event.id, round_number, fetch_runs=True)
+
+    competitor = event.competitors[int(bib_number)]
+
+    f3f_round.give_penalty(competitor, penalty)
+
+    RoundDAO().update(f3f_round)
+
+    return HttpResponseRedirect('manage_round?event_id='+event_id+'&round_number='+round_number)
 
 
 def set_competitor_presence(request):
@@ -287,7 +504,7 @@ def set_competitor_presence(request):
 
     dao.update(competitor)
 
-    return manage_event(request)
+    return HttpResponseRedirect('manage_event?event_id='+event_id)
 
 
 def remove_competitor(request):
@@ -306,7 +523,7 @@ def remove_competitor(request):
 
     event.unregister_competitor(competitor, insert_database=True)
 
-    return manage_event(request)
+    return HttpResponseRedirect('manage_event?event_id='+event_id)
 
 @never_cache
 def index(request):

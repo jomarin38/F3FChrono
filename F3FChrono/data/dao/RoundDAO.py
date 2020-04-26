@@ -21,15 +21,22 @@ class RoundDAO(Dao):
 
     def get(self, f3f_round, fetch_runs=False):
         from F3FChrono.data.Round import Round
-        sql = 'SELECT r.valid, rg.group_number, rg.start_date, rg.end_date ' \
+        sql = 'SELECT r.valid, rg.group_number, rg.start_date, rg.end_date, r.flight_order ' \
               'FROM round r LEFT JOIN roundgroup rg ON r.event_id=rg.event_id AND r.round_number=rg.round_number ' \
               'WHERE r.event_id=%s AND r.round_number=%s'
         query_result = self._execute_query(sql, f3f_round.event.id, f3f_round.round_number)
         fetched_f3f_round = Round.new_round(f3f_round.event, add_initial_group=False)
         fetched_f3f_round.event = f3f_round.event
         fetched_f3f_round.round_number = f3f_round.round_number
+        first_time_in_loop = True
         for row in query_result:
-            fetched_f3f_round.valid = row[0]
+            if first_time_in_loop:
+                fetched_f3f_round.valid = row[0]
+                if row[4] is not None:
+                    fetched_f3f_round.set_flight_order_from_db(row[4])
+                else:
+                    fetched_f3f_round.set_flight_order_from_scratch()
+                first_time_in_loop = False
             round_group = RoundGroup(fetched_f3f_round, group_number=row[1])
             round_group.start_time = row[2]
             round_group.end_time = row[3]
@@ -56,10 +63,16 @@ class RoundDAO(Dao):
         for run in runs:
             fetched_run = dao.get(run.id, run.round_group)
             round_group.add_run(fetched_run)
+        #Warning : will not work if different groups are present ... maybe
+        if len(runs)>0:
+            round_group.round.set_flight_order_index(len(runs)-1)
+        else:
+            round_group.round.set_flight_order_index(0)
 
     def insert(self, f3f_round):
-        sql = 'INSERT INTO round (round_number, event_id, valid) VALUES (%s, %s, %s)'
-        self._execute_insert(sql, f3f_round.round_number, f3f_round.event.id, f3f_round.valid)
+        sql = 'INSERT INTO round (round_number, event_id, valid, flight_order) VALUES (%s, %s, %s, %s)'
+        self._execute_insert(sql, f3f_round.round_number, f3f_round.event.id, f3f_round.valid,
+                             f3f_round.get_serialized_flight_order())
         sql = 'INSERT INTO roundgroup (event_id, round_number, group_number, start_date, end_date) ' \
               'VALUES (%s, %s, %s, %s, %s)'
         for group in f3f_round.groups:
@@ -78,8 +91,9 @@ class RoundDAO(Dao):
                     RoundDAO.run_dao.insert(run)
 
     def update(self, f3f_round):
-        sql = 'UPDATE round SET valid=%s WHERE round_number=%s AND event_id=%s'
-        self._execute_update(sql, f3f_round.valid, f3f_round.round_number, f3f_round.event.id)
+        sql = 'UPDATE round SET valid=%s, flight_order=%s WHERE round_number=%s AND event_id=%s'
+        self._execute_update(sql, f3f_round.valid, f3f_round.get_serialized_flight_order(), f3f_round.round_number,
+                             f3f_round.event.id)
         sql = 'UPDATE roundgroup SET start_date=%s, end_date=%s ' \
               'WHERE event_id=%s AND round_number=%s AND group_number=%s'
         for group in f3f_round.groups:

@@ -20,9 +20,6 @@ class RoundGroup:
             self.runs[run.competitor] = [run]
         if (insert_database):
             RoundGroup.rundao.insert(run)
-        #Set current competitor
-        self.round.set_current_competitor(run.competitor)
-
 
     def get_valid_run(self, competitor):
         if competitor in self.runs:
@@ -39,6 +36,13 @@ class RoundGroup:
             return len(self.runs[competitor]) > 0
         else:
             return False
+
+    def get_penalty(self, competitor):
+        penalty = 0
+        if competitor in self.runs:
+            for run in self.runs[competitor]:
+                penalty += run.penalty
+        return penalty
 
     def to_string(self):
         result = ''

@@ -11,6 +11,7 @@ from F3FChrono.data.Competitor import Competitor
 from F3FChrono.data.Round import Round
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
+from F3FChrono.data.dao.RoundDAO import RoundDAO
 
 
 class Event:
@@ -157,6 +158,7 @@ class Event:
 
     def create_new_round(self, insert_database=False):
         f3f_round = Round.new_round(self)
+        f3f_round.set_flight_order_from_scratch()
         self.add_existing_round(f3f_round)
         if insert_database:
             Round.round_dao.insert(f3f_round)
@@ -213,6 +215,11 @@ class Event:
 
     def random_bib(self):
         self.bib_start = random.randrange(1, self.get_nb_competitors(), 1)
+        #Update flying order of current round if no runs were registered
+        f3f_round = self.get_current_round()
+        if f3f_round is not None and not f3f_round.has_run():
+            f3f_round.set_flight_order_from_scratch()
+            RoundDAO().update(f3f_round)
 
     def bib_day_1_compute(self):
         self.bib_start += int(self.get_nb_competitors()/self.dayduration)
@@ -258,10 +265,13 @@ class Event:
                             for run in runs:
                                 competitor.penalty += run.penalty
 
-
     def to_string(self):
-        result=os.linesep+"Event : "+self.name+os.linesep
-        for round in self.rounds:
-            if (round!=None):
-                result+=round.to_string()
-        return(result)
+        result = os.linesep+"Event : "+self.name+os.linesep
+        for f3f_round in self.rounds:
+            if f3f_round is not None:
+                result += f3f_round.to_string()
+        return result
+
+    def export_to_f3x_vault(self, login, password):
+        for f3f_round in self.rounds:
+            f3f_round.export_to_f3x_vault(login, password)
