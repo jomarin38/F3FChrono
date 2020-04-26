@@ -243,6 +243,9 @@ class Round:
                                       '&round=' + str(self.valid_round_number) + \
                                       '&seconds=' + str(run.get_flight_time()) + \
                                       '&penalty=' + str(run.penalty)
+                        request_url += '&sub1=' + str(0.0)
+                        for i in range(0,10):
+                            request_url += '&sub'+str(i+2)+'=' + str(run.chrono.get_lap_time(i))
                         response = requests.post(request_url)
                         print(request_url)
                         pass
