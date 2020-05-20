@@ -195,23 +195,23 @@ class ChronoArduino(ChronoHard, QTimer):
             self.arduino.set_status(value)
 
     def handle_chrono_event(self, caller, data, address):
-        if not caller.lower() == "btnnext":
-            self.buzzer_validated.emit()
-
         if caller.lower() == "btnnext" and \
                 (self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.InWait):
             self.arduino.set_status(self.status+1)
-        if caller.lower() == "btnnext" and data == "event" and address == "baseA" and\
-                self.status == chronoStatus.InStart:
+        elif caller.lower() == "btnnext" and self.status == chronoStatus.InStart:
             self.arduino.set_status(self.status + 1)
-        if (caller.lower() == "btnnext" or caller.lower()=="udpreceive") and data == "event" and address == "baseA":
+        elif caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
+            self.run_validated.emit()
+        elif caller.lower() == "btnnext":
+            print("demande event btn Next")
+            self.arduino.event_Base('n')
+
+        if caller.lower()=="udpreceive" and data == "event" and address == "baseA":
             print("demande event base A")
             self.arduino.event_Base('a')
-        if (caller.lower() == "btnnext" or caller.lower()=="udpreceive") and data == "event" and address == "baseB":
+        if caller.lower()=="udpreceive" and data == "event" and address == "baseB":
             print("demande event base B")
             self.arduino.event_Base('b')
-        if caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
-            self.run_validated.emit()
 
     def handle_run_started(self):
         self.startTime = datetime.now()

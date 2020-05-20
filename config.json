@@ -19,7 +19,7 @@
  "ledB": 26,
  "rebound_btn_time": 200,
  "run_webserver": true,
- "simulatemode": false,
+ "simulatemode": true,
  "sound": true,
  "udpport": 4445,
  "voice": false,

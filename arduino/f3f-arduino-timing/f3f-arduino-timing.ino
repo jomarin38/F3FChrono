@@ -7,6 +7,7 @@
 #define SLAVE_ADDRESS 0x05
 const byte BASEAPIN = 2;
 const byte BASEBPIN = 3;
+const byte BTNNEXTPIN = -1; //Not a real btn
 const byte VOLTAGEPIN = A1;
 const byte BUZZERPIN = 12;
 const byte LOOPDELAY = 5;
@@ -184,42 +185,45 @@ void RS232Run(void) {
   //Process serial request
   if (serial.data_available) {
     char tmp = serial.data_read[0];
-    if (tmp=='t'){
+    if (tmp=='t'){ //Set buzzer time
       buzzer.Time=0;
       for (i=1; i<serial.nb_data-1; i++){
         buzzer.Time = buzzer.Time*10+(int)(serial.data_read[i]-'0');
       }
       led.Time = buzzer.Time;
       printbuzzer();
-    }else if (tmp=='d'){
+    }else if (tmp=='d'){  //debug
       printdebug();
-    }else if (tmp=='s'){
+    }else if (tmp=='s'){  //Start chrono
       chronostatus.runStatus=byte(serial.data_read[1]-'0');
       if (chronostatus.runStatus==InStart_Late or chronostatus.runStatus==Late) {
         chronostart();
         buzzerSet(&buzzer, 1);
       }
       printstatus();
-    }else if (tmp=='b'){
+    }else if (tmp=='b'){  //set base rebound time
       baseA.rebundBtn_time=0;
       for (i=1; i<serial.nb_data-1; i++){
         baseA.rebundBtn_time = baseA.rebundBtn_time*10+(int)(serial.data_read[i]-'0');
       }
       baseB.rebundBtn_time = baseA.rebundBtn_time;
       printbase();
-    }else if (tmp=='v'){
+    }else if (tmp=='v'){  //Send voltage
       printvoltage();
-    }else if (tmp=='r'){
+    }else if (tmp=='r'){  //Reset chrono
       memset(&chronostatus, 0, sizeof(chronostatus));
       memset(&chrono, 0, sizeof(chrono));
       printresetchrono();
-    }else if (tmp=='e'){
+    }else if (tmp=='e'){  //event base or btn next
       if (serial.data_read[1]=='a'){
         baseCheck(baseA.Pin);
         printforcebaseA();
       }else if (serial.data_read[1]=='b'){
         baseCheck(baseB.Pin);
         printforcebaseB();
+      }else if (serial.data_read[1]=='n'){
+        baseCheck(BTNNEXTPIN);
+        printforcebtnnext();
       }
     }else if (tmp=='k'){
       resetFunc();
@@ -323,20 +327,20 @@ void baseB_Interrupt(void) {
 
 void baseCheck(byte base) {
   unsigned long time1=0;
-  if (chronostatus.runStatus==Launched and BASEAPIN == base) {
+  if (chronostatus.runStatus==Launched and (BASEAPIN == base or base == BTNNEXTPIN)) {
     chronostatus.runStatus = InStart;
     buzzerSet(&buzzer, 1);
-  }else if (chronostatus.runStatus==Late and BASEAPIN == base){
+  }else if (chronostatus.runStatus==Late and (BASEAPIN == base or base == BTNNEXTPIN)){
     chronostatus.runStatus = InStart_Late;
     buzzerSet(&buzzer, 1);
-  }else if (chronostatus.runStatus==InStart and BASEAPIN == base) {
+  }else if (chronostatus.runStatus==InStart and (BASEAPIN == base or base == BTNNEXTPIN)) {
     buzzerSet(&buzzer, 1);
     chronostart();
     chronostatus.runStatus = InProgressB;
-  }else if (chronostatus.runStatus==InStart_Late and BASEAPIN == base){
+  }else if (chronostatus.runStatus==InStart_Late and (BASEAPIN == base or base == BTNNEXTPIN)){
     chronostatus.runStatus = InProgressB;
     buzzerSet(&buzzer, 1);
-  }else if (chronostatus.runStatus==InProgressA and base == BASEAPIN) {
+  }else if (chronostatus.runStatus==InProgressA and (base == BASEAPIN or base == BTNNEXTPIN)) {
     time1 = millis();
     chrono.lap[chrono.lapCount] = time1 - chrono.oldtime;
     chrono.lapCount++;
@@ -350,7 +354,7 @@ void baseCheck(byte base) {
     } else {
       chronostatus.runStatus = InProgressB;
     }
-  }else if (chronostatus.runStatus==InProgressB and base == BASEBPIN) {
+  }else if (chronostatus.runStatus==InProgressB and (base == BASEBPIN or base == BTNNEXTPIN)) {
     time1 = millis();
     chrono.lap[chrono.lapCount] = time1 - chrono.oldtime;
     /*Serial.print("chronoInProgressB,lapCount ");
@@ -444,6 +448,11 @@ void printforcebaseA(void){
 
 void printforcebaseB(void){
   Serial.print("force baseB");
+  Serial.println(",");
+}
+
+void printforcebtnnext(void){
+  Serial.print("force btn next");
   Serial.println(",");
 }
 
