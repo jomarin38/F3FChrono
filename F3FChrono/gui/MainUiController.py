@@ -157,8 +157,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         #print event data
         self.controllers['round'].wChronoCtrl.stoptime()
         self.vocal.stop_all()
-        print(self.event.to_string())
-
         self.show_config()
 
     def next_pilot(self, insert_database=False):
@@ -193,20 +191,29 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.getcontextparameters(True)
 
     def start(self):
-        self.getcontextparameters(True)
-        if self.event:
+        if self.event is not None:
+            self.getcontextparameters(True)
             del self.event
-        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
-                    fetch_competitors=True, fetch_rounds=True, fetch_runs=True, fetch_runs_lastround=True)
+            self.event = None
 
         self.chronoHard.reset()
         self.chronodata.reset()
-        current_competitor = self.event.get_current_round().get_current_competitor()
-        if not current_competitor.present:
-            self.event.get_current_round().set_null_flight(current_competitor)
-            current_competitor = self.event.get_current_round().next_pilot()
-        self.controllers['round'].wPilotCtrl.set_data(current_competitor,
-                                                      self.event.get_current_round())
+
+        eventData = self.controllers['config'].view.ContestList.currentData()
+        if eventData is not None:
+            self.event = self.daoEvent.get(eventData.id,
+                        fetch_competitors=True, fetch_rounds=True, fetch_runs=True, fetch_runs_lastround=True)
+            current_competitor = self.event.get_current_round().get_current_competitor()
+            if not current_competitor.present:
+                self.event.get_current_round().set_null_flight(current_competitor)
+                current_competitor = self.event.get_current_round().next_pilot()
+            self.controllers['round'].wPilotCtrl.set_data(current_competitor,
+                                                          self.event.get_current_round())
+            self.chronoHard.set_mode(training=False)
+        else:
+            self.chronoHard.set_mode(training=True)
+
+
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False)
         self.controllers['round'].wChronoCtrl.reset_ui()
@@ -215,13 +222,13 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def getcontextparameters(self, updateBDD=False):
         self.controllers['config'].get_data()
-        self.event.max_interruption_time=self.controllers['config'].max_interruption_time
-        self.event.min_allowed_wind_speed=self.controllers['config'].min_allowed_wind_speed
-        self.event.max_allowed_wind_speed=self.controllers['config'].max_allowed_wind_speed
-        self.event.max_wind_dir_dev=self.controllers['config'].max_wind_dir_dev
-        self.event.flights_before_refly=self.controllers['config'].flights_before_refly
-        self.event.bib_start=self.controllers['config'].bib_start
-        self.event.dayduration=self.controllers['config'].dayduration
+        self.event.max_interruption_time = self.controllers['config'].max_interruption_time
+        self.event.min_allowed_wind_speed = self.controllers['config'].min_allowed_wind_speed
+        self.event.max_allowed_wind_speed = self.controllers['config'].max_allowed_wind_speed
+        self.event.max_wind_dir_dev = self.controllers['config'].max_wind_dir_dev
+        self.event.flights_before_refly = self.controllers['config'].flights_before_refly
+        self.event.bib_start = self.controllers['config'].bib_start
+        self.event.dayduration = self.controllers['config'].dayduration
         if updateBDD:
             self.daoEvent.update(self.event)
 
@@ -288,13 +295,16 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.set_null_flight(True)
 
     def contest_changed(self):
-        if self.event:
+
+        if self.event is not None:
             self.getcontextparameters(updateBDD=True)
             del self.event
-        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
-                                  fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
+            self.event = None
 
-        self.controllers['config'].set_data(self.event)
+        eventData = self.controllers['config'].view.ContestList.currentData()
+        if (eventData is not None):
+            self.event = self.daoEvent.get(eventData.id, fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
+            self.controllers['config'].set_data(self.event)
 
     def slot_status_changed(self, status):
         print ("slot status", status)

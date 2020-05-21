@@ -397,11 +397,14 @@ class WConfigCtrl(QObject):
         self.view.daydurationvalue.setValue(event.dayduration)
 
     def set_contest(self, contest_list):
+        _translate = QtCore.QCoreApplication.translate
         self.chrono_sig.emit()
+        self.view.ContestList.removeItem(0)
+        self.view.ContestList.addItem(_translate("contest_training", "Training"), userData=None)
         for contest in contest_list:
             self.view.ContestList.addItem(contest.name, userData=contest)
 
-        self.view.ContestList.setCurrentIndex(1)
+        self.view.ContestList.setCurrentIndex(len(contest_list))
 
     def get_data(self):
         self.min_allowed_wind_speed = self.view.WindMinValue.value()

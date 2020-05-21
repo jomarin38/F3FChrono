@@ -237,6 +237,8 @@ class ChronoArduino(ChronoHard, QTimer):
     def stop(self):
         self.arduino.stop()
 
+    def set_mode (self, training=True):
+        self.arduino.set_mode(training)
 
 '''
 class ChronoRpi(ChronoHard):

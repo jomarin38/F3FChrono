@@ -31,8 +31,8 @@ enum chronoStatus {
 };
 
 enum chronoMode{
-  Training = 0,
-  Race
+  Race = 0,
+  Training
 };
 
 typedef struct {

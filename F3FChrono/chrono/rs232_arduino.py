@@ -111,6 +111,12 @@ class rs232_arduino (QObject):
                 return None
             time.sleep(0.002)
 
+    def set_mode(self, training=True):
+        self.check_request_time()
+        chaine = "m"+'1' if training else '0'+"\n"
+        self.bus.write(chaine.encode())
+        return 0
+
     def set_inRun(self):
         self.inRun = True
 

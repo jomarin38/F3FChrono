@@ -12,7 +12,7 @@
  "buzzer_next_duration": 300,
  "buzzer_next_valid": false,
  "buzzer_valid": true,
- "fullscreen": true,
+ "fullscreen": false,
  "i2c_refresh": 100,
  "langage": "French",
  "ledA": 20,
