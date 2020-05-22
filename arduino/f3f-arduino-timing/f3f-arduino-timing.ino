@@ -347,10 +347,8 @@ void baseB_Interrupt(void) {
 
 void baseCheck(byte base) {
   if (chrono_mode==Training){
-    Serial.println("baseCheckTraining");
     baseCheckTraining(base);    
   }else if (chrono_mode==Race){
-    Serial.println("baseCheckRace");
     baseCheckRace(base);
   }
 }

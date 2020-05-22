@@ -22,7 +22,7 @@
  "simulatemode": false,
  "sound": true,
  "udpport": 4445,
- "voice": false,
+ "voice": true,
  "voltage_coef": 0.354,
  "voltage_min": 9.9,
  "webserver_port": 8000

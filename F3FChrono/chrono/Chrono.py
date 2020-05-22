@@ -34,6 +34,7 @@ class ChronoHard(QObject):
     lap_finished = pyqtSignal(int, float)
     run_finished = pyqtSignal(float)
     run_validated = pyqtSignal()
+    run_training = pyqtSignal(int, float)
     buzzer_validated = pyqtSignal()
     chrono_signal = pyqtSignal(str, str, str)
     wind_signal = pyqtSignal(int, int, bool)
@@ -178,7 +179,7 @@ class ChronoArduino(ChronoHard, QTimer):
 
         self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'],
                                    ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
-                                     self.lap_finished, self.run_finished, self.altitude_finished, self.accu_signal)
+                                     self.lap_finished, self.run_finished, self.run_training, self.altitude_finished, self.accu_signal)
         self.status_changed.connect(self.slot_status)
         self.timer = QTimer()
         self.timer.timeout.connect(self.event_voltage)
