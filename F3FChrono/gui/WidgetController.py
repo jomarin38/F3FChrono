@@ -711,15 +711,15 @@ class WSettings(QObject):
         if self.udp_sig is not None and self.ipbaseclear_sig is not None:
             self.udp_sig.connect(self.slot_udp)
             self.ipbaseclear_sig.emit()
-            self.view.baseA_IP.setText(self._translate("None", "None"))
-            self.view.baseB_IP.setText(self._translate("None", "None"))
+            self.view.baseA_IP.setText("...")
+            self.view.baseB_IP.setText("...")
             self.udp_sig_connected = True
 
     def slot_udp(self, caller, data, address):
         print(caller, data, address)
-        if caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseA_IP.toPlainText() == "None":
+        if caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseA_IP.toPlainText() == "...":
             self.view.baseA_IP.setText(address)
-        elif caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseB_IP.toPlainText() == "None" and \
+        elif caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseB_IP.toPlainText() == "..." and \
                 address != self.view.baseA_IP.toPlainText():
             self.view.baseB_IP.setText(address)
 
