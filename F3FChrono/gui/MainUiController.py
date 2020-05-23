@@ -29,13 +29,12 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.vocal = chronoQSound(ConfigReader.config.conf['langage'], ConfigReader.config.conf['sound'],\
                                   ConfigReader.config.conf['voice'], ConfigReader.config.conf['buzzer_valid'])
 
-        '''_translator = QtCore.QTranslator()
-        _path = os.path.dirname(os.path.realpath('Sound/' + ConfigReader.config.conf['langage'] +
-                                                 '/fr_FR.ts') + '/race_management.ts')
+        _translator = QtCore.QTranslator()
+        _path = os.path.dirname(os.path.realpath('Languages/fr_FR.qm') + '/fr_FR.qm')
         print(_path)
         _translator.load(_path)
         QtWidgets.QApplication.instance().installTranslator(_translator)
-        '''
+
         self.initUI()
 
         self.signal_btnnext.connect(self.btn_next_action)

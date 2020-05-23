@@ -46,7 +46,7 @@ class chronoQSound(QThread):
     def loadwav(self, langage, playsound, playvoice, buzzer):
         self.play_sound = playsound
         self.play_voice = playvoice
-        pathname = os.path.dirname(os.path.realpath('Sound/'+langage+'/base0.wav'))
+        pathname = os.path.dirname(os.path.realpath('Languages/'+langage+'/base0.wav'))
         lap_pathname = pathname + '/laps_beep'
         self.soundbase.clear()
         if buzzer:

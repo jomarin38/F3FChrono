@@ -106,8 +106,7 @@
     <message>
         <location filename="WChrono_ui.py" line="345"/>
         <source>Wait New Run</source>
-        <translation>Attente run
-</translation>
+        <translation>Attente Run</translation>
     </message>
     <message>
         <location filename="WChrono_ui.py" line="346"/>
@@ -283,17 +282,17 @@
     <message>
         <location filename="WConfig_ui.py" line="196"/>
         <source>Random</source>
-        <translation>Aléatoire</translation>
+        <translation>Dossard Aléatoire</translation>
     </message>
     <message>
         <location filename="WConfig_ui.py" line="197"/>
         <source>Day+1</source>
-        <translation>Jour+1</translation>
+        <translation>Dossard Jour+1</translation>
     </message>
     <message>
         <location filename="WConfig_ui.py" line="198"/>
         <source>Start</source>
-        <translation>Concours</translation>
+        <translation>Lancer Concours</translation>
     </message>
 </context>
 <context>
@@ -379,7 +378,7 @@
     <message>
         <location filename="WSettings_ui.py" line="182"/>
         <source>Close Race Management</source>
-        <translation>Quit Race Management</translation>
+        <translation>Quitter logiciel</translation>
     </message>
     <message>
         <location filename="WSettings_ui.py" line="183"/>
@@ -438,12 +437,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="WSettings_ui.py" line="201"/>
         <source>Cancel</source>
-        <translation>Annulé</translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="WSettings_ui.py" line="202"/>
         <source>Valid</source>
-        <translation>Validation</translation>
+        <translation>Valider</translation>
     </message>
 </context>
 <context>
