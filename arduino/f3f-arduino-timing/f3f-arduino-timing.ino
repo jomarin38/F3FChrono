@@ -97,7 +97,7 @@ volatile debugStr debug = {0};
 volatile unsigned int i = 0;
 volatile byte temp = 0;
 volatile byte reset = true;
-volatile chronoMode chrono_mode = Training;
+volatile chronoMode chrono_mode = Race;
 /*void baseA_Interrupt(void);
 void baseB_Interrupt(void);
 void baseCheck(byte base);
@@ -117,8 +117,8 @@ void setup() {
   memset (&chrono_old, 0, sizeof(chrono_old));
   memset (&chronostatus, 0, sizeof(chronostatus));
   memset (&chronostatus_old, 0, sizeof(chronostatus_old));
-  chrono_mode = Training;
-  chronostatus.runStatus = InStart;
+  chrono_mode = Race;
+  chronostatus.runStatus = InWait;
 
   memset (&buzzer, 0, sizeof(buzzer));
   memset (&led, 0, sizeof(led));
