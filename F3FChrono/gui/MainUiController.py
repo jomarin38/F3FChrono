@@ -45,6 +45,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.MainWindow.closeEvent = self.closeEvent
         self.ui = Ui_MainWindow()
 
+
+
         self.ui.setupUi(self.MainWindow)
         if ConfigReader.config.conf['fullscreen']:
             self.MainWindow.showFullScreen()
@@ -377,8 +379,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         print("Main UI Controller slot run finished : ", time.time())
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
+        self.controllers['round'].widget.update()
         if ConfigReader.config.conf["voice"]:
-            #time.sleep(0.5)     #wait gui has been refresh otherwise the time is updated after vocal sound
             self.vocal.signal_time.emit(run_time)
 
     def slot_altitude_finished(self):

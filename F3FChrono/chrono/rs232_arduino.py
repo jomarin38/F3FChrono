@@ -39,6 +39,7 @@ class rs232_arduino (QObject):
         self.inRun = False
         self.kill_aduino()
         self.training = False
+        self.__debug = False
 
     @staticmethod
     def get_raspi_revision():
@@ -71,7 +72,7 @@ class rs232_arduino (QObject):
     def slot_arduino_reset(self):
         self.set_RebundBtn(self.rebundTime)
         self.set_buzzerTime(self.buzzerTime)
-        self.debug()
+        #self.debug()
         self.set_mode(training=False)
 
     def receive(self):
@@ -79,7 +80,8 @@ class rs232_arduino (QObject):
             try:
                 if self.bus.inWaiting() > 0:
                     data = self.bus.readline().decode().split(',')
-                    print(data)
+                    if (self.__debug):
+                        print(data)
                     if data[0] == "status":
                         self.status = int(data[1])
                         self.status_changed_sig.emit(self.status)
@@ -93,19 +95,24 @@ class rs232_arduino (QObject):
                         if self.status == Chrono.chronoStatus.Finished:
                             self.wait_alt_sig.emit()
                     if data[0] == "lap":
-                        if 1 <= int(data[1]) <= 10:
-                            self.lap_finished_sig.emit(int(data[1]), int(data[int(data[1])+1])/1000)
-                        if int(data[1]) == 10:
-                            tmp = 0.
-                            for i in range(2, int(data[1])+2):
-                                tmp += int(data[i])/1000
-                            self.run_finished_sig.emit(tmp)
+                        if self.training:
+                            if int(data[1]) >= 10:
+                                tmp = 0.
+                                for i in range(2, 11):
+                                    tmp += int(data[i]) / 1000
+                                self.run_training_sig.emit(int(data[1]), tmp)
+                            else:
+                                self.run_training_sig.emit(int(data[1]), 0.0)
+                        else:
+                            if 1 <= int(data[1]) <= 10:
+                                self.lap_finished_sig.emit(int(data[1]), int(data[int(data[1])+1])/1000)
+                            if int(data[1]) == 10:
+                                tmp = 0.
+                                for i in range(2, int(data[1])+2):
+                                    tmp += int(data[i])/1000
+                                self.run_finished_sig.emit(tmp)
 
-                        if int(data[1]) >= 10:
-                            tmp = 0.
-                            for i in range(2, 11):
-                                tmp += int(data[i])/1000
-                            self.run_training_sig.emit(int(data[1]), tmp)
+
                     if data[0] == "voltage":
                         self.accu_sig.emit(int(data[1])*5/1024/self.voltageCoef)
                     if data[0] == "resetµc":
@@ -133,6 +140,7 @@ class rs232_arduino (QObject):
     def debug(self):
         self.check_request_time()
         self.bus.write("d\n".encode())
+        self.__debug = True
         return 0
 
     def set_status(self, status):
@@ -158,6 +166,7 @@ class rs232_arduino (QObject):
     def kill_aduino(self):
         self.check_request_time()
         self.bus.write(("k\n").encode())
+        self.__debug = False
 
     def reset(self):
         self.check_request_time()

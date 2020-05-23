@@ -455,25 +455,27 @@ class WChronoTrainingCtrl(QObject):
             self.view.Status.setText(self.statusText[status])
 
     def set_time(self, lapcount, finaltime):
-        if lapcount % 2 == 0:
-            self.run_time.append(finaltime)
-            self.mean += finaltime
-            self.view.runMean.setText("Mean : {:0>6.2f}".format(self.mean/((lapcount-10)/2+1)))
-            if finaltime < self.min:
-                self.min = finaltime
-                self.view.runMin.setText("Min : {:0>6.2f}".format(self.min))
-            if finaltime > self.max:
-                self.max = finaltime
-                self.view.runMax.setText("Max : {:0>6.2f}".format(self.max))
-
-        if len(self.run_time) > 10:
-            del self.run_time[0]
-        for i in range(len(self.run_time)):
-            self.run[i].setText("{:d} : {:0>6.2f}".format(i+1, self.run_time[i]))
         self.view.lapNumber.setText("Total laps : {:d}".format(lapcount))
+        if lapcount>=10:
+            if lapcount % 2 == 0:
+                self.run_time.append(finaltime)
+                self.mean += finaltime
+                self.view.runMean.setText("Mean : {:0>6.2f}".format(self.mean/((lapcount-10)/2+1)))
+                if finaltime < self.min:
+                    self.min = finaltime
+                    self.view.runMin.setText("Min : {:0>6.2f}".format(self.min))
+                if finaltime > self.max:
+                    self.max = finaltime
+                    self.view.runMax.setText("Max : {:0>6.2f}".format(self.max))
 
-        if (lapcount-10)/2 % 5 == 0:
-            self.training_voice_sig.emit(finaltime)
+            if len(self.run_time) > 10:
+                del self.run_time[0]
+            for i in range(len(self.run_time)):
+                self.run[i].setText("{:d} : {:0>6.2f}".format(i+1, self.run_time[i]))
+
+
+            if (lapcount-10)/2 % 5 == 0:
+                self.training_voice_sig.emit(finaltime)
 
     def reset(self):
         for run in self.run:

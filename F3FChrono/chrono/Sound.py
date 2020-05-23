@@ -4,13 +4,13 @@ import sys
 import platform
 import collections
 from F3FChrono.chrono import ConfigReader
-from PyQt5.QtCore import pyqtSignal, QObject, QTimer, QCoreApplication
+from PyQt5.QtCore import pyqtSignal, QObject, QThread, QCoreApplication
 from PyQt5.QtMultimedia import QSound
 from F3FChrono.chrono import ConfigReader
 import pyttsx3
 
 
-class chronoQSound(QObject):
+class chronoQSound(QThread):
     signal_penalty = pyqtSignal()
     signal_base = pyqtSignal(int)
     signal_entry = pyqtSignal()
@@ -43,6 +43,8 @@ class chronoQSound(QObject):
         #self.voices = self.voice_engine.getProperty('voices')
         #self.voice_engine.setProperty('voice', self.voices[26].id)
 
+
+
     def loadwav(self, langage, buzzer):
 
         pathname = os.path.dirname(os.path.realpath('Sound/'+langage+'/base0.wav'))
@@ -71,12 +73,27 @@ class chronoQSound(QObject):
         self.elapsedtime['all'] = QSound(pathname+'/start/startall.wav')
 
 
-    def sound_time(self, time):
+    '''
+    def sound_time(self, run_time):
         if (self.play_voice):
-            self.voice_engine.say("{:0>.2f}".format(time))
-            self.voice_engine.startLoop()
+            self.voice_engine.say("{:0>.2f}".format(run_time))
+            self.voice_engine.startLoop()'''
+
+    def sound_time(self, run_time):
+        if (self.play_voice):
+            self.voice_engine.setProperty('voice', "english")
+            #self.voice_engine.setProperty('voice', "french")
+            self.voice_engine.say("{:0>.2f}".format(run_time))
+            self.start()
+
+
+    def run(self):
+        self.voice_engine.startLoop()
+
+
     def onVoiceEnd(self, name, completed):
         self.voice_engine.endLoop()
+        self.stop()
 
     def sound_base(self, index):
         if self.play_sound and self.soundbase[index] is not None:
