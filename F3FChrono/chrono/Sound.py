@@ -19,7 +19,7 @@ class chronoQSound(QThread):
     signal_start = pyqtSignal(int)
 
 
-    def __init__(self, langage, playsound, playvoice, buzzer):
+    def __init__(self, langage, playsound, playvoice, voicerate, buzzer):
         super().__init__()
         self.soundbase = []
 
@@ -33,8 +33,7 @@ class chronoQSound(QThread):
         self.signal_penalty.connect(self.sound_penalty)
         self.soundstart_run = False
         self.voice_engine = pyttsx3.init()
-        rate = self.voice_engine.getProperty('rate')
-        self.voice_engine.setProperty('rate', rate-30)
+        self.voice_engine.setProperty('rate', voicerate)
         self.voice_engine.setProperty('volume', 1)
 
         self.voice_engine.connect('finished-utterance', self.onVoiceEnd)

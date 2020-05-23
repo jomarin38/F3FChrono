@@ -56,18 +56,20 @@ default_config = \
     "buzzer_duration":1000,
     "buzzer_next":21,
     "buzzer_next_duration":500,
-    "udpport" : 4445,
+    "udpport": 4445,
     "fullscreen":False,
     "buzzer_valid":True,
     "buzzer_next_valid":True,
     "run_webserver": False,
-    "webserver_port" : 8000,
-    "voltage_coef" : 0.354,
-    "i2c_refresh" : 100, #time in ms
-    "rebound_btn_time" : 500, #time in ms
-    "Launch_time" : 12000,
-    "Launched_time" : 12000,
-    "langage" : "French"
+    "webserver_port": 8000,
+    "voltage_coef": 0.354,
+    "i2c_refresh": 100, #time in ms
+    "rebound_btn_time": 500, #time in ms
+    "Launch_time": 12000,
+    "Launched_time": 12000,
+    "langage": "English",
+    "voice_language": "French",
+    "voice_rate": 150
 }
 
 def init():

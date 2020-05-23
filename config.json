@@ -25,5 +25,9 @@
  "voice": true,
  "voltage_coef": 0.354,
  "voltage_min": 9.9,
- "webserver_port": 8000
+ "webserver_port": 8000,
+ "language": "English",
+ "voice_language" : "French",
+ "voice_rate" : 150
+
 }

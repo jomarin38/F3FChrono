@@ -24,16 +24,17 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.event = None
         self.chronodata = chronodata
         self.chronoHard = ChronoArduino(self.signal_btnnext)
-        self.rpigpio=rpi_gpio(rpi, self.btn_next_action, None, None)
+        self.rpigpio = rpi_gpio(rpi, self.btn_next_action, None, None)
         self.base_test = -10
-        self.vocal = chronoQSound(ConfigReader.config.conf['langage'], ConfigReader.config.conf['sound'],\
-                                  ConfigReader.config.conf['voice'], ConfigReader.config.conf['buzzer_valid'])
+        self.vocal = chronoQSound(ConfigReader.config.conf['voice_language'], ConfigReader.config.conf['sound'],
+                                  ConfigReader.config.conf['voice'], ConfigReader.config.conf['voice_rate'],
+                                  ConfigReader.config.conf['buzzer_valid'])
 
-        _translator = QtCore.QTranslator()
-        _path = os.path.dirname(os.path.realpath('Languages/fr_FR.qm') + '/fr_FR.qm')
-        print(_path)
-        _translator.load(_path)
-        QtWidgets.QApplication.instance().installTranslator(_translator)
+        if ConfigReader.config.conf['language'] == "French":
+            _translator = QtCore.QTranslator()
+            _path = os.path.dirname(os.path.realpath('Languages/fr_FR.qm') + '/fr_FR.qm')
+            _translator.load(_path)
+            QtWidgets.QApplication.instance().installTranslator(_translator)
 
         self.initUI()
 
