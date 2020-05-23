@@ -5,8 +5,8 @@ from datetime import datetime
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.chrono import ConfigReader
-from F3FChrono.gui.WWind_UI import Ui_WWind
-from F3FChrono.gui.WPilot_UI import Ui_WPilot
+from F3FChrono.gui.WWind_ui import Ui_WWind
+from F3FChrono.gui.WPilot_ui import Ui_WPilot
 from F3FChrono.gui.WChrono_ui import Ui_WChrono
 from F3FChrono.gui.WChronoTraining_ui import Ui_WTraining
 from F3FChrono.gui.WChronoBtn_ui import Ui_WChronoBtn
@@ -33,7 +33,7 @@ class WRoundCtrl(QObject):
         self.wBtnCtrl = Ui_WChronoBtn()
         self.name = name
         self.parent = parent
-        self.widget=QtWidgets.QWidget(parent)
+        self.widget = QtWidgets.QWidget(parent)
         self.wBtnCtrl.setupUi(self.widget)
         self.widgetList.append(self.wPilotCtrl.get_widget())
         self.widgetList.append(self.wChronoCtrl.get_widget())
@@ -86,7 +86,7 @@ class WTrainingCtrl(QObject):
         self.wBtnCtrl = Ui_WTrainingBtn()
         self.name = name
         self.parent = parent
-        self.widget=QtWidgets.QWidget(parent)
+        self.widget = QtWidgets.QWidget(parent)
         self.wBtnCtrl.setupUi(self.widget)
         self.widgetList.append(self.wChronoCtrl.get_widget())
         self.widgetList.append(self.widget)
@@ -122,7 +122,8 @@ class WTrainingCtrl(QObject):
 
 
 class WWindCtrl():
-    widgetList=[]
+    widgetList = []
+
     def __init__(self, name, parent):
         self.view = Ui_WWind()
         self.name = name
@@ -141,9 +142,10 @@ class WWindCtrl():
         self.rules['alarm'] = False
         self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
         self.windstylesheet = "background-color:rgba( 255, 255, 255, 0% );"
+        self._translate = QtCore.QCoreApplication.translate
 
     def get_widget(self):
-        return(self.widgetList)
+        return (self.widgetList)
 
     def show(self):
         self.widget.show()
@@ -158,10 +160,10 @@ class WWindCtrl():
 
     def set_data(self, speed, angle, rain):
         if rain:
-            strrain = 'Rain'
+            strrain = self._translate("Rain", "Rain")
         else:
-            strrain = 'No Rain'
-        self.view.WindInfo.setText('Wind : '+str(speed)+'m/s, Angle : '+str(angle)+'°'+', '+strrain)
+            strrain = self._translate("No Rain", "No Rain")
+        self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + str(speed) + self._translate("m/s, Angle : ", "m/s, Angle : ") + str(angle) + '°' + ', ' + strrain)
         self.rules['dir'] = angle
         self.rules['speed'] = speed
         self.rules['rain'] = rain
@@ -174,40 +176,41 @@ class WWindCtrl():
                 self.rules['time(s)'] = time.time()
                 self.rules['detected'] = True
             else:
-                if ((time.time()-self.rules['time(s)']) > 20):
+                if ((time.time() - self.rules['time(s)']) > 20):
                     self.view.WindInfo.setStyleSheet('background-color:red;')
                     self.view.Elapsedtime.setVisible(True)
-                    if (time.time()-self.rules['time(s)']) > (time_limit*60):
+                    if (time.time() - self.rules['time(s)']) > (time_limit * 60):
                         self.view.Elapsedtime.setStyleSheet('background-color:red;')
                         self.view.btn_clear.setVisible(True)
-                        self.rules['alarm']=True
+                        self.rules['alarm'] = True
 
-                    self.view.Elapsedtime.setText("time : "+\
-                                time.strftime("%H:%M:%S", time.gmtime(time.time()-self.rules['time(s)']))\
-                                +self.cancelroundtostr())
+                    self.view.Elapsedtime.setText(self._translate("time : ", "time : ") + \
+                                                  time.strftime("%H:%M:%S",
+                                                                time.gmtime(time.time() - self.rules['time(s)'])) \
+                                                  + self.cancelroundtostr())
 
         else:
             self.view.WindInfo.setStyleSheet('background-color:rgba( 255, 255, 255, 0% );')
-            self.rules['detected']=False
+            self.rules['detected'] = False
             if not self.rules['alarm']:
                 self.view.Elapsedtime.setStyleSheet('background-color:rgba( 255, 255, 255, 0% );')
                 self.view.Elapsedtime.setVisible(False)
 
     def clear_alarm(self):
-        self.rules['alarm']=False
+        self.rules['alarm'] = False
         self.view.Elapsedtime.setVisible(False)
         self.view.btn_clear.setVisible(False)
 
     def cancelroundtostr(self):
-        cancelstr=''
+        cancelstr = ''
         if self.rules['alarm']:
-            #cancelstr=', Cancel Round'
-            cancelstr =''
+            # cancelstr=', Cancel Round'
+            cancelstr = ''
         return cancelstr
 
     def set_voltage(self, voltage):
-        self.view.voltage.setText("{:0>3.1f}".format(voltage)+" V")
-        if voltage <= ConfigReader.config.conf['voltage_min'] and\
+        self.view.voltage.setText("{:0>3.1f}".format(voltage) + " V")
+        if voltage <= ConfigReader.config.conf['voltage_min'] and \
                 self.voltagestylesheet == "background-color:rgba( 255, 255, 255, 0% );":
             self.voltagestylesheet = "background-color:red;"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
@@ -216,7 +219,7 @@ class WWindCtrl():
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
 
     def set_rssi(self, rssi1, rssi2):
-        self.view.rssi.setText(str(rssi1) + "%, "+str(rssi2)+"%")
+        self.view.rssi.setText(str(rssi1) + "%, " + str(rssi2) + "%")
 
 
 class WPilotCtrl():
@@ -226,9 +229,10 @@ class WPilotCtrl():
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
+        self._translate = QtCore.QCoreApplication.translate
 
     def get_widget(self):
-        return(self.widget)
+        return (self.widget)
 
     def show(self):
         self.widget.show()
@@ -241,8 +245,8 @@ class WPilotCtrl():
 
     def set_data(self, competitor, round):
         self.view.pilotName.setText(competitor.display_name())
-        self.view.bib.setText("BIB : "+str(competitor.get_bib_number()))
-        self.view.round.setText("Round : "+str(len(round.event.valid_rounds)+1))
+        self.view.bib.setText(self._translate("BIB : ", "BIB : ") + str(competitor.get_bib_number()))
+        self.view.round.setText(self._translate("Round : ", "Round : ") + str(len(round.event.valid_rounds) + 1))
 
 
 class WChronoCtrl(QTimer):
@@ -260,23 +264,23 @@ class WChronoCtrl(QTimer):
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
 
-        _translate = QtCore.QCoreApplication.translate
+        self._translate = QtCore.QCoreApplication.translate
         self.statusText = []
-        self.statusText.append(_translate("chronoStatus_WaitNewRun", "Wait New Run"))
-        self.statusText.append(_translate("chronoStatus_WaitToLaunch", "Wait To Launch"))
-        self.statusText.append(_translate("chronoStatus_Launched", "Launched"))
-        self.statusText.append(_translate("chronoStatus_L30s_reached", "30s reached"))
-        self.statusText.append(_translate("chronoStatus_InStart", "In Start"))
-        self.statusText.append(_translate("chronoStatus_I30s_reached", "In Start 30s reached"))
-        self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
-        self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
-        self.statusText.append(_translate("chronoStatus_WaitAltitude", "Wait Altitude"))
-        self.statusText.append(_translate("chronoStatus_Finished", "Finished"))
+        self.statusText.append(self._translate("chronoStatus_WaitNewRun", "Wait New Run"))
+        self.statusText.append(self._translate("chronoStatus_WaitToLaunch", "Wait To Launch"))
+        self.statusText.append(self._translate("chronoStatus_Launched", "Launched"))
+        self.statusText.append(self._translate("chronoStatus_L30s_reached", "30s reached"))
+        self.statusText.append(self._translate("chronoStatus_InStart", "In Start"))
+        self.statusText.append(self._translate("chronoStatus_I30s_reached", "In Start 30s reached"))
+        self.statusText.append(self._translate("chronoStatus_InProgress", "In Progress"))
+        self.statusText.append(self._translate("chronoStatus_InProgress", "In Progress"))
+        self.statusText.append(self._translate("chronoStatus_WaitAltitude", "Wait Altitude"))
+        self.statusText.append(self._translate("chronoStatus_Finished", "Finished"))
 
         self.vocal_elapsedTime_sig = vocal_elapsedTime_sig
-        #initialize labels for lap time
+        # initialize labels for lap time
         self.lap = []
-        #initialize labels for status
+        # initialize labels for status
         self.current_lap = 0
         self.view.setupUi(self.widget)
         self.lap.append(self.view.Lap1)
@@ -319,10 +323,10 @@ class WChronoCtrl(QTimer):
             self.view.Status.setText(self.statusText[status])
 
     def set_laptime(self, laptime):
-        #self.view.Time_label.setText("{:0>6.3f}".format(time)
-        print("current lap : "+str(self.current_lap))
-        if self.current_lap<len(self.lap):
-            self.lap[self.current_lap].setText("{:d} : {:0>6.1f}".format(self.current_lap+1, laptime))
+        # self.view.Time_label.setText("{:0>6.3f}".format(time)
+        print("current lap : " + str(self.current_lap))
+        if self.current_lap < len(self.lap):
+            self.lap[self.current_lap].setText("{:d} : {:0>6.1f}".format(self.current_lap + 1, laptime))
             self.current_lap += 1
 
     def set_finaltime(self, data_time):
@@ -330,10 +334,10 @@ class WChronoCtrl(QTimer):
         self.view.Time_label.setText("{:0>6.2f}".format(data_time))
 
     def reset_ui(self):
-        #self.view.Time_label.setText("{:0>6.3f}".format(0.0))
+        # self.view.Time_label.setText("{:0>6.3f}".format(0.0))
         for lap in self.lap:
             lap.setText("")
-        #for ctrl in self.lap_list:
+        # for ctrl in self.lap_list:
         #    ctrl.setText("")
         self.current_lap = 0
         self.set_penalty_value(0)
@@ -355,8 +359,8 @@ class WChronoCtrl(QTimer):
         if self.time_up:
             self.view.Time_label.setText("{:0>6.2f}".format(time.time() - self.startTime))
         else:
-            self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000 - (time.time()-self.startTime)))
-            timeval = self.time / 1000 - (time.time()-self.startTime)
+            self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000 - (time.time() - self.startTime)))
+            timeval = self.time / 1000 - (time.time() - self.startTime)
             if timeval >= 29.8:
                 self.vocal_elapsedTime_sig.emit('30s')
             if 25.9 <= timeval <= 26.1:
@@ -387,8 +391,8 @@ class WChronoCtrl(QTimer):
         self.btn_null_flight_sig.emit()
 
     def set_null_flight(self, value=False):
-        if(value):
-            self.view.nullFlightLabel.setText("Null Flight")
+        if (value):
+            self.view.nullFlightLabel.setText(self._translate("Null Flight", "Null Flight"))
         else:
             self.view.nullFlightLabel.setText("")
 
@@ -404,22 +408,22 @@ class WChronoTrainingCtrl(QObject):
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
 
-        _translate = QtCore.QCoreApplication.translate
+        self._translate = QtCore.QCoreApplication.translate
         self.statusText = []
-        self.statusText.append(_translate("chronoStatus_WaitNewRun", "Wait New Run"))
-        self.statusText.append(_translate("chronoStatus_WaitToLaunch", "Wait To Launch"))
-        self.statusText.append(_translate("chronoStatus_Launched", "Launched"))
-        self.statusText.append(_translate("chronoStatus_L30s_reached", "30s reached"))
-        self.statusText.append(_translate("chronoStatus_InStart", "In Start"))
-        self.statusText.append(_translate("chronoStatus_I30s_reached", "In Start 30s reached"))
-        self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
-        self.statusText.append(_translate("chronoStatus_InProgress", "In Progress"))
-        self.statusText.append(_translate("chronoStatus_WaitAltitude", "Wait Altitude"))
-        self.statusText.append(_translate("chronoStatus_Finished", "Finished"))
+        self.statusText.append(self._translate("chronoStatus_WaitNewRun", "Wait New Run"))
+        self.statusText.append(self._translate("chronoStatus_WaitToLaunch", "Wait To Launch"))
+        self.statusText.append(self._translate("chronoStatus_Launched", "Launched"))
+        self.statusText.append(self._translate("chronoStatus_L30s_reached", "30s reached"))
+        self.statusText.append(self._translate("chronoStatus_InStart", "In Start"))
+        self.statusText.append(self._translate("chronoStatus_I30s_reached", "In Start 30s reached"))
+        self.statusText.append(self._translate("chronoStatus_InProgress", "In Progress"))
+        self.statusText.append(self._translate("chronoStatus_InProgress", "In Progress"))
+        self.statusText.append(self._translate("chronoStatus_WaitAltitude", "Wait Altitude"))
+        self.statusText.append(self._translate("chronoStatus_Finished", "Finished"))
 
-        #initialize labels for lap time
+        # initialize labels for lap time
         self.run = []
-        #initialize labels for status
+        # initialize labels for status
         self.view.setupUi(self.widget)
         self.run.append(self.view.Lap1)
         self.run.append(self.view.Lap2)
@@ -436,7 +440,6 @@ class WChronoTrainingCtrl(QObject):
         self.min = 2000.0
         self.mean = 0.0
         self.max = 0.0
-
 
     def get_widget(self):
         return (self.widget)
@@ -455,41 +458,38 @@ class WChronoTrainingCtrl(QObject):
             self.view.Status.setText(self.statusText[status])
 
     def set_time(self, lapcount, finaltime):
-        self.view.lapNumber.setText("Total laps : {:d}".format(lapcount))
-        if lapcount>=10:
+        self.view.lapNumber.setText(self._translate("Total Laps : ", "Total Laps : ") + "{:d}".format(lapcount))
+        if lapcount >= 10:
             if lapcount % 2 == 0:
                 self.run_time.append(finaltime)
                 self.mean += finaltime
-                self.view.runMean.setText("Mean : {:0>6.2f}".format(self.mean/((lapcount-10)/2+1)))
+                self.view.runMean.setText(self._translate("Mean : ", "Mean : ")+"{:0>6.2f}".format(self.mean / ((lapcount - 10) / 2 + 1)))
                 if finaltime < self.min:
                     self.min = finaltime
-                    self.view.runMin.setText("Min : {:0>6.2f}".format(self.min))
+                    self.view.runMin.setText(self._translate("Min : ", "Min : ")+"{:0>6.2f}".format(self.min))
                 if finaltime > self.max:
                     self.max = finaltime
-                    self.view.runMax.setText("Max : {:0>6.2f}".format(self.max))
+                    self.view.runMax.setText(self._translate("Max : ", "Max : ")+"{:0>6.2f}".format(self.max))
 
             if len(self.run_time) > 10:
                 del self.run_time[0]
             for i in range(len(self.run_time)):
-                self.run[i].setText("{:d} : {:0>6.2f}".format(i+1, self.run_time[i]))
+                self.run[i].setText("{:d} : {:0>6.2f}".format(i + 1, self.run_time[i]))
 
-
-            if (lapcount-10)/2 % 5 == 0:
+            if (lapcount - 10) / 2 % 5 == 0:
                 self.training_voice_sig.emit(finaltime)
 
     def reset(self):
         for run in self.run:
             run.setText("")
-        self.view.runMin.setText("Min : ")
-        self.view.runMean.setText("Mean : ")
-        self.view.runMax.setText("Max : ")
-        self.view.lapNumber.setText("Total Laps : ")
+        self.view.runMin.setText(self._translate("Min : ", "Min : "))
+        self.view.runMean.setText(self._translate("Mean : ", "Mean : "))
+        self.view.runMax.setText(self._translate("Max : ", "Max : "))
+        self.view.lapNumber.setText(self._translate("Total Laps : ", "Total Laps : "))
         self.run_time.clear()
         self.min = 2000.0
         self.mean = 0.0
         self.max = 0.0
-
-
 
 
 class WConfigCtrl(QObject):
@@ -509,6 +509,7 @@ class WConfigCtrl(QObject):
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
+        self._translate = QtCore.QCoreApplication.translate
 
         # Event connect
         self.view.StartBtn.clicked.connect(self.btn_next)
@@ -518,7 +519,7 @@ class WConfigCtrl(QObject):
         self.view.day_1btn.clicked.connect(self.btn_day_1_sig.emit)
 
     def get_widget(self):
-        return(self.widgetList)
+        return (self.widgetList)
 
     def show(self):
         self.widget.show()
@@ -538,7 +539,7 @@ class WConfigCtrl(QObject):
         self.view.OrientationValue.setValue(event.max_wind_dir_dev)
         self.view.RevolValue.setValue(event.flights_before_refly)
         self.view.bib_start.setValue(event.bib_start)
-        self.view.MaxInterruptValue.setValue(event.max_interruption_time/60)
+        self.view.MaxInterruptValue.setValue(event.max_interruption_time / 60)
         self.view.daydurationvalue.setValue(event.dayduration)
 
     def set_contest(self, contest_list):
@@ -555,16 +556,17 @@ class WConfigCtrl(QObject):
         self.min_allowed_wind_speed = self.view.WindMinValue.value()
         self.max_allowed_wind_speed = self.view.WindMaxValue.value()
         self.max_wind_dir_dev = self.view.OrientationValue.value()
-        self.max_interruption_time = self.view.MaxInterruptValue.value()*60
-        self.flights_before_refly=self.view.RevolValue.value()
-        self.bib_start=self.view.bib_start.value()
-        self.dayduration=self.view.daydurationvalue.value()
-        self.contest=self.view.ContestList.currentIndex()
+        self.max_interruption_time = self.view.MaxInterruptValue.value() * 60
+        self.flights_before_refly = self.view.RevolValue.value()
+        self.bib_start = self.view.bib_start.value()
+        self.dayduration = self.view.daydurationvalue.value()
+        self.contest = self.view.ContestList.currentIndex()
 
 
 class WSettingsAdvanced(QObject):
     btn_settings_sig = pyqtSignal()
     widgetList = []
+
     def __init__(self, name, parent):
         super().__init__()
         self.view = Ui_WSettingsAdvanced()
@@ -574,8 +576,10 @@ class WSettingsAdvanced(QObject):
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
         self.view.btn_back.clicked.connect(self.btn_settings_sig.emit)
+        self._translate = QtCore.QCoreApplication.translate
+
     def get_widget(self):
-        return(self.widgetList)
+        return (self.widgetList)
 
     def show(self):
         self.widget.show()
@@ -610,6 +614,7 @@ class WSettingsAdvanced(QObject):
         ConfigReader.config.conf['buzzer_next_duration'] = self.view.buzzer_next_duration.value()
         ConfigReader.config.conf['udpport'] = self.view.udp_port.value()
 
+
 class WSettings(QObject):
     btn_settingsadvanced_sig = pyqtSignal()
     btn_cancel_sig = pyqtSignal()
@@ -623,6 +628,7 @@ class WSettings(QObject):
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
+        self._translate = QtCore.QCoreApplication.translate
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
         self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
@@ -637,9 +643,8 @@ class WSettings(QObject):
         self.udp_sig_connected = False
         self.ipbaseinvert_sig = None
 
-
     def get_widget(self):
-        return(self.widgetList)
+        return (self.widgetList)
 
     def show(self):
         if Utils.server_alive():
@@ -684,8 +689,8 @@ class WSettings(QObject):
             self.udp_sig_connected = False
             if self.udp_sig is not None:
                 self.ipbaseclear_sig.emit()
-                self.view.baseA_IP.setText("None")
-                self.view.baseB_IP.setText("None")
+                self.view.baseA_IP.setText(self._translate("None", "None"))
+                self.view.baseB_IP.setText(self._translate("None", "None"))
         self.btn_cancel_sig.emit()
 
     def btn_valid(self):
@@ -706,22 +711,21 @@ class WSettings(QObject):
         if self.udp_sig is not None and self.ipbaseclear_sig is not None:
             self.udp_sig.connect(self.slot_udp)
             self.ipbaseclear_sig.emit()
-            self.view.baseA_IP.setText("None")
-            self.view.baseB_IP.setText("None")
+            self.view.baseA_IP.setText(self._translate("None", "None"))
+            self.view.baseB_IP.setText(self._translate("None", "None"))
             self.udp_sig_connected = True
-
 
     def slot_udp(self, caller, data, address):
         print(caller, data, address)
         if caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseA_IP.toPlainText() == "None":
             self.view.baseA_IP.setText(address)
-        elif caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseB_IP.toPlainText() == "None" and\
+        elif caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseB_IP.toPlainText() == "None" and \
                 address != self.view.baseA_IP.toPlainText():
             self.view.baseB_IP.setText(address)
 
     def base_invert(self):
         if self.ipbaseinvert_sig is not None:
-            tmp=self.view.baseA_IP.toPlainText()
+            tmp = self.view.baseA_IP.toPlainText()
             self.view.baseA_IP.setText(self.view.baseB_IP.toPlainText())
             self.view.baseB_IP.setText(tmp)
 
@@ -742,6 +746,7 @@ class WPiCamPair(QObject):
         self.view = Ui_WPicamPair()
         self.name = name
         self.parent = parent
+        self._translate = QtCore.QCoreApplication.translate
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
@@ -749,7 +754,7 @@ class WPiCamPair(QObject):
         self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
 
     def get_widget(self):
-        return(self.widgetList)
+        return (self.widgetList)
 
     def show(self):
         self.widget.show()
@@ -761,6 +766,7 @@ class WPiCamPair(QObject):
         self.widget.hide()
 
     def set_data(self):
-        print ("todo PiCamPair - set data")
+        print("todo PiCamPair - set data")
+
     def get_data(self):
         print("todo PiCamPair - get data")

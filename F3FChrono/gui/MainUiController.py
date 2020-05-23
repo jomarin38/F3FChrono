@@ -7,6 +7,7 @@ from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.chrono.Sound import *
 from F3FChrono.chrono.GPIOPort import rpi_gpio
+import os
 
 
 class MainUiCtrl (QtWidgets.QMainWindow):
@@ -28,6 +29,13 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.vocal = chronoQSound(ConfigReader.config.conf['langage'], ConfigReader.config.conf['sound'],\
                                   ConfigReader.config.conf['voice'], ConfigReader.config.conf['buzzer_valid'])
 
+        '''_translator = QtCore.QTranslator()
+        _path = os.path.dirname(os.path.realpath('Sound/' + ConfigReader.config.conf['langage'] +
+                                                 '/fr_FR.ts') + '/race_management.ts')
+        print(_path)
+        _translator.load(_path)
+        QtWidgets.QApplication.instance().installTranslator(_translator)
+        '''
         self.initUI()
 
         self.signal_btnnext.connect(self.btn_next_action)
@@ -40,7 +48,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.signal_race = None
         self.signal_training = None
 
-    def initUI(self):
+    def initUI(self, ):
         self.MainWindow = QtWidgets.QMainWindow()
         self.MainWindow.closeEvent = self.closeEvent
         self.ui = Ui_MainWindow()
