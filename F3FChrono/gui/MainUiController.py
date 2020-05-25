@@ -7,6 +7,7 @@ from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.chrono.Sound import *
 from F3FChrono.chrono.GPIOPort import rpi_gpio
+import os
 
 
 class MainUiCtrl (QtWidgets.QMainWindow):
@@ -23,30 +24,36 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.event = None
         self.chronodata = chronodata
         self.chronoHard = ChronoArduino(self.signal_btnnext)
-        self.rpigpio=rpi_gpio(rpi, self.btn_next_action, None, None)
+        self.rpigpio = rpi_gpio(rpi, self.btn_next_action, None, None)
         self.base_test = -10
-        self.vocal = chronoQSound(ConfigReader.config.conf['langage'], ConfigReader.config.conf['sound'],\
-                                  ConfigReader.config.conf['voice'], ConfigReader.config.conf['buzzer_valid'])
+        self.vocal = chronoQSound(ConfigReader.config.conf['voice_language'], ConfigReader.config.conf['sound'],
+                                  ConfigReader.config.conf['voice'], ConfigReader.config.conf['voice_rate'],
+                                  ConfigReader.config.conf['buzzer_valid'])
+
+        if ConfigReader.config.conf['language'] == "French":
+            _translator = QtCore.QTranslator()
+            _path = os.path.dirname(os.path.realpath('Languages/fr_FR.qm') + '/fr_FR.qm')
+            _translator.load(_path)
+            QtWidgets.QApplication.instance().installTranslator(_translator)
 
         self.initUI()
 
         self.signal_btnnext.connect(self.btn_next_action)
 
-        self.chronoHard.status_changed.connect(self.slot_status_changed)
-        self.chronoHard.run_started.connect(self.slot_run_started)
-        self.chronoHard.lap_finished.connect(self.slot_lap_finished)
-        self.chronoHard.run_finished.connect(self.slot_run_finished)
-        self.chronoHard.run_validated.connect(self.slot_run_validated)
         self.chronoHard.wind_signal.connect(self.slot_wind_ui)
         self.chronoHard.rssi_signal.connect(self.slot_rssi)
         self.chronoHard.accu_signal.connect(self.slot_accu)
         self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
         self.chronoHard.event_voltage()
+        self.signal_race = None
+        self.signal_training = None
 
-    def initUI(self):
+    def initUI(self, ):
         self.MainWindow = QtWidgets.QMainWindow()
         self.MainWindow.closeEvent = self.closeEvent
         self.ui = Ui_MainWindow()
+
+
 
         self.ui.setupUi(self.MainWindow)
         if ConfigReader.config.conf['fullscreen']:
@@ -59,6 +66,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.controllers['config'] = WConfigCtrl("panel Config", self.ui.centralwidget)
         self.controllers['round'] = WRoundCtrl("panel Chrono", self.ui.centralwidget, self.vocal.signal_elapsedTime)
+        self.controllers['training'] = WTrainingCtrl("panel Training", self.ui.centralwidget)
         self.controllers['settings'] = WSettings("panel Settings", self.ui.centralwidget)
         self.controllers['settingsadvanced'] = WSettingsAdvanced("panel SettingsAdvanced", self.ui.centralwidget)
         self.controllers['wind'] = WWindCtrl("panel Wind", self.ui.centralwidget)
@@ -97,8 +105,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                                                  self.chronoHard.udpReceive.ipbaseclear_sig,
                                                  self.chronoHard.udpReceive.ipinvert_sig)
         self.controllers['settingsadvanced'].btn_settings_sig.connect(self.show_settings)
-
-
+        self.controllers['training'].btn_reset_sig.connect(self.chronoHard.arduino.reset_training)
+        self.controllers['training'].btn_home_sig.connect(self.home_training)
+        self.controllers['training'].btn_next_sig.connect(self.next_action)
 
         self.show_config()
         self.MainWindow.show()
@@ -107,6 +116,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def show_config(self):
         self.controllers['round'].hide()
+        self.controllers['training'].hide()
         self.controllers['settings'].hide()
         self.controllers['settingsadvanced'].hide()
         self.controllers['config'].show()
@@ -114,6 +124,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         print(self.MainWindow.size())
 
     def show_chrono(self):
+        self.controllers['training'].hide()
         self.controllers['config'].hide()
         self.controllers['settings'].hide()
         self.controllers['settingsadvanced'].hide()
@@ -122,6 +133,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         print(self.MainWindow.size())
 
     def show_settings(self):
+        self.controllers['training'].hide()
         self.controllers['config'].hide()
         self.controllers['settingsadvanced'].hide()
         self.controllers['round'].hide()
@@ -130,6 +142,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         print(self.MainWindow.size())
 
     def show_settingsadvanced(self):
+        self.controllers['training'].hide()
         self.controllers['config'].hide()
         self.controllers['settings'].hide()
         self.controllers['round'].hide()
@@ -137,10 +150,46 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
+    def show_training(self):
+        self.controllers['training'].show()
+        self.controllers['config'].hide()
+        self.controllers['settings'].hide()
+        self.controllers['round'].hide()
+        self.controllers['settingsadvanced'].hide()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
+
     def set_show_settings(self):
         self.controllers['settings'].set_data()
         self.controllers['settingsadvanced'].set_data()
         self.show_settings()
+
+    def set_signal_mode(self, training=False):
+        if self.signal_training is not None:
+            self.chronoHard.run_training.disconnect(self.controllers['training'].wChronoCtrl.set_time)
+            self.chronoHard.status_changed.disconnect(self.controllers['training'].wChronoCtrl.set_status)
+            self.controllers['training'].wChronoCtrl.training_voice_sig.disconnect(self.vocal.sound_time)
+            self.signal_training = None
+        if self.signal_race is not None:
+            self.chronoHard.status_changed.disconnect(self.slot_status_changed)
+            self.chronoHard.run_started.disconnect(self.slot_run_started)
+            self.chronoHard.lap_finished.disconnect(self.slot_lap_finished)
+            self.chronoHard.run_finished.disconnect(self.slot_run_finished)
+            self.chronoHard.run_validated.disconnect(self.slot_run_validated)
+            self.signal_race = None
+        if training==True:
+            self.chronoHard.run_training.connect(self.controllers['training'].wChronoCtrl.set_time)
+            self.chronoHard.status_changed.connect(self.controllers['training'].wChronoCtrl.set_status)
+            self.controllers['training'].wChronoCtrl.training_voice_sig.connect(self.vocal.sound_time)
+            self.signal_training = True
+        elif training == False:
+            self.chronoHard.status_changed.connect(self.slot_status_changed)
+            self.chronoHard.run_started.connect(self.slot_run_started)
+            self.chronoHard.lap_finished.connect(self.slot_lap_finished)
+            self.chronoHard.run_finished.connect(self.slot_run_finished)
+            self.chronoHard.run_validated.connect(self.slot_run_validated)
+            self.signal_race = True
+
 
     def settings_valid(self):
         self.controllers['settings'].get_data()
@@ -157,9 +206,12 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         #print event data
         self.controllers['round'].wChronoCtrl.stoptime()
         self.vocal.stop_all()
-        print(self.event.to_string())
-
         self.show_config()
+        self.set_signal_mode(training=None)
+
+    def home_training(self):
+        self.show_config()
+        self.set_signal_mode(training=None)
 
     def next_pilot(self, insert_database=False):
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot(insert_database,
@@ -193,35 +245,49 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.getcontextparameters(True)
 
     def start(self):
-        self.getcontextparameters(True)
-        if self.event:
+        if self.event is not None:
+            self.getcontextparameters(True)
             del self.event
-        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
-                    fetch_competitors=True, fetch_rounds=True, fetch_runs=True, fetch_runs_lastround=True)
+            self.event = None
 
         self.chronoHard.reset()
         self.chronodata.reset()
-        current_competitor = self.event.get_current_round().get_current_competitor()
-        if not current_competitor.present:
-            self.event.get_current_round().set_null_flight(current_competitor)
-            current_competitor = self.event.get_current_round().next_pilot()
-        self.controllers['round'].wPilotCtrl.set_data(current_competitor,
-                                                      self.event.get_current_round())
-        self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
-        self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False)
-        self.controllers['round'].wChronoCtrl.reset_ui()
-        self.show_chrono()
+
+        eventData = self.controllers['config'].view.ContestList.currentData()
+        if eventData is not None:
+            self.event = self.daoEvent.get(eventData.id,
+                        fetch_competitors=True, fetch_rounds=True, fetch_runs=True, fetch_runs_lastround=True)
+            current_competitor = self.event.get_current_round().get_current_competitor()
+            if not current_competitor.present:
+                self.event.get_current_round().set_null_flight(current_competitor)
+                current_competitor = self.event.get_current_round().next_pilot()
+            self.controllers['round'].wPilotCtrl.set_data(current_competitor,
+                                                          self.event.get_current_round())
+            self.chronoHard.set_mode(training=False)
+            self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
+            self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False)
+            self.controllers['round'].wChronoCtrl.reset_ui()
+            self.set_signal_mode(training=False)
+            self.show_chrono()
+        else:
+            self.chronoHard.set_mode(training=True)
+            self.controllers['training'].wChronoCtrl.reset()
+            self.set_signal_mode(training=True)
+            self.show_training()
+
+
+
 
 
     def getcontextparameters(self, updateBDD=False):
         self.controllers['config'].get_data()
-        self.event.max_interruption_time=self.controllers['config'].max_interruption_time
-        self.event.min_allowed_wind_speed=self.controllers['config'].min_allowed_wind_speed
-        self.event.max_allowed_wind_speed=self.controllers['config'].max_allowed_wind_speed
-        self.event.max_wind_dir_dev=self.controllers['config'].max_wind_dir_dev
-        self.event.flights_before_refly=self.controllers['config'].flights_before_refly
-        self.event.bib_start=self.controllers['config'].bib_start
-        self.event.dayduration=self.controllers['config'].dayduration
+        self.event.max_interruption_time = self.controllers['config'].max_interruption_time
+        self.event.min_allowed_wind_speed = self.controllers['config'].min_allowed_wind_speed
+        self.event.max_allowed_wind_speed = self.controllers['config'].max_allowed_wind_speed
+        self.event.max_wind_dir_dev = self.controllers['config'].max_wind_dir_dev
+        self.event.flights_before_refly = self.controllers['config'].flights_before_refly
+        self.event.bib_start = self.controllers['config'].bib_start
+        self.event.dayduration = self.controllers['config'].dayduration
         if updateBDD:
             self.daoEvent.update(self.event)
 
@@ -230,11 +296,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.rpigpio.signal_buzzer_next.emit()
 
     def btn_next_action(self, port):
-        if self.controllers['round'].is_show():
+        if self.controllers['round'].is_show() or self.controllers['training'].is_show():
             self.next_action()
 
     def handle_time_elapsed(self):
-        print ("time elapsed")
+        print("time elapsed")
         if self.chronoHard.get_status() == chronoStatus.WaitLaunch:
             self.vocal.signal_penalty.emit()
             self.controllers['round'].wChronoCtrl.stoptime()
@@ -288,13 +354,15 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.set_null_flight(True)
 
     def contest_changed(self):
-        if self.event:
+        if self.event is not None:
             self.getcontextparameters(updateBDD=True)
             del self.event
-        self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
-                                  fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
+            self.event = None
 
-        self.controllers['config'].set_data(self.event)
+        eventData = self.controllers['config'].view.ContestList.currentData()
+        if (eventData is not None):
+            self.event = self.daoEvent.get(eventData.id, fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
+            self.controllers['config'].set_data(self.event)
 
     def slot_status_changed(self, status):
         print ("slot status", status)
@@ -319,8 +387,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         print("Main UI Controller slot run finished : ", time.time())
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
+        self.controllers['round'].widget.update()
         if ConfigReader.config.conf["voice"]:
-            #time.sleep(0.5)     #wait gui has been refresh otherwise the time is updated after vocal sound
             self.vocal.signal_time.emit(run_time)
 
     def slot_altitude_finished(self):

@@ -15,7 +15,7 @@ const int BUZZERTIME = 300;
 const int LEDTIME = 300;
 const int REBUNDTIME = 500;
 const int VOLTAGE_TIME = 2000;
-const float VERSION = 0.9;
+const float VERSION = 0.91;
 
 enum chronoStatus {
   InWait = 0,
@@ -28,6 +28,11 @@ enum chronoStatus {
   InProgressB,
   WaitAltitude,
   Finished
+};
+
+enum chronoMode{
+  Race = 0,
+  Training
 };
 
 typedef struct {
@@ -92,7 +97,7 @@ volatile debugStr debug = {0};
 volatile unsigned int i = 0;
 volatile byte temp = 0;
 volatile byte reset = true;
-
+volatile chronoMode chrono_mode = Race;
 /*void baseA_Interrupt(void);
 void baseB_Interrupt(void);
 void baseCheck(byte base);
@@ -112,6 +117,8 @@ void setup() {
   memset (&chrono_old, 0, sizeof(chrono_old));
   memset (&chronostatus, 0, sizeof(chronostatus));
   memset (&chronostatus_old, 0, sizeof(chronostatus_old));
+  chrono_mode = Race;
+  chronostatus.runStatus = InWait;
 
   memset (&buzzer, 0, sizeof(buzzer));
   memset (&led, 0, sizeof(led));
@@ -225,9 +232,22 @@ void RS232Run(void) {
         baseCheck(BTNNEXTPIN);
         printforcebtnnext();
       }
-    }else if (tmp=='k'){
+    }else if (tmp=='k'){  //reboot arduino
       resetFunc();
+    }else if (tmp=='m'){  //Set chrono mode
+      chrono_mode = serial.data_read[1]-'0';
+      printmode();
+      if (chrono_mode==Training){
+        memset(&chronostatus, 0, sizeof(chronostatus));
+        memset(&chrono, 0, sizeof(chrono));
+        chronostatus.runStatus=InStart;        
+      }
+      if (chrono_mode==Race){
+        memset(&chronostatus, 0, sizeof(chronostatus));
+        memset(&chrono, 0, sizeof(chrono));
+      }
     }
+    
     
     memset(&serial, 0, sizeof(serial));
   }
@@ -326,6 +346,45 @@ void baseB_Interrupt(void) {
 }
 
 void baseCheck(byte base) {
+  if (chrono_mode==Training){
+    baseCheckTraining(base);    
+  }else if (chrono_mode==Race){
+    baseCheckRace(base);
+  }
+}
+
+void baseCheckTraining(byte base){
+  if (chronostatus.runStatus==InStart and (base == BASEAPIN or base == BTNNEXTPIN)){
+    chrono.oldtime=millis();
+    chronostatus.runStatus=InProgressB;
+  }else if (chronostatus.runStatus==InStart and (base == BASEBPIN or base == BTNNEXTPIN)) {
+    chrono.oldtime=millis();
+    chronostatus.runStatus=InProgressA;
+  }else if (chronostatus.runStatus==InProgressA and (base == BASEAPIN or base == BTNNEXTPIN)){
+    chronostatus.runStatus=InProgressB;
+    trainingSetTime ();
+  }else if (chronostatus.runStatus==InProgressB and (base == BASEBPIN or base == BTNNEXTPIN)) {
+    chronostatus.runStatus=InProgressA;
+    trainingSetTime ();
+  }
+  buzzer.Cmd = 1;
+}
+
+void trainingSetTime(void){
+  unsigned long time1=0;
+  time1 = millis();
+  if (chrono.lapCount>10){
+    memcpy(chrono.lap, &chrono.lap[1], sizeof (unsigned long)*9);
+    chrono.lap[9] = time1 - chrono.oldtime;
+    chrono.lapCount++;    
+  }else{
+    chrono.lap[chrono.lapCount] = time1 - chrono.oldtime;
+    chrono.lapCount++;
+  }
+  chrono.oldtime = time1;
+}
+
+void baseCheckRace(byte base){
   unsigned long time1=0;
   if (chronostatus.runStatus==Launched and (BASEAPIN == base or base == BTNNEXTPIN)) {
     chronostatus.runStatus = InStart;
@@ -416,10 +475,16 @@ void printstatus(void){
   Serial.println(",");
 }
 
+void printmode(void){
+  Serial.print("mode,");
+  Serial.print(chrono_mode);
+  Serial.println(",");
+}
+
 void printchrono(void){
   Serial.print("lap,");
   Serial.print(chrono.lapCount);
-  for (i = 0; i < chrono.lapCount; i++) {
+  for (i = 0; i < (chrono.lapCount<=10?chrono.lapCount:10); i++) {
     Serial.print(",");
     Serial.print(chrono.lap[i]);
   }
@@ -457,6 +522,7 @@ void printforcebtnnext(void){
 }
 
 void printdebug(void){
+  printmode();
   printstatus();
   printchrono();
   printbase();

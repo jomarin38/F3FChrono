@@ -5,7 +5,7 @@ import subprocess
 import time
 
 from argparse import ArgumentParser
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 import os.path
 
 def get_raspi_revision():
@@ -78,7 +78,7 @@ def main():
 
 
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(dao, chronodata, rpi=pi['pi'], webserver_process=webserver_process)
+    ui = MainUiCtrl(dao, chronodata, rpi=pi['pi'], webserver_process=webserver_process)
 
     if not os.path.isfile('voltage_log.txt'):
         MainUiCtrl.startup_time = time.time()
@@ -109,6 +109,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     ConfigReader.init()
-    ConfigReader.config = ConfigReader.Configuration ('config.json')
+    ConfigReader.config = ConfigReader.Configuration('config.json')
 
     main()

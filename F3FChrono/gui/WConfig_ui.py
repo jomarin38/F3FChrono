@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_WConfig(object):
     def setupUi(self, WConfig):
         WConfig.setObjectName("WConfig")
-        WConfig.resize(480, 260)
+        WConfig.resize(480, 287)
         self.gridLayout = QtWidgets.QGridLayout(WConfig)
         self.gridLayout.setContentsMargins(-1, 1, -1, 3)
         self.gridLayout.setSpacing(3)
@@ -184,7 +184,7 @@ class Ui_WConfig(object):
         WConfig.setWindowTitle(_translate("WConfig", "Form"))
         self.btn_settings.setText(_translate("WConfig", "Race Management Settings"))
         self.Contest.setText(_translate("WConfig", "Contest"))
-        self.ContestList.setItemText(0, _translate("WConfig", "None"))
+        self.ContestList.setItemText(0, _translate("WConfig", "Training"))
         self.ContestLimitLabel.setText(_translate("WConfig", "Contest settings"))
         self.MaxInterruptLabel.setText(_translate("WConfig", "Max Interrupt (mn)"))
         self.WindMinLabel.setText(_translate("WConfig", "WindMin (m/s)"))

@@ -8,11 +8,12 @@ import threading
 from F3FChrono.chrono import Chrono
 
 
+
 class rs232_arduino (QObject):
     reset_arduino_sig = pyqtSignal()
 
     def __init__(self, voltageCoef, rebundTimeBtn, buzzerTime, status_changed, run_started, lap_finished,
-                 run_finished, wait_alt_sig, accu_sig):
+                 run_finished, run_training, wait_alt_sig, accu_sig):
         super().__init__()
         self.bus = serial.Serial(port=rs232_arduino.get_serial_port(), baudrate = 57600, parity=serial.PARITY_NONE,
                                  stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=0.2)
@@ -21,6 +22,7 @@ class rs232_arduino (QObject):
         self.run_started_sig = run_started
         self.lap_finished_sig = lap_finished
         self.run_finished_sig = run_finished
+        self.run_training_sig = run_training
         self.wait_alt_sig = wait_alt_sig
         self.accu_sig = accu_sig
         self.status=0
@@ -34,8 +36,10 @@ class rs232_arduino (QObject):
         self.event = threading.Thread(target=self.receive)
         self.event.daemon = True
         self.event.start()
-        self.inRun=False
+        self.inRun = False
         self.kill_aduino()
+        self.training = False
+        self.__debug = False
 
     @staticmethod
     def get_raspi_revision():
@@ -68,15 +72,16 @@ class rs232_arduino (QObject):
     def slot_arduino_reset(self):
         self.set_RebundBtn(self.rebundTime)
         self.set_buzzerTime(self.buzzerTime)
-        self.debug()
         #self.debug()
+        self.set_mode(training=False)
 
     def receive(self):
         while not self.terminated:
             try:
                 if self.bus.inWaiting() > 0:
                     data = self.bus.readline().decode().split(',')
-                    print(data)
+                    if (self.__debug):
+                        print(data)
                     if data[0] == "status":
                         self.status = int(data[1])
                         self.status_changed_sig.emit(self.status)
@@ -90,13 +95,24 @@ class rs232_arduino (QObject):
                         if self.status == Chrono.chronoStatus.Finished:
                             self.wait_alt_sig.emit()
                     if data[0] == "lap":
-                        if 1 <= int(data[1]) <= 10:
-                            self.lap_finished_sig.emit(int(data[1]), int(data[int(data[1])+1])/1000)
-                        if int(data[1]) == 10:
-                            tmp=0.
-                            for i in range(2, int(data[1])+2):
-                                tmp += int(data[i])/1000
-                            self.run_finished_sig.emit(tmp)
+                        if self.training:
+                            if int(data[1]) >= 10:
+                                tmp = 0.
+                                for i in range(2, 11):
+                                    tmp += int(data[i]) / 1000
+                                self.run_training_sig.emit(int(data[1]), tmp)
+                            else:
+                                self.run_training_sig.emit(int(data[1]), 0.0)
+                        else:
+                            if 1 <= int(data[1]) <= 10:
+                                self.lap_finished_sig.emit(int(data[1]), int(data[int(data[1])+1])/1000)
+                            if int(data[1]) == 10:
+                                tmp = 0.
+                                for i in range(2, int(data[1])+2):
+                                    tmp += int(data[i])/1000
+                                self.run_finished_sig.emit(tmp)
+
+
                     if data[0] == "voltage":
                         self.accu_sig.emit(int(data[1])*5/1024/self.voltageCoef)
                     if data[0] == "resetµc":
@@ -111,12 +127,20 @@ class rs232_arduino (QObject):
                 return None
             time.sleep(0.002)
 
+    def set_mode(self, training=True):
+        self.check_request_time()
+        chaine = "m1\n" if training else "m0\n"
+        self.bus.write(chaine.encode())
+        self.training = training
+        return 0
+
     def set_inRun(self):
         self.inRun = True
 
     def debug(self):
         self.check_request_time()
         self.bus.write("d\n".encode())
+        self.__debug = True
         return 0
 
     def set_status(self, status):
@@ -142,11 +166,16 @@ class rs232_arduino (QObject):
     def kill_aduino(self):
         self.check_request_time()
         self.bus.write(("k\n").encode())
+        self.__debug = False
 
     def reset(self):
         self.check_request_time()
         self.bus.write(("r\n").encode())
         return 0
+
+    def reset_training(self):
+        self.reset()
+        self.set_status(Chrono.chronoStatus.InStart)
 
     def get_voltage(self):
         self.check_request_time()

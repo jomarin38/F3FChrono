@@ -96,7 +96,7 @@ class udpreceive(QThread):
                 
 if __name__ == '__main__':
     print ("Main start")
-    udpreceive = udpreceive (UDP_PORT, None, None, None)
+    udpreceive = udpreceive(UDP_PORT, None, None, None)
     udpreceive.start()
     while (not udpreceive.isFinished()):
         #udpreceive.event.set ()
