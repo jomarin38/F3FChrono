@@ -196,6 +196,18 @@ def round_view_html(event_id, round_number):
 
     page.add_table(table)
 
+    table = ResultTable(title='Remaining pilots to fly', css_id='ranking')
+    header = Header(name=Cell('Bib'))
+    header.add_cell(Cell('Name'))
+    table.set_header(header)
+
+    for bib_number in f3f_round.get_remaining_bibs_to_fly():
+        row = Line(name=Cell(str(bib_number)))
+        row.add_cell(Cell(f3f_round.event.competitors[bib_number].display_name()))
+        table.add_line(row)
+
+    page.add_table(table)
+
     result = page.to_html()
     return result
 

@@ -49,6 +49,16 @@ class Round:
     def get_flight_order(self):
         return self._flight_order
 
+    def get_remaining_bibs_to_fly(self):
+        if not self.valid:
+            if self.has_run():
+                currently_flying_bib = self._current_competitor_index+1
+            else:
+                currently_flying_bib = self._current_competitor_index
+            return self._flight_order[currently_flying_bib:]
+        else:
+            return []
+
     def set_flight_order_from_db(self, serialized_flight_order):
         splitted_line = serialized_flight_order.split(',')
         self._flight_order.clear()
