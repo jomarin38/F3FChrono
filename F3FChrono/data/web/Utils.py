@@ -1,6 +1,6 @@
-import socket
 import requests
-from F3FChrono.chrono import ConfigReader
+from netifaces import AF_INET
+import netifaces as ni
 
 
 class Utils:
@@ -10,16 +10,22 @@ class Utils:
 
     @staticmethod
     def get_ip():
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        try:
-            # doesn't even have to be reachable
-            s.connect(('10.255.255.255', 1))
-            IP = s.getsockname()[0]
-        except:
-            IP = '127.0.0.1'
-        finally:
-            s.close()
-        return IP
+
+        interfaces = ni.interfaces()
+
+        if 'wlan1' in interfaces:
+            return ni.ifaddresses('wlan1')[AF_INET][0]['addr']
+        elif 'wlan0' in interfaces:
+            return ni.ifaddresses('wlan0')[AF_INET][0]['addr']
+        else:
+            #Probably not running on raspberry pi ... try to find working interface
+            for interface in interfaces:
+                if interface != 'lo':
+                    if AF_INET in ni.ifaddresses(interface):
+                        return ni.ifaddresses(interface)[AF_INET][0]['addr']
+
+        #return the loopback address if we did not find anything better
+        return '127.0.0.1'
 
     @staticmethod
     def set_port_number(port_number):
