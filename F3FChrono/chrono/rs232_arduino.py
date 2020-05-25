@@ -6,7 +6,7 @@ import time
 from PyQt5.QtCore import QObject, pyqtSignal
 import threading
 from F3FChrono.chrono import Chrono
-
+from F3FChrono.Utils import is_running_on_pi
 
 
 class rs232_arduino (QObject):
@@ -42,32 +42,11 @@ class rs232_arduino (QObject):
         self.__debug = False
 
     @staticmethod
-    def get_raspi_revision():
-        rev_file = '/sys/firmware/devicetree/base/model'
-        info = {'pi': '', 'model': '', 'rev': ''}
-        raspi = model = revision = ''
-        try:
-            fd = os.open(rev_file, os.O_RDONLY)
-            line = os.read(fd, 256)
-            os.close(fd)
-            print(line)
-            m = re.split(r'\s', line.decode('utf-8'))
-            if m:
-                info['pi'] = m[3]
-                info['model'] = m[5]
-            return info
-        except:
-            pass
-        return info
-
-    @staticmethod
     def get_serial_port():
-        info = rs232_arduino.get_raspi_revision()
-
-        if info['pi'] == '':
-            return '/dev/ttyUSB0'
-        else:
+        if is_running_on_pi():
             return '/dev/ttyS0'
+        else:
+            return '/dev/ttyUSB0'
 
     def slot_arduino_reset(self):
         self.set_RebundBtn(self.rebundTime)
