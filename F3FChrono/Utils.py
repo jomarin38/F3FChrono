@@ -1,4 +1,5 @@
-
+import os
+import re
 
 def get_raspi_revision():
     rev_file = '/sys/firmware/devicetree/base/model'
