@@ -66,7 +66,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.controllers['config'] = WConfigCtrl("panel Config", self.ui.centralwidget)
         self.controllers['round'] = WRoundCtrl("panel Chrono", self.ui.centralwidget, self.vocal.signal_elapsedTime)
-        self.controllers['training'] = WTrainingCtrl("panel Training", self.ui.centralwidget)
+        self.controllers['training'] = WTrainingCtrl("panel Training", self.ui.centralwidget,
+                                                     ConfigReader.config.conf['training_speech_interval'])
         self.controllers['settings'] = WSettings("panel Settings", self.ui.centralwidget)
         self.controllers['settingsadvanced'] = WSettingsAdvanced("panel SettingsAdvanced", self.ui.centralwidget)
         self.controllers['wind'] = WWindCtrl("panel Wind", self.ui.centralwidget)
