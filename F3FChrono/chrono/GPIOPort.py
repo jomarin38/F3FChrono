@@ -167,7 +167,7 @@ class rpi_gpio(QObject):
         self.signal_buzzer_next.connect(self.buzzer_next_fct)
         self.buzzer = None
         self.buzzer_next = None
-        if rpi != '':
+        if rpi:
             self.buzzer = gpioPort(ConfigReader.config.conf['buzzer'],
                                    duration=ConfigReader.config.conf['buzzer_duration'], start_blinks=2)
             self.buzzer_next = gpioPort(ConfigReader.config.conf['buzzer_next'],

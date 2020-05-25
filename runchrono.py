@@ -34,8 +34,7 @@ from F3FChrono.data.web.Utils import Utils
 def main():
 
     #logging.basicConfig (filename="runchrono.log", level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-    pi=get_raspi_revision()
-    if(pi['pi']!=''):
+    if is_running_on_pi():
         print("warm-up 2 seconds...")
         time.sleep(2.0)
 
@@ -60,7 +59,7 @@ def main():
 
 
     app = QtWidgets.QApplication(sys.argv)
-    ui = MainUiCtrl(dao, chronodata, rpi=pi['pi'], webserver_process=webserver_process)
+    ui = MainUiCtrl(dao, chronodata, rpi=is_running_on_pi(), webserver_process=webserver_process)
 
     if not os.path.isfile('voltage_log.txt'):
         MainUiCtrl.startup_time = time.time()
