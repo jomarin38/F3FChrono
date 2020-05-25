@@ -80,9 +80,9 @@ class WTrainingCtrl(QObject):
     btn_reset_sig = pyqtSignal()
     widgetList = []
 
-    def __init__(self, name, parent):
+    def __init__(self, name, parent, speech_interval):
         super().__init__()
-        self.wChronoCtrl = WChronoTrainingCtrl("TrainingCtrl", parent)
+        self.wChronoCtrl = WChronoTrainingCtrl("TrainingCtrl", parent, speech_interval)
         self.wBtnCtrl = Ui_WTrainingBtn()
         self.name = name
         self.parent = parent
@@ -400,7 +400,7 @@ class WChronoCtrl(QTimer):
 class WChronoTrainingCtrl(QObject):
     training_voice_sig = pyqtSignal(float)
 
-    def __init__(self, name, parent):
+    def __init__(self, name, parent, speech_interval):
         super().__init__()
 
         self.view = Ui_WTraining()
@@ -441,6 +441,8 @@ class WChronoTrainingCtrl(QObject):
         self.mean = 0.0
         self.max = 0.0
 
+        self.training_speech_interval = speech_interval
+
     def get_widget(self):
         return (self.widget)
 
@@ -476,7 +478,7 @@ class WChronoTrainingCtrl(QObject):
             for i in range(len(self.run_time)):
                 self.run[i].setText("{:d} : {:0>6.2f}".format(i + 1, self.run_time[i]))
 
-            if (lapcount - 10) / 2 % 5 == 0:
+            if (lapcount - 10) / 2 % self.training_speech_interval == 0:
                 self.training_voice_sig.emit(finaltime)
 
     def reset(self):

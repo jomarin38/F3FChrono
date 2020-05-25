@@ -69,7 +69,8 @@ default_config = \
     "Launched_time": 12000,
     "langage": "English",
     "voice_language": "French",
-    "voice_rate": 150
+    "voice_rate": 150,
+    "training_speech_interval": 2
 }
 
 def init():
