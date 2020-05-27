@@ -293,12 +293,15 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.daoEvent.update(self.event)
 
     def next_action(self):
-        self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
+        if self.controllers['round'].is_show():
+            self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
+        elif  self.controllers['training'].is_show():
+            self.controllers['training'].btn_reset()
+
         self.rpigpio.signal_buzzer_next.emit()
 
     def btn_next_action(self, port):
-        if self.controllers['round'].is_show() or self.controllers['training'].is_show():
-            self.next_action()
+        self.next_action()
 
     def handle_time_elapsed(self):
         print("time elapsed")
