@@ -18,12 +18,13 @@ class udpreceive(QThread):
     ipinvert_sig = pyqtSignal()
     ipset_sig = pyqtSignal(str, str)
 
-    def __init__(self, udpport, signal_chrono, signal_btnnext, signal_wind, signal_accu, signal_rssi):
+    def __init__(self, udpport, signal_chrono, signal_btnnext, signal_wind, signal_rain, signal_accu, signal_rssi):
         super().__init__()
         self.port = udpport
         self.event_chrono = signal_chrono
         self.event_btn_next = signal_btnnext
         self.event_wind = signal_wind
+        self.event_rain = signal_rain
         self.event_accu = signal_accu
         self.event_rssi = signal_rssi
         self.ipbaseA = ""
@@ -76,11 +77,14 @@ class udpreceive(QThread):
                     if m[2].lower()=="btnnext":
                         self.event_btn_next.emit(0)
 
-                elif (m[0]=='simulate' and m[1]=='weather'):
-                    self.event_wind.emit(int(m[3]), int(m[2]), bool(m[4] == 'True'))
-                elif (m[0] == 'simulate' and m[1] == 'info'):
-                    self.event_accu.emit(float(m[2]))
-                    self.event_rssi.emit(int(m[3]), int(m[4]))
+                elif m[0]=='wind':
+                    self.event_wind.emit(int(m[2]), int(m[1]))
+                elif m[0]=='rain':
+                    self.event_rain.emit(bool(m[1] == 'True'))
+
+                elif m[0] == 'info':
+                    self.event_accu.emit(float(m[1]))
+                    self.event_rssi.emit(int(m[2]), int(m[3]))
                 else:
                     base = address[0]
                     if base == self.ipbaseA:
