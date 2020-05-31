@@ -41,6 +41,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.signal_btnnext.connect(self.btn_next_action)
 
         self.chronoHard.wind_signal.connect(self.slot_wind_ui)
+        self.chronoHard.rain_signal.connect(self.slot_rain_ui)
         self.chronoHard.rssi_signal.connect(self.slot_rssi)
         self.chronoHard.accu_signal.connect(self.slot_accu)
         self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
@@ -113,7 +114,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.show_config()
         self.MainWindow.show()
         self.controllers['config'].set_contest(self.daoEvent.get_list())
-        self.controllers['wind'].set_data(0, 0, 0)
+        self.controllers['wind'].set_wind(0, 0)
+        self.controllers['wind'].set_rain(0)
 
     def show_config(self):
         self.controllers['round'].hide()
@@ -369,7 +371,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['config'].set_data(self.event)
 
     def slot_status_changed(self, status):
-        print ("slot status", status)
+        #print ("slot status", status)
         self.controllers['round'].wChronoCtrl.set_status(status)
         if (status==chronoStatus.WaitLaunch):
             self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False)
@@ -388,7 +390,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.vocal.signal_base.emit(lap)
 
     def slot_run_finished(self, run_time):
-        print("Main UI Controller slot run finished : ", time.time())
+        #print("Main UI Controller slot run finished : ", time.time())
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         self.controllers['round'].widget.update()
@@ -399,7 +401,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         print("slot altitude")
 
     def slot_run_validated(self):
-        print("run validated")
+        #print("run validated")
         self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
         self.event.get_current_round().handle_terminated_flight(
             self.event.get_current_round().get_current_competitor(),
@@ -433,12 +435,22 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['config'].piCamB_config=False
             self.controllers['config'].set_piCamB(address)
     '''
-    def slot_wind_ui(self, wind, angle, rain=False):
-        print("Wind UI")
-        self.controllers['wind'].set_data(wind, angle, rain)
-        self.controllers['wind'].check_rules(self.event.max_wind_dir_dev,\
-                                    self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,\
-                                    self.event.max_interruption_time)
+    def slot_wind_ui(self, wind, angle):
+        #print("Wind UI")
+        self.controllers['wind'].set_wind(wind, angle)
+        if self.event is not None:
+            self.controllers['wind'].check_rules(self.event.max_wind_dir_dev,\
+                                        self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,\
+                                        self.event.max_interruption_time)
+
+    def slot_rain_ui(self, rain=False):
+        #print("Rain UI")
+        self.controllers['wind'].set_rain(rain)
+        if self.event is not None:
+            self.controllers['wind'].check_rules(self.event.max_wind_dir_dev,\
+                                        self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,\
+                                        self.event.max_interruption_time)
+
 
     def slot_accu(self, voltage):
         self.controllers['wind'].set_voltage(voltage)

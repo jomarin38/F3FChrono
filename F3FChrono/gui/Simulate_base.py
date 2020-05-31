@@ -52,8 +52,9 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
             self.timerEvent.stop()
 
     def run(self):
-        self.udpbeep.sendData("simulate weather " + str(self.ui.wind_dir.value()) + " " + \
-                              str(self.ui.wind_speed.value()) + " " + str(self.ui.rain.isChecked()))
+        self.udpbeep.sendData("wind " + str(self.ui.wind_dir.value()) + " " + \
+                              str(self.ui.wind_speed.value()))
+        self.udpbeep.sendData("rain " + str(self.ui.rain.isChecked()))
         self.udpbeep.sendData("simulate info " + str(self.ui.AccuRace.value()) + " " + \
                               str(self.ui.rssi_picam1.value()) + " " + str(self.ui.rssi_picam2.value()))
 

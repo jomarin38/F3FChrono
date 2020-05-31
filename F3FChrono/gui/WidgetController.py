@@ -158,15 +158,24 @@ class WWindCtrl():
     def hide(self):
         self.widget.hide()
 
-    def set_data(self, speed, angle, rain):
-        if rain:
+    def set_wind(self, speed, angle):
+        self.rules['dir'] = angle
+        self.rules['speed'] = speed
+        self.__set_data()
+
+    def set_rain(self, rain):
+        self.rules['rain'] = rain
+        self.__set_data()
+
+    def __set_data(self):
+        if self.rules['rain']:
             strrain = self._translate("Rain", "Rain")
         else:
             strrain = self._translate("No Rain", "No Rain")
-        self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + str(speed) + self._translate("m/s, Angle : ", "m/s, Angle : ") + str(angle) + '°' + ', ' + strrain)
-        self.rules['dir'] = angle
-        self.rules['speed'] = speed
-        self.rules['rain'] = rain
+        self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + str(self.rules['speed']) +
+                                   self._translate("m/s, Angle : ", "m/s, Angle : ") + str(self.rules['dir'])
+                                   + '°' + ', ' + strrain)
+
 
     def check_rules(self, limit_angle, speed_min, speed_max, time_limit):
         if abs(self.rules['dir']) > limit_angle or self.rules['speed'] < speed_min or self.rules['speed'] > speed_max \
