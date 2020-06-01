@@ -58,9 +58,10 @@ class chronoQSound(QThread):
             for index in range(11):
                 self.soundbase.append(QSound(lap_pathname+'/base'+str(index)+'.wav'))
         self.entry = None
-        if not buzzer:
+        '''if not buzzer:
             self.entry = QSound(pathname+'/entry.wav')
-
+        '''
+        self.entry = QSound(pathname+'/instart.wav')
         self.penalty = QSound(pathname+'/penalty.wav')
 
         self.elapsedtime['30s'] = QSound(pathname+'/start/30s.wav')
@@ -100,6 +101,8 @@ class chronoQSound(QThread):
     def sound_entry(self):
         if self.play_sound and self.entry is not None:
             self.entry.play()
+
+
 
     def sound_penalty(self):
         if self.play_sound:
