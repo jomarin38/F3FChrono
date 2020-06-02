@@ -90,7 +90,7 @@ class chronoQSound(QThread):
 
     def pilot(self, first_name, name):
         if self.play_voice:
-            self.voice_engine.say("Wait competitor " + first_name + " " + name)
+            self.voice_engine.say("Next pilot : " + first_name + " " + name)
             self.start()
 
     def run(self):
