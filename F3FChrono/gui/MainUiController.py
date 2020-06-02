@@ -221,6 +221,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                                                                                                 visited_competitors=[]),
                                                       self.event.get_current_round())
         self.controllers['round'].wChronoCtrl.reset_ui()
+        pilot=self.event.get_current_round().get_current_competitor().pilot
+        self.vocal.signal_pilotname.emit(pilot.first_name, pilot.name)
 
     def refly(self):
         #TODO : get penalty value if any
@@ -266,6 +268,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 current_competitor = self.event.get_current_round().next_pilot()
             self.controllers['round'].wPilotCtrl.set_data(current_competitor,
                                                           self.event.get_current_round())
+            self.vocal.signal_pilotname.emit(current_competitor.pilot.first_name, current_competitor.pilot.name)
             self.chronoHard.set_mode(training=False)
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
             self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False)

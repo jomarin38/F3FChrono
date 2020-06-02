@@ -10,6 +10,7 @@ from F3FChrono.chrono import ConfigReader
 import pyttsx3
 
 
+
 class chronoQSound(QThread):
     signal_penalty = pyqtSignal()
     signal_base = pyqtSignal(int)
@@ -17,6 +18,7 @@ class chronoQSound(QThread):
     signal_time = pyqtSignal(float)
     signal_elapsedTime = pyqtSignal(str)
     signal_start = pyqtSignal(int)
+    signal_pilotname = pyqtSignal(str, str)
 
 
     def __init__(self, langage, playsound, playvoice, voicerate, buzzer):
@@ -31,12 +33,15 @@ class chronoQSound(QThread):
         self.signal_base.connect(self.sound_base)
         self.signal_time.connect(self.sound_time)
         self.signal_penalty.connect(self.sound_penalty)
+        self.signal_pilotname.connect(self.pilot)
         self.soundstart_run = False
         self.voice_engine = pyttsx3.init()
         self.voice_engine.setProperty('rate', voicerate)
         self.voice_engine.setProperty('volume', 1)
 
         self.voice_engine.connect('finished-utterance', self.onVoiceEnd)
+        self.voice_engine.setProperty('voice', "english")
+
         #self.voices = self.voice_engine.getProperty('voices')
         #self.voice_engine.setProperty('voice', self.voices[26].id)
 
@@ -58,9 +63,10 @@ class chronoQSound(QThread):
             for index in range(11):
                 self.soundbase.append(QSound(lap_pathname+'/base'+str(index)+'.wav'))
         self.entry = None
-        if not buzzer:
+        '''if not buzzer:
             self.entry = QSound(pathname+'/entry.wav')
-
+        '''
+        self.entry = QSound(pathname+'/instart.wav')
         self.penalty = QSound(pathname+'/penalty.wav')
 
         self.elapsedtime['30s'] = QSound(pathname+'/start/30s.wav')
@@ -79,11 +85,13 @@ class chronoQSound(QThread):
 
     def sound_time(self, run_time):
         if (self.play_voice):
-            self.voice_engine.setProperty('voice', "english")
-            #self.voice_engine.setProperty('voice', "french")
             self.voice_engine.say("{:0>.2f}".format(run_time))
             self.start()
 
+    def pilot(self, first_name, name):
+        if self.play_voice:
+            self.voice_engine.say("Next pilot : " + first_name + " " + name)
+            self.start()
 
     def run(self):
         self.voice_engine.startLoop()
@@ -100,6 +108,8 @@ class chronoQSound(QThread):
     def sound_entry(self):
         if self.play_sound and self.entry is not None:
             self.entry.play()
+
+
 
     def sound_penalty(self):
         if self.play_sound:
