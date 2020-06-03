@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="fr_FR" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.1" language="fr_FR">
 <context>
     <name>BIB : </name>
     <message>
@@ -43,7 +44,7 @@
 <context>
     <name>None</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="704"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="708"/>
         <source>None</source>
         <translation>Aucun</translation>
     </message>
@@ -260,7 +261,7 @@
     </message>
     <message>
         <location filename="../F3FChrono/gui/WConfig_ui.py" line="192"/>
-        <source>Orientation (&#xc2;&#xb0;)</source>
+        <source>Orientation (Â°)</source>
         <translation>Dir vent (°)</translation>
     </message>
     <message>
@@ -447,64 +448,74 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>WSettingsAdvanced</name>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="154"/>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="166"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="155"/>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="167"/>
         <source>Advanced Settings</source>
         <translation>Configuration avancée</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="156"/>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="168"/>
         <source>Button Base B</source>
         <translation>Bouton base B</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="157"/>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="169"/>
         <source>Buzzer</source>
         <translation>Buzzer</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="158"/>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="170"/>
         <source>UDP Port</source>
         <translation>Port UDP</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="159"/>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="171"/>
         <source>Button Base A</source>
         <translation>Bouton base A</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="160"/>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="172"/>
         <source>Button Next</source>
         <translation>Bouton Next</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="161"/>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="173"/>
         <source>Led A</source>
         <translation>Led A</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="162"/>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="174"/>
         <source>Led B</source>
         <translation>Led B</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="163"/>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="175"/>
         <source>Buzzer Next</source>
         <translation>Buzzert Next</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="165"/>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="177"/>
         <source>duration (ms)</source>
         <translation>durée (ms)</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="166"/>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="180"/>
         <source>Back to Settings</source>
         <translation>retour configuration</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="178"/>
+        <source>Noise Sound</source>
+        <translation>Bruit pour enceinte</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettingsAdvanced_ui.py" line="179"/>
+        <source>Noise Volume</source>
+        <translation>Volume bruit</translation>
     </message>
 </context>
 <context>
@@ -632,7 +643,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../F3FChrono/gui/WWind_ui.py" line="92"/>
-        <source>Wind : 6.2m/s, 10&#xc2;&#xb0;, No rain</source>
+        <source>Wind : 6.2m/s, 10Â°, No rain</source>
         <translation>Vent : 6.2m/s, 10°, pas pluie</translation>
     </message>
     <message>
