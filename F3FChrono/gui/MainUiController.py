@@ -29,6 +29,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.vocal = chronoQSound(ConfigReader.config.conf['voice_language'], ConfigReader.config.conf['sound'],
                                   ConfigReader.config.conf['voice'], ConfigReader.config.conf['voice_rate'],
                                   ConfigReader.config.conf['buzzer_valid'])
+        self.noise = noiseGenerator(ConfigReader.config.conf['noisesound'], ConfigReader.config.conf['noisevolume'])
 
         if ConfigReader.config.conf['language'] == "French":
             _translator = QtCore.QTranslator()
@@ -199,10 +200,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settingsadvanced'].get_data()
         ConfigReader.config.write('config.json')
         self.show_config()
-        self.vocal.loadwav(ConfigReader.config.conf['langage'],
-                           ConfigReader.config.conf['sound'],
-                           ConfigReader.config.conf['voice'],
-                           ConfigReader.config.conf['buzzer_valid'])
+        self.vocal.settings(ConfigReader.config.conf['sound'],
+                           ConfigReader.config.conf['voice'])
+        self.noise.settings(ConfigReader.config.conf['noisesound'],
+                           ConfigReader.config.conf['noisevolume'])
         self.chronoHard.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
 
     def home_action(self):
@@ -211,10 +212,12 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.vocal.stop_all()
         self.show_config()
         self.set_signal_mode(training=None)
+        self.noise.stop()
 
     def home_training(self):
         self.show_config()
         self.set_signal_mode(training=None)
+        self.noise.stop()
 
     def next_pilot(self, insert_database=False):
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot(insert_database,
@@ -257,6 +260,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.chronoHard.reset()
         self.chronodata.reset()
+        self.noise.start()
 
         eventData = self.controllers['config'].view.ContestList.currentData()
         if eventData is not None:

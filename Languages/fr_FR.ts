@@ -3,7 +3,7 @@
 <context>
     <name>BIB : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="248"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="257"/>
         <source>BIB : </source>
         <translation>Dossard : </translation>
     </message>
@@ -11,7 +11,7 @@
 <context>
     <name>Max : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="487"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="498"/>
         <source>Max : </source>
         <translation>Max : </translation>
     </message>
@@ -19,7 +19,7 @@
 <context>
     <name>Mean : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="486"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="497"/>
         <source>Mean : </source>
         <translation>Moyenne : </translation>
     </message>
@@ -27,7 +27,7 @@
 <context>
     <name>Min : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="485"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="496"/>
         <source>Min : </source>
         <translation>Min : </translation>
     </message>
@@ -35,7 +35,7 @@
 <context>
     <name>No Rain</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="165"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="174"/>
         <source>No Rain</source>
         <translation>Soleil</translation>
     </message>
@@ -43,7 +43,7 @@
 <context>
     <name>None</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="693"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="704"/>
         <source>None</source>
         <translation>Aucun</translation>
     </message>
@@ -51,7 +51,7 @@
 <context>
     <name>Null Flight</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="395"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="404"/>
         <source>Null Flight</source>
         <translation>Vol Null</translation>
     </message>
@@ -59,7 +59,7 @@
 <context>
     <name>Rain</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="163"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="172"/>
         <source>Rain</source>
         <translation>Pluie</translation>
     </message>
@@ -67,7 +67,7 @@
 <context>
     <name>Round : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="249"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="258"/>
         <source>Round : </source>
         <translation>Manche : </translation>
     </message>
@@ -75,7 +75,7 @@
 <context>
     <name>Total Laps : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="488"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="499"/>
         <source>Total Laps : </source>
         <translation>Nbre tours : </translation>
     </message>
@@ -654,7 +654,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>Wind : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="166"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="175"/>
         <source>Wind : </source>
         <translation>Vent : </translation>
     </message>
@@ -662,7 +662,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>chronoStatus_Finished</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="422"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="431"/>
         <source>Finished</source>
         <translation>Terminé</translation>
     </message>
@@ -670,7 +670,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>chronoStatus_I30s_reached</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="418"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="427"/>
         <source>In Start 30s reached</source>
         <translation>Au départ +30s</translation>
     </message>
@@ -678,7 +678,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>chronoStatus_InProgress</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="420"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="429"/>
         <source>In Progress</source>
         <translation>En cours</translation>
     </message>
@@ -686,7 +686,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>chronoStatus_InStart</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="417"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="426"/>
         <source>In Start</source>
         <translation>Au départ</translation>
     </message>
@@ -694,7 +694,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>chronoStatus_L30s_reached</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="416"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="425"/>
         <source>30s reached</source>
         <translation>30s dépassé</translation>
     </message>
@@ -702,7 +702,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>chronoStatus_Launched</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="415"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="424"/>
         <source>Launched</source>
         <translation>Lancé</translation>
     </message>
@@ -710,7 +710,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>chronoStatus_WaitAltitude</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="421"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="430"/>
         <source>Wait Altitude</source>
         <translation>Attente Altitude</translation>
     </message>
@@ -718,7 +718,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>chronoStatus_WaitNewRun</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="413"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="422"/>
         <source>Wait New Run</source>
         <translation>Attente nouveau run</translation>
     </message>
@@ -726,7 +726,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>chronoStatus_WaitToLaunch</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="414"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="423"/>
         <source>Wait To Launch</source>
         <translation>Attente lancé</translation>
     </message>
@@ -734,7 +734,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>contest_training</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="549"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="560"/>
         <source>Training</source>
         <translation>Entrainement</translation>
     </message>
@@ -742,7 +742,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>m/s, Angle : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="166"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="175"/>
         <source>m/s, Angle : </source>
         <translation>m/s, Angle : </translation>
     </message>
@@ -750,7 +750,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>time : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="187"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="196"/>
         <source>time : </source>
         <translation>temps : </translation>
     </message>
