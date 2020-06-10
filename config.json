@@ -14,7 +14,6 @@
  "buzzer_valid": true,
  "fullscreen": true,
  "i2c_refresh": 100,
- "langage": "French",
  "language": "French",
  "ledA": 20,
  "ledB": 26,
