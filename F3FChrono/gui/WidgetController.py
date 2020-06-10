@@ -612,6 +612,8 @@ class WSettingsAdvanced(QObject):
         self.view.port_buzzer_next.setValue(ConfigReader.config.conf['buzzer_next'])
         self.view.buzzer_next_duration.setValue(ConfigReader.config.conf['buzzer_next_duration'])
         self.view.udp_port.setValue(ConfigReader.config.conf['udpport'])
+        self.view.noiseSound.setChecked(ConfigReader.config.conf['noisesound'])
+        self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume'])
 
     def get_data(self):
         ConfigReader.config.conf['btn_baseA'] = self.view.port_btn_baseA.value()
@@ -624,6 +626,8 @@ class WSettingsAdvanced(QObject):
         ConfigReader.config.conf['buzzer_next'] = self.view.port_buzzer_next.value()
         ConfigReader.config.conf['buzzer_next_duration'] = self.view.buzzer_next_duration.value()
         ConfigReader.config.conf['udpport'] = self.view.udp_port.value()
+        ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
+        ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()
 
 
 class WSettings(QObject):

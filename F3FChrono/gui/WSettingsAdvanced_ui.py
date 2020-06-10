@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_WSettingsAdvanced(object):
     def setupUi(self, WSettingsAdvanced):
         WSettingsAdvanced.setObjectName("WSettingsAdvanced")
-        WSettingsAdvanced.resize(480, 268)
+        WSettingsAdvanced.resize(480, 270)
         self.gridLayout = QtWidgets.QGridLayout(WSettingsAdvanced)
         self.gridLayout.setContentsMargins(-1, 3, -1, 3)
         self.gridLayout.setObjectName("gridLayout")
@@ -126,6 +126,19 @@ class Ui_WSettingsAdvanced(object):
         self.label_19.setObjectName("label_19")
         self.horizontalLayout_21.addWidget(self.label_19)
         self.gridLayout_2.addLayout(self.horizontalLayout_21, 1, 1, 1, 1)
+        self.noiseSound = QtWidgets.QCheckBox(WSettingsAdvanced)
+        self.noiseSound.setObjectName("noiseSound")
+        self.gridLayout_2.addWidget(self.noiseSound, 5, 0, 1, 1)
+        self.horizontalLayout_24 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_24.setObjectName("horizontalLayout_24")
+        self.noisevolume = QtWidgets.QDoubleSpinBox(WSettingsAdvanced)
+        self.noisevolume.setDecimals(3)
+        self.noisevolume.setObjectName("noisevolume")
+        self.horizontalLayout_24.addWidget(self.noisevolume)
+        self.label_22 = QtWidgets.QLabel(WSettingsAdvanced)
+        self.label_22.setObjectName("label_22")
+        self.horizontalLayout_24.addWidget(self.label_22)
+        self.gridLayout_2.addLayout(self.horizontalLayout_24, 5, 1, 1, 1)
         self.verticalLayout.addLayout(self.gridLayout_2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -146,8 +159,7 @@ class Ui_WSettingsAdvanced(object):
         WSettingsAdvanced.setTabOrder(self.port_ledB, self.port_btn_next)
         WSettingsAdvanced.setTabOrder(self.port_btn_next, self.port_btn_baseA)
         WSettingsAdvanced.setTabOrder(self.port_btn_baseA, self.udp_port)
-        WSettingsAdvanced.setTabOrder(self.udp_port, self.port_btn_baseB)
-        WSettingsAdvanced.setTabOrder(self.port_btn_baseB, self.btn_back)
+        WSettingsAdvanced.setTabOrder(self.udp_port, self.btn_back)
 
     def retranslateUi(self, WSettingsAdvanced):
         _translate = QtCore.QCoreApplication.translate
@@ -163,6 +175,8 @@ class Ui_WSettingsAdvanced(object):
         self.label_6.setText(_translate("WSettingsAdvanced", "Buzzer Next"))
         self.label_18.setText(_translate("WSettingsAdvanced", "duration (ms)"))
         self.label_19.setText(_translate("WSettingsAdvanced", "duration (ms)"))
+        self.noiseSound.setText(_translate("WSettingsAdvanced", "Noise Sound"))
+        self.label_22.setText(_translate("WSettingsAdvanced", "Noise Volume"))
         self.btn_back.setText(_translate("WSettingsAdvanced", "Back to Settings"))
 
 

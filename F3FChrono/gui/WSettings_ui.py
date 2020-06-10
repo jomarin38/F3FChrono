@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_WSettings(object):
     def setupUi(self, WSettings):
         WSettings.setObjectName("WSettings")
-        WSettings.resize(480, 268)
+        WSettings.resize(480, 271)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)

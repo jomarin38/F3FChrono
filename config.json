@@ -18,6 +18,8 @@
  "language": "French",
  "ledA": 20,
  "ledB": 26,
+ "noisesound": true,
+ "noisevolume": 0.005,
  "rebound_btn_time": 200,
  "run_webserver": true,
  "simulatemode": false,

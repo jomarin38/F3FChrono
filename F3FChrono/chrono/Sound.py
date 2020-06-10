@@ -4,8 +4,8 @@ import sys
 import platform
 import collections
 from F3FChrono.chrono import ConfigReader
-from PyQt5.QtCore import pyqtSignal, QObject, QThread, QCoreApplication
-from PyQt5.QtMultimedia import QSound
+from PyQt5.QtCore import pyqtSignal, QObject, QThread, QCoreApplication, QUrl
+from PyQt5.QtMultimedia import QSound, QSoundEffect
 from F3FChrono.chrono import ConfigReader
 import pyttsx3
 
@@ -27,7 +27,8 @@ class chronoQSound(QThread):
 
         self.elapsedtime = collections.OrderedDict()
         self.elapsedtime_play = collections.OrderedDict()
-        self.loadwav(langage, playsound, playvoice, buzzer)
+        self.settings(playsound, playvoice)
+        self.loadwav(langage, buzzer)
         self.signal_elapsedTime.connect(self.sound_elapsedTime)
         self.signal_entry.connect(self.sound_entry)
         self.signal_base.connect(self.sound_base)
@@ -46,10 +47,11 @@ class chronoQSound(QThread):
         #self.voice_engine.setProperty('voice', self.voices[26].id)
 
 
-
-    def loadwav(self, langage, playsound, playvoice, buzzer):
+    def settings(self, playsound, playvoice):
         self.play_sound = playsound
         self.play_voice = playvoice
+
+    def loadwav(self, langage, buzzer):
         pathname = os.path.dirname(os.path.realpath('Languages/'+langage+'/base0.wav'))
         lap_pathname = pathname + '/laps_beep'
         self.soundbase.clear()
@@ -75,7 +77,6 @@ class chronoQSound(QThread):
         self.elapsedtime['15s'] = QSound(pathname+'/start/15s.wav')
         self.elapsedtime['10s'] = QSound(pathname+'/start/10s.wav')
         self.elapsedtime['all'] = QSound(pathname+'/start/startall.wav')
-
 
     '''
     def sound_time(self, run_time):
@@ -137,6 +138,28 @@ class chronoQSound(QThread):
             if sound is not None:
                 sound.stop()
 
+
+class noiseGenerator(QThread):
+
+    def __init__(self, playnoise, volume):
+        super().__init__()
+        pathname = os.path.dirname(os.path.realpath('F3FChrono/chrono/whitenoise.wav'))
+        self.sound = QSoundEffect()
+        self.sound.setSource(QUrl.fromLocalFile(pathname + '/whitenoise.wav'))
+
+        self.sound.setLoopCount(QSoundEffect.Infinite)
+        self.settings(playnoise, volume)
+
+    def settings(self, playnoise, volume):
+        self.playnoise = playnoise
+        self.sound.setVolume(volume)
+
+    def run(self):
+        if self.playnoise:
+            self.sound.play()
+
+    def stop(self):
+        self.sound.stop()
 
 if __name__ == '__main__':
     app = QCoreApplication(sys.argv)

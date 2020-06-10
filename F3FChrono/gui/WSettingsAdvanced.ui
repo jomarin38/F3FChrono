@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>268</height>
+    <height>270</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -197,6 +197,31 @@
          </item>
         </layout>
        </item>
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="noiseSound">
+         <property name="text">
+          <string>Noise Sound</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_24">
+         <item>
+          <widget class="QDoubleSpinBox" name="noisevolume">
+           <property name="decimals">
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_22">
+           <property name="text">
+            <string>Noise Volume</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </item>
      <item>
@@ -227,7 +252,6 @@
   <tabstop>port_btn_next</tabstop>
   <tabstop>port_btn_baseA</tabstop>
   <tabstop>udp_port</tabstop>
-  <tabstop>port_btn_baseB</tabstop>
   <tabstop>btn_back</tabstop>
  </tabstops>
  <resources/>
