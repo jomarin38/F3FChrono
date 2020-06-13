@@ -8,8 +8,7 @@
 
 
 // buffers for receiving and sending data
-char packetBuffer[UDP_TX_PACKET_MAX_SIZE + 1]; //buffer to hold incoming packet,
-char  message[] = "simulate GPIO btnnext\r\n";       // a string to send back
+char  message[] = "simulate GPIO btnnext\r\n";       // a string to send
 
 char remoteIP[] = "255.255.255.255";
 int remotePort = 4445;
