@@ -67,7 +67,7 @@ default_config = \
     "rebound_btn_time": 500, #time in ms
     "Launch_time": 12000,
     "Launched_time": 12000,
-    "langage": "English",
+    "language": "English",
     "voice_language": "French",
     "voice_rate": 150,
     "training_speech_interval": 2,
