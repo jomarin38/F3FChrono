@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WSettings</class>
- <widget class="QWidget" name="WSettings">
+ <class>WSettingsBase</class>
+ <widget class="QWidget" name="WSettingsBase">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -52,7 +52,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Settings</string>
+          <string>Base Settings</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -66,122 +66,96 @@
        <property name="verticalSpacing">
         <number>2</number>
        </property>
+       <item row="0" column="0">
+        <widget class="QPushButton" name="wbase_detect_btn">
+         <property name="text">
+          <string>Detect</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="baseB_label">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>2</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Base B : </string>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="1">
-        <widget class="QComboBox" name="comboBox">
-         <item>
-          <property name="text">
-           <string>Competition</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Training</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="QPushButton" name="btn_sound_settings">
+        <widget class="QPushButton" name="buttonClearB">
          <property name="text">
-          <string>Sound &amp;&amp; Voice Settings</string>
+          <string>Clear</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
-        <widget class="QPushButton" name="closebtn">
+       <item row="3" column="0">
+        <widget class="QPushButton" name="buttonClearA">
          <property name="text">
-          <string>Close Race Management</string>
+          <string>Clear</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="QCheckBox" name="webserver">
+       <item row="1" column="0">
+        <widget class="QLabel" name="baseA_label">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>2</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
-          <string>WebServer</string>
+          <string>Base A : </string>
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
-        <widget class="QPushButton" name="btn_advanced_settings">
+       <item row="0" column="1">
+        <widget class="QPushButton" name="wbase_detect_btn_2">
          <property name="text">
-          <string>Advanced Settings</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QLabel" name="webserverUrl">
-         <property name="text">
-          <string>Not started</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QPushButton" name="btn_base_settings">
-         <property name="text">
-          <string>Base Settings</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Langage</string>
+          <string>Detect</string>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QComboBox" name="language">
-         <item>
-          <property name="text">
-           <string>French</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>English</string>
-          </property>
-         </item>
-        </widget>
+        <widget class="QListWidget" name="listWidget_baseB"/>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_2">
+       <item row="2" column="0">
+        <widget class="QListWidget" name="listWidget_baseA"/>
+       </item>
+       <item row="4" column="0" colspan="2">
+        <widget class="QPushButton" name="buttonInvert">
          <property name="text">
-          <string>Mode</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0" colspan="2">
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QCheckBox" name="fullscreen">
-         <property name="text">
-          <string>FullScreen</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QCheckBox" name="simulate_mode">
-         <property name="text">
-          <string>Simulate Mode</string>
+          <string>Invert</string>
          </property>
         </widget>
        </item>
       </layout>
      </item>
      <item>
-      <widget class="Line" name="line_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="btn_back">
+         <property name="text">
+          <string>Back to Settings</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QPushButton" name="btn_cancel">
          <property name="text">
@@ -208,6 +182,7 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>btn_back</tabstop>
   <tabstop>btn_cancel</tabstop>
   <tabstop>btn_valid</tabstop>
  </tabstops>

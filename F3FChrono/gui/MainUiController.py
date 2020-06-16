@@ -72,6 +72,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                                                      ConfigReader.config.conf['training_speech_interval'])
         self.controllers['settings'] = WSettings("panel Settings", self.ui.centralwidget)
         self.controllers['settingsadvanced'] = WSettingsAdvanced("panel SettingsAdvanced", self.ui.centralwidget)
+        self.controllers['settingsbase'] = WSettingsBase("panel SettingsBase", self.ui.centralwidget)
+        self.controllers['settingssound'] = WSettingsSound("panel SettingsSound", self.ui.centralwidget)
         self.controllers['wind'] = WWindCtrl("panel Wind", self.ui.centralwidget)
 
         for key, ctrl in self.controllers.items():
@@ -103,11 +105,16 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].btn_cancel_sig.connect(self.show_config)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
         self.controllers['settings'].btn_quitapp_sig.connect(self.shutdown_app)
-        self.controllers['settings'].set_udp_sig(self.chronoHard.chrono_signal,
+        self.controllers['settings'].btn_settingsbase_sig.connect(self.show_settingsbase)
+        self.controllers['settings'].btn_settingssound_sig.connect(self.show_settingssound)
+
+        self.controllers['settingsbase'].set_udp_sig(self.chronoHard.chrono_signal,
                                                  self.chronoHard.udpReceive.ipset_sig,
                                                  self.chronoHard.udpReceive.ipbaseclear_sig,
                                                  self.chronoHard.udpReceive.ipinvert_sig)
         self.controllers['settingsadvanced'].btn_settings_sig.connect(self.show_settings)
+        self.controllers['settingsbase'].btn_settings_sig.connect(self.show_settings)
+        self.controllers['settingssound'].btn_settings_sig.connect(self.show_settings)
         self.controllers['training'].btn_reset_sig.connect(self.chronoHard.arduino.reset_training)
         self.controllers['training'].btn_home_sig.connect(self.home_training)
         self.controllers['training'].btn_next_sig.connect(self.next_action)
@@ -123,6 +130,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['training'].hide()
         self.controllers['settings'].hide()
         self.controllers['settingsadvanced'].hide()
+        self.controllers['settingsbase'].hide()
+        self.controllers['settingssound'].hide()
         self.controllers['config'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
@@ -132,6 +141,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].hide()
         self.controllers['settings'].hide()
         self.controllers['settingsadvanced'].hide()
+        self.controllers['settingsbase'].hide()
+        self.controllers['settingssound'].hide()
         self.controllers['round'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
@@ -141,6 +152,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].hide()
         self.controllers['settingsadvanced'].hide()
         self.controllers['round'].hide()
+        self.controllers['settingsbase'].hide()
+        self.controllers['settingssound'].hide()
         self.controllers['settings'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
@@ -151,6 +164,30 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].hide()
         self.controllers['round'].hide()
         self.controllers['settingsadvanced'].show()
+        self.controllers['settingsbase'].hide()
+        self.controllers['settingssound'].hide()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
+
+    def show_settingsbase(self):
+        self.controllers['training'].hide()
+        self.controllers['config'].hide()
+        self.controllers['settings'].hide()
+        self.controllers['round'].hide()
+        self.controllers['settingsadvanced'].hide()
+        self.controllers['settingsbase'].show()
+        self.controllers['settingssound'].hide()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
+
+    def show_settingssound(self):
+        self.controllers['training'].hide()
+        self.controllers['config'].hide()
+        self.controllers['settings'].hide()
+        self.controllers['round'].hide()
+        self.controllers['settingsadvanced'].hide()
+        self.controllers['settingsbase'].hide()
+        self.controllers['settingssound'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
@@ -160,6 +197,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].hide()
         self.controllers['round'].hide()
         self.controllers['settingsadvanced'].hide()
+        self.controllers['settingsbase'].hide()
+        self.controllers['settingssound'].hide()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 

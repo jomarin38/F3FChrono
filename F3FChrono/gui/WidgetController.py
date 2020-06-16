@@ -14,6 +14,9 @@ from F3FChrono.gui.WTrainingBtn_ui import Ui_WTrainingBtn
 from F3FChrono.gui.WConfig_ui import Ui_WConfig
 from F3FChrono.gui.WSettings_ui import Ui_WSettings
 from F3FChrono.gui.WSettingsAdvanced_ui import Ui_WSettingsAdvanced
+from F3FChrono.gui.WSettingsBase_ui import Ui_WSettingsBase
+from F3FChrono.gui.WSettingsBase_item_ui import Ui_WSettingBase_item
+from F3FChrono.gui.WSettingsSound_ui import Ui_WSettingsSound
 from F3FChrono.gui.WPicamPair_ui import Ui_WPicamPair
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.web.Utils import Utils
@@ -612,8 +615,7 @@ class WSettingsAdvanced(QObject):
         self.view.port_buzzer_next.setValue(ConfigReader.config.conf['buzzer_next'])
         self.view.buzzer_next_duration.setValue(ConfigReader.config.conf['buzzer_next_duration'])
         self.view.udp_port.setValue(ConfigReader.config.conf['udpport'])
-        self.view.noiseSound.setChecked(ConfigReader.config.conf['noisesound'])
-        self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume'])
+        self.view.voltagemin.setValue(ConfigReader.config.conf['voltage_min'])
 
     def get_data(self):
         ConfigReader.config.conf['btn_baseA'] = self.view.port_btn_baseA.value()
@@ -626,44 +628,53 @@ class WSettingsAdvanced(QObject):
         ConfigReader.config.conf['buzzer_next'] = self.view.port_buzzer_next.value()
         ConfigReader.config.conf['buzzer_next_duration'] = self.view.buzzer_next_duration.value()
         ConfigReader.config.conf['udpport'] = self.view.udp_port.value()
-        ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
-        ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()
+        ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
 
 
-class WSettings(QObject):
-    btn_settingsadvanced_sig = pyqtSignal()
-    btn_cancel_sig = pyqtSignal()
-    btn_valid_sig = pyqtSignal()
-    btn_quitapp_sig = pyqtSignal()
+class WSettingsBase(QObject):
+    btn_settings_sig = pyqtSignal()
     widgetList = []
+    baseAList = []
+    baseBList = []
+    viewbaseAList = []
+    viewbaseBList = []
+    widgetBaseList = []
 
     def __init__(self, name, parent):
         super().__init__()
-        self.view = Ui_WSettings()
+        self.view = Ui_WSettingsBase()
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
-        self._translate = QtCore.QCoreApplication.translate
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
-        self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
-        self.view.wbase_detect_btn.clicked.connect(self.base_detect)
-        self.view.wbase_invert_btn.clicked.connect(self.base_invert)
-        self.view.btn_cancel.clicked.connect(self.btn_cancel)
-        self.view.btn_valid.clicked.connect(self.btn_valid)
-        self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
+        self.view.btn_back.clicked.connect(self.btn_settings_sig.emit)
+        self._translate = QtCore.QCoreApplication.translate
         self.udp_sig = None
         self.ipset_sig = None
         self.ipbaseclear_sig = None
         self.udp_sig_connected = False
         self.ipbaseinvert_sig = None
-
+        for i in range(3):
+            self.baseAList.append(QtWidgets.QListWidgetItem())
+            self.view.listWidget_baseA.addItem(self.baseAList[-1])
+            self.widgetBaseList.append(QtWidgets.QWidget())
+            self.viewbaseAList.append(Ui_WSettingBase_item())
+            self.viewbaseAList[-1].setupUi(self.widgetBaseList[-1])
+            self.viewbaseAList[-1].label.setText("192.168.1."+str(i+20))
+            self.view.listWidget_baseA.setItemWidget(self.baseAList[-1], self.widgetBaseList[-1])
+        for i in range(5):
+            self.baseBList.append(QtWidgets.QListWidgetItem())
+            self.view.listWidget_baseB.addItem(self.baseBList[-1])
+            self.widgetBaseList.append(QtWidgets.QWidget())
+            self.viewbaseBList.append(Ui_WSettingBase_item())
+            self.viewbaseBList[-1].setupUi(self.widgetBaseList[-1])
+            self.viewbaseBList[-1].label.setText("192.168.1."+str(i+50))
+            self.view.listWidget_baseB.setItemWidget(self.baseBList[-1], self.widgetBaseList[-1])
     def get_widget(self):
         return (self.widgetList)
 
     def show(self):
-        if Utils.server_alive():
-            self.view.webserverUrl.setText(Utils.get_base_url())
         self.widget.show()
 
     def is_show(self):
@@ -673,48 +684,10 @@ class WSettings(QObject):
         self.widget.hide()
 
     def set_data(self):
-        self.view.sound.setChecked(ConfigReader.config.conf['sound'])
-        self.view.voice.setChecked(ConfigReader.config.conf['voice'])
-        self.view.anemometer.setChecked(ConfigReader.config.conf['anemometer'])
-        self.view.arduino.setChecked(ConfigReader.config.conf['arduino'])
-        self.view.simulate_mode.setChecked(ConfigReader.config.conf['simulatemode'])
-        self.view.voltagemin.setValue(ConfigReader.config.conf['voltage_min'])
-        self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
-        self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
-        self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
-        self.view.webserver.setChecked(ConfigReader.config.conf['run_webserver'])
+        print("todo")
 
     def get_data(self):
-        ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
-        ConfigReader.config.conf['voice'] = self.view.voice.isChecked()
-        ConfigReader.config.conf['anemometer'] = self.view.anemometer.isChecked()
-        ConfigReader.config.conf['arduino'] = self.view.arduino.isChecked()
-        ConfigReader.config.conf['simulatemode'] = self.view.simulate_mode.isChecked()
-        ConfigReader.config.conf['fullscreen'] = self.view.fullscreen.isChecked()
-        ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
-        ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
-        ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
-        ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
-        ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
-
-    def btn_cancel(self):
-
-        if self.udp_sig is not None and self.udp_sig_connected:
-            self.udp_sig.disconnect(self.slot_udp)
-            self.udp_sig_connected = False
-            if self.udp_sig is not None:
-                self.ipbaseclear_sig.emit()
-                self.view.baseA_IP.setText(self._translate("None", "None"))
-                self.view.baseB_IP.setText(self._translate("None", "None"))
-        self.btn_cancel_sig.emit()
-
-    def btn_valid(self):
-        if self.udp_sig is not None and self.udp_sig_connected:
-            self.udp_sig.disconnect(self.slot_udp)
-            self.udp_sig_connected = False
-        if self.ipset_sig is not None:
-            self.ipset_sig.emit(self.get_ipbaseA(), self.get_ipbaseB())
-        self.btn_valid_sig.emit()
+        print("todo")
 
     def set_udp_sig(self, udp, set, clear, invert):
         self.udp_sig = udp
@@ -749,6 +722,120 @@ class WSettings(QObject):
 
     def get_ipbaseB(self):
         return self.view.baseB_IP.toPlainText()
+
+    def btn_cancel(self):
+        if self.udp_sig is not None and self.udp_sig_connected:
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            if self.udp_sig is not None:
+                self.ipbaseclear_sig.emit()
+                self.view.baseA_IP.setText(self._translate("None", "None"))
+                self.view.baseB_IP.setText(self._translate("None", "None"))
+
+    def btn_valid(self):
+        if self.udp_sig is not None and self.udp_sig_connected:
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+        if self.ipset_sig is not None:
+            self.ipset_sig.emit(self.get_ipbaseA(), self.get_ipbaseB())
+
+class WSettingsSound(QObject):
+    btn_settings_sig = pyqtSignal()
+    widgetList = []
+
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WSettingsSound()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.btn_back.clicked.connect(self.btn_settings_sig.emit)
+        self._translate = QtCore.QCoreApplication.translate
+
+    def get_widget(self):
+        return (self.widgetList)
+
+    def show(self):
+        self.widget.show()
+
+    def is_show(self):
+        return self.widget.isVisible()
+
+    def hide(self):
+        self.widget.hide()
+
+    def set_data(self):
+        self.view.sound.setChecked(ConfigReader.config.conf['sound'])
+        self.view.voice.setChecked(ConfigReader.config.conf['voice'])
+        self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
+        self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
+        self.view.noiseSound.setChecked(ConfigReader.config.conf['noisesound'])
+        self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume'])
+
+    def get_data(self):
+        ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
+        ConfigReader.config.conf['voice'] = self.view.voice.isChecked()
+        ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
+        ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
+        ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
+        ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()
+
+class WSettings(QObject):
+    btn_settingsadvanced_sig = pyqtSignal()
+    btn_settingsbase_sig = pyqtSignal()
+    btn_settingssound_sig = pyqtSignal()
+    btn_cancel_sig = pyqtSignal()
+    btn_valid_sig = pyqtSignal()
+    btn_quitapp_sig = pyqtSignal()
+    widgetList = []
+
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WSettings()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self._translate = QtCore.QCoreApplication.translate
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
+        self.view.btn_base_settings.clicked.connect(self.btn_settingsbase_sig.emit)
+        self.view.btn_sound_settings.clicked.connect(self.btn_settingssound_sig.emit)
+
+        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
+        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
+
+
+    def get_widget(self):
+        return (self.widgetList)
+
+    def show(self):
+        if Utils.server_alive():
+            self.view.webserverUrl.setText(Utils.get_base_url())
+        self.widget.show()
+
+    def is_show(self):
+        return self.widget.isVisible()
+
+    def hide(self):
+        self.widget.hide()
+
+    def set_data(self):
+        self.view.simulate_mode.setChecked(ConfigReader.config.conf['simulatemode'])
+        self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
+        self.view.webserver.setChecked(ConfigReader.config.conf['run_webserver'])
+
+    def get_data(self):
+        ConfigReader.config.conf['simulatemode'] = self.view.simulate_mode.isChecked()
+        ConfigReader.config.conf['fullscreen'] = self.view.fullscreen.isChecked()
+        ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
+        ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
+
+
+
 
 
 class WPiCamPair(QObject):

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>270</height>
+    <height>271</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,20 +45,6 @@
      </item>
      <item>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="4" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <item>
-          <widget class="QSpinBox" name="port_btn_baseB"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Button Base B</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_9">
          <item>
@@ -73,38 +59,6 @@
          </item>
         </layout>
        </item>
-       <item row="4" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_10">
-         <item>
-          <widget class="QSpinBox" name="udp_port">
-           <property name="maximum">
-            <number>65535</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>UDP Port</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="3" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QSpinBox" name="port_btn_baseA"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Button Base A</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item row="3" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
@@ -114,66 +68,6 @@
           <widget class="QLabel" name="label_5">
            <property name="text">
             <string>Button Next</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="2" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_11">
-         <item>
-          <widget class="QSpinBox" name="port_ledA"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_9">
-           <property name="text">
-            <string>Led A</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="2" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_12">
-         <item>
-          <widget class="QSpinBox" name="port_ledB"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_10">
-           <property name="text">
-            <string>Led B</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_8">
-         <item>
-          <widget class="QSpinBox" name="port_buzzer_next"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Buzzer Next</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="0" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_20">
-         <item>
-          <widget class="QSpinBox" name="buzzer_duration">
-           <property name="maximum">
-            <number>65535</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_18">
-           <property name="text">
-            <string>duration (ms)</string>
            </property>
           </widget>
          </item>
@@ -197,26 +91,128 @@
          </item>
         </layout>
        </item>
-       <item row="5" column="0">
-        <widget class="QCheckBox" name="noiseSound">
-         <property name="text">
-          <string>Noise Sound</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_24">
+       <item row="2" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_12">
          <item>
-          <widget class="QDoubleSpinBox" name="noisevolume">
-           <property name="decimals">
-            <number>3</number>
+          <widget class="QSpinBox" name="port_ledB"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Led B</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QSpinBox" name="port_btn_baseA"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Button Base A</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="4" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QSpinBox" name="port_btn_baseB"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Button Base B</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_20">
+         <item>
+          <widget class="QSpinBox" name="buzzer_duration">
+           <property name="maximum">
+            <number>65535</number>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_22">
+          <widget class="QLabel" name="label_18">
            <property name="text">
-            <string>Noise Volume</string>
+            <string>duration (ms)</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QSpinBox" name="port_buzzer_next"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Buzzer Next</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <item>
+          <widget class="QSpinBox" name="port_ledA"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Led A</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="4" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <item>
+          <widget class="QSpinBox" name="udp_port">
+           <property name="maximum">
+            <number>65535</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>UDP Port</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="5" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QDoubleSpinBox" name="voltagemin">
+           <property name="decimals">
+            <number>1</number>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Min Voltage</string>
            </property>
           </widget>
          </item>
@@ -238,6 +234,25 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="btn_cancel_2">
+         <property name="text">
+          <string>Cancel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_valid_2">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Valid</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
@@ -252,7 +267,6 @@
   <tabstop>port_btn_next</tabstop>
   <tabstop>port_btn_baseA</tabstop>
   <tabstop>udp_port</tabstop>
-  <tabstop>btn_back</tabstop>
  </tabstops>
  <resources/>
  <connections/>
