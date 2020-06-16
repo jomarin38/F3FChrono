@@ -31,6 +31,12 @@
    </property>
    <item row="0" column="1">
     <widget class="QPushButton" name="buttonDelete">
+     <property name="maximumSize">
+      <size>
+       <width>33</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="text">
       <string>Del</string>
      </property>
@@ -52,6 +58,19 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="buttonMove">
+     <property name="maximumSize">
+      <size>
+       <width>33</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>--&gt;</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

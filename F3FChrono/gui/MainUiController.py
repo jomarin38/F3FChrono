@@ -204,6 +204,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def set_show_settings(self):
         self.controllers['settings'].set_data()
+        self.controllers['settingssound'].set_data()
         self.controllers['settingsadvanced'].set_data()
         self.show_settings()
 
@@ -236,6 +237,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def settings_valid(self):
         self.controllers['settings'].get_data()
+        self.controllers['settingssound'].get_data()
         self.controllers['settingsadvanced'].get_data()
         ConfigReader.config.write('config.json')
         self.show_config()

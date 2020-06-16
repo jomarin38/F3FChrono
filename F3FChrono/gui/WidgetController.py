@@ -17,7 +17,6 @@ from F3FChrono.gui.WSettingsAdvanced_ui import Ui_WSettingsAdvanced
 from F3FChrono.gui.WSettingsBase_ui import Ui_WSettingsBase
 from F3FChrono.gui.WSettingsBase_item_ui import Ui_WSettingBase_item
 from F3FChrono.gui.WSettingsSound_ui import Ui_WSettingsSound
-from F3FChrono.gui.WPicamPair_ui import Ui_WPicamPair
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.web.Utils import Utils
 
@@ -616,6 +615,7 @@ class WSettingsAdvanced(QObject):
         self.view.buzzer_next_duration.setValue(ConfigReader.config.conf['buzzer_next_duration'])
         self.view.udp_port.setValue(ConfigReader.config.conf['udpport'])
         self.view.voltagemin.setValue(ConfigReader.config.conf['voltage_min'])
+        self.view.voltagecoef.setValue(ConfigReader.config.conf['voltage_coef'])
 
     def get_data(self):
         ConfigReader.config.conf['btn_baseA'] = self.view.port_btn_baseA.value()
@@ -629,6 +629,7 @@ class WSettingsAdvanced(QObject):
         ConfigReader.config.conf['buzzer_next_duration'] = self.view.buzzer_next_duration.value()
         ConfigReader.config.conf['udpport'] = self.view.udp_port.value()
         ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
+        ConfigReader.config.conf['voltage_coef'] = self.view.voltagecoef.value()
 
 
 class WSettingsBase(QObject):
@@ -671,6 +672,7 @@ class WSettingsBase(QObject):
             self.viewbaseBList[-1].setupUi(self.widgetBaseList[-1])
             self.viewbaseBList[-1].label.setText("192.168.1."+str(i+50))
             self.view.listWidget_baseB.setItemWidget(self.baseBList[-1], self.widgetBaseList[-1])
+
     def get_widget(self):
         return (self.widgetList)
 
@@ -838,37 +840,3 @@ class WSettings(QObject):
 
 
 
-class WPiCamPair(QObject):
-    btn_cancel_sig = pyqtSignal()
-    btn_valid_sig = pyqtSignal()
-    widgetList = []
-
-    def __init__(self, name, parent):
-        super().__init__()
-        self.view = Ui_WPicamPair()
-        self.name = name
-        self.parent = parent
-        self._translate = QtCore.QCoreApplication.translate
-        self.widget = QtWidgets.QWidget(parent)
-        self.view.setupUi(self.widget)
-        self.widgetList.append(self.widget)
-        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
-        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
-
-    def get_widget(self):
-        return (self.widgetList)
-
-    def show(self):
-        self.widget.show()
-
-    def is_show(self):
-        return self.widget.isVisible()
-
-    def hide(self):
-        self.widget.hide()
-
-    def set_data(self):
-        print("todo PiCamPair - set data")
-
-    def get_data(self):
-        print("todo PiCamPair - get data")

@@ -1,8 +1,6 @@
 {
  "Launch_time": 30000,
  "Launched_time": 30000,
- "anemometer": false,
- "arduino": true,
  "btn_baseA": 5,
  "btn_baseB": 6,
  "btn_next": 12,
@@ -13,12 +11,11 @@
  "buzzer_next_valid": true,
  "buzzer_valid": true,
  "fullscreen": false,
- "i2c_refresh": 100,
  "language": "English",
  "ledA": 20,
  "ledB": 26,
  "noisesound": true,
- "noisevolume": 0.005,
+ "noisevolume": 0.001,
  "rebound_btn_time": 200,
  "run_webserver": true,
  "simulatemode": true,
@@ -30,5 +27,6 @@
  "voice_rate": 150,
  "voltage_coef": 0.354,
  "voltage_min": 9.9,
- "webserver_port": 8000
+ "webserver_port": 8000,
+ "competition_mode": false
 }

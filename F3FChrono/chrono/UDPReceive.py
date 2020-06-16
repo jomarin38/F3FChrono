@@ -14,9 +14,9 @@ EVENTMSG = "Event"
 https://github.com/jsh2134/iw_parse/
 '''
 class udpreceive(QThread):
-    ipbaseclear_sig = pyqtSignal()
-    ipinvert_sig = pyqtSignal()
-    ipset_sig = pyqtSignal(str, str)
+    ipbaseclear_sig = pyqtSignal(list)
+    ipinvert_sig = pyqtSignal(list)
+    ipset_sig = pyqtSignal(list)
 
     def __init__(self, udpport, signal_chrono, signal_btnnext, signal_wind, signal_rain, signal_accu, signal_rssi):
         super().__init__()
@@ -93,7 +93,7 @@ class udpreceive(QThread):
                         base = "baseB"
                     self.event_chrono.emit("udpreceive", data.decode("utf-8").lower(), base)
             except socket.error as msg:
-                print ('udp receive error {}'.format(msg))
+                print('udp receive error {}'.format(msg))
                 logging.warning('udp receive error {}'.format(msg))
                 continue
 
