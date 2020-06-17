@@ -10,6 +10,7 @@
  "buzzer_next_duration": 300,
  "buzzer_next_valid": true,
  "buzzer_valid": true,
+ "competition_mode": 1,
  "fullscreen": false,
  "language": "English",
  "ledA": 20,
@@ -27,6 +28,5 @@
  "voice_rate": 150,
  "voltage_coef": 0.354,
  "voltage_min": 9.9,
- "webserver_port": 8000,
- "competition_mode": false
+ "webserver_port": 8000
 }

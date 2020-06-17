@@ -1,4 +1,5 @@
 import sys
+import collections
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.gui.simulate_base_ui import Ui_MainWindow
@@ -10,16 +11,16 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
     close_signal = pyqtSignal()
     baseAList = []
     baseBList = []
-    viewbaseAList = []
+ #   viewbaseAList = []
     viewbaseBList = []
-    widgetBaseList = []
+#    widgetBaseList = []
 
     def __init__(self):
         super().__init__()
         self.MainWindow = QtWidgets.QMainWindow()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.MainWindow)
-        self.MainWindow.closeEvent=self.closeEvent
+        self.MainWindow.closeEvent = self.closeEvent
         self.MainWindow.show()
 
         self.ui.btn_gpio_A.clicked.connect(self.send_gpio_A)
@@ -32,19 +33,17 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         self.timerEvent.timeout.connect(self.run)
         self.duration = 1000
 
-        self.__addbase_List()
+        self.__addbase_List(self.baseAList, self.ui.listBaseA, 3, 20, self.send_base_A)
+        self.__addbase_List(self.baseBList, self.ui.listBaseB, 5, 50, self.send_base_B)
+
 
     def send_base_A(self):
-        p = self.sender().parent()
-        item = self.ui.listBaseA.itemAt(p.pos())
-        index = self.baseAList.index(item)
-        self.__sendbase(self.viewbaseAList[index])
+        self.__sendbase(self.udpbeep,
+                        self.__getWidgetinQlistWidget(self.baseAList, self.ui.listBaseA, self.sender().parent().pos()))
 
     def send_base_B(self):
-        p = self.sender().parent()
-        item = self.ui.listBaseB.itemAt(p.pos())
-        index = self.baseBList.index(item)
-        self.__sendbase(self.viewbaseBList[index])
+        self.__sendbase(self.udpbeep,
+                        self.__getWidgetinQlistWidget(self.baseBList, self.ui.listBaseB, self.sender().parent().pos()))
 
     def send_gpio_A(self):
         self.udpbeep.sendData("simulate GPIO baseA")
@@ -74,34 +73,35 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         self.close_signal.emit()
         event.accept()
 
-
-    def __sendbase(self, item):
+    @staticmethod
+    def __sendbase(udp, item):
         msg="simulate base " + item.ipAddress.text() + " " + item.event.text()
         print(msg)
-        self.udpbeep.sendData(msg)
+        udp.sendData(msg)
 
-    def __addbase_List (self):
-        for i in range(3):
-            self.baseAList.append(QtWidgets.QListWidgetItem())
-            self.ui.listBaseA.addItem(self.baseAList[-1])
-            self.widgetBaseList.append(QtWidgets.QWidget())
-            self.viewbaseAList.append(Ui_base_widget())
-            self.viewbaseAList[-1].setupUi(self.widgetBaseList[-1])
-            self.viewbaseAList[-1].ipAddress.setText("192.168.1."+str(i+20))
-            self.viewbaseAList[-1].event.setText("Event")
-            self.viewbaseAList[-1].buttonSend.clicked.connect(self.send_base_A)
-            self.ui.listBaseA.setItemWidget(self.baseAList[-1], self.widgetBaseList[-1])
+    @staticmethod
+    def __addbase_List (list, uilist, nb, ip_base, event):
+        for i in range(nb):
+            collect = collections.OrderedDict()
+            collect['QlistWidgetItem'] = QtWidgets.QListWidgetItem()
+            collect['QWidget'] = QtWidgets.QWidget()
+            collect['ui_widget'] = Ui_base_widget()
+            list.append(collect)
+            uilist.addItem(list[-1]['QlistWidgetItem'])
 
-        for i in range(5):
-            self.baseBList.append(QtWidgets.QListWidgetItem())
-            self.ui.listBaseB.addItem(self.baseBList[-1])
-            self.widgetBaseList.append(QtWidgets.QWidget())
-            self.viewbaseBList.append(Ui_base_widget())
-            self.viewbaseBList[-1].setupUi(self.widgetBaseList[-1])
-            self.viewbaseBList[-1].ipAddress.setText("192.168.1."+str(i+50))
-            self.viewbaseBList[-1].event.setText("Event")
-            self.viewbaseBList[-1].buttonSend.clicked.connect(self.send_base_B)
-            self.ui.listBaseB.setItemWidget(self.baseBList[-1], self.widgetBaseList[-1])
+            list[-1]['ui_widget'].setupUi(list[-1]['QWidget'])
+            list[-1]['ui_widget'].ipAddress.setText("192.168.1."+str(i+ip_base))
+            list[-1]['ui_widget'].event.setText("Event")
+            list[-1]['ui_widget'].buttonSend.clicked.connect(event)
+            uilist.setItemWidget(list[-1]['QlistWidgetItem'], list[-1]['QWidget'])
+
+    @staticmethod
+    def __getWidgetinQlistWidget (list, uilist, pos):
+        item = uilist.itemAt(pos)
+        for index in list:
+            if index['QlistWidgetItem'] == item:
+                return index['ui_widget']
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

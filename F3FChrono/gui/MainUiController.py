@@ -63,7 +63,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         else:
             self.MainWindow.setFixedSize(480, 320)
 
-
         self.controllers = collections.OrderedDict()
 
         self.controllers['config'] = WConfigCtrl("panel Config", self.ui.centralwidget)
@@ -102,7 +101,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.time_elapsed_sig.connect(self.handle_time_elapsed)
         self.controllers['round'].btn_cancel_flight_sig.connect(self.cancel_round)
         self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
-        self.controllers['settings'].btn_cancel_sig.connect(self.show_config)
+        self.controllers['settings'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
         self.controllers['settings'].btn_quitapp_sig.connect(self.shutdown_app)
         self.controllers['settings'].btn_settingsbase_sig.connect(self.show_settingsbase)
@@ -113,8 +112,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                                                  self.chronoHard.udpReceive.ipbaseclear_sig,
                                                  self.chronoHard.udpReceive.ipinvert_sig)
         self.controllers['settingsadvanced'].btn_settings_sig.connect(self.show_settings)
+        self.controllers['settingsadvanced'].btn_cancel_sig.connect(self.settings_cancel)
+        self.controllers['settingsadvanced'].btn_valid_sig.connect(self.settings_valid)
         self.controllers['settingsbase'].btn_settings_sig.connect(self.show_settings)
+        self.controllers['settingsbase'].btn_cancel_sig.connect(self.settings_cancel)
+        self.controllers['settingsbase'].btn_valid_sig.connect(self.settings_valid)
         self.controllers['settingssound'].btn_settings_sig.connect(self.show_settings)
+        self.controllers['settingssound'].btn_cancel_sig.connect(self.settings_cancel)
+        self.controllers['settingssound'].btn_valid_sig.connect(self.settings_valid)
         self.controllers['training'].btn_reset_sig.connect(self.chronoHard.arduino.reset_training)
         self.controllers['training'].btn_home_sig.connect(self.home_training)
         self.controllers['training'].btn_next_sig.connect(self.next_action)
@@ -239,6 +244,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].get_data()
         self.controllers['settingssound'].get_data()
         self.controllers['settingsadvanced'].get_data()
+        self.controllers['settingsbase'].btn_valid()
         ConfigReader.config.write('config.json')
         self.show_config()
         self.vocal.settings(ConfigReader.config.conf['sound'],
@@ -246,6 +252,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.noise.settings(ConfigReader.config.conf['noisesound'],
                            ConfigReader.config.conf['noisevolume'])
         self.chronoHard.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
+
+    def settings_cancel(self):
+        self.controllers['settingsbase'].btn_cancel()
+        self.show_config()
 
     def home_action(self):
         #print event data

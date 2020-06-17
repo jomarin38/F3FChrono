@@ -67,15 +67,18 @@
         <number>2</number>
        </property>
        <item row="3" column="1">
-        <widget class="QComboBox" name="comboBox">
+        <widget class="QComboBox" name="mode">
+         <property name="currentIndex">
+          <number>1</number>
+         </property>
          <item>
           <property name="text">
-           <string>Competition</string>
+           <string>Training</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Training</string>
+           <string>Competition</string>
           </property>
          </item>
         </widget>

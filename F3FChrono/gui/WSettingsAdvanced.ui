@@ -256,14 +256,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_cancel_2">
+        <widget class="QPushButton" name="btn_cancel">
          <property name="text">
           <string>Cancel</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_valid_2">
+        <widget class="QPushButton" name="btn_valid">
          <property name="font">
           <font>
            <pointsize>11</pointsize>

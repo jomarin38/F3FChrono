@@ -157,15 +157,15 @@ class Ui_WSettingsAdvanced(object):
         self.btn_back.setFont(font)
         self.btn_back.setObjectName("btn_back")
         self.horizontalLayout.addWidget(self.btn_back)
-        self.btn_cancel_2 = QtWidgets.QPushButton(WSettingsAdvanced)
-        self.btn_cancel_2.setObjectName("btn_cancel_2")
-        self.horizontalLayout.addWidget(self.btn_cancel_2)
-        self.btn_valid_2 = QtWidgets.QPushButton(WSettingsAdvanced)
+        self.btn_cancel = QtWidgets.QPushButton(WSettingsAdvanced)
+        self.btn_cancel.setObjectName("btn_cancel")
+        self.horizontalLayout.addWidget(self.btn_cancel)
+        self.btn_valid = QtWidgets.QPushButton(WSettingsAdvanced)
         font = QtGui.QFont()
         font.setPointSize(11)
-        self.btn_valid_2.setFont(font)
-        self.btn_valid_2.setObjectName("btn_valid_2")
-        self.horizontalLayout.addWidget(self.btn_valid_2)
+        self.btn_valid.setFont(font)
+        self.btn_valid.setObjectName("btn_valid")
+        self.horizontalLayout.addWidget(self.btn_valid)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 
@@ -195,8 +195,8 @@ class Ui_WSettingsAdvanced(object):
         self.label_3.setText(_translate("WSettingsAdvanced", "Min Voltage"))
         self.label_11.setText(_translate("WSettingsAdvanced", "ADC coef"))
         self.btn_back.setText(_translate("WSettingsAdvanced", "Back to Settings"))
-        self.btn_cancel_2.setText(_translate("WSettingsAdvanced", "Cancel"))
-        self.btn_valid_2.setText(_translate("WSettingsAdvanced", "Valid"))
+        self.btn_cancel.setText(_translate("WSettingsAdvanced", "Cancel"))
+        self.btn_valid.setText(_translate("WSettingsAdvanced", "Valid"))
 
 
 if __name__ == "__main__":

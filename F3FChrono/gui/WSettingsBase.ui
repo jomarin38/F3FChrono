@@ -67,7 +67,7 @@
         <number>2</number>
        </property>
        <item row="0" column="0">
-        <widget class="QPushButton" name="wbase_detect_btn">
+        <widget class="QPushButton" name="buttonBaseADetect">
          <property name="text">
           <string>Detect</string>
          </property>
@@ -126,7 +126,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QPushButton" name="wbase_detect_btn_2">
+        <widget class="QPushButton" name="buttonBaseBDetect">
          <property name="text">
           <string>Detect</string>
          </property>
