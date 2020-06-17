@@ -32,49 +32,26 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         self.timerEvent.timeout.connect(self.run)
         self.duration = 1000
 
-        for i in range(3):
-            self.baseAList.append(QtWidgets.QListWidgetItem())
-            self.ui.listBaseA.addItem(self.baseAList[-1])
-            self.widgetBaseList.append(QtWidgets.QWidget())
-            self.viewbaseAList.append(Ui_base_widget())
-            self.viewbaseAList[-1].setupUi(self.widgetBaseList[-1])
-            self.viewbaseAList[-1].ipAddress.setText("192.168.1."+str(i+20))
-            self.viewbaseAList[-1].event.setText("Event")
-            self.viewbaseAList[-1].buttonSend.clicked.connect(self.send_base_A)
-            self.ui.listBaseA.setItemWidget(self.baseAList[-1], self.widgetBaseList[-1])
-
-        for i in range(5):
-            self.baseBList.append(QtWidgets.QListWidgetItem())
-            self.ui.listBaseB.addItem(self.baseBList[-1])
-            self.widgetBaseList.append(QtWidgets.QWidget())
-            self.viewbaseBList.append(Ui_base_widget())
-            self.viewbaseBList[-1].setupUi(self.widgetBaseList[-1])
-            self.viewbaseBList[-1].ipAddress.setText("192.168.1."+str(i+50))
-            self.viewbaseBList[-1].event.setText("Event")
-            self.viewbaseBList[-1].buttonSend.clicked.connect(self.send_base_B)
-            self.ui.listBaseB.setItemWidget(self.baseBList[-1], self.widgetBaseList[-1])
+        self.__addbase_List()
 
     def send_base_A(self):
         p = self.sender().parent()
         item = self.ui.listBaseA.itemAt(p.pos())
-        widget = self.ui.listBaseA.itemWidget(item)
-
-        #self.udpbeep.sendData("simulate base " + widget.children()[1].text() + " " + widget.children()[3].text())
-        print("simulate base " + widget.children()[1].text() + " " + widget.children()[3].text())
+        index = self.baseAList.index(item)
+        self.__sendbase(self.viewbaseAList[index])
 
     def send_base_B(self):
         p = self.sender().parent()
         item = self.ui.listBaseB.itemAt(p.pos())
-        widget = self.ui.listBaseB.itemWidget(item)
-
-        # self.udpbeep.sendData("simulate base " + widget.children()[1].text() + " " + widget.children()[3].text())
-        print("simulate base " + widget.children()[1].text() + " " + widget.children()[3].text())
+        index = self.baseBList.index(item)
+        self.__sendbase(self.viewbaseBList[index])
 
     def send_gpio_A(self):
         self.udpbeep.sendData("simulate GPIO baseA")
 
     def send_gpio_B(self):
         self.udpbeep.sendData("simulate GPIO baseB")
+
     def send_gpio_next(self):
         self.udpbeep.sendData("simulate GPIO btnnext")
 
@@ -96,6 +73,35 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
     def closeEvent(self, event):
         self.close_signal.emit()
         event.accept()
+
+
+    def __sendbase(self, item):
+        msg="simulate base " + item.ipAddress.text() + " " + item.event.text()
+        print(msg)
+        self.udpbeep.sendData(msg)
+
+    def __addbase_List (self):
+        for i in range(3):
+            self.baseAList.append(QtWidgets.QListWidgetItem())
+            self.ui.listBaseA.addItem(self.baseAList[-1])
+            self.widgetBaseList.append(QtWidgets.QWidget())
+            self.viewbaseAList.append(Ui_base_widget())
+            self.viewbaseAList[-1].setupUi(self.widgetBaseList[-1])
+            self.viewbaseAList[-1].ipAddress.setText("192.168.1."+str(i+20))
+            self.viewbaseAList[-1].event.setText("Event")
+            self.viewbaseAList[-1].buttonSend.clicked.connect(self.send_base_A)
+            self.ui.listBaseA.setItemWidget(self.baseAList[-1], self.widgetBaseList[-1])
+
+        for i in range(5):
+            self.baseBList.append(QtWidgets.QListWidgetItem())
+            self.ui.listBaseB.addItem(self.baseBList[-1])
+            self.widgetBaseList.append(QtWidgets.QWidget())
+            self.viewbaseBList.append(Ui_base_widget())
+            self.viewbaseBList[-1].setupUi(self.widgetBaseList[-1])
+            self.viewbaseBList[-1].ipAddress.setText("192.168.1."+str(i+50))
+            self.viewbaseBList[-1].event.setText("Event")
+            self.viewbaseBList[-1].buttonSend.clicked.connect(self.send_base_B)
+            self.ui.listBaseB.setItemWidget(self.baseBList[-1], self.widgetBaseList[-1])
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
