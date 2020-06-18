@@ -208,8 +208,9 @@ class ChronoArduino(ChronoHard, QTimer):
         elif caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
             self.run_validated.emit()
         elif caller.lower() == "btnnext":
-            print("demande event btn Next")
-            self.arduino.event_Base('n')
+            if ConfigReader.config.conf['competition_mode']==False:
+                print("demande event btn Next")
+                self.arduino.event_Base('n')
 
         if caller.lower()=="udpreceive" and data == "event" and address == "baseA":
             print("demande event base A")

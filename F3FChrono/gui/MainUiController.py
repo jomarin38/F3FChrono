@@ -26,16 +26,17 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard = ChronoArduino(self.signal_btnnext)
         self.rpigpio = rpi_gpio(rpi, self.btn_next_action, None, None)
         self.base_test = -10
-        self.vocal = chronoQSound(ConfigReader.config.conf['voice_language'], ConfigReader.config.conf['sound'],
+
+        if ConfigReader.config.conf['language'] is not "English":
+            _translator = QtCore.QTranslator()
+            _path = os.path.join(os.getcwd(), 'Languages', ConfigReader.config.conf['language']+'.qm')
+            _translator.load(_path)
+            QtWidgets.QApplication.instance().installTranslator(_translator)
+
+        self.vocal = chronoQSound(ConfigReader.config.conf['language'], ConfigReader.config.conf['sound'],
                                   ConfigReader.config.conf['voice'], ConfigReader.config.conf['voice_rate'],
                                   ConfigReader.config.conf['buzzer_valid'])
         self.noise = noiseGenerator(ConfigReader.config.conf['noisesound'], ConfigReader.config.conf['noisevolume'])
-
-        if ConfigReader.config.conf['language'] == "French":
-            _translator = QtCore.QTranslator()
-            _path = os.path.dirname(os.path.realpath('Languages/fr_FR.qm') + '/fr_FR.qm')
-            _translator.load(_path)
-            QtWidgets.QApplication.instance().installTranslator(_translator)
 
         self.initUI()
 
@@ -129,6 +130,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].set_contest(self.daoEvent.get_list())
         self.controllers['wind'].set_wind(0, 0)
         self.controllers['wind'].set_rain(0)
+        self.controllers['wind'].set_signal(self.vocal.signal_lowVoltage)
 
     def show_config(self):
         self.controllers['round'].hide()

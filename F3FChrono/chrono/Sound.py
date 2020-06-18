@@ -5,6 +5,7 @@ import platform
 import collections
 from F3FChrono.chrono import ConfigReader
 from PyQt5.QtCore import pyqtSignal, QObject, QThread, QCoreApplication, QUrl
+from PyQt5 import QtCore
 from PyQt5.QtMultimedia import QSound, QSoundEffect
 from F3FChrono.chrono import ConfigReader
 import pyttsx3
@@ -19,12 +20,13 @@ class chronoQSound(QThread):
     signal_elapsedTime = pyqtSignal(str)
     signal_start = pyqtSignal(int)
     signal_pilotname = pyqtSignal(str, str)
+    signal_lowVoltage = pyqtSignal()
 
 
     def __init__(self, langage, playsound, playvoice, voicerate, buzzer):
         super().__init__()
+        self._translate = QtCore.QCoreApplication.translate
         self.soundbase = []
-
         self.elapsedtime = collections.OrderedDict()
         self.elapsedtime_play = collections.OrderedDict()
         self.settings(playsound, playvoice)
@@ -35,17 +37,19 @@ class chronoQSound(QThread):
         self.signal_time.connect(self.sound_time)
         self.signal_penalty.connect(self.sound_penalty)
         self.signal_pilotname.connect(self.pilot)
+        self.signal_lowVoltage.connect(self.lowVoltage)
         self.soundstart_run = False
         self.voice_engine = pyttsx3.init()
         self.voice_engine.setProperty('rate', voicerate)
         self.voice_engine.setProperty('volume', 1)
 
         self.voice_engine.connect('finished-utterance', self.onVoiceEnd)
-        self.voice_engine.setProperty('voice', "english")
+        self.voice_engine.setProperty('voice', langage.lower())
 
+        self.nextpilot = self._translate("Next pilot : ", "Next pilot : ")
+        self.lowVoltagestr = self._translate("Low Voltage", "Low Voltage")
         #self.voices = self.voice_engine.getProperty('voices')
         #self.voice_engine.setProperty('voice', self.voices[26].id)
-
 
     def settings(self, playsound, playvoice):
         self.play_sound = playsound
@@ -53,21 +57,13 @@ class chronoQSound(QThread):
 
     def loadwav(self, langage, buzzer):
         pathname = os.path.dirname(os.path.realpath('Languages/'+langage+'/base0.wav'))
-        lap_pathname = pathname + '/laps_beep'
         self.soundbase.clear()
-        if buzzer:
-            lap_pathname = pathname+'/laps_only'
-            self.soundbase.append(None)
-            for index in range(1, 10):
-                self.soundbase.append(QSound(lap_pathname + '/base' + str(index) + '.wav'))
-            self.soundbase.append(None)
-        else:
-            for index in range(11):
-                self.soundbase.append(QSound(lap_pathname+'/base'+str(index)+'.wav'))
+        lap_pathname = pathname+'/laps_only'
+        self.soundbase.append(None)
+        for index in range(1, 10):
+            self.soundbase.append(QSound(lap_pathname + '/base' + str(index) + '.wav'))
+        self.soundbase.append(None)
         self.entry = None
-        '''if not buzzer:
-            self.entry = QSound(pathname+'/entry.wav')
-        '''
         self.entry = QSound(pathname+'/instart.wav')
         self.penalty = QSound(pathname+'/penalty.wav')
 
@@ -76,13 +72,7 @@ class chronoQSound(QThread):
         self.elapsedtime['20s'] = QSound(pathname+'/start/20s.wav')
         self.elapsedtime['15s'] = QSound(pathname+'/start/15s.wav')
         self.elapsedtime['10s'] = QSound(pathname+'/start/10s.wav')
-        self.elapsedtime['all'] = QSound(pathname+'/start/startall.wav')
-
-    '''
-    def sound_time(self, run_time):
-        if (self.play_voice):
-            self.voice_engine.say("{:0>.2f}".format(run_time))
-            self.voice_engine.startLoop()'''
+        #self.elapsedtime['all'] = QSound(pathname+'/start/startall.wav')
 
     def sound_time(self, run_time):
         if (self.play_voice):
@@ -91,7 +81,12 @@ class chronoQSound(QThread):
 
     def pilot(self, first_name, name):
         if self.play_voice:
-            self.voice_engine.say("Next pilot : " + first_name + " " + name)
+            self.voice_engine.say(self.nextpilot + first_name + " " + name)
+            self.start()
+
+    def lowVoltage(self):
+        if self.play_voice:
+            self.voice_engine.say(self.lowVoltagestr)
             self.start()
 
     def run(self):

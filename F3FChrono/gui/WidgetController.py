@@ -144,6 +144,7 @@ class WWindCtrl():
         self.rules['alarm'] = False
         self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
         self.windstylesheet = "background-color:rgba( 255, 255, 255, 0% );"
+        self.lowVoltage_sig = None
         self._translate = QtCore.QCoreApplication.translate
 
     def get_widget(self):
@@ -219,12 +220,17 @@ class WWindCtrl():
             cancelstr = ''
         return cancelstr
 
+    def set_signal(self, voltage_sig):
+        self.lowVoltage_sig = voltage_sig
+
     def set_voltage(self, voltage):
         self.view.voltage.setText("{:0>3.1f}".format(voltage) + " V")
         if voltage <= ConfigReader.config.conf['voltage_min'] and \
                 self.voltagestylesheet == "background-color:rgba( 255, 255, 255, 0% );":
             self.voltagestylesheet = "background-color:red;"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
+            if self.lowVoltage_sig is not None:
+                self.lowVoltage_sig.emit()
         elif voltage > ConfigReader.config.conf['voltage_min'] and self.voltagestylesheet == "background-color:red;":
             self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
@@ -917,7 +923,6 @@ class WSettings(QObject):
         self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
 
         self.languages_available = []
-        self.languages_available.append('English')
 
         for dI in os.listdir('Languages'):
             if os.path.isdir(os.path.join('Languages', dI)):
