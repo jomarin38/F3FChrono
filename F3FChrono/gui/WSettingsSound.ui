@@ -45,6 +45,13 @@
      </item>
      <item>
       <layout class="QGridLayout" name="gridLayout_2">
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="voice">
+         <property name="text">
+          <string>Voice</string>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0">
         <widget class="QCheckBox" name="sound">
          <property name="text">
@@ -52,10 +59,17 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="voice">
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="buzzernext">
          <property name="text">
-          <string>Voice</string>
+          <string>Buzzer Next button</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="noiseSound">
+         <property name="text">
+          <string>Noise Sound</string>
          </property>
         </widget>
        </item>
@@ -87,17 +101,10 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QCheckBox" name="noiseSound">
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="lowVoltage">
          <property name="text">
-          <string>Noise Sound</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="buzzernext">
-         <property name="text">
-          <string>Buzzer Next button</string>
+          <string>Low Voltage</string>
          </property>
         </widget>
        </item>

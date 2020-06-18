@@ -876,14 +876,17 @@ class WSettingsSound(QObject):
         self.view.voice.setChecked(ConfigReader.config.conf['voice'])
         self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
         self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
+        self.view.lowVoltage.setChecked(ConfigReader.config.conf['lowvoltage_sound'])
         self.view.noiseSound.setChecked(ConfigReader.config.conf['noisesound'])
         self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume'])
+
 
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
         ConfigReader.config.conf['voice'] = self.view.voice.isChecked()
         ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
         ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
+        ConfigReader.config.conf['lowvoltage_sound'] = self.view.lowVoltage.isChecked()
         ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
         ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()
 
@@ -913,11 +916,15 @@ class WSettings(QObject):
         self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
         self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
 
-        print(os.path.dirname(os.path.realpath(__file__)))
-        for root, dirs, _ in os.walk('./Languages/'):
-            for d in dirs:
-                print (os.path.join(root, d))
+        self.languages_available = []
+        self.languages_available.append('English')
 
+        for dI in os.listdir('Languages'):
+            if os.path.isdir(os.path.join('Languages', dI)):
+                self.languages_available.append(dI)
+        self.view.language.clear()
+        for item in self.languages_available:
+            self.view.language.addItem(item, item)
 
     def get_widget(self):
         return (self.widgetList)
@@ -938,18 +945,14 @@ class WSettings(QObject):
         self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
         self.view.webserver.setChecked(ConfigReader.config.conf['run_webserver'])
         self.view.mode.setCurrentIndex(ConfigReader.config.conf['competition_mode'])
+        index=0
+        if ConfigReader.config.conf['language'] in self.languages_available:
+            index=self.languages_available.index(ConfigReader.config.conf['language'])
+        self.view.language.setCurrentIndex(index)
 
     def get_data(self):
         ConfigReader.config.conf['simulatemode'] = self.view.simulate_mode.isChecked()
         ConfigReader.config.conf['fullscreen'] = self.view.fullscreen.isChecked()
         ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
         ConfigReader.config.conf['competition_mode'] = self.view.mode.currentIndex()
-
-    def fast_scandir(self, dirname):
-        subfolders = [f.path for f in os.scandir(dirname) if f.is_dir()]
-        for dirname in list(subfolders):
-            subfolders.extend(self.fast_scandir(dirname))
-        return subfolders
-
-
-
+        ConfigReader.config.conf['language']=self.languages_available[self.view.language.currentIndex()]

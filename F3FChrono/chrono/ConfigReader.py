@@ -70,7 +70,8 @@ default_config = \
     "voice_rate": 150,
     "training_speech_interval": 2,
     "noisesound": False,
-    "noisevolume": 0.005
+    "noisevolume": 0.005,
+    'lowvoltage_sound': False
 }
 
 def init():

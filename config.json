@@ -15,6 +15,7 @@
  "language": "English",
  "ledA": 20,
  "ledB": 26,
+ "lowvoltage_sound": false,
  "noisesound": true,
  "noisevolume": 0.001,
  "rebound_btn_time": 200,
