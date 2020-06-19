@@ -41,11 +41,10 @@ import json
 
 default_config = \
 {
+    "competition_mode" : False,
     "simulatemode": False,
     "sound": False,
     "voice": False,
-    "anemometer": False,
-    "arduino": False,
     "voltage_min": 9.9,
     "btn_baseA": 5,
     "btn_baseB": 6,
@@ -63,7 +62,6 @@ default_config = \
     "run_webserver": False,
     "webserver_port": 8000,
     "voltage_coef": 0.354,
-    "i2c_refresh": 100, #time in ms
     "rebound_btn_time": 500, #time in ms
     "Launch_time": 12000,
     "Launched_time": 12000,
@@ -72,7 +70,8 @@ default_config = \
     "voice_rate": 150,
     "training_speech_interval": 2,
     "noisesound": False,
-    "noisevolume": 0.005
+    "noisevolume": 0.005,
+    'lowvoltage_sound': False
 }
 
 def init():

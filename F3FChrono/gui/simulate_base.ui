@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>839</width>
-    <height>172</height>
+    <width>1016</width>
+    <height>231</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -42,53 +42,7 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>IP Address</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="ip_A">
-            <property name="text">
-             <string>192.168.0.10</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QLabel" name="label_5">
-            <property name="minimumSize">
-             <size>
-              <width>72</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Data</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="data_A">
-            <property name="text">
-             <string>event</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_send_A">
-          <property name="text">
-           <string>Send UDP</string>
-          </property>
-         </widget>
+         <widget class="QListWidget" name="listBaseA"/>
         </item>
         <item>
          <widget class="QPushButton" name="btn_gpio_A">
@@ -125,53 +79,7 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>IP Address</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="ip_B">
-            <property name="text">
-             <string>192.168.0.11</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
-          <item>
-           <widget class="QLabel" name="label_6">
-            <property name="minimumSize">
-             <size>
-              <width>72</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Data</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="data_B">
-            <property name="text">
-             <string>Event</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_send_B">
-          <property name="text">
-           <string>Send UDP</string>
-          </property>
-         </widget>
+         <widget class="QListWidget" name="listBaseB"/>
         </item>
         <item>
          <widget class="QPushButton" name="btn_gpio_B">

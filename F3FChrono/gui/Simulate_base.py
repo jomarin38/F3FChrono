@@ -1,23 +1,28 @@
 import sys
+import collections
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.gui.simulate_base_ui import Ui_MainWindow
+from F3FChrono.gui.simulate_base_widget_ui import Ui_base_widget
 from F3FChrono.chrono.UDPBeep import udpbeep
 
 
 class SimulateBase(QtWidgets.QMainWindow, QTimer):
     close_signal = pyqtSignal()
+    baseAList = []
+    baseBList = []
+ #   viewbaseAList = []
+    viewbaseBList = []
+#    widgetBaseList = []
 
     def __init__(self):
         super().__init__()
         self.MainWindow = QtWidgets.QMainWindow()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.MainWindow)
-        self.MainWindow.closeEvent=self.closeEvent
+        self.MainWindow.closeEvent = self.closeEvent
         self.MainWindow.show()
 
-        self.ui.btn_send_A.clicked.connect(self.send_base_A)
-        self.ui.btn_send_B.clicked.connect(self.send_base_B)
         self.ui.btn_gpio_A.clicked.connect(self.send_gpio_A)
         self.ui.btn_gpio_B.clicked.connect(self.send_gpio_B)
         self.ui.btn_next.clicked.connect(self.send_gpio_next)
@@ -28,18 +33,24 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         self.timerEvent.timeout.connect(self.run)
         self.duration = 1000
 
+        self.__addbase_List(self.baseAList, self.ui.listBaseA, 3, 20, self.send_base_A)
+        self.__addbase_List(self.baseBList, self.ui.listBaseB, 5, 50, self.send_base_B)
+
 
     def send_base_A(self):
-        self.udpbeep.sendData("simulate base " + self.ui.ip_A.text() + " " + self.ui.data_A.text())
+        self.__sendbase(self.udpbeep,
+                        self.__getWidgetinQlistWidget(self.baseAList, self.ui.listBaseA, self.sender().parent().pos()))
 
     def send_base_B(self):
-        self.udpbeep.sendData("simulate base " + self.ui.ip_B.text() + " " + self.ui.data_B.text())
+        self.__sendbase(self.udpbeep,
+                        self.__getWidgetinQlistWidget(self.baseBList, self.ui.listBaseB, self.sender().parent().pos()))
 
     def send_gpio_A(self):
         self.udpbeep.sendData("simulate GPIO baseA")
 
     def send_gpio_B(self):
         self.udpbeep.sendData("simulate GPIO baseB")
+
     def send_gpio_next(self):
         self.udpbeep.sendData("simulate GPIO btnnext")
 
@@ -61,6 +72,36 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
     def closeEvent(self, event):
         self.close_signal.emit()
         event.accept()
+
+    @staticmethod
+    def __sendbase(udp, item):
+        msg="simulate base " + item.ipAddress.text() + " " + item.event.text()
+        print(msg)
+        udp.sendData(msg)
+
+    @staticmethod
+    def __addbase_List (list, uilist, nb, ip_base, event):
+        for i in range(nb):
+            collect = collections.OrderedDict()
+            collect['QlistWidgetItem'] = QtWidgets.QListWidgetItem()
+            collect['QWidget'] = QtWidgets.QWidget()
+            collect['ui_widget'] = Ui_base_widget()
+            list.append(collect)
+            uilist.addItem(list[-1]['QlistWidgetItem'])
+
+            list[-1]['ui_widget'].setupUi(list[-1]['QWidget'])
+            list[-1]['ui_widget'].ipAddress.setText("192.168.1."+str(i+ip_base))
+            list[-1]['ui_widget'].event.setText("Event")
+            list[-1]['ui_widget'].buttonSend.clicked.connect(event)
+            uilist.setItemWidget(list[-1]['QlistWidgetItem'], list[-1]['QWidget'])
+
+    @staticmethod
+    def __getWidgetinQlistWidget (list, uilist, pos):
+        item = uilist.itemAt(pos)
+        for index in list:
+            if index['QlistWidgetItem'] == item:
+                return index['ui_widget']
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

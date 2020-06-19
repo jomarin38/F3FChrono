@@ -14,7 +14,9 @@ from F3FChrono.gui.WTrainingBtn_ui import Ui_WTrainingBtn
 from F3FChrono.gui.WConfig_ui import Ui_WConfig
 from F3FChrono.gui.WSettings_ui import Ui_WSettings
 from F3FChrono.gui.WSettingsAdvanced_ui import Ui_WSettingsAdvanced
-from F3FChrono.gui.WPicamPair_ui import Ui_WPicamPair
+from F3FChrono.gui.WSettingsBase_ui import Ui_WSettingsBase
+from F3FChrono.gui.WSettingsBase_item_ui import Ui_WSettingBase_item
+from F3FChrono.gui.WSettingsSound_ui import Ui_WSettingsSound
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.web.Utils import Utils
 
@@ -142,6 +144,7 @@ class WWindCtrl():
         self.rules['alarm'] = False
         self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
         self.windstylesheet = "background-color:rgba( 255, 255, 255, 0% );"
+        self.lowVoltage_sig = None
         self._translate = QtCore.QCoreApplication.translate
 
     def get_widget(self):
@@ -217,12 +220,17 @@ class WWindCtrl():
             cancelstr = ''
         return cancelstr
 
+    def set_signal(self, voltage_sig):
+        self.lowVoltage_sig = voltage_sig
+
     def set_voltage(self, voltage):
         self.view.voltage.setText("{:0>3.1f}".format(voltage) + " V")
         if voltage <= ConfigReader.config.conf['voltage_min'] and \
                 self.voltagestylesheet == "background-color:rgba( 255, 255, 255, 0% );":
             self.voltagestylesheet = "background-color:red;"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
+            if self.lowVoltage_sig is not None:
+                self.lowVoltage_sig.emit()
         elif voltage > ConfigReader.config.conf['voltage_min'] and self.voltagestylesheet == "background-color:red;":
             self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
@@ -576,6 +584,8 @@ class WConfigCtrl(QObject):
 
 class WSettingsAdvanced(QObject):
     btn_settings_sig = pyqtSignal()
+    btn_valid_sig = pyqtSignal()
+    btn_cancel_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -587,6 +597,8 @@ class WSettingsAdvanced(QObject):
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
         self.view.btn_back.clicked.connect(self.btn_settings_sig.emit)
+        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
+        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
         self._translate = QtCore.QCoreApplication.translate
 
     def get_widget(self):
@@ -612,8 +624,8 @@ class WSettingsAdvanced(QObject):
         self.view.port_buzzer_next.setValue(ConfigReader.config.conf['buzzer_next'])
         self.view.buzzer_next_duration.setValue(ConfigReader.config.conf['buzzer_next_duration'])
         self.view.udp_port.setValue(ConfigReader.config.conf['udpport'])
-        self.view.noiseSound.setChecked(ConfigReader.config.conf['noisesound'])
-        self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume'])
+        self.view.voltagemin.setValue(ConfigReader.config.conf['voltage_min'])
+        self.view.voltagecoef.setValue(ConfigReader.config.conf['voltage_coef'])
 
     def get_data(self):
         ConfigReader.config.conf['btn_baseA'] = self.view.port_btn_baseA.value()
@@ -626,44 +638,49 @@ class WSettingsAdvanced(QObject):
         ConfigReader.config.conf['buzzer_next'] = self.view.port_buzzer_next.value()
         ConfigReader.config.conf['buzzer_next_duration'] = self.view.buzzer_next_duration.value()
         ConfigReader.config.conf['udpport'] = self.view.udp_port.value()
-        ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
-        ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()
+        ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
+        ConfigReader.config.conf['voltage_coef'] = self.view.voltagecoef.value()
 
 
-class WSettings(QObject):
-    btn_settingsadvanced_sig = pyqtSignal()
-    btn_cancel_sig = pyqtSignal()
+class WSettingsBase(QObject):
+    btn_settings_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
-    btn_quitapp_sig = pyqtSignal()
+    btn_cancel_sig = pyqtSignal()
     widgetList = []
+    baseAList = []
+    baseBList = []
+    viewbaseAList = []
+    viewbaseBList = []
+    widgetBaseList = []
 
     def __init__(self, name, parent):
         super().__init__()
-        self.view = Ui_WSettings()
+        self.view = Ui_WSettingsBase()
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
-        self._translate = QtCore.QCoreApplication.translate
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
-        self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
-        self.view.wbase_detect_btn.clicked.connect(self.base_detect)
-        self.view.wbase_invert_btn.clicked.connect(self.base_invert)
-        self.view.btn_cancel.clicked.connect(self.btn_cancel)
-        self.view.btn_valid.clicked.connect(self.btn_valid)
-        self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
+        self.view.buttonBaseADetect.clicked.connect(self.baseA_detect)
+        self.view.buttonBaseBDetect.clicked.connect(self.baseB_detect)
+        self.view.buttonClearA.clicked.connect(self.clearA)
+        self.view.buttonClearB.clicked.connect(self.clearB)
+        self.view.buttonInvert.clicked.connect(self.moveAll)
+        self.view.btn_back.clicked.connect(self.btn_settings_sig.emit)
+        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
+        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self._translate = QtCore.QCoreApplication.translate
         self.udp_sig = None
         self.ipset_sig = None
         self.ipbaseclear_sig = None
         self.udp_sig_connected = False
         self.ipbaseinvert_sig = None
+        self.baseInProgress = None
 
     def get_widget(self):
         return (self.widgetList)
 
     def show(self):
-        if Utils.server_alive():
-            self.view.webserverUrl.setText(Utils.get_base_url())
         self.widget.show()
 
     def is_show(self):
@@ -673,48 +690,10 @@ class WSettings(QObject):
         self.widget.hide()
 
     def set_data(self):
-        self.view.sound.setChecked(ConfigReader.config.conf['sound'])
-        self.view.voice.setChecked(ConfigReader.config.conf['voice'])
-        self.view.anemometer.setChecked(ConfigReader.config.conf['anemometer'])
-        self.view.arduino.setChecked(ConfigReader.config.conf['arduino'])
-        self.view.simulate_mode.setChecked(ConfigReader.config.conf['simulatemode'])
-        self.view.voltagemin.setValue(ConfigReader.config.conf['voltage_min'])
-        self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
-        self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
-        self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
-        self.view.webserver.setChecked(ConfigReader.config.conf['run_webserver'])
+        print("todo")
 
     def get_data(self):
-        ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
-        ConfigReader.config.conf['voice'] = self.view.voice.isChecked()
-        ConfigReader.config.conf['anemometer'] = self.view.anemometer.isChecked()
-        ConfigReader.config.conf['arduino'] = self.view.arduino.isChecked()
-        ConfigReader.config.conf['simulatemode'] = self.view.simulate_mode.isChecked()
-        ConfigReader.config.conf['fullscreen'] = self.view.fullscreen.isChecked()
-        ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
-        ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
-        ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
-        ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
-        ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
-
-    def btn_cancel(self):
-
-        if self.udp_sig is not None and self.udp_sig_connected:
-            self.udp_sig.disconnect(self.slot_udp)
-            self.udp_sig_connected = False
-            if self.udp_sig is not None:
-                self.ipbaseclear_sig.emit()
-                self.view.baseA_IP.setText(self._translate("None", "None"))
-                self.view.baseB_IP.setText(self._translate("None", "None"))
-        self.btn_cancel_sig.emit()
-
-    def btn_valid(self):
-        if self.udp_sig is not None and self.udp_sig_connected:
-            self.udp_sig.disconnect(self.slot_udp)
-            self.udp_sig_connected = False
-        if self.ipset_sig is not None:
-            self.ipset_sig.emit(self.get_ipbaseA(), self.get_ipbaseB())
-        self.btn_valid_sig.emit()
+        print("todo")
 
     def set_udp_sig(self, udp, set, clear, invert):
         self.udp_sig = udp
@@ -722,49 +701,167 @@ class WSettings(QObject):
         self.ipbaseclear_sig = clear
         self.ipbaseinvert_sig = invert
 
-    def base_detect(self):
-        if self.udp_sig is not None and self.ipbaseclear_sig is not None:
+    def baseA_detect(self):
+        if self.udp_sig is not None and self.ipbaseclear_sig is not None and self.baseInProgress == None:
             self.udp_sig.connect(self.slot_udp)
             self.ipbaseclear_sig.emit()
-            self.view.baseA_IP.setText("...")
-            self.view.baseB_IP.setText("...")
+            self.view.buttonBaseADetect.setText(self._translate("In Progress...", "In Progress..."))
             self.udp_sig_connected = True
+            self.baseInProgress = 'A'
+        elif self.baseInProgress == 'A':
+            self.baseInProgress = None
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            self.view.buttonBaseADetect.setText(self._translate("Detect", "Detect"))
+
+    def baseB_detect(self):
+        if self.udp_sig is not None and self.ipbaseclear_sig is not None and self.baseInProgress == None:
+            self.udp_sig.connect(self.slot_udp)
+            self.ipbaseclear_sig.emit()
+            self.view.buttonBaseBDetect.setText(self._translate("In Progress...", "In Progress..."))
+            self.udp_sig_connected = True
+            self.baseInProgress = 'B'
+        elif self.baseInProgress == 'B':
+            self.baseInProgress = None
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            self.view.buttonBaseBDetect.setText(self._translate("Detect", "Detect"))
+
 
     def slot_udp(self, caller, data, address):
         print(caller, data, address)
-        if caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseA_IP.toPlainText() == "...":
-            self.view.baseA_IP.setText(address)
-        elif caller.lower() == "udpreceive" and data.lower() == "event" and self.view.baseB_IP.toPlainText() == "..." and \
-                address != self.view.baseA_IP.toPlainText():
-            self.view.baseB_IP.setText(address)
+        if self.baseInProgress == 'A' and self.__ipNotPresent(self.baseAList, address):
+            self.__addbase_List(self.baseAList, self.view.listWidget_baseA, address, self.deleteItemBaseA,
+                                self.moveItemBaseA)
+        elif self.baseInProgress == 'B' and self.__ipNotPresent(self.baseBList, address):
+            self.__addbase_List(self.baseBList, self.view.listWidget_baseB, address, self.deleteItemBaseB,
+                                self.moveItemBaseB)
 
-    def base_invert(self):
-        if self.ipbaseinvert_sig is not None:
-            tmp = self.view.baseA_IP.toPlainText()
-            self.view.baseA_IP.setText(self.view.baseB_IP.toPlainText())
-            self.view.baseB_IP.setText(tmp)
+    def clearA(self):
+        self.view.listWidget_baseA.clear()
+        self.baseAList.clear()
+
+    def deleteItemBaseA(self):
+        self.__deleteWidgetinQlistWidget(self.baseAList, self.view.listWidget_baseA, self.sender().parent().pos())
+
+    def clearB(self):
+        self.view.listWidget_baseB.clear()
+        self.baseBList.clear()
+
+    def deleteItemBaseB(self):
+        self.__deleteWidgetinQlistWidget(self.baseBList, self.view.listWidget_baseB, self.sender().parent().pos())
+
+    def moveItemBaseA(self):
+        ip = self.__deleteWidgetinQlistWidget(self.baseAList, self.view.listWidget_baseA, self.sender().parent().pos())
+        self.__addbase_List(self.baseBList, self.view.listWidget_baseB, ip, self.deleteItemBaseB,
+                            self.moveItemBaseB)
+
+    def moveItemBaseB(self):
+        ip = self.__deleteWidgetinQlistWidget(self.baseBList, self.view.listWidget_baseB, self.sender().parent().pos())
+        self.__addbase_List(self.baseAList, self.view.listWidget_baseA, ip, self.deleteItemBaseA,
+                            self.moveItemBaseA)
+
+    def moveAll(self):
+        ipA=self.__getAllIp(self.baseAList)
+        ipB=self.__getAllIp(self.baseBList)
+
+        self.clearA()
+        for ip in ipB:
+            self.__addbase_List(self.baseAList, self.view.listWidget_baseA, ip, self.deleteItemBaseA,
+                                self.moveItemBaseA)
+        self.clearB()
+        for ip in ipA:
+            self.__addbase_List(self.baseBList, self.view.listWidget_baseB, ip, self.deleteItemBaseB,
+                                self.moveItemBaseB)
 
     def get_ipbaseA(self):
-        return self.view.baseA_IP.toPlainText()
+        return self.__getAllIp(self.baseAList)
 
     def get_ipbaseB(self):
-        return self.view.baseB_IP.toPlainText()
+        return self.__getAllIp(self.baseBList)
 
+    def btn_cancel(self):
+        if self.udp_sig is not None and self.udp_sig_connected:
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            if self.udp_sig is not None:
+                self.ipbaseclear_sig.emit()
+                self.clearA()
+                self.clearB()
 
-class WPiCamPair(QObject):
-    btn_cancel_sig = pyqtSignal()
+    def btn_valid(self):
+        if self.udp_sig is not None and self.udp_sig_connected:
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+        if self.ipset_sig is not None:
+            self.ipset_sig.emit(self.get_ipbaseA(), self.get_ipbaseB())
+
+    @staticmethod
+    def __addbase_List (list, uilist, ip, deleteEvent, moveEvent):
+        collect = collections.OrderedDict()
+        collect['QlistWidgetItem'] = QtWidgets.QListWidgetItem()
+        collect['QWidget'] = QtWidgets.QWidget()
+        collect['ui_widget'] = Ui_WSettingBase_item()
+        list.append(collect)
+        uilist.addItem(list[-1]['QlistWidgetItem'])
+
+        list[-1]['ui_widget'].setupUi(list[-1]['QWidget'])
+        list[-1]['ui_widget'].ipAddress.setText(ip)
+        list[-1]['ui_widget'].buttonDelete.clicked.connect(deleteEvent)
+        list[-1]['ui_widget'].buttonMove.clicked.connect(moveEvent)
+        uilist.setItemWidget(list[-1]['QlistWidgetItem'], list[-1]['QWidget'])
+
+    @staticmethod
+    def __getWidgetinQlistWidget (list, uilist, pos):
+        item = uilist.itemAt(pos)
+        for index in list:
+            if index['QlistWidgetItem'] == item:
+                return index['ui_widget']
+
+    @staticmethod
+    def __deleteWidgetinQlistWidget (list, uilist, pos):
+        ip=""
+        item = uilist.itemAt(pos)
+        itemdelete = None
+        for i in range(len(list)):
+            if list[i]['QlistWidgetItem'] == item:
+                itemdelete = i
+        if itemdelete is not None:
+            ip = list[itemdelete]['ui_widget'].ipAddress.text()
+            del(list[itemdelete])
+            uilist.takeItem(itemdelete)
+        return ip
+
+    @staticmethod
+    def __ipNotPresent(list, ip):
+        for i in range(len(list)):
+            if list[i]['ui_widget'].ipAddress.text()==ip:
+                return False
+        return True
+
+    @staticmethod
+    def __getAllIp(list):
+        ip = []
+        for i in list:
+            ip.append(i['ui_widget'].ipAddress.text())
+        return ip
+
+class WSettingsSound(QObject):
+    btn_settings_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
+    btn_cancel_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
         super().__init__()
-        self.view = Ui_WPicamPair()
+        self.view = Ui_WSettingsSound()
         self.name = name
         self.parent = parent
-        self._translate = QtCore.QCoreApplication.translate
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
+        self.view.btn_back.clicked.connect(self.btn_settings_sig.emit)
+        self._translate = QtCore.QCoreApplication.translate
         self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
         self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
 
@@ -781,7 +878,86 @@ class WPiCamPair(QObject):
         self.widget.hide()
 
     def set_data(self):
-        print("todo PiCamPair - set data")
+        self.view.sound.setChecked(ConfigReader.config.conf['sound'])
+        self.view.voice.setChecked(ConfigReader.config.conf['voice'])
+        self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
+        self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
+        self.view.lowVoltage.setChecked(ConfigReader.config.conf['lowvoltage_sound'])
+        self.view.noiseSound.setChecked(ConfigReader.config.conf['noisesound'])
+        self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume'])
+
 
     def get_data(self):
-        print("todo PiCamPair - get data")
+        ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
+        ConfigReader.config.conf['voice'] = self.view.voice.isChecked()
+        ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
+        ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
+        ConfigReader.config.conf['lowvoltage_sound'] = self.view.lowVoltage.isChecked()
+        ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
+        ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()
+
+class WSettings(QObject):
+    btn_settingsadvanced_sig = pyqtSignal()
+    btn_settingsbase_sig = pyqtSignal()
+    btn_settingssound_sig = pyqtSignal()
+    btn_cancel_sig = pyqtSignal()
+    btn_valid_sig = pyqtSignal()
+    btn_quitapp_sig = pyqtSignal()
+    widgetList = []
+
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WSettings()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self._translate = QtCore.QCoreApplication.translate
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
+        self.view.btn_base_settings.clicked.connect(self.btn_settingsbase_sig.emit)
+        self.view.btn_sound_settings.clicked.connect(self.btn_settingssound_sig.emit)
+
+        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
+        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
+
+        self.languages_available = []
+
+        for dI in os.listdir('Languages'):
+            if os.path.isdir(os.path.join('Languages', dI)):
+                self.languages_available.append(dI)
+        self.view.language.clear()
+        for item in self.languages_available:
+            self.view.language.addItem(item, item)
+
+    def get_widget(self):
+        return (self.widgetList)
+
+    def show(self):
+        if Utils.server_alive():
+            self.view.webserverUrl.setText(Utils.get_base_url())
+        self.widget.show()
+
+    def is_show(self):
+        return self.widget.isVisible()
+
+    def hide(self):
+        self.widget.hide()
+
+    def set_data(self):
+        self.view.simulate_mode.setChecked(ConfigReader.config.conf['simulatemode'])
+        self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
+        self.view.webserver.setChecked(ConfigReader.config.conf['run_webserver'])
+        self.view.mode.setCurrentIndex(ConfigReader.config.conf['competition_mode'])
+        index=0
+        if ConfigReader.config.conf['language'] in self.languages_available:
+            index=self.languages_available.index(ConfigReader.config.conf['language'])
+        self.view.language.setCurrentIndex(index)
+
+    def get_data(self):
+        ConfigReader.config.conf['simulatemode'] = self.view.simulate_mode.isChecked()
+        ConfigReader.config.conf['fullscreen'] = self.view.fullscreen.isChecked()
+        ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
+        ConfigReader.config.conf['competition_mode'] = self.view.mode.currentIndex()
+        ConfigReader.config.conf['language']=self.languages_available[self.view.language.currentIndex()]

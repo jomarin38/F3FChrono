@@ -15,8 +15,8 @@ https://github.com/jsh2134/iw_parse/
 '''
 class udpreceive(QThread):
     ipbaseclear_sig = pyqtSignal()
-    ipinvert_sig = pyqtSignal()
-    ipset_sig = pyqtSignal(str, str)
+    ipinvert_sig = pyqtSignal(list)
+    ipset_sig = pyqtSignal(list, list)
 
     def __init__(self, udpport, signal_chrono, signal_btnnext, signal_wind, signal_rain, signal_accu, signal_rssi):
         super().__init__()
@@ -68,11 +68,7 @@ class udpreceive(QThread):
                     self.terminate()
                 elif (m[0]=='simulate' and m[1]=='base'):
                     base = m[2]
-                    if base == self.ipbaseA:
-                        base = "baseA"
-                    elif base == self.ipbaseB:
-                        base = "baseB"
-                    self.event_chrono.emit("udpreceive", 'event', base)
+                    self.event_chrono.emit("udpreceive", 'event', self._find_base_name(base))
                 elif (m[0]=='simulate' and m[1]=='GPIO'):
                     if m[2].lower()=="btnnext":
                         self.event_btn_next.emit(0)
@@ -87,17 +83,23 @@ class udpreceive(QThread):
                     self.event_rssi.emit(int(m[2]), int(m[3]))
                 else:
                     base = address[0]
-                    if base == self.ipbaseA:
-                        base = "baseA"
-                    elif base == self.ipbaseB:
-                        base = "baseB"
-                    self.event_chrono.emit("udpreceive", data.decode("utf-8").lower(), base)
+                    self.event_chrono.emit("udpreceive", data.decode("utf-8").lower(),
+                                           self._find_base_name(base))
             except socket.error as msg:
-                print ('udp receive error {}'.format(msg))
+                print('udp receive error {}'.format(msg))
                 logging.warning('udp receive error {}'.format(msg))
                 continue
 
-                
+    def _find_base_name(self, ip):
+        if ip in self.ipbaseA:
+            print("baseA")
+            return "baseA"
+        elif ip in self.ipbaseB:
+            print("baseB")
+            return "baseB"
+        else:
+            return ip
+
 if __name__ == '__main__':
     print ("Main start")
     udpreceive = udpreceive(UDP_PORT, None, None, None)
