@@ -68,7 +68,7 @@ class udpreceive(QThread):
                     self.terminate()
                 elif (m[0]=='simulate' and m[1]=='base'):
                     base = m[2]
-                    self.event_chrono.emit("udpreceive", 'event', self.__isBaseExist(base, self.ipbaseA, self.ipbaseB))
+                    self.event_chrono.emit("udpreceive", 'event', self._find_base_name(base))
                 elif (m[0]=='simulate' and m[1]=='GPIO'):
                     if m[2].lower()=="btnnext":
                         self.event_btn_next.emit(0)
@@ -84,22 +84,21 @@ class udpreceive(QThread):
                 else:
                     base = address[0]
                     self.event_chrono.emit("udpreceive", data.decode("utf-8").lower(),
-                                           self.__isBaseExist(base, self.ipbaseA, self.ipbaseB))
+                                           self._find_base_name(base))
             except socket.error as msg:
                 print('udp receive error {}'.format(msg))
                 logging.warning('udp receive error {}'.format(msg))
                 continue
-    @staticmethod
-    def __isBaseExist(ip, listA, listB):
-        for i in listA:
-            if i == ip:
-                print("baseA")
-                return "baseA"
-        for i in listB:
-            if i == ip:
-                print("baseB")
-                return "baseB"
-        return ip
+
+    def _find_base_name(self, ip):
+        if ip in self.ipbaseA:
+            print("baseA")
+            return "baseA"
+        elif ip in self.ipbaseB:
+            print("baseB")
+            return "baseB"
+        else:
+            return ip
 
 if __name__ == '__main__':
     print ("Main start")
