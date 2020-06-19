@@ -27,7 +27,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.rpigpio = rpi_gpio(rpi, self.btn_next_action, None, None)
         self.base_test = -10
 
-        if ConfigReader.config.conf['language'] is not "English":
+        if ConfigReader.config.conf['language'] != "English":
             _translator = QtCore.QTranslator()
             _path = os.path.join(os.getcwd(), 'Languages', ConfigReader.config.conf['language']+'.qm')
             _translator.load(_path)
