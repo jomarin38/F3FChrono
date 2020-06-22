@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'WSettingsBase.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.2
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -13,8 +13,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_WSettingsBase(object):
     def setupUi(self, WSettingsBase):
         WSettingsBase.setObjectName("WSettingsBase")
-        WSettingsBase.resize(480, 271)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        WSettingsBase.resize(437, 264)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Ignored)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(WSettingsBase.sizePolicy().hasHeightForWidth())
@@ -24,6 +24,7 @@ class Ui_WSettingsBase(object):
         self.gridLayout.setSpacing(3)
         self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.verticalLayout.setSpacing(4)
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
@@ -74,9 +75,19 @@ class Ui_WSettingsBase(object):
         self.buttonBaseBDetect.setObjectName("buttonBaseBDetect")
         self.gridLayout_2.addWidget(self.buttonBaseBDetect, 0, 1, 1, 1)
         self.listWidget_baseB = QtWidgets.QListWidget(WSettingsBase)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.listWidget_baseB.sizePolicy().hasHeightForWidth())
+        self.listWidget_baseB.setSizePolicy(sizePolicy)
         self.listWidget_baseB.setObjectName("listWidget_baseB")
         self.gridLayout_2.addWidget(self.listWidget_baseB, 2, 1, 1, 1)
         self.listWidget_baseA = QtWidgets.QListWidget(WSettingsBase)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.listWidget_baseA.sizePolicy().hasHeightForWidth())
+        self.listWidget_baseA.setSizePolicy(sizePolicy)
         self.listWidget_baseA.setObjectName("listWidget_baseA")
         self.gridLayout_2.addWidget(self.listWidget_baseA, 2, 0, 1, 1)
         self.buttonInvert = QtWidgets.QPushButton(WSettingsBase)
