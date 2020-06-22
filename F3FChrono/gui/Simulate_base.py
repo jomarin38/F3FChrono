@@ -39,11 +39,15 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
 
     def send_base_A(self):
         self.__sendbase(self.udpbeep,
-                        self.__getWidgetinQlistWidget(self.baseAList, self.ui.listBaseA, self.sender().parent().pos()))
+                        self.baseAList[0]['ui_widget'])
+        self.__sendbase(self.udpbeep,
+                        self.baseAList[1]['ui_widget'])
 
     def send_base_B(self):
         self.__sendbase(self.udpbeep,
-                        self.__getWidgetinQlistWidget(self.baseBList, self.ui.listBaseB, self.sender().parent().pos()))
+                        self.baseBList[0]['ui_widget'])
+        self.__sendbase(self.udpbeep,
+                        self.baseBList[1]['ui_widget'])
 
     def send_gpio_A(self):
         self.udpbeep.sendData("simulate GPIO baseA")
