@@ -49,6 +49,7 @@ class Ui_WSettingsSound(object):
         self.horizontalLayout_24.setObjectName("horizontalLayout_24")
         self.noisevolume = QtWidgets.QDoubleSpinBox(WSettingsSound)
         self.noisevolume.setDecimals(3)
+        self.noisevolume.setSingleStep(0.001)
         self.noisevolume.setProperty("value", 0.005)
         self.noisevolume.setObjectName("noisevolume")
         self.horizontalLayout_24.addWidget(self.noisevolume)
