@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'WSettingsBase.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -93,6 +93,21 @@ class Ui_WSettingsBase(object):
         self.buttonInvert = QtWidgets.QPushButton(WSettingsBase)
         self.buttonInvert.setObjectName("buttonInvert")
         self.gridLayout_2.addWidget(self.buttonInvert, 4, 0, 1, 2)
+        self.horizontalLayout_24 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_24.setObjectName("horizontalLayout_24")
+        self.inStartBlackOut_second = QtWidgets.QDoubleSpinBox(WSettingsBase)
+        self.inStartBlackOut_second.setDecimals(1)
+        self.inStartBlackOut_second.setSingleStep(0.1)
+        self.inStartBlackOut_second.setProperty("value", 0.7)
+        self.inStartBlackOut_second.setObjectName("inStartBlackOut_second")
+        self.horizontalLayout_24.addWidget(self.inStartBlackOut_second)
+        self.label_22 = QtWidgets.QLabel(WSettingsBase)
+        self.label_22.setObjectName("label_22")
+        self.horizontalLayout_24.addWidget(self.label_22)
+        self.gridLayout_2.addLayout(self.horizontalLayout_24, 5, 1, 1, 1)
+        self.inStartBlackOut = QtWidgets.QCheckBox(WSettingsBase)
+        self.inStartBlackOut.setObjectName("inStartBlackOut")
+        self.gridLayout_2.addWidget(self.inStartBlackOut, 5, 0, 1, 1)
         self.verticalLayout.addLayout(self.gridLayout_2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -127,6 +142,8 @@ class Ui_WSettingsBase(object):
         self.baseA_label.setText(_translate("WSettingsBase", "Base A : "))
         self.buttonBaseBDetect.setText(_translate("WSettingsBase", "Detect"))
         self.buttonInvert.setText(_translate("WSettingsBase", "Invert"))
+        self.label_22.setText(_translate("WSettingsBase", "InStart blackout (s)"))
+        self.inStartBlackOut.setText(_translate("WSettingsBase", "InStart blackout"))
         self.btn_back.setText(_translate("WSettingsBase", "Back to Settings"))
         self.btn_cancel.setText(_translate("WSettingsBase", "Cancel"))
         self.btn_valid.setText(_translate("WSettingsBase", "Valid"))

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'WSettingsSound.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -49,6 +49,7 @@ class Ui_WSettingsSound(object):
         self.horizontalLayout_24.setObjectName("horizontalLayout_24")
         self.noisevolume = QtWidgets.QDoubleSpinBox(WSettingsSound)
         self.noisevolume.setDecimals(3)
+        self.noisevolume.setSingleStep(0.001)
         self.noisevolume.setProperty("value", 0.005)
         self.noisevolume.setObjectName("noisevolume")
         self.horizontalLayout_24.addWidget(self.noisevolume)

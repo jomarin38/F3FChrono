@@ -690,10 +690,12 @@ class WSettingsBase(QObject):
         self.widget.hide()
 
     def set_data(self):
-        print("todo")
+        self.view.inStartBlackOut.setChecked(ConfigReader.config.conf['inStartBlackOut'])
+        self.view.inStartBlackOut_second.setValue(ConfigReader.config.conf['inStartBlackOut_second'])
 
     def get_data(self):
-        print("todo")
+        ConfigReader.config.conf['inStartBlackOut'] = self.view.inStartBlackOut.isChecked()
+        ConfigReader.config.conf['inStartBlackOut_second'] = self.view.inStartBlackOut_second.value()
 
     def set_udp_sig(self, udp, set, clear, invert):
         self.udp_sig = udp

@@ -71,7 +71,9 @@ default_config = \
     "training_speech_interval": 2,
     "noisesound": False,
     "noisevolume": 0.005,
-    'lowvoltage_sound': False
+    'lowvoltage_sound': False,
+    'inStartBlackOut': False,
+    'inStartBlackOut_second': 0.5
 }
 
 def init():

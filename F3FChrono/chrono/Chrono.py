@@ -183,6 +183,8 @@ class ChronoArduino(ChronoHard, QTimer):
         self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'],
                                    ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
                                      self.lap_finished, self.run_finished, self.run_training, self.altitude_finished, self.accu_signal)
+
+        self.blackOutTime = 0
         self.status_changed.connect(self.slot_status)
         self.timer = QTimer()
         self.timer.timeout.connect(self.event_voltage)
@@ -213,8 +215,19 @@ class ChronoArduino(ChronoHard, QTimer):
                 self.arduino.event_Base('n')
 
         if caller.lower()=="udpreceive" and data == "event" and address == "baseA":
-            print("demande event base A")
-            self.arduino.event_Base('a')
+            if ConfigReader.config.conf['competition_mode']==False:
+                if self.status == chronoStatus.Launched or self.status == chronoStatus.Late:
+                    self.blackOutTime = time.time()
+                if ConfigReader.config.conf['inStartBlackOut'] == False or (self.status != chronoStatus.InStart and
+                                                                            self.status != chronoStatus.InStartLate):
+                    self.arduino.event_Base('a')
+                elif self.blackOutTime+ConfigReader.config.conf['inStartBlackOut_second']<time.time() and \
+                        ConfigReader.config.conf['inStartBlackOut'] and \
+                        (self.status ==chronoStatus.InStart or self.status == chronoStatus.InStartLate) :
+                    self.arduino.event_Base('a')
+            else:
+                self.arduino.event_Base('a')
+
         if caller.lower()=="udpreceive" and data == "event" and address == "baseB":
             print("demande event base B")
             self.arduino.event_Base('b')

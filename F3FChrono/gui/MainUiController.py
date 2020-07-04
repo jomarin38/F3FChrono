@@ -213,6 +213,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].set_data()
         self.controllers['settingssound'].set_data()
         self.controllers['settingsadvanced'].set_data()
+        self.controllers['settingsbase'].set_data()
         self.show_settings()
 
     def set_signal_mode(self, training=False):
@@ -246,6 +247,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].get_data()
         self.controllers['settingssound'].get_data()
         self.controllers['settingsadvanced'].get_data()
+        self.controllers['settingsbase'].get_data()
         self.controllers['settingsbase'].btn_valid()
         ConfigReader.config.write('config.json')
         self.show_config()
