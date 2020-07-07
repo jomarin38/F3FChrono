@@ -171,6 +171,10 @@ class ChronoHard(QObject):
 
 
 class ChronoArduino(ChronoHard, QTimer):
+
+    _lock = threading.Lock()
+    _last_event_time = 0
+
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
         print("chronoArduino init")
@@ -184,12 +188,14 @@ class ChronoArduino(ChronoHard, QTimer):
                                    ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
                                      self.lap_finished, self.run_finished, self.run_training, self.altitude_finished, self.accu_signal)
 
-        self.blackOutTime = 0
         self.status_changed.connect(self.slot_status)
         self.timer = QTimer()
         self.timer.timeout.connect(self.event_voltage)
         self.timer.start(30000)
         self.reset()
+        self.in_start_blackout_enabled = ConfigReader.config.conf['inStartBlackOut']
+        self.in_start_blackout_second = ConfigReader.config.conf['inStartBlackOut_second']
+        self.competition_mode = ConfigReader.config.conf['competition_mode']
 
     def slot_status(self, status):
         self.status = status
@@ -202,6 +208,7 @@ class ChronoArduino(ChronoHard, QTimer):
             self.arduino.set_status(value)
 
     def handle_chrono_event(self, caller, data, address):
+        ChronoArduino._lock.acquire()
         if caller.lower() == "btnnext" and \
                 (self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.InWait):
             self.arduino.set_status(self.status+1)
@@ -210,27 +217,24 @@ class ChronoArduino(ChronoHard, QTimer):
         elif caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
             self.run_validated.emit()
         elif caller.lower() == "btnnext":
-            if ConfigReader.config.conf['competition_mode']==False:
+            if not self.competition_mode:
                 print("demande event btn Next")
                 self.arduino.event_Base('n')
 
         if caller.lower()=="udpreceive" and data == "event" and address == "baseA":
-            if ConfigReader.config.conf['competition_mode']==False:
-                if self.status == chronoStatus.Launched or self.status == chronoStatus.Late:
-                    self.blackOutTime = time.time()
-                if ConfigReader.config.conf['inStartBlackOut'] == False or (self.status != chronoStatus.InStart and
-                                                                            self.status != chronoStatus.InStartLate):
-                    self.arduino.event_Base('a')
-                elif self.blackOutTime+ConfigReader.config.conf['inStartBlackOut_second']<time.time() and \
-                        ConfigReader.config.conf['inStartBlackOut'] and \
-                        (self.status ==chronoStatus.InStart or self.status == chronoStatus.InStartLate) :
+            if not self.competition_mode:
+                if not self.in_start_blackout_enabled or self.status > chronoStatus.InStart or \
+                        ChronoArduino._last_event_time+self.in_start_blackout_second < time.time():
                     self.arduino.event_Base('a')
             else:
                 self.arduino.event_Base('a')
+            if self.in_start_blackout_enabled:
+                ChronoArduino._last_event_time = time.time()
 
         if caller.lower()=="udpreceive" and data == "event" and address == "baseB":
             print("demande event base B")
             self.arduino.event_Base('b')
+        ChronoArduino._lock.release()
 
     def handle_run_started(self):
         self.startTime = datetime.now()
