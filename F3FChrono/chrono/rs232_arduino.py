@@ -12,7 +12,7 @@ from F3FChrono.Utils import is_running_on_pi
 class rs232_arduino (QObject):
     reset_arduino_sig = pyqtSignal()
 
-    def __init__(self, voltageCoef, rebundTimeBtn, buzzerTime, status_changed, run_started, lap_finished,
+    def __init__(self, voltageCoef, rebundTimeBtn, buzzerTime, status_changed, run_started, climbout_time, lap_finished,
                  run_finished, run_training, wait_alt_sig, accu_sig):
         super().__init__()
         self.bus = serial.Serial(port=rs232_arduino.get_serial_port(), baudrate = 57600, parity=serial.PARITY_NONE,
@@ -23,6 +23,7 @@ class rs232_arduino (QObject):
         self.lap_finished_sig = lap_finished
         self.run_finished_sig = run_finished
         self.run_training_sig = run_training
+        self.climbout_time_sig = climbout_time
         self.wait_alt_sig = wait_alt_sig
         self.accu_sig = accu_sig
         self.status=0
@@ -90,8 +91,8 @@ class rs232_arduino (QObject):
                                 for i in range(2, int(data[1])+2):
                                     tmp += int(data[i])/1000
                                 self.run_finished_sig.emit(tmp)
-
-
+                    if data[0] == "climbout_time":
+                        self.climbout_time_sig.emit(int(data[1])/1000)
                     if data[0] == "voltage":
                         self.accu_sig.emit(int(data[1])*5/1024/self.voltageCoef)
                     if data[0] == "resetµc":
@@ -100,7 +101,7 @@ class rs232_arduino (QObject):
                 print("serial exception")
                 return None
             except TypeError as e:
-                print("bus close")
+                print("bus close : ", e)
                 self.bus.close()
                 self.bus = None
                 return None

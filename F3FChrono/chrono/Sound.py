@@ -105,8 +105,6 @@ class chronoQSound(QThread):
         if self.play_sound and self.entry is not None:
             self.entry.play()
 
-
-
     def sound_penalty(self):
         if self.play_sound:
             self.penalty.play()

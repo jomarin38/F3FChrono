@@ -43,6 +43,7 @@ CREATE TABLE `chrono` (
   `lap8` double DEFAULT NULL,
   `lap9` double DEFAULT NULL,
   `lap10` double DEFAULT NULL,
+  `climbout_time` double DEFAULT NULL,
   PRIMARY KEY (`chrono_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=281 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;

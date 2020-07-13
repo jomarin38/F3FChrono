@@ -476,13 +476,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     @staticmethod
     def chronoHard_to_chrono(chronoHard, chrono):
-        chrono.run_time=chronoHard.get_time()
-        chrono.start_time=chronoHard.getStartTime()
-        chrono.end_time=chronoHard.getEndTime()
-        chrono.max_wind_speed=chronoHard.getMaxWindSpeed()
-        chrono.min_wind_speed=chronoHard.getMinWindSpeed()
-        chrono.mean_wind_speed=chronoHard.getMeanWindSpeed()
-        chrono.wind_direction=chronoHard.getWindDir()
+        chrono.run_time = chronoHard.get_time()
+        chrono.climbout_time = chronoHard.get_climbout_time()
+        chrono.start_time = chronoHard.getStartTime()
+        chrono.end_time = chronoHard.getEndTime()
+        chrono.max_wind_speed = chronoHard.getMaxWindSpeed()
+        chrono.min_wind_speed = chronoHard.getMinWindSpeed()
+        chrono.mean_wind_speed = chronoHard.getMeanWindSpeed()
+        chrono.wind_direction = chronoHard.getWindDir()
         for lap in chronoHard.getLaps():
             chrono.add_lap_time(lap)
         print(chrono.to_string())

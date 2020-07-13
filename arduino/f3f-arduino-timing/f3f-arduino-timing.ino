@@ -42,7 +42,10 @@ typedef struct {
   unsigned long oldtime;
   unsigned long starttime;
   unsigned long startaltitudetime;
+  unsigned long climbout_time, oldclimbout_time;
 } chronoStr;
+
+
 
 typedef struct {
   int runStatus;
@@ -98,6 +101,7 @@ volatile unsigned int i = 0;
 volatile byte temp = 0;
 volatile byte reset = true;
 volatile chronoMode chrono_mode = Race;
+
 /*void baseA_Interrupt(void);
 void baseB_Interrupt(void);
 void baseCheck(byte base);
@@ -107,6 +111,7 @@ void buzzerRun(buzzerStr *data);
 void buzzerSet(buzzerStr *data, byte nb);
 void baseCheck(byte base);
 */
+
 void(* resetFunc) (void) = 0;
 
 // the setup function runs once when you press reset or power the board
@@ -188,6 +193,11 @@ void RS232Run(void) {
   if (temp != 0){
     memcpy(&chrono_old, &chrono, sizeof(chrono));
     printchrono();
+    if (chrono.climbout_time!=chrono.oldclimbout_time){
+      printclimbout_time();      
+      chrono.oldclimbout_time=chrono.climbout_time;
+    }
+
   }
   //Process serial request
   if (serial.data_available) {
@@ -203,7 +213,7 @@ void RS232Run(void) {
       printdebug();
     }else if (tmp=='s'){  //Start chrono
       chronostatus.runStatus=byte(serial.data_read[1]-'0');
-      if (chronostatus.runStatus==InStart_Late or chronostatus.runStatus==Late) {
+      if (chronostatus.runStatus==Launched) {
         chronostart();
         buzzerSet(&buzzer, 1);
       }
@@ -394,10 +404,15 @@ void baseCheckRace(byte base){
     buzzerSet(&buzzer, 1);
   }else if (chronostatus.runStatus==InStart and (BASEAPIN == base or base == BTNNEXTPIN)) {
     buzzerSet(&buzzer, 1);
-    chronostart();
+    time1=millis();
+    chrono.climbout_time = time1 - chrono.oldtime;
+    chrono.oldtime=time1;
     chronostatus.runStatus = InProgressB;
   }else if (chronostatus.runStatus==InStart_Late and (BASEAPIN == base or base == BTNNEXTPIN)){
     chronostatus.runStatus = InProgressB;
+    time1=millis();
+    chrono.climbout_time = time1 - chrono.oldtime;
+    chrono.oldtime=time1;
     buzzerSet(&buzzer, 1);
   }else if (chronostatus.runStatus==InProgressA and (base == BASEAPIN or base == BTNNEXTPIN)) {
     time1 = millis();
@@ -488,6 +503,12 @@ void printchrono(void){
     Serial.print(",");
     Serial.print(chrono.lap[i]);
   }
+  Serial.println(",");
+}
+
+void printclimbout_time(void){
+  Serial.print("climbout_time,");
+  Serial.print(chrono.climbout_time);
   Serial.println(",");
 }
 

@@ -31,6 +31,7 @@ class chronoStatus():
 class ChronoHard(QObject):
     status_changed = pyqtSignal(int)
     run_started = pyqtSignal()
+    climbout = pyqtSignal(float)
     lap_finished = pyqtSignal(int, float)
     run_finished = pyqtSignal(float)
     run_validated = pyqtSignal()
@@ -46,9 +47,10 @@ class ChronoHard(QObject):
     def __init__(self, signal_btnnext):
         super().__init__()
         self.penalty = 0.0
-        self.startTime=None
-        self.endTime=None
-        self.signal_btnnext=signal_btnnext
+        self.startTime = None
+        self.endTime = None
+        self.climbout_time = 0
+        self.signal_btnnext = signal_btnnext
         self.wind_signal.connect(self.wind_info)
         self.rain_signal.connect(self.rain_info)
         self.wind= collections.OrderedDict()
@@ -136,6 +138,9 @@ class ChronoHard(QObject):
         else:
             return 0
 
+    def get_climbout_time(self):
+        return (self.climbout_time)
+
     def get_time(self):
         time=0
         for i in range(self.getLapCount()):
@@ -185,10 +190,11 @@ class ChronoArduino(ChronoHard, QTimer):
         self.run_finished.connect(self.handle_run_finished)
 
         self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'],
-                                   ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
+                                   ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started, self.climbout,
                                      self.lap_finished, self.run_finished, self.run_training, self.altitude_finished, self.accu_signal)
 
         self.status_changed.connect(self.slot_status)
+        self.climbout.connect(self.handle_climbout_time)
         self.timer = QTimer()
         self.timer.timeout.connect(self.event_voltage)
         self.timer.start(30000)
@@ -239,6 +245,10 @@ class ChronoArduino(ChronoHard, QTimer):
     def handle_run_started(self):
         self.startTime = datetime.now()
         self.arduino.set_inRun ()
+
+    def handle_climbout_time(self, time):
+        self.climbout_time=time
+        print("climbout Time : ", time)
 
     def handle_lap_finished(self, lap, time):
         self.chronoLap.append(time)

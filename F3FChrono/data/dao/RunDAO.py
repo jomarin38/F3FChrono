@@ -45,7 +45,7 @@ class RunDAO(Dao):
               'r.valid, r.reason, ' \
               'ch.run_time, ch.min_wind_speed, ch.max_wind_speed, ch.mean_wind_speed, ch.wind_direction, ' \
               'ch.start_date, ch.end_date, ch.lap1, ch.lap2, ch.lap3, ch.lap4, ch.lap5, ch.lap6, ch.lap7, ch.lap8, ' \
-              'ch.lap9, ch.lap10, ch.chrono_id ' \
+              'ch.lap9, ch.lap10, ch.climbout_time, ch.chrono_id ' \
               'FROM run r ' \
               'LEFT JOIN competitor c ON r.competitor_id=c.pilot_id AND r.event_id=c.event_id ' \
               'LEFT JOIN pilot p ON c.pilot_id=p.pilot_id ' \
@@ -75,7 +75,8 @@ class RunDAO(Dao):
             chrono.end_time = row[18]
             for i in range(19, 29):
                 chrono.add_lap_time(row[i])
-            chrono.id = row[29]
+            chrono.climbout_time = row[29]
+            chrono.id = row[30]
 
             f3f_run.chrono = chrono
 
@@ -85,8 +86,8 @@ class RunDAO(Dao):
         chrono = run.chrono
         if chrono is not None:
             sql = 'INSERT INTO chrono (run_time, min_wind_speed, max_wind_speed, mean_wind_speed, wind_direction, ' \
-                  'start_date, end_date, lap1, lap2, lap3, lap4, lap5, lap6, lap7, lap8, lap9, lap10) ' \
-                  'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                  'start_date, end_date, lap1, lap2, lap3, lap4, lap5, lap6, lap7, lap8, lap9, lap10, climbout_time) ' \
+                  'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
             if chrono.start_time is not None:
                 start_time = chrono.start_time.strftime('%Y-%m-%d %H:%M:%S')
             else:
@@ -100,7 +101,8 @@ class RunDAO(Dao):
                                  chrono.wind_direction, start_time, end_time, chrono.get_lap_time(0),
                                  chrono.get_lap_time(1), chrono.get_lap_time(2), chrono.get_lap_time(3),
                                  chrono.get_lap_time(4), chrono.get_lap_time(5), chrono.get_lap_time(6),
-                                 chrono.get_lap_time(7), chrono.get_lap_time(8), chrono.get_lap_time(9))
+                                 chrono.get_lap_time(7), chrono.get_lap_time(8), chrono.get_lap_time(9),
+                                 chrono.climbout_time)
 
             sql = 'SELECT LAST_INSERT_ID()'
             query_result = self._execute_query(sql)
