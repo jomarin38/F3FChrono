@@ -120,6 +120,7 @@ CREATE TABLE `round` (
   `round_number` int(11) NOT NULL,
   `event_id` int(11) NOT NULL,
   `valid` tinyint(4) DEFAULT NULL,
+  `flight_order` text DEFAULT NULL,
   PRIMARY KEY (`round_number`,`event_id`),
   KEY `fk_round_event_idx` (`event_id`),
   CONSTRAINT `fk_round_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
