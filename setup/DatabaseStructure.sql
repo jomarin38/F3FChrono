@@ -1,8 +1,8 @@
--- MySQL dump 10.16  Distrib 10.1.43-MariaDB, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.16  Distrib 10.1.44-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: f3f_chrono
+-- Host: 127.0.0.1    Database: f3f_chrono
 -- ------------------------------------------------------
--- Server version	10.1.43-MariaDB-0ubuntu0.18.04.1
+-- Server version	10.1.44-MariaDB-0ubuntu0.18.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -43,7 +43,7 @@ CREATE TABLE `chrono` (
   `lap10` double DEFAULT NULL,
   `climbout_time` double DEFAULT NULL,
   PRIMARY KEY (`chrono_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=453 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -83,12 +83,12 @@ CREATE TABLE `event` (
   `max_allowed_wind_speed` double DEFAULT NULL,
   `max_wind_dir_dev` double DEFAULT NULL,
   `max_interruption_time` double DEFAULT NULL,
-  `bib_start` int(11) DEFAULT 0,
-  `flights_before_refly` int(11) DEFAULT 5,
-  `dayduration` int(11) DEFAULT 1,
+  `bib_start` int(11) DEFAULT '0',
+  `flights_before_refly` int(11) DEFAULT '5',
+  `dayduration` int(11) DEFAULT '1',
   `f3x_vault_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`event_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -106,7 +106,7 @@ CREATE TABLE `pilot` (
   `national_id` varchar(45) DEFAULT NULL,
   `f3x_vault_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`pilot_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -120,7 +120,7 @@ CREATE TABLE `round` (
   `round_number` int(11) NOT NULL,
   `event_id` int(11) NOT NULL,
   `valid` tinyint(4) DEFAULT NULL,
-  `flight_order` text DEFAULT NULL,
+  `flight_order` text,
   PRIMARY KEY (`round_number`,`event_id`),
   KEY `fk_round_event_idx` (`event_id`),
   CONSTRAINT `fk_round_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -170,7 +170,7 @@ CREATE TABLE `run` (
   CONSTRAINT `fk_run_chrono` FOREIGN KEY (`chrono_id`) REFERENCES `chrono` (`chrono_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_run_competitor` FOREIGN KEY (`competitor_id`, `event_id`) REFERENCES `competitor` (`pilot_id`, `event_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_run_roundgroup` FOREIGN KEY (`round_number`, `group_number`, `event_id`) REFERENCES `roundgroup` (`round_number`, `group_number`, `event_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=453 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -182,4 +182,4 @@ CREATE TABLE `run` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-11-26 21:45:36
+-- Dump completed on 2020-07-14  9:34:19
