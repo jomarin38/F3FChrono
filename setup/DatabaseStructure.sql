@@ -58,6 +58,7 @@ CREATE TABLE `competitor` (
   `event_id` int(11) NOT NULL,
   `team` int(11) DEFAULT NULL,
   `bib_number` int(11) DEFAULT NULL,
+  `present` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`pilot_id`,`event_id`),
   KEY `fk_competitor_event_idx` (`event_id`),
   CONSTRAINT `fk_competitor_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
