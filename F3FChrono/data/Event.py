@@ -129,7 +129,9 @@ class Event:
             response = requests.post(request_url)
             df = pd.read_csv(StringIO(response.text), sep=",", header=1)
 
+            f3x_vault_data = {}
             for index, row in df.iterrows():
+                #First put data in a dictionary to sort it on bib numbers
 
                 competitor = event.competitor_from_f3x_vault_id(row['Pilot_id'])
                 pilot_flight_time = row['seconds']
@@ -139,7 +141,16 @@ class Event:
                 if competitor is not None:
                     pilot_chrono = Chrono()
                     pilot_chrono.run_time = pilot_flight_time
-                    f3f_round.handle_terminated_flight(competitor, pilot_chrono, pilot_penalty, pilot_flight_valid)
+                    f3x_vault_data[competitor.bib_number] = {'competitor' : competitor,
+                                                             'pilot_chrono' : pilot_chrono,
+                                                             'pilot_penalty' : pilot_penalty,
+                                                             'pilot_flight_valid' : pilot_flight_valid}
+
+            for bib in sorted(f3x_vault_data):
+                f3f_round.handle_terminated_flight(f3x_vault_data[bib]['competitor'],
+                                                   f3x_vault_data[bib]['pilot_chrono'],
+                                                   f3x_vault_data[bib]['pilot_penalty'],
+                                                   f3x_vault_data[bib]['pilot_flight_valid'])
 
             f3f_round.validate_round()
 
