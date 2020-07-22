@@ -11,6 +11,7 @@ class Chrono:
         self.wind_direction = None
         self.start_time = None
         self.end_time = None
+        self.climbout_time = None
         self._lap_times = []
 
     def get_lap_time(self, i):
@@ -31,6 +32,7 @@ class Chrono:
         self.wind_direction = None
         self.start_time = None
         self.end_time = None
+        self.climbout_time = None
         self._lap_times.clear()
 
     def to_string(self):
@@ -41,6 +43,7 @@ class Chrono:
                      "\tEnd Time : " + str(self.end_time) + os.linesep +\
                      "\tWindMin : "+str(self.min_wind_speed)+", WindMax : "+str(self.max_wind_speed)+\
                      ", WindMean : "+str(self.mean_wind_speed)+", WindDir : "+str(self.wind_direction)+os.linesep+\
+                     "\tClimout Time : "+str(self.climbout_time)+os.linesep+\
                      "\tRun Time : " + self.run_time_as_string() + os.linesep + "\tLapTime : "
             for lap in self._lap_times:
                 if lap!=None:

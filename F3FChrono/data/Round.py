@@ -253,7 +253,7 @@ class Round:
                                   '&round=' + str(self.valid_round_number) + \
                                   '&seconds=' + str(valid_run.get_flight_time()) + \
                                   '&penalty=' + str(valid_run.penalty)
-                    request_url += '&sub1=' + str(0.0)
+                    request_url += '&sub1=' + str(valid_run.chrono.climbout_time)
                     for i in range(0, 10):
                         request_url += '&sub' + str(i + 2) + '=' + str(valid_run.chrono.get_lap_time(i))
                 else:
