@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_WChronoBtn(object):
     def setupUi(self, WChronoBtn):
         WChronoBtn.setObjectName("WChronoBtn")
-        WChronoBtn.resize(480, 45)
+        WChronoBtn.resize(480, 40)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)

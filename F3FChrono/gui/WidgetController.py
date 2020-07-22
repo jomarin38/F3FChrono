@@ -10,6 +10,7 @@ from F3FChrono.gui.WPilot_ui import Ui_WPilot
 from F3FChrono.gui.WChrono_ui import Ui_WChrono
 from F3FChrono.gui.WChronoTraining_ui import Ui_WTraining
 from F3FChrono.gui.WChronoBtn_ui import Ui_WChronoBtn
+from F3FChrono.gui.WChronoBtn_cancel_ui import Ui_WChronoBtn_Cancel
 from F3FChrono.gui.WTrainingBtn_ui import Ui_WTrainingBtn
 from F3FChrono.gui.WConfig_ui import Ui_WConfig
 from F3FChrono.gui.WSettings_ui import Ui_WSettings
@@ -23,6 +24,7 @@ from F3FChrono.data.web.Utils import Utils
 
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
+    cancel_round_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()
     btn_refly_sig = pyqtSignal()
     btn_gscoring_sig = pyqtSignal()
@@ -33,38 +35,57 @@ class WRoundCtrl(QObject):
         self.wPilotCtrl = WPilotCtrl("PilotCtrl", parent)
         self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent, vocal_elapsedTime_sig)
         self.wBtnCtrl = Ui_WChronoBtn()
+        self.wBtnCancel = Ui_WChronoBtn_Cancel()
         self.name = name
         self.parent = parent
-        self.widget = QtWidgets.QWidget(parent)
-        self.wBtnCtrl.setupUi(self.widget)
+        self.widgetBtn = QtWidgets.QWidget(parent)
+        self.widgetBtnCancel = QtWidgets.QWidget(parent)
+        self.wBtnCtrl.setupUi(self.widgetBtn)
+        self.wBtnCancel.setupUi(self.widgetBtnCancel)
         self.widgetList.append(self.wPilotCtrl.get_widget())
         self.widgetList.append(self.wChronoCtrl.get_widget())
-        self.widgetList.append(self.widget)
+        self.widgetList.append(self.widgetBtn)
+        self.widgetList.append(self.widgetBtnCancel)
         self.wBtnCtrl.Btn_gscoring.setEnabled(False)
+        self.set_cancelmode(False)
         # Event connect
         self.wBtnCtrl.Btn_Home.clicked.connect(self.btn_home_sig.emit)
         self.wBtnCtrl.Btn_Next.clicked.connect(self.btn_next_sig.emit)
         self.wBtnCtrl.Btn_reflight.clicked.connect(self.btn_refly_sig.emit)
         self.wBtnCtrl.Btn_gscoring.clicked.connect(self.btn_gscoring_sig.emit)
-
+        self.wBtnCancel.Btn_Next.clicked.connect(self.cancel_next)
+        self.wBtnCancel.Btn_Home.clicked.connect(self.cancel_home)
 
     def get_widget(self):
         return (self.widgetList)
 
     def show(self):
-        self.widget.show()
+        self.widgetBtn.show()
         self.wPilotCtrl.show()
         self.wChronoCtrl.show()
 
     def is_show(self):
-        return self.widget.isVisible()
+        return self.widgetBtn.isVisible()
 
     def hide(self):
-        self.widget.hide()
+        self.widgetBtn.hide()
         self.wPilotCtrl.hide()
         self.wChronoCtrl.hide()
 
+    def set_cancelmode(self, cancel):
+        if cancel:
+            self.widgetBtn.hide()
+            self.widgetBtnCancel.show()
+        else:
+            self.widgetBtnCancel.hide()
+            self.widgetBtn.show()
 
+    def cancel_next(self):
+        self.set_cancelmode(False)
+        self.cancel_round_sig.emit()
+
+    def cancel_home(self):
+        self.set_cancelmode(False)
 
 class WTrainingCtrl(QObject):
     btn_next_sig = pyqtSignal()

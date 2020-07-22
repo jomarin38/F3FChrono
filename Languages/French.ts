@@ -4,7 +4,7 @@
 <context>
     <name>BIB : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="265"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="283"/>
         <source>BIB : </source>
         <translation>Dossard : </translation>
     </message>
@@ -12,7 +12,7 @@
 <context>
     <name>Detect</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="728"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="748"/>
         <source>Detect</source>
         <translation>Détection</translation>
     </message>
@@ -20,7 +20,7 @@
 <context>
     <name>In Progress...</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="721"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="741"/>
         <source>In Progress...</source>
         <translation>En cours...</translation>
     </message>
@@ -28,7 +28,7 @@
 <context>
     <name>Low Voltage</name>
     <message>
-        <location filename="../F3FChrono/chrono/Sound.py" line="87"/>
+        <location filename="../F3FChrono/chrono/Sound.py" line="50"/>
         <source>Low Voltage</source>
         <translation>Tension basse</translation>
     </message>
@@ -36,7 +36,7 @@
 <context>
     <name>Max : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="506"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="524"/>
         <source>Max : </source>
         <translation>Max : </translation>
     </message>
@@ -44,7 +44,7 @@
 <context>
     <name>Mean : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="505"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="523"/>
         <source>Mean : </source>
         <translation>Moyenne : </translation>
     </message>
@@ -52,7 +52,7 @@
 <context>
     <name>Min : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="504"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="522"/>
         <source>Min : </source>
         <translation>Min : </translation>
     </message>
@@ -62,13 +62,21 @@
     <message>
         <location filename="../F3FChrono/chrono/Sound.py" line="83"/>
         <source>Next pilot : </source>
-        <translation>Pilote suivant :</translation>
+        <translation type="obsolete">Pilote suivant :</translation>
+    </message>
+</context>
+<context>
+    <name>Next pilot BIB number : </name>
+    <message>
+        <location filename="../F3FChrono/chrono/Sound.py" line="49"/>
+        <source>Next pilot BIB number : </source>
+        <translation>Pilote suivant dossard numéro : </translation>
     </message>
 </context>
 <context>
     <name>No Rain</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="177"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="188"/>
         <source>No Rain</source>
         <translation>Soleil</translation>
     </message>
@@ -84,7 +92,7 @@
 <context>
     <name>Null Flight</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="412"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="430"/>
         <source>Null Flight</source>
         <translation>Vol Null</translation>
     </message>
@@ -92,7 +100,7 @@
 <context>
     <name>Rain</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="175"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="186"/>
         <source>Rain</source>
         <translation>Pluie</translation>
     </message>
@@ -100,7 +108,7 @@
 <context>
     <name>Round : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="266"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="284"/>
         <source>Round : </source>
         <translation>Manche : </translation>
     </message>
@@ -108,7 +116,7 @@
 <context>
     <name>Total Laps : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="507"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="525"/>
         <source>Total Laps : </source>
         <translation>Nbre tours : </translation>
     </message>
@@ -224,29 +232,39 @@
 <context>
     <name>WChronoBtn</name>
     <message>
-        <location filename="../F3FChrono/gui/WChronoBtn_ui.py" line="90"/>
+        <location filename="../F3FChrono/gui/WChronoBtn_ui.py" line="92"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../F3FChrono/gui/WChronoBtn_ui.py" line="91"/>
         <source>Home</source>
-        <translation>Retour</translation>
+        <translation type="obsolete">Retour</translation>
     </message>
     <message>
         <location filename="../F3FChrono/gui/WChronoBtn_ui.py" line="92"/>
         <source>Cancel Round</source>
-        <translation>Annuler Manche</translation>
+        <translation type="obsolete">Annuler Manche</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChronoBtn_ui.py" line="93"/>
+        <location filename="../F3FChrono/gui/WChronoBtn_ui.py" line="95"/>
         <source>Reflight</source>
         <translation>Revol</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChronoBtn_ui.py" line="94"/>
+        <location filename="../F3FChrono/gui/WChronoBtn_ui.py" line="96"/>
         <source>Next</source>
         <translation>Suivant</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoBtn_ui.py" line="93"/>
+        <source>Exit</source>
+        <translation>Sortie</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoBtn_ui.py" line="94"/>
+        <source>G Scoring</source>
+        <translation>G Scoring</translation>
     </message>
 </context>
 <context>
@@ -330,24 +348,29 @@
 <context>
     <name>WPilot</name>
     <message>
-        <location filename="../F3FChrono/gui/WPilot_ui.py" line="72"/>
+        <location filename="../F3FChrono/gui/WPilot_ui.py" line="84"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WPilot_ui.py" line="73"/>
+        <location filename="../F3FChrono/gui/WPilot_ui.py" line="85"/>
         <source> _____ _______</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WPilot_ui.py" line="74"/>
+        <location filename="../F3FChrono/gui/WPilot_ui.py" line="86"/>
         <source>bib : XXX</source>
         <translation>Dossard : XXX</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WPilot_ui.py" line="75"/>
+        <location filename="../F3FChrono/gui/WPilot_ui.py" line="87"/>
         <source>Round : </source>
         <translation>Manche : </translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WPilot_ui.py" line="88"/>
+        <source>Cancel Round</source>
+        <translation>Annuler Manche</translation>
     </message>
 </context>
 <context>
@@ -612,115 +635,125 @@
 <context>
     <name>WSettingsBase</name>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="110"/>
+        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="136"/>
         <source>Form</source>
         <translation>Ecran</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="111"/>
+        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="137"/>
         <source>Base Settings</source>
         <translation>Configuration Bases</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="117"/>
+        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="143"/>
         <source>Detect</source>
         <translation>Détection</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="113"/>
+        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="139"/>
         <source>Base B : </source>
         <translation>Base B : </translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="115"/>
+        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="141"/>
         <source>Clear</source>
         <translation>Effacer</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="116"/>
+        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="142"/>
         <source>Base A : </source>
         <translation>Base A : </translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="118"/>
+        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="144"/>
         <source>Invert</source>
         <translation>Invertion</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="119"/>
+        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="147"/>
         <source>Back to Settings</source>
         <translation>retour configuration</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="120"/>
+        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="148"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="121"/>
+        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="149"/>
         <source>Valid</source>
         <translation>Valider</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="145"/>
+        <source>InStart blackout (s)</source>
+        <translation>InStart blackout (s)</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettingsBase_ui.py" line="146"/>
+        <source>InStart blackout</source>
+        <translation>InStart blackout</translation>
     </message>
 </context>
 <context>
     <name>WSettingsSound</name>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="91"/>
+        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="92"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="92"/>
+        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="93"/>
         <source>Sound Settings</source>
         <translation>Configuration sons</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="93"/>
+        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="94"/>
         <source>Voice</source>
         <translation>Voix</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="94"/>
+        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="95"/>
         <source>Sound</source>
         <translation>Sons</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="95"/>
+        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="96"/>
         <source>Buzzer Next button</source>
         <translation>Buzzer bouton Next</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="96"/>
+        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="97"/>
         <source>Noise Sound</source>
         <translation>Bruit pour enceinte</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="97"/>
+        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="98"/>
         <source>Noise Volume</source>
         <translation>Volume bruit</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="98"/>
+        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="99"/>
         <source>Buzzer</source>
         <translation>Buzzer</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="99"/>
+        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="100"/>
         <source>Low Voltage</source>
         <translation>Tension basse</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="100"/>
+        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="101"/>
         <source>Back to Settings</source>
         <translation>retour configuration</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="101"/>
+        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="102"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="102"/>
+        <location filename="../F3FChrono/gui/WSettingsSound_ui.py" line="103"/>
         <source>Valid</source>
         <translation>Valider</translation>
     </message>
@@ -872,7 +905,7 @@
 <context>
     <name>Wind : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="178"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="189"/>
         <source>Wind : </source>
         <translation>Vent : </translation>
     </message>
@@ -880,7 +913,7 @@
 <context>
     <name>chronoStatus_Finished</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="439"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="457"/>
         <source>Finished</source>
         <translation>Terminé</translation>
     </message>
@@ -888,7 +921,7 @@
 <context>
     <name>chronoStatus_I30s_reached</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="435"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="453"/>
         <source>In Start 30s reached</source>
         <translation>Au départ +30s</translation>
     </message>
@@ -896,7 +929,7 @@
 <context>
     <name>chronoStatus_InProgress</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="437"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="455"/>
         <source>In Progress</source>
         <translation>En cours</translation>
     </message>
@@ -904,7 +937,7 @@
 <context>
     <name>chronoStatus_InStart</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="434"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="452"/>
         <source>In Start</source>
         <translation>Au départ</translation>
     </message>
@@ -912,7 +945,7 @@
 <context>
     <name>chronoStatus_L30s_reached</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="433"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="451"/>
         <source>30s reached</source>
         <translation>30s dépassé</translation>
     </message>
@@ -920,7 +953,7 @@
 <context>
     <name>chronoStatus_Launched</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="432"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="450"/>
         <source>Launched</source>
         <translation>Lancé</translation>
     </message>
@@ -928,7 +961,7 @@
 <context>
     <name>chronoStatus_WaitAltitude</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="438"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="456"/>
         <source>Wait Altitude</source>
         <translation>Attente Altitude</translation>
     </message>
@@ -936,7 +969,7 @@
 <context>
     <name>chronoStatus_WaitNewRun</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="430"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="448"/>
         <source>Wait New Run</source>
         <translation>Attente nouveau run</translation>
     </message>
@@ -944,7 +977,7 @@
 <context>
     <name>chronoStatus_WaitToLaunch</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="431"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="449"/>
         <source>Wait To Launch</source>
         <translation>Attente lancé</translation>
     </message>
@@ -952,7 +985,7 @@
 <context>
     <name>contest_training</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="568"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="586"/>
         <source>Training</source>
         <translation>Entrainement</translation>
     </message>
@@ -960,7 +993,7 @@
 <context>
     <name>m/s, Angle : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="178"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="189"/>
         <source>m/s, Angle : </source>
         <translation>m/s, Angle : </translation>
     </message>
@@ -968,7 +1001,7 @@
 <context>
     <name>time : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="199"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="210"/>
         <source>time : </source>
         <translation>temps : </translation>
     </message>
