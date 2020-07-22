@@ -82,6 +82,21 @@ def cancel_round(request):
     return HttpResponseRedirect('manage_event?event_id='+event_id)
 
 
+def validate_round(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET['event_id']
+    round_number = request.GET['round_number']
+
+    f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
+    f3f_round.validate_round(insert_database=True)
+
+    return HttpResponseRedirect('manage_event?event_id='+event_id)
+
+
 def register_new_pilot(request):
 
     if not request.user.is_authenticated:
@@ -262,7 +277,8 @@ def manage_event(request):
             row.add_cell(Link('Cancel Round', 'cancel_round?event_id=' + str(event.id) +
                               '&round_number='+str(f3f_round.round_number)))
         else:
-            row.add_cell(Cell(''))
+            row.add_cell(Link('Validate Round', 'validate_round?event_id=' + str(event.id) +
+                              '&round_number='+str(f3f_round.round_number)))
         table.add_line(row)
     page.add_table(table)
 

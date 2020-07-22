@@ -15,6 +15,7 @@ urlpatterns = [
     path('new_pilot_input', views.new_pilot_input, name='new_pilot_input'),
     path('register_new_pilot', views.register_new_pilot, name='register_new_pilot'),
     path('cancel_round', views.cancel_round, name='cancel_round'),
+    path('validate_round', views.validate_round, name='validate_round'),
     path('delete_event', views.delete_event, name='delete_event'),
     path('do_delete_event', views.do_delete_event, name='do_delete_event'),
     path('manage_round', views.manage_round, name='manage_round'),
