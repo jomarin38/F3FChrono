@@ -110,6 +110,11 @@ class Round:
         self.groups[-1].add_run(run, insert_database)
         self.set_current_competitor(run.competitor)
 
+    def add_run_from_web(self, run):
+        # TODO : search in which group the run has to be added
+        run.round_group = self.groups[-1]
+        self.groups[-1].add_run(run, True)
+
     def to_string(self):
         result = os.linesep + 'Round number ' + str(self.round_number) + os.linesep
         for g in self.groups:
