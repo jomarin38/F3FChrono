@@ -25,7 +25,7 @@ class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()
     btn_refly_sig = pyqtSignal()
-    btn_cancel_flight_sig = pyqtSignal()
+    btn_gscoring_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent, vocal_elapsedTime_sig):
@@ -40,12 +40,13 @@ class WRoundCtrl(QObject):
         self.widgetList.append(self.wPilotCtrl.get_widget())
         self.widgetList.append(self.wChronoCtrl.get_widget())
         self.widgetList.append(self.widget)
-
+        self.wBtnCtrl.Btn_gscoring.setEnabled(False)
         # Event connect
-        self.wBtnCtrl.Btn_Home.clicked.connect(self.btn_home)
-        self.wBtnCtrl.Btn_Next.clicked.connect(self.btn_next_pilot)
-        self.wBtnCtrl.Btn_reflight.clicked.connect(self.btn_refly)
-        self.wBtnCtrl.Btn_CancelRound.clicked.connect(self.btn_cancel_flight)
+        self.wBtnCtrl.Btn_Home.clicked.connect(self.btn_home_sig.emit)
+        self.wBtnCtrl.Btn_Next.clicked.connect(self.btn_next_sig.emit)
+        self.wBtnCtrl.Btn_reflight.clicked.connect(self.btn_refly_sig.emit)
+        self.wBtnCtrl.Btn_gscoring.clicked.connect(self.btn_gscoring_sig.emit)
+
 
     def get_widget(self):
         return (self.widgetList)
@@ -63,17 +64,6 @@ class WRoundCtrl(QObject):
         self.wPilotCtrl.hide()
         self.wChronoCtrl.hide()
 
-    def btn_next_pilot(self):
-        self.btn_next_sig.emit()
-
-    def btn_home(self):
-        self.btn_home_sig.emit()
-
-    def btn_cancel_flight(self):
-        self.btn_cancel_flight_sig.emit()
-
-    def btn_refly(self):
-        self.btn_refly_sig.emit()
 
 
 class WTrainingCtrl(QObject):
@@ -239,14 +229,18 @@ class WWindCtrl():
         self.view.rssi.setText(str(rssi1) + "%, " + str(rssi2) + "%")
 
 
-class WPilotCtrl():
+class WPilotCtrl(QObject):
+    btn_cancel_flight_sig = pyqtSignal()
+
     def __init__(self, name, parent):
+        super().__init__()
         self.view = Ui_WPilot()
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
         self.view.setupUi(self.widget)
         self._translate = QtCore.QCoreApplication.translate
+        self.view.Btn_CancelRound.clicked.connect(self.btn_cancel_flight)
 
     def get_widget(self):
         return (self.widget)
@@ -259,6 +253,9 @@ class WPilotCtrl():
 
     def hide(self):
         self.widget.hide()
+
+    def btn_cancel_flight(self):
+        self.btn_cancel_flight_sig.emit()
 
     def set_data(self, competitor, round):
         self.view.pilotName.setText(competitor.display_name())

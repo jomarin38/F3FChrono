@@ -100,7 +100,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.btn_clear_penalty_sig.connect(self.clear_penalty)
         self.controllers['round'].wChronoCtrl.btn_null_flight_sig.connect(self.null_flight)
         self.controllers['round'].wChronoCtrl.time_elapsed_sig.connect(self.handle_time_elapsed)
-        self.controllers['round'].btn_cancel_flight_sig.connect(self.cancel_round)
+        self.controllers['round'].wPilotCtrl.btn_cancel_flight_sig.connect(self.cancel_round)
         self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
         self.controllers['settings'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)

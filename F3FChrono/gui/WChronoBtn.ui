@@ -63,7 +63,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Home</string>
+        <string>Exit</string>
        </property>
        <property name="flat">
         <bool>false</bool>
@@ -71,7 +71,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="Btn_CancelRound">
+      <widget class="QPushButton" name="Btn_gscoring">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -89,8 +89,14 @@
          <pointsize>10</pointsize>
         </font>
        </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
        <property name="text">
-        <string>Cancel Round</string>
+        <string>G Scoring</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
