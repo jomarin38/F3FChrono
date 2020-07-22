@@ -20,7 +20,7 @@
  "lowvoltage_sound": false,
  "noisesound": true,
  "noisevolume": 0.005,
- "rebound_btn_time": 200,
+ "rebound_btn_time": 500,
  "run_webserver": true,
  "simulatemode": false,
  "sound": true,
