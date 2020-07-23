@@ -56,6 +56,8 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
+  baseA_check();
+  baseB_check();
   serial_run();
   analogRun();
   buzzerRun();
