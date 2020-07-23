@@ -268,6 +268,29 @@
     </message>
 </context>
 <context>
+    <name>WChronoBtn_Cancel</name>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoBtn_cancel_ui.py" line="67"/>
+        <source>Form</source>
+        <translation>Ecran</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoBtn_cancel_ui.py" line="68"/>
+        <source>Exit</source>
+        <translation>Sortie</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoBtn_cancel_ui.py" line="69"/>
+        <source>Cancel round wait Next button</source>
+        <translation>Suivant pour annuler la manche</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoBtn_cancel_ui.py" line="70"/>
+        <source>Next</source>
+        <translation>Suivant</translation>
+    </message>
+</context>
+<context>
     <name>WConfig</name>
     <message>
         <location filename="../F3FChrono/gui/WConfig_ui.py" line="184"/>
