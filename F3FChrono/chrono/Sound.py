@@ -19,7 +19,7 @@ class chronoQSound(QThread):
     signal_time = pyqtSignal(float)
     signal_elapsedTime = pyqtSignal(str)
     signal_start = pyqtSignal(int)
-    signal_pilotname = pyqtSignal(str, str)
+    signal_pilotname = pyqtSignal(str)
     signal_lowVoltage = pyqtSignal()
 
 
@@ -46,7 +46,7 @@ class chronoQSound(QThread):
         self.voice_engine.connect('finished-utterance', self.onVoiceEnd)
         self.voice_engine.setProperty('voice', langage.lower())
 
-        self.nextpilot = self._translate("Next pilot : ", "Next pilot : ")
+        self.nextpilot = self._translate("Next pilot BIB number : ", "Next pilot BIB number : ")
         self.lowVoltagestr = self._translate("Low Voltage", "Low Voltage")
         #self.voices = self.voice_engine.getProperty('voices')
         #self.voice_engine.setProperty('voice', self.voices[26].id)
@@ -79,9 +79,9 @@ class chronoQSound(QThread):
             self.voice_engine.say("{:0>.2f}".format(run_time))
             self.start()
 
-    def pilot(self, first_name, name):
+    def pilot(self, bib):
         if self.play_voice:
-            self.voice_engine.say(self.nextpilot + first_name + " " + name)
+            self.voice_engine.say(self.nextpilot + bib)
             self.start()
 
     def lowVoltage(self):

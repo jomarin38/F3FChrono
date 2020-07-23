@@ -13,6 +13,7 @@ import os
 class MainUiCtrl (QtWidgets.QMainWindow):
     close_signal = pyqtSignal()
     signal_btnnext = pyqtSignal(int)
+    signal_lowvoltage_ask = pyqtSignal()
     startup_time = None
 
     def __init__(self, eventdao, chronodata, rpi, webserver_process):
@@ -50,6 +51,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard.event_voltage()
         self.signal_race = None
         self.signal_training = None
+        self.low_voltage_ask = False
 
     def initUI(self, ):
         self.MainWindow = QtWidgets.QMainWindow()
@@ -95,12 +97,13 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.home_action)
         self.controllers['round'].btn_refly_sig.connect(self.refly)
+        self.controllers['round'].cancel_round_sig.connect(self.cancel_round)
         self.controllers['round'].wChronoCtrl.btn_penalty_100_sig.connect(self.penalty_100)
         self.controllers['round'].wChronoCtrl.btn_penalty_1000_sig.connect(self.penalty_1000)
         self.controllers['round'].wChronoCtrl.btn_clear_penalty_sig.connect(self.clear_penalty)
         self.controllers['round'].wChronoCtrl.btn_null_flight_sig.connect(self.null_flight)
         self.controllers['round'].wChronoCtrl.time_elapsed_sig.connect(self.handle_time_elapsed)
-        self.controllers['round'].btn_cancel_flight_sig.connect(self.cancel_round)
+        self.controllers['round'].wPilotCtrl.btn_cancel_flight_sig.connect(self.display_cancel_round)
         self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
         self.controllers['settings'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
@@ -130,7 +133,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].set_contest(self.daoEvent.get_list())
         self.controllers['wind'].set_wind(0, 0)
         self.controllers['wind'].set_rain(0)
-        self.controllers['wind'].set_signal(self.vocal.signal_lowVoltage)
+        self.controllers['wind'].set_signal(self.signal_lowvoltage_ask)
+        self.signal_lowvoltage_ask.connect(self.slot_low_voltage_ask)
 
     def show_config(self):
         self.controllers['round'].hide()
@@ -279,8 +283,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                                                                                                 visited_competitors=[]),
                                                       self.event.get_current_round())
         self.controllers['round'].wChronoCtrl.reset_ui()
-        pilot=self.event.get_current_round().get_current_competitor().pilot
-        self.vocal.signal_pilotname.emit(pilot.first_name, pilot.name)
+        self.vocal.signal_pilotname.emit(str(self.event.get_current_round().get_current_competitor().get_bib_number()))
 
     def refly(self):
         #TODO : get penalty value if any
@@ -327,7 +330,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 current_competitor = self.event.get_current_round().next_pilot()
             self.controllers['round'].wPilotCtrl.set_data(current_competitor,
                                                           self.event.get_current_round())
-            self.vocal.signal_pilotname.emit(current_competitor.pilot.first_name, current_competitor.pilot.name)
+            self.vocal.signal_pilotname.emit(str(current_competitor.get_bib_number()))
             self.chronoHard.set_mode(training=False)
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
             self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False)
@@ -404,6 +407,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard.clearPenalty()
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
+    def display_cancel_round(self):
+        self.controllers['round'].set_cancelmode(True)
+
     def cancel_round(self):
         self.event.get_current_round().cancel_round()
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor(),
@@ -435,6 +441,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_status_changed(self, status):
         #print ("slot status", status)
         self.controllers['round'].wChronoCtrl.set_status(status)
+        if (status==chronoStatus.InWait):
+            if self.low_voltage_ask:
+                self.vocal.signal_lowVoltage.emit()
+                self.low_voltage_ask=False
+
         if (status==chronoStatus.WaitLaunch):
             self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False)
         if (status == chronoStatus.Launched):
@@ -455,7 +466,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         #print("Main UI Controller slot run finished : ", time.time())
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
-        self.controllers['round'].widget.update()
+        self.controllers['round'].widgetBtn.update()
         if ConfigReader.config.conf["voice"]:
             self.vocal.signal_time.emit(run_time)
 
@@ -525,6 +536,12 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def slot_rssi(self, rssi1, rssi2):
         self.controllers['wind'].set_rssi(rssi1, rssi2)
+
+    def slot_low_voltage_ask(self):
+        if  not self.controllers['round'].is_show():
+            self.vocal.signal_lowVoltage.emit()
+        else:
+            self.low_voltage_ask=True
 
     def closeEvent(self, event):
         self.close_signal.emit()

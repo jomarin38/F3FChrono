@@ -62,6 +62,18 @@ class Ui_WPilot(object):
         self.round.setFont(font)
         self.round.setObjectName("round")
         self.horizontalLayout.addWidget(self.round)
+        self.Btn_CancelRound = QtWidgets.QPushButton(WPilot)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.Btn_CancelRound.sizePolicy().hasHeightForWidth())
+        self.Btn_CancelRound.setSizePolicy(sizePolicy)
+        self.Btn_CancelRound.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.Btn_CancelRound.setFont(font)
+        self.Btn_CancelRound.setObjectName("Btn_CancelRound")
+        self.horizontalLayout.addWidget(self.Btn_CancelRound)
         self.gridLayout.addLayout(self.horizontalLayout, 0, 0, 1, 1)
 
         self.retranslateUi(WPilot)
@@ -73,6 +85,7 @@ class Ui_WPilot(object):
         self.pilotName.setText(_translate("WPilot", " _____ _______"))
         self.bib.setText(_translate("WPilot", "bib : XXX"))
         self.round.setText(_translate("WPilot", "Round : "))
+        self.Btn_CancelRound.setText(_translate("WPilot", "Cancel Round"))
 
 
 if __name__ == "__main__":
