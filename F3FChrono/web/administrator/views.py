@@ -6,6 +6,8 @@ from django.shortcuts import render, redirect
 from django.template import RequestContext
 from django.views.decorators.cache import never_cache
 
+from F3FChrono.data.Chrono import Chrono
+from F3FChrono.data.Run import Run
 from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
 from F3FChrono.data.dao.EventDAO import EventDAO
 from F3FChrono.data.dao.RoundDAO import RoundDAO
@@ -67,6 +69,17 @@ def new_pilot_input(request):
     return render(request, 'new_pilot_template.html', {'event_id': request.GET.get('event_id')})
 
 
+def set_time(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    return render(request, 'edit_time_template.html', {'event_id': request.GET.get('event_id'),
+                                                       'round_number': request.GET.get('round_number'),
+                                                       'bib_number': request.GET.get('bib_number')})
+
+
 def cancel_round(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % ('sign_in', request.path))
@@ -78,6 +91,21 @@ def cancel_round(request):
 
     f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
     f3f_round.do_cancel_round()
+
+    return HttpResponseRedirect('manage_event?event_id='+event_id)
+
+
+def validate_round(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET['event_id']
+    round_number = request.GET['round_number']
+
+    f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
+    f3f_round.validate_round(insert_database=True)
 
     return HttpResponseRedirect('manage_event?event_id='+event_id)
 
@@ -111,6 +139,38 @@ def register_new_pilot(request):
     CompetitorDAO().insert(competitor)
 
     return HttpResponseRedirect('manage_event?event_id='+event_id)
+
+
+def edit_run_time(request):
+
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    flight_time = float(request.POST['flight_time'])
+
+    event_id = int(request.GET.get('event_id'))
+    round_number = int(request.GET.get('round_number'))
+    bib_number = int(request.GET.get('bib_number'))
+
+    event = EventDAO().get(event_id, fetch_competitors=True)
+    f3f_round = RoundDAO().get_from_ids(event_id, round_number, fetch_runs=True)
+
+    chrono = Chrono()
+    chrono.run_time = flight_time
+
+    run = Run()
+    run.competitor = event.get_competitor(bib_number)
+    run.penalty = 0
+    run.chrono = chrono
+    run.valid = True
+
+    f3f_round.add_run_from_web(run)
+
+    RoundDAO().update(f3f_round)
+
+    return HttpResponseRedirect('manage_round?event_id='+str(event_id)+'&round_number='+str(round_number))
 
 
 def delete_event(request):
@@ -262,7 +322,8 @@ def manage_event(request):
             row.add_cell(Link('Cancel Round', 'cancel_round?event_id=' + str(event.id) +
                               '&round_number='+str(f3f_round.round_number)))
         else:
-            row.add_cell(Cell(''))
+            row.add_cell(Link('Validate Round', 'validate_round?event_id=' + str(event.id) +
+                              '&round_number='+str(f3f_round.round_number)))
         table.add_line(row)
     page.add_table(table)
 
@@ -297,7 +358,7 @@ def export_round_f3x_vault(request):
         event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
         requested_f3f_round = None
         for f3f_round in event.rounds:
-            if f3f_round.valid_round_number:
+            if f3f_round.round_number == round_number:
                 requested_f3f_round = f3f_round
 
         if requested_f3f_round is not None:
@@ -395,11 +456,14 @@ def manage_round(request):
     table = ResultTable(title='Flight order', css_id='ranking')
     header = Header(name=Cell('Bib'))
     header.add_cell(Cell('Name'))
+    header.add_cell(Cell(''))
     table.set_header(header)
 
     for bib_number in f3f_round.get_flight_order():
         row = Line(name=Cell(str(bib_number)))
         row.add_cell(Cell(f3f_round.event.competitors[bib_number].display_name()))
+        row.add_cell(Link('Set time', 'set_time?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+                          '&bib_number=' + str(bib_number)))
         table.add_line(row)
 
     page.add_table(table)
