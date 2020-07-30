@@ -46,7 +46,7 @@ class chronoQSound(QThread):
         self.voice_engine.connect('finished-utterance', self.onVoiceEnd)
         self.voice_engine.setProperty('voice', langage.lower())
 
-        self.nextpilot = self._translate("Next pilot BIB number : ", "Next pilot BIB number : ")
+        self.nextpilot = self._translate("Pilot number", "Pilot number")
         self.lowVoltagestr = self._translate("Low Voltage", "Low Voltage")
         #self.voices = self.voice_engine.getProperty('voices')
         #self.voice_engine.setProperty('voice', self.voices[26].id)
