@@ -98,11 +98,19 @@
     </message>
 </context>
 <context>
+    <name>Pilot number</name>
+    <message>
+        <location filename="../F3FChrono/chrono/Sound.py" line="49"/>
+        <source>Pilot number</source>
+        <translation>Pilote numéro</translation>
+    </message>
+</context>
+<context>
     <name>Pilot number : </name>
     <message>
         <location filename="../F3FChrono/chrono/Sound.py" line="49"/>
         <source>Pilot number : </source>
-        <translation>Pilote numéro : </translation>
+        <translation type="obsolete">Pilote numéro : </translation>
     </message>
 </context>
 <context>
