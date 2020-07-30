@@ -70,7 +70,7 @@
     <message>
         <location filename="../F3FChrono/chrono/Sound.py" line="49"/>
         <source>Next pilot BIB number : </source>
-        <translation>Pilote suivant dossard numéro : </translation>
+        <translation type="obsolete">Pilote suivant dossard numéro : </translation>
     </message>
 </context>
 <context>
@@ -95,6 +95,14 @@
         <location filename="../F3FChrono/gui/WidgetController.py" line="430"/>
         <source>Null Flight</source>
         <translation>Vol Null</translation>
+    </message>
+</context>
+<context>
+    <name>Pilot number : </name>
+    <message>
+        <location filename="../F3FChrono/chrono/Sound.py" line="49"/>
+        <source>Pilot number : </source>
+        <translation>Pilote numéro : </translation>
     </message>
 </context>
 <context>
