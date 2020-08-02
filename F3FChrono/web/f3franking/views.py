@@ -138,10 +138,10 @@ def event_view_html(event_id):
                     score = run.score
                 winner = score >= 1000
                 joker = (event.number_of_valid_rounds >= event.first_joker_round_number and
-                         f3f_round.round_number == competitor.first_joker_round_number) \
+                         f3f_round.valid_round_number == competitor.first_joker_round_number) \
                         or \
                         (event.number_of_valid_rounds >= event.second_joker_round_number and
-                         f3f_round.round_number == competitor.second_joker_round_number)
+                         f3f_round.valid_round_number == competitor.second_joker_round_number)
 
                 row.add_cell(Cell('{:2d}'.format(int(score)), joker=joker, winner=winner))
             table.add_line(row)
