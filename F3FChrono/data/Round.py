@@ -257,7 +257,7 @@ class Round:
                                   '&pilot_id=' + str(fetched_competitor.get_pilot().f3x_vault_id) + \
                                   '&round=' + str(self.valid_round_number) + \
                                   '&seconds=' + str(valid_run.get_flight_time()) + \
-                                  '&penalty=' + str(valid_run.penalty)
+                                  '&penalty=' + str(group.get_penalty(competitor)) #take also penalties from non valid flights
                     request_url += '&sub1=' + str(valid_run.chrono.climbout_time)
                     for i in range(0, 10):
                         request_url += '&sub' + str(i + 2) + '=' + str(valid_run.chrono.get_lap_time(i))
@@ -269,7 +269,7 @@ class Round:
                                   '&pilot_id=' + str(fetched_competitor.get_pilot().f3x_vault_id) + \
                                   '&round=' + str(self.valid_round_number) + \
                                   '&seconds=' + str(0.0) + \
-                                  '&penalty=' + str(0.0)
+                                  '&penalty=' + str(group.get_penalty(competitor))
                     request_url += '&sub1=' + str(0.0)
                     for i in range(0, 10):
                         request_url += '&sub' + str(i + 2) + '=' + str(0.0)
