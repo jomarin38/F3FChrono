@@ -358,7 +358,7 @@ def export_round_f3x_vault(request):
         event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
         requested_f3f_round = None
         for f3f_round in event.rounds:
-            if f3f_round.round_number == round_number:
+            if f3f_round.round_number == int(round_number):
                 requested_f3f_round = f3f_round
 
         if requested_f3f_round is not None:

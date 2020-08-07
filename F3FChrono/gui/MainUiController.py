@@ -1,4 +1,5 @@
 from F3FChrono.chrono import ConfigReader
+from F3FChrono.data.Round import Round
 from F3FChrono.gui.MainUi_UI import *
 from F3FChrono.gui.WidgetController import *
 from F3FChrono.gui.Simulate_base import SimulateBase
@@ -324,10 +325,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if eventData is not None:
             self.event = self.daoEvent.get(eventData.id,
                         fetch_competitors=True, fetch_rounds=True, fetch_runs=True, fetch_runs_lastround=True)
-            current_competitor = self.event.get_current_round().get_current_competitor()
+            current_round = self.event.get_current_round()
+            if not current_round.has_run():
+                current_round.set_flight_order_from_scratch()
+                Round.round_dao.update(current_round)
+            current_competitor = current_round.get_current_competitor()
             if not current_competitor.present:
-                self.event.get_current_round().set_null_flight(current_competitor)
-                current_competitor = self.event.get_current_round().next_pilot()
+                current_round.set_null_flight(current_competitor)
+                current_competitor = current_round.next_pilot()
             self.controllers['round'].wPilotCtrl.set_data(current_competitor,
                                                           self.event.get_current_round())
             self.vocal.signal_pilotname.emit(str(current_competitor.get_bib_number()))
