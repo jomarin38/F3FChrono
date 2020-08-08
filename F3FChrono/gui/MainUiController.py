@@ -97,13 +97,13 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].btn_day_1_sig.connect(self.bib_day_1)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.home_action)
-        self.controllers['round'].btn_refly_sig.connect(self.refly)
         self.controllers['round'].cancel_round_sig.connect(self.cancel_round)
         self.controllers['round'].wChronoCtrl.btn_penalty_100_sig.connect(self.penalty_100)
         self.controllers['round'].wChronoCtrl.btn_penalty_1000_sig.connect(self.penalty_1000)
         self.controllers['round'].wChronoCtrl.btn_clear_penalty_sig.connect(self.clear_penalty)
         self.controllers['round'].wChronoCtrl.btn_null_flight_sig.connect(self.null_flight)
         self.controllers['round'].wChronoCtrl.time_elapsed_sig.connect(self.handle_time_elapsed)
+        self.controllers['round'].wChronoCtrl.btn_refly_sig.connect(self.refly)
         self.controllers['round'].wPilotCtrl.btn_cancel_flight_sig.connect(self.display_cancel_round)
         self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
         self.controllers['settings'].btn_cancel_sig.connect(self.settings_cancel)
@@ -286,14 +286,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.reset_ui()
         self.vocal.signal_pilotname.emit(str(self.event.get_current_round().get_current_competitor().get_bib_number()))
 
-    def refly(self):
-        #TODO : get penalty value if any
-        self.event.get_current_round().handle_refly(0, insert_database=True)
-        self.chronoHard.reset()
-        self.chronodata.reset()
-        self.next_pilot()
-        self.controllers['round'].wChronoCtrl.reset_ui()
-
     def random_bib_start(self):
         self.getcontextparameters(False)
         self.event.random_bib()
@@ -431,6 +423,16 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['round'].wChronoCtrl.set_null_flight(True)
+
+
+    def refly(self):
+        # TODO : get penalty value if any
+        self.chronoHard.set_status(chronoStatus.Finished)
+        self.chronoHard.valid = False
+        self.controllers['round'].wChronoCtrl.stoptime()
+        self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
+        self.controllers['round'].wChronoCtrl.set_refly(True)
+        self.event.get_current_round().handle_refly(0, insert_database=True)
 
     def contest_changed(self):
         if self.event is not None:

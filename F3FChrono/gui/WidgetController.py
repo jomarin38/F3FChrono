@@ -26,7 +26,6 @@ class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
     cancel_round_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()
-    btn_refly_sig = pyqtSignal()
     btn_gscoring_sig = pyqtSignal()
     widgetList = []
 
@@ -51,7 +50,6 @@ class WRoundCtrl(QObject):
         # Event connect
         self.wBtnCtrl.Btn_Home.clicked.connect(self.btn_home_sig.emit)
         self.wBtnCtrl.Btn_Next.clicked.connect(self.btn_next_sig.emit)
-        self.wBtnCtrl.Btn_reflight.clicked.connect(self.btn_refly_sig.emit)
         self.wBtnCtrl.Btn_gscoring.clicked.connect(self.btn_gscoring_sig.emit)
         self.wBtnCancel.Btn_Next.clicked.connect(self.cancel_next)
         self.wBtnCancel.Btn_Home.clicked.connect(self.cancel_home)
@@ -290,6 +288,7 @@ class WChronoCtrl(QTimer):
     btn_penalty_1000_sig = pyqtSignal()
     btn_clear_penalty_sig = pyqtSignal()
     time_elapsed_sig = pyqtSignal()
+    btn_refly_sig = pyqtSignal()
 
     def __init__(self, name, parent, vocal_elapsedTime_sig):
         super().__init__()
@@ -318,7 +317,7 @@ class WChronoCtrl(QTimer):
         # initialize labels for status
         self.current_lap = 0
         self.view.setupUi(self.widget)
-        self.lap.append(self.view.Lap1)
+        '''self.lap.append(self.view.Lap1)
         self.lap.append(self.view.Lap2)
         self.lap.append(self.view.Lap3)
         self.lap.append(self.view.Lap4)
@@ -328,15 +327,17 @@ class WChronoCtrl(QTimer):
         self.lap.append(self.view.Lap8)
         self.lap.append(self.view.Lap9)
         self.lap.append(self.view.Lap10)
-
+        '''
         self.view.nullFlight.clicked.connect(self.null_flight)
+
         self.view.btn_penalty_100.clicked.connect(self.penalty_100)
         self.view.btn_penalty_1000.clicked.connect(self.penalty_1000)
         self.view.btn_clear_penalty.clicked.connect(self.clear_penalty)
+        self.view.Btn_reflight.clicked.connect(self.btn_refly_sig.emit)
 
         self.timerEvent = QTimer()
         self.timerEvent.timeout.connect(self.run)
-        self.duration = 10
+        self.duration = 100
         self.startTime = time.time()
         self.time = 0
         self.time_up = True
@@ -359,16 +360,18 @@ class WChronoCtrl(QTimer):
 
     def set_laptime(self, laptime):
         # self.view.Time_label.setText("{:0>6.3f}".format(time)
+        '''
         print("current lap : " + str(self.current_lap))
         if self.current_lap < len(self.lap):
             self.lap[self.current_lap].setText("{:d} : {:0>6.1f}".format(self.current_lap + 1, laptime))
             self.current_lap += 1
-
+        '''
     def set_finaltime(self, data_time):
         print("Widget chrono set final time : ", time.time())
-        self.view.Time_label.setText("{:0>6.2f}".format(data_time))
+        self.view.Time_label.setText("{:>6.2f}".format(data_time))
 
     def reset_ui(self):
+        self.stoptime()
         # self.view.Time_label.setText("{:0>6.3f}".format(0.0))
         for lap in self.lap:
             lap.setText("")
@@ -378,9 +381,10 @@ class WChronoCtrl(QTimer):
         self.set_penalty_value(0)
         self.set_null_flight(False)
 
+
     def settime(self, settime, count_up, starttimer=True):
         self.time = settime
-        self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000))
+        self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000))
         self.time_up = count_up
         self.startTime = time.time()
         if starttimer:
@@ -392,9 +396,9 @@ class WChronoCtrl(QTimer):
 
     def run(self):
         if self.time_up:
-            self.view.Time_label.setText("{:0>6.2f}".format(time.time() - self.startTime))
+            self.view.Time_label.setText("{:>6.0f}".format(time.time() - self.startTime))
         else:
-            self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000 - (time.time() - self.startTime)))
+            self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000 - (time.time() - self.startTime)))
             timeval = self.time / 1000 - (time.time() - self.startTime)
             if timeval >= 29.8:
                 self.vocal_elapsedTime_sig.emit('30s')
@@ -428,6 +432,12 @@ class WChronoCtrl(QTimer):
     def set_null_flight(self, value=False):
         if (value):
             self.view.nullFlightLabel.setText(self._translate("Null Flight", "Null Flight"))
+        else:
+            self.view.nullFlightLabel.setText("")
+
+    def set_refly(self, value=False):
+        if (value):
+            self.view.nullFlightLabel.setText(self._translate("Refly", "Refly"))
         else:
             self.view.nullFlightLabel.setText("")
 
