@@ -316,18 +316,9 @@ class WChronoCtrl(QTimer):
         self.lap = []
         # initialize labels for status
         self.current_lap = 0
+        self.current_status = 0
         self.view.setupUi(self.widget)
-        '''self.lap.append(self.view.Lap1)
-        self.lap.append(self.view.Lap2)
-        self.lap.append(self.view.Lap3)
-        self.lap.append(self.view.Lap4)
-        self.lap.append(self.view.Lap5)
-        self.lap.append(self.view.Lap6)
-        self.lap.append(self.view.Lap7)
-        self.lap.append(self.view.Lap8)
-        self.lap.append(self.view.Lap9)
-        self.lap.append(self.view.Lap10)
-        '''
+
         self.view.nullFlight.clicked.connect(self.null_flight)
 
         self.view.btn_penalty_100.clicked.connect(self.penalty_100)
@@ -356,27 +347,20 @@ class WChronoCtrl(QTimer):
 
     def set_status(self, status):
         if status < len(self.statusText):
+            self.current_status = status
             self.view.Status.setText(self.statusText[status])
 
     def set_laptime(self, laptime):
-        # self.view.Time_label.setText("{:0>6.3f}".format(time)
-        '''
-        print("current lap : " + str(self.current_lap))
-        if self.current_lap < len(self.lap):
-            self.lap[self.current_lap].setText("{:d} : {:0>6.1f}".format(self.current_lap + 1, laptime))
-            self.current_lap += 1
-        '''
+        self.current_lap += 1
+        if self.current_lap<10:
+            self.view.Status.setText(self.statusText[self.current_status]+"  {:d}".format(self.current_lap))
+
     def set_finaltime(self, data_time):
         print("Widget chrono set final time : ", time.time())
         self.view.Time_label.setText("{:>6.2f}".format(data_time))
 
     def reset_ui(self):
         self.stoptime()
-        # self.view.Time_label.setText("{:0>6.3f}".format(0.0))
-        for lap in self.lap:
-            lap.setText("")
-        # for ctrl in self.lap_list:
-        #    ctrl.setText("")
         self.current_lap = 0
         self.set_penalty_value(0)
         self.set_null_flight(False)

@@ -465,7 +465,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_run_started(self):
         self.controllers['round'].wChronoCtrl.settime(0, True)
 
-    def slot_lap_finished (self, lap, last_lap_time):
+    def slot_lap_finished(self, lap, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
         self.vocal.signal_base.emit(lap)
 
