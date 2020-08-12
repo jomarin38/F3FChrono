@@ -429,10 +429,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         # TODO : get penalty value if any
         self.chronoHard.set_status(chronoStatus.Finished)
         self.chronoHard.valid = False
+        self.chronoHard.setrefly()
         self.controllers['round'].wChronoCtrl.stoptime()
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['round'].wChronoCtrl.set_refly(True)
-        self.event.get_current_round().handle_refly(0, insert_database=True)
 
     def contest_changed(self):
         if self.event is not None:
@@ -482,10 +482,14 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def slot_run_validated(self):
         #print("run validated")
-        self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
-        self.event.get_current_round().handle_terminated_flight(
-            self.event.get_current_round().get_current_competitor(),
-            self.chronodata, self.chronoHard.getPenalty(), self.chronoHard.valid, insert_database=True)
+        if self.chronoHard.isRefly():
+            self.event.get_current_round().handle_refly(0, insert_database=True)
+        else:
+            self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
+            self.event.get_current_round().handle_terminated_flight(
+                self.event.get_current_round().get_current_competitor(),
+                self.chronodata, self.chronoHard.getPenalty(), self.chronoHard.valid, insert_database=True)
+
         self.chronoHard.reset()
         self.chronodata = Chrono()
         self.next_pilot(insert_database=True)

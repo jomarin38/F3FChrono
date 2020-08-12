@@ -22,7 +22,7 @@
  "noisevolume": 0.005,
  "rebound_btn_time": 500,
  "run_webserver": true,
- "simulatemode": false,
+ "simulatemode": true,
  "sound": true,
  "training_speech_interval": 2,
  "udpport": 4445,

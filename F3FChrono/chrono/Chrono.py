@@ -61,6 +61,8 @@ class ChronoHard(QObject):
                                      self.rain_signal, self.accu_signal, self.rssi_signal)
         self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
         self.valid = True
+        self.refly=False
+
 
 
     def addPenalty(self, value):
@@ -131,6 +133,7 @@ class ChronoHard(QObject):
         self.penalty = 0.0
         self.reset_wind()
         self.valid = True
+        self.refly = False
 
     def getLastLapTime(self):
         if self.getLapCount()>0:
@@ -173,6 +176,11 @@ class ChronoHard(QObject):
                 "rain : " + str(self.getRain()) + os.linesep
         return (result)
 
+    def setrefly(self):
+        self.refly=True
+
+    def isRefly(self):
+        return(self.refly)
 
 
 class ChronoArduino(ChronoHard, QTimer):

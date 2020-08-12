@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_WPilot(object):
     def setupUi(self, WPilot):
         WPilot.setObjectName("WPilot")
-        WPilot.resize(429, 34)
+        WPilot.resize(429, 32)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
