@@ -46,11 +46,11 @@ void serial_run(void);
 void setup() {
   //Initialize chrono var.
   memset (&debug, 0, sizeof(debug));
+  serial_setup();
   chrono_setup();
   output_setup();
   analog_setup();
   base_setup();
-  serial_setup();
 
 }
 

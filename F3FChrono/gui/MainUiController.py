@@ -539,6 +539,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def slot_accu(self, voltage):
         self.controllers['wind'].set_voltage(voltage)
+        print(voltage)
         #adding for log voltage
         f = open("voltage_log.txt", "a+")
         f.write(str(self.startup_time)+','+str((time.time()-self.startup_time)/60.0) +

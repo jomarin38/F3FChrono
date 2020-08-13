@@ -365,7 +365,6 @@ class WChronoCtrl(QTimer):
         self.set_penalty_value(0)
         self.set_null_flight(False)
 
-
     def settime(self, settime, count_up, starttimer=True):
         self.time = settime
         self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000))
