@@ -799,7 +799,7 @@ class WSettingsBase(QObject):
         if self.udp_sig is not None and self.udp_sig_connected:
             self.udp_sig.disconnect(self.slot_udp)
             self.udp_sig_connected = False
-            if self.udp_sig is not None:
+            if self.ipbaseclear_sig is not None:
                 self.ipbaseclear_sig.emit()
                 self.clearA()
                 self.clearB()
