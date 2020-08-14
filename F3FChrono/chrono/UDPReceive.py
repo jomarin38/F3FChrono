@@ -14,9 +14,13 @@ EVENTMSG = "Event"
 https://github.com/jsh2134/iw_parse/
 '''
 class udpreceive(QThread):
-    ipbaseclear_sig = pyqtSignal()
-    ipinvert_sig = pyqtSignal(list)
-    ipset_sig = pyqtSignal(list, list)
+    ipbase_clear_sig = pyqtSignal()
+    ipbase_invert_sig = pyqtSignal(list)
+    ipbase_set_sig = pyqtSignal(list, list)
+    ipwBtn_clear_sig = pyqtSignal()
+    ipwBtn_set_sig = pyqtSignal(str, str, str)
+    simulate_base_sig = pyqtSignal(str)
+    simulate_wbtn_sig = pyqtSignal(str)
 
     def __init__(self, udpport, signal_chrono, signal_btnnext, signal_wind, signal_rain, signal_accu, signal_rssi):
         super().__init__()
@@ -29,9 +33,14 @@ class udpreceive(QThread):
         self.event_rssi = signal_rssi
         self.ipbaseA = ""
         self.ipbaseB = ""
-        self.ipbaseclear_sig.connect(self.clear_ipbase)
-        self.ipinvert_sig.connect(self.invert_ipbase)
-        self.ipset_sig.connect(self.set_ipbase)
+        self.ipwBtn_baseA = ""
+        self.ipwBtn_baseB = ""
+        self.ipwBtn_btnNext = ""
+        self.ipbase_clear_sig.connect(self.clear_ipbase)
+        self.ipbase_invert_sig.connect(self.invert_ipbase)
+        self.ipbase_set_sig.connect(self.set_ipbase)
+        self.ipwBtn_clear_sig.connect(self.clear_ipwBtn)
+        self.ipwBtn_set_sig.connect(self.set_ipwBtn)
 
 
         self.msg = ""
@@ -57,6 +66,17 @@ class udpreceive(QThread):
         self.ipbaseB = self.ipbaseA
         self.ipbaseA = tmp
 
+    def set_ipwBtn(self, baseA, baseB, btnNext):
+        self.ipwBtn_baseA = baseA
+        self.ipwBtn_baseB = baseB
+        self.ipwBtn_btnNext = btnNext
+        print("baseA : ", baseA, "baseB : ", baseB)
+
+    def clear_ipwBtn(self):
+        self.ipwBtn_baseA = ""
+        self.ipwBtn_baseB = ""
+        self.ipwBtn_btnNext = ""
+
     def run(self):
         while(not self.isFinished()):
         # wait until somebody throws an event
@@ -67,12 +87,23 @@ class udpreceive(QThread):
                 if (m[0]=='terminated'):
                     self.terminate()
                 elif (m[0]=='simulate' and m[1]=='base'):
-                    base = m[2]
-                    self.event_chrono.emit("udpreceive", 'event', self._find_base_name(base))
+                    base = self._find_base_name(m[2])
+                    if base is not None:
+                        self.event_chrono.emit("udpreceive", 'event', base)
+                    else:
+                        self.simulate_base_sig.emit(m[2])
                 elif (m[0]=='simulate' and m[1]=='GPIO'):
                     if m[2].lower()=="btnnext":
                         self.event_btn_next.emit(0)
-
+                elif (m[0]=='simulate' and m[1]=='wBtn'):
+                    if m[2].lower()==self.ipwBtn_btnNext:
+                        self.event_btn_next.emit(0)
+                    elif m[2].lower()==self.ipwBtn_baseA:
+                        self.event_chrono.emit("udpreceive", 'event', 'baseA')
+                    elif m[2].lower() == self.ipwBtn_baseB:
+                        self.event_chrono.emit("udpreceive", 'event', 'baseB')
+                    else:
+                        self.simulate_wbtn_sig.emit(m[2])
                 elif m[0]=='wind':
                     self.event_wind.emit(int(m[2]), int(m[1]))
                 elif m[0]=='rain':
@@ -98,7 +129,7 @@ class udpreceive(QThread):
             print("baseB")
             return "baseB"
         else:
-            return ip
+            return None
 
 if __name__ == '__main__':
     print ("Main start")

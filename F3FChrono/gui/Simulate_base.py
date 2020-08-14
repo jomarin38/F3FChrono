@@ -11,6 +11,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
     close_signal = pyqtSignal()
     baseAList = []
     baseBList = []
+    wBtnList = []
  #   viewbaseAList = []
     viewbaseBList = []
 #    widgetBaseList = []
@@ -25,8 +26,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
 
         self.ui.btn_gpio_A.clicked.connect(self.send_gpio_A)
         self.ui.btn_gpio_B.clicked.connect(self.send_gpio_B)
-        self.ui.btn_next.clicked.connect(self.send_gpio_next)
-        self.ui.btn_send_wind.clicked.connect(self.send_weather)
+        self.ui.btn_send_Info.clicked.connect(self.send_info)
         self.udpbeep = udpbeep("255.255.255.255", 4445)
 
         self.timerEvent = QTimer()
@@ -35,6 +35,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
 
         self.__addbase_List(self.baseAList, self.ui.listBaseA, 3, 20, self.send_base_A)
         self.__addbase_List(self.baseBList, self.ui.listBaseB, 5, 50, self.send_base_B)
+        self.__addbase_List(self.wBtnList, self.ui.listWBtn, 3, 70, self.send_wbtn)
 
 
     def send_base_A(self):
@@ -44,6 +45,9 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
     def send_base_B(self):
         self.__sendbase(self.udpbeep,
                         self.__getWidgetinQlistWidget(self.baseBList, self.ui.listBaseB, self.sender().parent().pos()))
+    def send_wbtn(self):
+        self.__sendwBtn(self.udpbeep,
+                        self.__getWidgetinQlistWidget(self.wBtnList, self.ui.listWBtn, self.sender().parent().pos()))
 
     def send_gpio_A(self):
         self.udpbeep.sendData("simulate GPIO baseA")
@@ -54,19 +58,19 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
     def send_gpio_next(self):
         self.udpbeep.sendData("simulate GPIO btnnext")
 
-    def send_weather(self):
+    def send_info(self):
         if self.timerEvent.isActive() == False:
             self.timerEvent.start(self.duration)
-            self.ui.btn_send_wind.setText("info Processing...")
+            self.ui.btn_send_Info.setText("info Processing...")
         else:
-            self.ui.btn_send_wind.setText("Send info")
+            self.ui.btn_send_Info.setText("Send info")
             self.timerEvent.stop()
 
     def run(self):
         self.udpbeep.sendData("wind " + str(self.ui.wind_dir.value()) + " " + \
                               str(self.ui.wind_speed.value()))
         self.udpbeep.sendData("rain " + str(self.ui.rain.isChecked()))
-        self.udpbeep.sendData("simulate info " + str(self.ui.AccuRace.value()) + " " + \
+        self.udpbeep.sendData("simulate info " + str(self.ui.AccuVoltage.value()) + " " + \
                               str(self.ui.rssi_picam1.value()) + " " + str(self.ui.rssi_picam2.value()))
 
     def closeEvent(self, event):
@@ -76,6 +80,12 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
     @staticmethod
     def __sendbase(udp, item):
         msg="simulate base " + item.ipAddress.text() + " " + item.event.text()
+        print(msg)
+        udp.sendData(msg)
+
+    @staticmethod
+    def __sendwBtn(udp, item):
+        msg="simulate wBtn " + item.ipAddress.text() + " " + item.event.text()
         print(msg)
         udp.sendData(msg)
 

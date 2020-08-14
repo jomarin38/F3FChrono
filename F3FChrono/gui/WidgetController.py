@@ -17,6 +17,8 @@ from F3FChrono.gui.WSettings_ui import Ui_WSettings
 from F3FChrono.gui.WSettingsAdvanced_ui import Ui_WSettingsAdvanced
 from F3FChrono.gui.WSettingsBase_ui import Ui_WSettingsBase
 from F3FChrono.gui.WSettingsBase_item_ui import Ui_WSettingBase_item
+from F3FChrono.gui.WSettingswBtn_ui import Ui_WSettingswBtn
+from F3FChrono.gui.WSettingswBtn_item_ui import Ui_WSettingwBtn_item
 from F3FChrono.gui.WSettingsSound_ui import Ui_WSettingsSound
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.web.Utils import Utils
@@ -741,8 +743,8 @@ class WSettingsBase(QObject):
             self.view.buttonBaseBDetect.setText(self._translate("Detect", "Detect"))
 
 
-    def slot_udp(self, caller, data, address):
-        print(caller, data, address)
+    def slot_udp(self, address):
+        print(address)
         if self.baseInProgress == 'A' and self.__ipNotPresent(self.baseAList, address):
             self.__addbase_List(self.baseAList, self.view.listWidget_baseA, address, self.deleteItemBaseA,
                                 self.moveItemBaseA)
@@ -859,6 +861,162 @@ class WSettingsBase(QObject):
             ip.append(i['ui_widget'].ipAddress.text())
         return ip
 
+class WSettingswBtn(QObject):
+    btn_settings_sig = pyqtSignal()
+    btn_valid_sig = pyqtSignal()
+    btn_cancel_sig = pyqtSignal()
+    widgetList = []
+    wBtnList = []
+    viewwBtnList = []
+    widgetwBtnList = []
+
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WSettingswBtn()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.buttonDetect.clicked.connect(self.wBtn_detect)
+        self.view.buttonClear.clicked.connect(self.clearwBtn)
+        self.view.btn_back.clicked.connect(self.btn_settings_sig.emit)
+        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
+        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self._translate = QtCore.QCoreApplication.translate
+        self.udp_sig = None
+        self.ipset_sig = None
+        self.ipwBtnclear_sig = None
+        self.udp_sig_connected = False
+        self.wBtnInProgress = None
+
+    def get_widget(self):
+        return (self.widgetList)
+
+    def show(self):
+        self.widget.show()
+
+    def is_show(self):
+        return self.widget.isVisible()
+
+    def hide(self):
+        self.widget.hide()
+
+    def set_data(self):
+        print("Settings wBtn set_data")
+
+    def get_data(self):
+        print ("Settings wBtn get_data")
+
+    def set_udp_sig(self, udp, set, clear):
+        self.udp_sig = udp
+        self.ipset_sig = set
+        self.ipwBtnclear_sig = clear
+
+
+    def wBtn_detect(self):
+        if self.udp_sig is not None and self.ipwBtnclear_sig is not None and self.wBtnInProgress == None:
+            self.udp_sig.connect(self.slot_udp)
+            self.ipwBtnclear_sig.emit()
+            self.view.buttonDetect.setText(self._translate("In Progress...", "In Progress..."))
+            self.udp_sig_connected = True
+            self.wBtnInProgress = True
+        elif self.wBtnInProgress:
+            self.wBtnInProgress = None
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            self.view.buttonDetect.setText(self._translate("Detect", "Detect"))
+
+    def slot_udp(self, address):
+        print(address)
+        if self.wBtnInProgress and self.__ipNotPresent(self.wBtnList, address):
+            self.__addwBtn_List(self.wBtnList, self.view.listWidget_wBtn, address, self.deleteItemwBtn)
+
+    def clearwBtn(self):
+        self.view.listWidget_wBtn.clear()
+        self.wBtnList.clear()
+        if self.ipwBtnclear_sig is not None:
+            self.ipwBtnclear_sig.emit()
+
+    def deleteItemwBtn(self):
+        self.__deleteWidgetinQlistWidget(self.wBtnList, self.view.listWidget_wBtn, self.sender().parent().pos())
+
+    def get_ipwBtn(self):
+        return self.__getAllIp(self.wBtnList)
+
+
+    def btn_cancel(self):
+        if self.udp_sig is not None and self.udp_sig_connected:
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+        self.clearwBtn()
+
+    def btn_valid(self):
+        if self.udp_sig is not None and self.udp_sig_connected:
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+        if self.ipset_sig is not None:
+            ip = self.get_ipwBtn()
+            self.ipset_sig.emit(ip[0], ip[1], ip[2])
+
+    @staticmethod
+    def __addwBtn_List (list, uilist, ip, deleteEvent):
+        collect = collections.OrderedDict()
+        collect['QlistWidgetItem'] = QtWidgets.QListWidgetItem()
+        collect['QWidget'] = QtWidgets.QWidget()
+        collect['ui_widget'] = Ui_WSettingwBtn_item()
+        list.append(collect)
+        uilist.addItem(list[-1]['QlistWidgetItem'])
+
+        list[-1]['ui_widget'].setupUi(list[-1]['QWidget'])
+        list[-1]['ui_widget'].ipAddress.setText(ip)
+        list[-1]['ui_widget'].buttonDelete.clicked.connect(deleteEvent)
+        uilist.setItemWidget(list[-1]['QlistWidgetItem'], list[-1]['QWidget'])
+
+    @staticmethod
+    def __getWidgetinQlistWidget (list, uilist, pos):
+        item = uilist.itemAt(pos)
+        for index in list:
+            if index['QlistWidgetItem'] == item:
+                return index['ui_widget']
+
+    @staticmethod
+    def __deleteWidgetinQlistWidget (list, uilist, pos):
+        ip=""
+        item = uilist.itemAt(pos)
+        itemdelete = None
+        for i in range(len(list)):
+            if list[i]['QlistWidgetItem'] == item:
+                itemdelete = i
+        if itemdelete is not None:
+            ip = list[itemdelete]['ui_widget'].ipAddress.text()
+            del(list[itemdelete])
+            uilist.takeItem(itemdelete)
+        return ip
+
+    @staticmethod
+    def __ipNotPresent(list, ip):
+        for i in range(len(list)):
+            if list[i]['ui_widget'].ipAddress.text()==ip:
+                return False
+        return True
+
+    @staticmethod
+    def __getAllIp(list):
+        baseA=""
+        baseB=""
+        btn_next=""
+        for i in list:
+            index = i['ui_widget'].comboBox_SP.currentIndex()
+            if index==1:
+                btn_next = i['ui_widget'].ipAddress.text()
+            if index == 2:
+                baseA = i['ui_widget'].ipAddress.text()
+            if index == 3:
+                baseB = i['ui_widget'].ipAddress.text()
+
+        return baseA, baseB, btn_next
+
 class WSettingsSound(QObject):
     btn_settings_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
@@ -912,6 +1070,7 @@ class WSettingsSound(QObject):
 class WSettings(QObject):
     btn_settingsadvanced_sig = pyqtSignal()
     btn_settingsbase_sig = pyqtSignal()
+    btn_settingswBtn_sig = pyqtSignal()
     btn_settingssound_sig = pyqtSignal()
     btn_cancel_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
@@ -929,6 +1088,7 @@ class WSettings(QObject):
         self.widgetList.append(self.widget)
         self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
         self.view.btn_base_settings.clicked.connect(self.btn_settingsbase_sig.emit)
+        self.view.wbtn_settings.clicked.connect(self.btn_settingswBtn_sig.emit)
         self.view.btn_sound_settings.clicked.connect(self.btn_settingssound_sig.emit)
 
         self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
