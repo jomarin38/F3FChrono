@@ -335,7 +335,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].set_data(self.event)
         self.getcontextparameters(True)
 
-    def start(self, force=False, contest=None):
+    def start(self):
         if self.event is not None:
             self.getcontextparameters(True)
             del self.event
@@ -345,11 +345,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronodata.reset()
         self.noise.start()
 
-        if force:
-            eventData = contest
-        else:
-            eventData = self.controllers['config'].view.ContestList.currentData()
-
+        eventData = self.controllers['config'].view.ContestList.currentData()
         if eventData is not None:
             self.event = self.daoEvent.get(eventData.id,
                         fetch_competitors=True, fetch_rounds=True, fetch_runs=True, fetch_runs_lastround=True)
@@ -466,17 +462,13 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['round'].wChronoCtrl.set_refly(True)
 
-    def contest_changed(self, force=False, contest=None):
+    def contest_changed(self):
         if self.event is not None:
             self.getcontextparameters(updateBDD=True)
             del self.event
             self.event = None
 
-        if force:
-            eventData = contest
-        else:
-            eventData = self.controllers['config'].view.ContestList.currentData()
-
+        eventData = self.controllers['config'].view.ContestList.currentData()
         if eventData is not None:
             self.event = self.daoEvent.get(eventData.id, fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
             self.controllers['config'].set_data(self.event)
@@ -485,23 +477,23 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if self.controllers['config'].is_show():
             print('config')
             contest = self.controllers['config'].view.ContestList.count()
-
-            event = self.controllers['config'].view.ContestList.itemData(contest-1)
-            self.contest_changed(True, event)
-            self.start(True, event)
+            self.controllers['config'].view.ContestList.setCurrentIndex(contest-1)
+            self.controllers['config'].contest_sig.emit()
+            self.start()
         elif self.controllers['round'].is_show():
             print("mode round")
             self.controllers['round'].btn_home_sig.emit()
-            event = self.controllers['config'].view.ContestList.itemData(0)
-            self.contest_changed(True, event)
-            self.start(True, event)
+            self.controllers['config'].view.ContestList.setCurrentIndex(0)
+            self.controllers['config'].contest_sig.emit()
+            self.start()
+
         elif self.controllers['training'].is_show():
             print("mode training")
             self.controllers['training'].btn_home_sig.emit()
             contest = self.controllers['config'].view.ContestList.count()
-            event = self.controllers['config'].view.ContestList.itemData(contest-1)
-            self.contest_changed(True, event)
-            self.start(True, event)
+            self.controllers['config'].view.ContestList.setCurrentIndex(contest-1)
+            self.controllers['config'].contest_sig.emit()
+            self.start()
 
     def slot_status_changed(self, status):
         #print ("slot status", status)
