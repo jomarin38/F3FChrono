@@ -58,17 +58,22 @@
      </item>
      <item>
       <property name="text">
-       <string>Btn Next</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
        <string>Base A</string>
       </property>
      </item>
      <item>
       <property name="text">
        <string>Base B</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Next Btn</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Switch Mode</string>
       </property>
      </item>
     </widget>
@@ -106,17 +111,22 @@
      </item>
      <item>
       <property name="text">
-       <string>Btn Next</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
        <string>Base A</string>
       </property>
      </item>
      <item>
       <property name="text">
        <string>Base B</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Next Btn</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Switch Mode</string>
       </property>
      </item>
     </widget>

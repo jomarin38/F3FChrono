@@ -50,6 +50,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronoHard.accu_signal.connect(self.slot_accu)
         self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
         self.chronoHard.event_voltage()
+        self.chronoHard.udpReceive.switchMode_sig.connect(self.slot_switch_mode)
         self.signal_race = None
         self.signal_training = None
         self.low_voltage_ask = False
@@ -334,7 +335,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].set_data(self.event)
         self.getcontextparameters(True)
 
-    def start(self):
+    def start(self, force=False, contest=None):
         if self.event is not None:
             self.getcontextparameters(True)
             del self.event
@@ -344,7 +345,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.chronodata.reset()
         self.noise.start()
 
-        eventData = self.controllers['config'].view.ContestList.currentData()
+        if force:
+            eventData = contest
+        else:
+            eventData = self.controllers['config'].view.ContestList.currentData()
+
         if eventData is not None:
             self.event = self.daoEvent.get(eventData.id,
                         fetch_competitors=True, fetch_rounds=True, fetch_runs=True, fetch_runs_lastround=True)
@@ -370,10 +375,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['training'].wChronoCtrl.reset()
             self.set_signal_mode(training=True)
             self.show_training()
-
-
-
-
 
     def getcontextparameters(self, updateBDD=False):
         self.controllers['config'].get_data()
@@ -465,16 +466,42 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['round'].wChronoCtrl.set_refly(True)
 
-    def contest_changed(self):
+    def contest_changed(self, force=False, contest=None):
         if self.event is not None:
             self.getcontextparameters(updateBDD=True)
             del self.event
             self.event = None
 
-        eventData = self.controllers['config'].view.ContestList.currentData()
-        if (eventData is not None):
+        if force:
+            eventData = contest
+        else:
+            eventData = self.controllers['config'].view.ContestList.currentData()
+
+        if eventData is not None:
             self.event = self.daoEvent.get(eventData.id, fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
             self.controllers['config'].set_data(self.event)
+
+    def slot_switch_mode(self):
+        if self.controllers['config'].is_show():
+            print('config')
+            contest = self.controllers['config'].view.ContestList.count()
+
+            event = self.controllers['config'].view.ContestList.itemData(contest-1)
+            self.contest_changed(True, event)
+            self.start(True, event)
+        elif self.controllers['round'].is_show():
+            print("mode round")
+            self.controllers['round'].btn_home_sig.emit()
+            event = self.controllers['config'].view.ContestList.itemData(0)
+            self.contest_changed(True, event)
+            self.start(True, event)
+        elif self.controllers['training'].is_show():
+            print("mode training")
+            self.controllers['training'].btn_home_sig.emit()
+            contest = self.controllers['config'].view.ContestList.count()
+            event = self.controllers['config'].view.ContestList.itemData(contest-1)
+            self.contest_changed(True, event)
+            self.start(True, event)
 
     def slot_status_changed(self, status):
         #print ("slot status", status)

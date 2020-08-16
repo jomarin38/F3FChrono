@@ -19,3 +19,4 @@ python3 -m PyQt5.uic.pyuic -x WSettingswBtn_item.ui -o WSettingswBtn_item_ui.py
 python3 -m PyQt5.uic.pyuic -x WSettingsAdvanced.ui -o WSettingsAdvanced_ui.py
 python3 -m PyQt5.uic.pyuic -x simulate_base.ui -o simulate_base_ui.py
 python3 -m PyQt5.uic.pyuic -x simulate_base_widget.ui -o simulate_base_widget_ui.py
+python3 -m PyQt5.uic.pyuic -x simulate_wBtn_widget.ui -o simulate_wBtn_widget_ui.py

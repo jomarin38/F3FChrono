@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.gui.simulate_base_ui import Ui_MainWindow
 from F3FChrono.gui.simulate_base_widget_ui import Ui_base_widget
+from F3FChrono.gui.simulate_wBtn_widget_ui import Ui_wBtn_widget
 from F3FChrono.chrono.UDPBeep import udpbeep
 
 
@@ -35,7 +36,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
 
         self.__addbase_List(self.baseAList, self.ui.listBaseA, 3, 20, self.send_base_A)
         self.__addbase_List(self.baseBList, self.ui.listBaseB, 5, 50, self.send_base_B)
-        self.__addbase_List(self.wBtnList, self.ui.listWBtn, 3, 70, self.send_wbtn)
+        self.__addwBtn_List(self.wBtnList, self.ui.listWBtn, 3, 70, self.send_wbtnSP, self.send_wbtnLP)
 
 
     def send_base_A(self):
@@ -45,9 +46,14 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
     def send_base_B(self):
         self.__sendbase(self.udpbeep,
                         self.__getWidgetinQlistWidget(self.baseBList, self.ui.listBaseB, self.sender().parent().pos()))
-    def send_wbtn(self):
+    def send_wbtnSP(self):
         self.__sendwBtn(self.udpbeep,
-                        self.__getWidgetinQlistWidget(self.wBtnList, self.ui.listWBtn, self.sender().parent().pos()))
+                        self.__getWidgetinQlistWidget(self.wBtnList, self.ui.listWBtn, self.sender().parent().pos()),
+                        '1')
+    def send_wbtnLP(self):
+        self.__sendwBtn(self.udpbeep,
+                        self.__getWidgetinQlistWidget(self.wBtnList, self.ui.listWBtn, self.sender().parent().pos()),
+                        '0')
 
     def send_gpio_A(self):
         self.udpbeep.sendData("simulate GPIO baseA")
@@ -84,8 +90,8 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         udp.sendData(msg)
 
     @staticmethod
-    def __sendwBtn(udp, item):
-        msg="simulate wBtn " + item.ipAddress.text() + " " + item.event.text()
+    def __sendwBtn(udp, item, shortpush):
+        msg="simulate wBtn " + item.ipAddress.text() + " " + str(shortpush)
         print(msg)
         udp.sendData(msg)
 
@@ -103,6 +109,22 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
             list[-1]['ui_widget'].ipAddress.setText("192.168.1."+str(i+ip_base))
             list[-1]['ui_widget'].event.setText("Event")
             list[-1]['ui_widget'].buttonSend.clicked.connect(event)
+            uilist.setItemWidget(list[-1]['QlistWidgetItem'], list[-1]['QWidget'])
+
+    @staticmethod
+    def __addwBtn_List (list, uilist, nb, ip_base, eventSP, eventLP):
+        for i in range(nb):
+            collect = collections.OrderedDict()
+            collect['QlistWidgetItem'] = QtWidgets.QListWidgetItem()
+            collect['QWidget'] = QtWidgets.QWidget()
+            collect['ui_widget'] = Ui_wBtn_widget()
+            list.append(collect)
+            uilist.addItem(list[-1]['QlistWidgetItem'])
+
+            list[-1]['ui_widget'].setupUi(list[-1]['QWidget'])
+            list[-1]['ui_widget'].ipAddress.setText("192.168.1."+str(i+ip_base))
+            list[-1]['ui_widget'].buttonSendSP.clicked.connect(eventSP)
+            list[-1]['ui_widget'].buttonSendLP.clicked.connect(eventLP)
             uilist.setItemWidget(list[-1]['QlistWidgetItem'], list[-1]['QWidget'])
 
     @staticmethod

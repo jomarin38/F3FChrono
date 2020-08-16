@@ -2,20 +2,20 @@
 #include <WiFiUdp.h>
 
 #ifndef STASSID
-#define STASSID "F3FCtrl"
-#define STAPSK  "F3FPassword"
+  #define STASSID "F3FCtrl"
+  #define STAPSK  "F3FPassword"
 #endif
 
 
 // buffers for receiving and sending data
-char  message[] = "simulate GPIO btnnext\r\n";       // a string to send
+char  message_wBtn[] = "";       // a string to send
 
 char remoteIP[] = "255.255.255.255";
 int remotePort = 4445;
 
 const int buttonPin = 2;
 int buttonState = 0;
-
+int count=0;
 WiFiUDP Udp;
 
 void setup() {
@@ -41,13 +41,18 @@ void loop() {
   buttonState = digitalRead(buttonPin);
 
   if (buttonState == LOW) {
-
-    Udp.beginPacket(remoteIP, remotePort);
-    Udp.write(message);
-    Udp.endPacket();
-    delay(500);
-
+    delay(100);
+    count++;
+  }else{
+    if (count>0){
+      strcpy (message_wBtn, "wBtn ");
+      strcat (message_wBtn, ((count>=10)?"0":"1"));
+      strcat (message_wBtn, "\r\n");
+      Udp.beginPacket(remoteIP, remotePort);
+      Udp.write(message_wBtn);
+      Udp.endPacket();
+      count=0;   
+     }
   }
-
+  delay(5);
 }
-
