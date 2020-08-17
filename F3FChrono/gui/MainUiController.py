@@ -35,9 +35,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             _translator.load(_path)
             QtWidgets.QApplication.instance().installTranslator(_translator)
 
-        self.vocal = chronoQSound(ConfigReader.config.conf['language'], ConfigReader.config.conf['sound'],
-                                  ConfigReader.config.conf['voice'], ConfigReader.config.conf['voice_rate'],
-                                  ConfigReader.config.conf['buzzer_valid'])
+        self.vocal = chronoQSound(os.getcwd(), ConfigReader.config.conf['language'], ConfigReader.config.conf['sound'])
         self.noise = noiseGenerator(ConfigReader.config.conf['noisesound'], ConfigReader.config.conf['noisevolume'])
 
         self.initUI()
@@ -287,8 +285,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settingswBtn'].btn_valid()
         ConfigReader.config.write('config.json')
         self.show_config()
-        self.vocal.settings(ConfigReader.config.conf['sound'],
-                           ConfigReader.config.conf['voice'])
+        #self.vocal.settings(ConfigReader.config.conf['sound'], ConfigReader.config.conf['voice'])
         self.noise.settings(ConfigReader.config.conf['noisesound'],
                            ConfigReader.config.conf['noisevolume'])
         self.chronoHard.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
@@ -316,7 +313,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                                                                                                 visited_competitors=[]),
                                                       self.event.get_current_round())
         self.controllers['round'].wChronoCtrl.reset_ui()
-        self.vocal.signal_pilotname.emit(str(self.event.get_current_round().get_current_competitor().get_bib_number()))
+        self.vocal.signal_pilotname.emit(int(self.event.get_current_round().get_current_competitor().get_bib_number()))
 
     def random_bib_start(self):
         self.getcontextparameters(False)
@@ -359,7 +356,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 current_competitor = current_round.next_pilot()
             self.controllers['round'].wPilotCtrl.set_data(current_competitor,
                                                           self.event.get_current_round())
-            self.vocal.signal_pilotname.emit(str(current_competitor.get_bib_number()))
+            self.vocal.signal_pilotname.emit(int(current_competitor.get_bib_number()))
             self.chronoHard.set_mode(training=False)
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
             self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False)
@@ -522,6 +519,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_run_finished(self, run_time):
         #print("Main UI Controller slot run finished : ", time.time())
         self.controllers['round'].wChronoCtrl.stoptime()
+        print ('final time : ' + str(run_time))
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         self.controllers['round'].widgetBtn.update()
         if ConfigReader.config.conf["voice"]:

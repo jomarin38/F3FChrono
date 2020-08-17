@@ -374,7 +374,6 @@ class WChronoCtrl(QTimer):
         self.startTime = time.time()
         if starttimer:
             self.timerEvent.start(self.duration)
-            self.vocal_elapsedTime_sig.emit('end')
 
     def stoptime(self):
         self.timerEvent.stop()
@@ -386,17 +385,35 @@ class WChronoCtrl(QTimer):
             self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000 - (time.time() - self.startTime)))
             timeval = self.time / 1000 - (time.time() - self.startTime)
             if timeval >= 29.8:
-                self.vocal_elapsedTime_sig.emit('30s')
-            if 25.9 <= timeval <= 26.1:
-                self.vocal_elapsedTime_sig.emit('25s')
-            if 20.9 <= timeval <= 21.1:
-                self.vocal_elapsedTime_sig.emit('20s')
-            if 15.9 <= timeval <= 16.1:
-                self.vocal_elapsedTime_sig.emit('15s')
-            if 10.9 <= timeval <= 11.1:
-                self.vocal_elapsedTime_sig.emit('10s')
+                self.vocal_elapsedTime_sig.emit(30)
+            if 25.9 <= timeval <= 26:
+                self.vocal_elapsedTime_sig.emit(25)
+            if 20.9 <= timeval <= 21:
+                self.vocal_elapsedTime_sig.emit(20)
+            if 15.9 <= timeval <= 16:
+                self.vocal_elapsedTime_sig.emit(15)
+            if 10.9 <= timeval <= 11:
+                self.vocal_elapsedTime_sig.emit(10)
+            if 9.9 <= timeval <= 10:
+                self.vocal_elapsedTime_sig.emit(9)
+            if 8.9 <= timeval <= 9:
+                self.vocal_elapsedTime_sig.emit(8)
+            if 7.9 <= timeval <= 8:
+                self.vocal_elapsedTime_sig.emit(7)
+            if 6.9 <= timeval <= 7:
+                self.vocal_elapsedTime_sig.emit(6)
+            if 5.9 <= timeval <= 6:
+                self.vocal_elapsedTime_sig.emit(5)
+            if 4.9 <= timeval <= 5:
+                self.vocal_elapsedTime_sig.emit(4)
+            if 3.9 <= timeval <= 4:
+                self.vocal_elapsedTime_sig.emit(3)
+            if 2.9 <= timeval <= 3:
+                self.vocal_elapsedTime_sig.emit(2)
+            if 1.9 <= timeval <= 2:
+                self.vocal_elapsedTime_sig.emit(1)
             if timeval < 0:
-                self.vocal_elapsedTime_sig.emit('end')
+                self.vocal_elapsedTime_sig.emit(0)
                 self.time_elapsed_sig.emit()
 
     def penalty_100(self):

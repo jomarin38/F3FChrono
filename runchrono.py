@@ -59,6 +59,8 @@ def main():
 
 
     app = QtWidgets.QApplication(sys.argv)
+    #set wait mouse cursor
+    app.setOverrideCursor(QtCore.Qt.WaitCursor)
     ui = MainUiCtrl(dao, chronodata, rpi=is_running_on_pi(), webserver_process=webserver_process)
 
     if not os.path.isfile('voltage_log.txt'):
@@ -74,6 +76,8 @@ def main():
         ui_simulate=SimulateBase()
         ui_simulate.close_signal.connect(ui.MainWindow.close)
         ui.close_signal.connect(ui_simulate.MainWindow.close)
+    #restore mouse cursor
+    app.restoreOverrideCursor()
 
     try:
         sys.exit(app.exec_())
