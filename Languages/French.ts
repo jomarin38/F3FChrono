@@ -4,7 +4,7 @@
 <context>
     <name>BIB : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="281"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="283"/>
         <source>BIB : </source>
         <translation>Dossard : </translation>
     </message>
@@ -12,7 +12,7 @@
 <context>
     <name>Detect</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="758"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="989"/>
         <source>Detect</source>
         <translation>Détection</translation>
     </message>
@@ -20,7 +20,7 @@
 <context>
     <name>In Progress...</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="751"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="951"/>
         <source>In Progress...</source>
         <translation>En cours...</translation>
     </message>
@@ -30,13 +30,13 @@
     <message>
         <location filename="../F3FChrono/chrono/Sound.py" line="50"/>
         <source>Low Voltage</source>
-        <translation>Tension basse</translation>
+        <translation type="obsolete">Tension basse</translation>
     </message>
 </context>
 <context>
     <name>Max : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="534"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="536"/>
         <source>Max : </source>
         <translation>Max : </translation>
     </message>
@@ -44,7 +44,7 @@
 <context>
     <name>Mean : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="533"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="535"/>
         <source>Mean : </source>
         <translation>Moyenne : </translation>
     </message>
@@ -52,7 +52,7 @@
 <context>
     <name>Min : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="532"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="534"/>
         <source>Min : </source>
         <translation>Min : </translation>
     </message>
@@ -76,7 +76,7 @@
 <context>
     <name>No Rain</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="186"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="188"/>
         <source>No Rain</source>
         <translation>Soleil</translation>
     </message>
@@ -92,7 +92,7 @@
 <context>
     <name>Null Flight</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="434"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="436"/>
         <source>Null Flight</source>
         <translation>Vol Null</translation>
     </message>
@@ -102,7 +102,7 @@
     <message>
         <location filename="../F3FChrono/chrono/Sound.py" line="49"/>
         <source>Pilot number</source>
-        <translation>Pilote N°</translation>
+        <translation type="obsolete">Pilote N°</translation>
     </message>
 </context>
 <context>
@@ -116,7 +116,7 @@
 <context>
     <name>Rain</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="184"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="186"/>
         <source>Rain</source>
         <translation>Pluie</translation>
     </message>
@@ -124,7 +124,7 @@
 <context>
     <name>Refly</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="440"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="442"/>
         <source>Refly</source>
         <translation>Revol</translation>
     </message>
@@ -132,7 +132,7 @@
 <context>
     <name>Round : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="282"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="284"/>
         <source>Round : </source>
         <translation>Manche : </translation>
     </message>
@@ -140,7 +140,7 @@
 <context>
     <name>Total Laps : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="535"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="537"/>
         <source>Total Laps : </source>
         <translation>Nbre tours : </translation>
     </message>
@@ -153,22 +153,22 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChrono_ui.py" line="177"/>
+        <location filename="../F3FChrono/gui/WChrono_ui.py" line="175"/>
         <source>30.00</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChrono_ui.py" line="176"/>
+        <location filename="../F3FChrono/gui/WChrono_ui.py" line="180"/>
         <source>Penalty :</source>
         <translation>Pénalité :</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChrono_ui.py" line="175"/>
+        <location filename="../F3FChrono/gui/WChrono_ui.py" line="173"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChrono_ui.py" line="173"/>
+        <location filename="../F3FChrono/gui/WChrono_ui.py" line="181"/>
         <source>Wait New Run</source>
         <translation>Attente Run</translation>
     </message>
@@ -183,17 +183,17 @@
         <translation type="obsolete">Pénalité</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChrono_ui.py" line="178"/>
+        <location filename="../F3FChrono/gui/WChrono_ui.py" line="177"/>
         <source>100</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChrono_ui.py" line="179"/>
+        <location filename="../F3FChrono/gui/WChrono_ui.py" line="176"/>
         <source>1000</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChrono_ui.py" line="180"/>
+        <location filename="../F3FChrono/gui/WChrono_ui.py" line="178"/>
         <source>0 Flight</source>
         <translation>Vol null</translation>
     </message>
@@ -203,7 +203,7 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChrono_ui.py" line="181"/>
+        <location filename="../F3FChrono/gui/WChrono_ui.py" line="179"/>
         <source>Reflight</source>
         <translation>Revol</translation>
     </message>
@@ -272,77 +272,77 @@
 <context>
     <name>WConfig</name>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="213"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="205"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="224"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="215"/>
         <source>Race Management Settings</source>
         <translation>Configuration</translation>
     </message>
     <message>
         <location filename="../F3FChrono/gui/WConfig_ui.py" line="222"/>
         <source>Contest</source>
-        <translation>Concours</translation>
+        <translation type="obsolete">Concours</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="220"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="212"/>
         <source>Training</source>
         <translation>Entrainement</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="219"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="211"/>
         <source>Contest settings</source>
         <translation>Paramètres concours</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="223"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="214"/>
         <source>Max Interrupt (mn)</source>
         <translation>Interrupt. max (mn)</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="216"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="208"/>
         <source>WindMin (m/s)</source>
         <translation>Vent min (m/s)</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="215"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="207"/>
         <source>WindMax (m/s)</source>
         <translation>Vent max (m/s)</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="217"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="209"/>
         <source>Orientation (Â°)</source>
         <translation>Dir vent (°)</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="214"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="206"/>
         <source>Revol</source>
         <translation>Revol</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="221"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="213"/>
         <source>Day duration</source>
         <translation>Durée concours</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="218"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="210"/>
         <source>BIB Starting</source>
         <translation>Dossard</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="227"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="218"/>
         <source>Random</source>
         <translation>Dossard Aléatoire</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="226"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="217"/>
         <source>Day+1</source>
         <translation>Dossard Jour+1</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WConfig_ui.py" line="225"/>
+        <location filename="../F3FChrono/gui/WConfig_ui.py" line="216"/>
         <source>Start</source>
         <translation>Lancer Concours</translation>
     </message>
@@ -350,27 +350,27 @@
 <context>
     <name>WPilot</name>
     <message>
-        <location filename="../F3FChrono/gui/WPilot_ui.py" line="86"/>
+        <location filename="../F3FChrono/gui/WPilot_ui.py" line="83"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WPilot_ui.py" line="87"/>
+        <location filename="../F3FChrono/gui/WPilot_ui.py" line="86"/>
         <source> _____ _______</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WPilot_ui.py" line="88"/>
+        <location filename="../F3FChrono/gui/WPilot_ui.py" line="87"/>
         <source>bib : XXX</source>
         <translation>Dossard : XXX</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WPilot_ui.py" line="89"/>
+        <location filename="../F3FChrono/gui/WPilot_ui.py" line="85"/>
         <source>Round : </source>
         <translation>Manche : </translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WPilot_ui.py" line="90"/>
+        <location filename="../F3FChrono/gui/WPilot_ui.py" line="84"/>
         <source>Cancel Round</source>
         <translation>Annuler Manche</translation>
     </message>
@@ -401,22 +401,22 @@
 <context>
     <name>WSettings</name>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="159"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="167"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Configuration wBtn</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="160"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="168"/>
         <source>Settings</source>
         <translation>Configuration</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="166"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="173"/>
         <source>FullScreen</source>
         <translation>Plein écran</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="164"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="171"/>
         <source>Simulate Mode</source>
         <translation>Mode simulé</translation>
     </message>
@@ -451,17 +451,17 @@
         <translation type="obsolete">Buzzer bouton Next</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="171"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="183"/>
         <source>Close Race Management</source>
         <translation>Quitter logiciel</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="174"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="182"/>
         <source>WebServer</source>
         <translation>WebServer</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="172"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="181"/>
         <source>Not started</source>
         <translation>Non Démarré</translation>
     </message>
@@ -486,59 +486,64 @@
         <translation type="obsolete">Inversion bases</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="165"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="172"/>
         <source>Advanced Settings</source>
         <translation>Configuration avancée</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="175"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="179"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="176"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="180"/>
         <source>Valid</source>
         <translation>Valider</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="162"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="169"/>
         <source>Training</source>
         <translation>Entrainement</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="163"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="170"/>
         <source>Competition</source>
         <translation>Compétition</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="167"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="174"/>
         <source>Sound &amp;&amp; Voice Settings</source>
-        <translation>Sons &amp; Voix</translation>
+        <translation>Sons &amp;&amp; Voix</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="161"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="184"/>
         <source>Base Settings</source>
         <translation>Configuration Bases</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="173"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="178"/>
         <source>Langage</source>
         <translation>Langue</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="168"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="175"/>
         <source>French</source>
         <translation>French</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="169"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="176"/>
         <source>English</source>
         <translation>English</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettings_ui.py" line="170"/>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="177"/>
         <source>Mode</source>
         <translation>Mode</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettings_ui.py" line="185"/>
+        <source>WBtn Settings</source>
+        <translation>Configuration wifi Btn</translation>
     </message>
 </context>
 <context>
@@ -761,64 +766,155 @@
     </message>
 </context>
 <context>
-    <name>WTraining</name>
+    <name>WSettingswBtn</name>
     <message>
-        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="228"/>
+        <location filename="../F3FChrono/gui/WSettingswBtn_ui.py" line="95"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="229"/>
-        <source>Lap Number : 0</source>
-        <translation>Numéro tour : 0</translation>
+        <location filename="../F3FChrono/gui/WSettingswBtn_ui.py" line="96"/>
+        <source>Wireless button Settings</source>
+        <translation>Configuration boutons sans fil</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="230"/>
-        <source>Min : </source>
-        <translation>Min : </translation>
+        <location filename="../F3FChrono/gui/WSettingswBtn_ui.py" line="97"/>
+        <source>Back to Settings</source>
+        <translation>retour configuration</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="231"/>
-        <source>Mean : </source>
-        <translation>Moyenne : </translation>
+        <location filename="../F3FChrono/gui/WSettingswBtn_ui.py" line="98"/>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="232"/>
-        <source>Max : </source>
-        <translation>Max : </translation>
+        <location filename="../F3FChrono/gui/WSettingswBtn_ui.py" line="99"/>
+        <source>Valid</source>
+        <translation>Valider</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="233"/>
-        <source>Wait New Run</source>
-        <translation>Attente Run</translation>
+        <location filename="../F3FChrono/gui/WSettingswBtn_ui.py" line="100"/>
+        <source>Detect</source>
+        <translation>Détection</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="234"/>
-        <source>Run(s) Time (s)</source>
-        <translation>Temps run(s)</translation>
+        <location filename="../F3FChrono/gui/WSettingswBtn_ui.py" line="101"/>
+        <source>Clear</source>
+        <translation>Effacer</translation>
     </message>
+</context>
+<context>
+    <name>WSettingwBtn_item</name>
     <message>
-        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="235"/>
-        <source>1 : XX.XXX</source>
+        <location filename="../F3FChrono/gui/WSettingswBtn_item_ui.py" line="69"/>
+        <source>Form</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="236"/>
-        <source>3 : XX.XXX</source>
+        <location filename="../F3FChrono/gui/WSettingswBtn_item_ui.py" line="70"/>
+        <source>SP</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettingswBtn_item_ui.py" line="71"/>
+        <source>Del</source>
+        <translation>Sup</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettingswBtn_item_ui.py" line="79"/>
+        <source>None</source>
+        <translation>Aucun</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettingswBtn_item_ui.py" line="80"/>
+        <source>Base A</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettingswBtn_item_ui.py" line="81"/>
+        <source>Base B</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettingswBtn_item_ui.py" line="82"/>
+        <source>Next Btn</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettingswBtn_item_ui.py" line="83"/>
+        <source>Switch Mode</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettingswBtn_item_ui.py" line="77"/>
+        <source>192.168.0.16</source>
+        <translation>192.168.0.16</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WSettingswBtn_item_ui.py" line="78"/>
+        <source>LP</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>WTraining</name>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="229"/>
+        <source>Form</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="237"/>
+        <source>Lap Number : 0</source>
+        <translation>Numéro tour : 0</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="231"/>
+        <source>Min : </source>
+        <translation>Min : </translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="233"/>
+        <source>Mean : </source>
+        <translation>Moyenne : </translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="238"/>
+        <source>Max : </source>
+        <translation>Max : </translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="232"/>
+        <source>Wait New Run</source>
+        <translation>Attente Run</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="245"/>
+        <source>Run(s) Time (s)</source>
+        <translation>Temps run(s)</translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="239"/>
+        <source>1 : XX.XXX</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="235"/>
+        <source>3 : XX.XXX</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="234"/>
         <source>5 : XX.XXX</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="238"/>
+        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="236"/>
         <source>7 : XX.XXX</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="239"/>
+        <location filename="../F3FChrono/gui/WChronoTraining_ui.py" line="230"/>
         <source>9 : XX.XXX</source>
         <translation></translation>
     </message>
@@ -851,22 +947,22 @@
 <context>
     <name>WTrainingBtn</name>
     <message>
-        <location filename="../F3FChrono/gui/WTrainingBtn_ui.py" line="78"/>
+        <location filename="../F3FChrono/gui/WTrainingBtn_ui.py" line="81"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WTrainingBtn_ui.py" line="79"/>
+        <location filename="../F3FChrono/gui/WTrainingBtn_ui.py" line="82"/>
         <source>Home</source>
         <translation>Retour</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WTrainingBtn_ui.py" line="80"/>
+        <location filename="../F3FChrono/gui/WTrainingBtn_ui.py" line="83"/>
         <source>Reset</source>
         <translation>RAZ</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WTrainingBtn_ui.py" line="81"/>
+        <location filename="../F3FChrono/gui/WTrainingBtn_ui.py" line="84"/>
         <source>Next</source>
         <translation>Suivant</translation>
     </message>
@@ -907,7 +1003,7 @@
 <context>
     <name>Wind : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="187"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="189"/>
         <source>Wind : </source>
         <translation>Vent : </translation>
     </message>
@@ -915,7 +1011,7 @@
 <context>
     <name>chronoStatus_Finished</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="467"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="469"/>
         <source>Finished</source>
         <translation>Terminé</translation>
     </message>
@@ -923,7 +1019,7 @@
 <context>
     <name>chronoStatus_I30s_reached</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="463"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="465"/>
         <source>In Start 30s reached</source>
         <translation>Au départ +30s</translation>
     </message>
@@ -931,7 +1027,7 @@
 <context>
     <name>chronoStatus_InProgress</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="465"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="467"/>
         <source>In Progress</source>
         <translation>En cours</translation>
     </message>
@@ -939,7 +1035,7 @@
 <context>
     <name>chronoStatus_InStart</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="462"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="464"/>
         <source>In Start</source>
         <translation>Au départ</translation>
     </message>
@@ -947,7 +1043,7 @@
 <context>
     <name>chronoStatus_L30s_reached</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="461"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="463"/>
         <source>30s reached</source>
         <translation>30s dépassé</translation>
     </message>
@@ -955,7 +1051,7 @@
 <context>
     <name>chronoStatus_Launched</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="460"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="462"/>
         <source>Launched</source>
         <translation>Lancé</translation>
     </message>
@@ -963,7 +1059,7 @@
 <context>
     <name>chronoStatus_WaitAltitude</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="466"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="468"/>
         <source>Wait Altitude</source>
         <translation>Attente Altitude</translation>
     </message>
@@ -971,7 +1067,7 @@
 <context>
     <name>chronoStatus_WaitNewRun</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="458"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="460"/>
         <source>Wait New Run</source>
         <translation>Attente nouveau run</translation>
     </message>
@@ -979,7 +1075,7 @@
 <context>
     <name>chronoStatus_WaitToLaunch</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="459"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="461"/>
         <source>Wait To Launch</source>
         <translation>Attente lancé</translation>
     </message>
@@ -987,7 +1083,7 @@
 <context>
     <name>contest_training</name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="596"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="598"/>
         <source>Training</source>
         <translation>Entrainement</translation>
     </message>
@@ -995,7 +1091,7 @@
 <context>
     <name>m/s, Angle : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="187"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="189"/>
         <source>m/s, Angle : </source>
         <translation>m/s, Angle : </translation>
     </message>
@@ -1003,7 +1099,7 @@
 <context>
     <name>time : </name>
     <message>
-        <location filename="../F3FChrono/gui/WidgetController.py" line="208"/>
+        <location filename="../F3FChrono/gui/WidgetController.py" line="210"/>
         <source>time : </source>
         <translation>temps : </translation>
     </message>

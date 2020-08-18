@@ -706,6 +706,8 @@ class WSettingsBase(QObject):
         self.udp_sig_connected = False
         self.ipbaseinvert_sig = None
         self.baseInProgress = None
+        self.Detect_label = self._translate("Detect", "Detect")
+        self.inprogress_label = self._translate("In Progress...", "In Progress...")
 
     def get_widget(self):
         return (self.widgetList)
@@ -734,31 +736,26 @@ class WSettingsBase(QObject):
         self.ipbaseinvert_sig = invert
 
     def baseA_detect(self):
+        self.__baseB_release()
         if self.udp_sig is not None and self.ipbaseclear_sig is not None and self.baseInProgress == None:
             self.udp_sig.connect(self.slot_udp)
             self.ipbaseclear_sig.emit()
-            self.view.buttonBaseADetect.setText(self._translate("In Progress...", "In Progress..."))
+            self.view.buttonBaseADetect.setText(self.inprogress_label)
             self.udp_sig_connected = True
             self.baseInProgress = 'A'
-        elif self.baseInProgress == 'A':
-            self.baseInProgress = None
-            self.udp_sig.disconnect(self.slot_udp)
-            self.udp_sig_connected = False
-            self.view.buttonBaseADetect.setText(self._translate("Detect", "Detect"))
+        else:
+            self.__baseA_release()
 
     def baseB_detect(self):
+        self.__baseA_release()
         if self.udp_sig is not None and self.ipbaseclear_sig is not None and self.baseInProgress == None:
             self.udp_sig.connect(self.slot_udp)
             self.ipbaseclear_sig.emit()
-            self.view.buttonBaseBDetect.setText(self._translate("In Progress...", "In Progress..."))
+            self.view.buttonBaseBDetect.setText(self.inprogress_label)
             self.udp_sig_connected = True
             self.baseInProgress = 'B'
-        elif self.baseInProgress == 'B':
-            self.baseInProgress = None
-            self.udp_sig.disconnect(self.slot_udp)
-            self.udp_sig_connected = False
-            self.view.buttonBaseBDetect.setText(self._translate("Detect", "Detect"))
-
+        else:
+            self.__baseB_release()
 
     def slot_udp(self, address):
         print(address)
@@ -813,6 +810,8 @@ class WSettingsBase(QObject):
         return self.__getAllIp(self.baseBList)
 
     def btn_cancel(self):
+        self.__baseA_release()
+        self.__baseB_release()
         if self.udp_sig is not None and self.udp_sig_connected:
             self.udp_sig.disconnect(self.slot_udp)
             self.udp_sig_connected = False
@@ -822,11 +821,27 @@ class WSettingsBase(QObject):
                 self.clearB()
 
     def btn_valid(self):
+        self.__baseA_release()
+        self.__baseB_release()
         if self.udp_sig is not None and self.udp_sig_connected:
             self.udp_sig.disconnect(self.slot_udp)
             self.udp_sig_connected = False
         if self.ipset_sig is not None:
             self.ipset_sig.emit(self.get_ipbaseA(), self.get_ipbaseB())
+
+    def __baseA_release(self):
+        if self.baseInProgress == 'A':
+            self.baseInProgress = None
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            self.view.buttonBaseADetect.setText(self.Detect_label)
+
+    def __baseB_release(self):
+        if self.baseInProgress == 'B':
+            self.baseInProgress = None
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            self.view.buttonBaseBDetect.setText(self.Detect_label)
 
     @staticmethod
     def __addbase_List (list, uilist, ip, deleteEvent, moveEvent):
@@ -906,6 +921,8 @@ class WSettingswBtn(QObject):
         self.ipwBtnclear_sig = None
         self.udp_sig_connected = False
         self.wBtnInProgress = None
+        self.Detect_label = self._translate("Detect", "Detect")
+        self.inprogress_label = self._translate("In Progress...", "In Progress...")
 
     def get_widget(self):
         return (self.widgetList)
@@ -923,7 +940,7 @@ class WSettingswBtn(QObject):
         print("Settings wBtn set_data")
 
     def get_data(self):
-        print ("Settings wBtn get_data")
+        print("Settings wBtn get_data")
 
     def set_udp_sig(self, udp, set, clear):
         self.udp_sig = udp
@@ -935,17 +952,13 @@ class WSettingswBtn(QObject):
         if self.udp_sig is not None and self.ipwBtnclear_sig is not None and self.wBtnInProgress == None:
             self.udp_sig.connect(self.slot_udp)
             self.ipwBtnclear_sig.emit()
-            self.view.buttonDetect.setText(self._translate("In Progress...", "In Progress..."))
+            self.view.buttonDetect.setText(self.inprogress_label)
             self.udp_sig_connected = True
             self.wBtnInProgress = True
-        elif self.wBtnInProgress:
-            self.wBtnInProgress = None
-            self.udp_sig.disconnect(self.slot_udp)
-            self.udp_sig_connected = False
-            self.view.buttonDetect.setText(self._translate("Detect", "Detect"))
+        else:
+            self.__release_detect()
 
     def slot_udp(self, address):
-        print(address)
         if self.wBtnInProgress and self.__ipNotPresent(self.wBtnList, address):
             self.__addwBtn_List(self.wBtnList, self.view.listWidget_wBtn, address, self.deleteItemwBtn)
 
@@ -963,18 +976,21 @@ class WSettingswBtn(QObject):
 
 
     def btn_cancel(self):
-        if self.udp_sig is not None and self.udp_sig_connected:
-            self.udp_sig.disconnect(self.slot_udp)
-            self.udp_sig_connected = False
+        self.__release_detect()
         self.clearwBtn()
 
     def btn_valid(self):
-        if self.udp_sig is not None and self.udp_sig_connected:
-            self.udp_sig.disconnect(self.slot_udp)
-            self.udp_sig_connected = False
+        self.__release_detect()
         if self.ipset_sig is not None:
             ip = self.get_ipwBtn()
             self.ipset_sig.emit(ip[0], ip[1], ip[2], ip[3])
+
+    def __release_detect(self):
+        if self.wBtnInProgress:
+            self.wBtnInProgress = None
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            self.view.buttonDetect.setText(self.Detect_label)
 
     @staticmethod
     def __addwBtn_List (list, uilist, ip, deleteEvent):
@@ -999,7 +1015,7 @@ class WSettingswBtn(QObject):
 
     @staticmethod
     def __deleteWidgetinQlistWidget (list, uilist, pos):
-        ip=""
+        ip = ""
         item = uilist.itemAt(pos)
         itemdelete = None
         for i in range(len(list)):
