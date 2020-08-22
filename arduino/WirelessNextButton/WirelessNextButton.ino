@@ -51,7 +51,7 @@ void setup() {
 void sendMessage(Event e) {
   strcpy (message_wBtn, "wBtn ");
   if (e==pressed) {
-    strcat (message_wBtn, "-1");
+    strcat (message_wBtn, "2");
   }
   else if (e==clicked) {
     strcat (message_wBtn, "1");
