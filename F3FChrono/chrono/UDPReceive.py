@@ -73,49 +73,60 @@ class udpreceive(QThread):
         print("baseA : ", baseA, "\nbaseB : ", baseB, "\nBtn Next : ", btnNext, "\nSwitchMode : ", switchMode)
 
     def clear_ipwBtn(self):
-        self.ipwBtn_baseA = [[], []]
-        self.ipwBtn_baseB = [[], []]
-        self.ipwBtn_btnNext = [[], []]
-        self.ipwBtn_SwitchMode = [[], []]
+        self.ipwBtn_baseA = [[], [], []]
+        self.ipwBtn_baseB = [[], [], []]
+        self.ipwBtn_btnNext = [[], [], []]
+        self.ipwBtn_SwitchMode = [[], [], []]
 
     def run(self):
         while (not self.isFinished()):
             # wait until somebody throws an event
             try:
-                data, address = self.sock.recvfrom(1024)
+                data, address_temp = self.sock.recvfrom(1024)
+                address = list(address_temp)
                 print(data, address)
                 dt = time.time()
                 m = re.split(r'\s', data.decode('utf-8'))
                 if (m[0] == 'terminated'):
                     self.terminate()
-                elif (m[0] == 'simulate' and m[1] == 'base'):
-                    self._base_function(m[3].lower(), m[2], True)
-                elif m[0] == 'simulate' and m[1] == 'GPIO':
-                    if m[2].lower() == "btnnext":
-                        self.event_btn_next.emit(0)
-                elif m[0] == 'simulate' and m[1] == 'wBtn':
-                    self._wbtn_function(m[2], int(m[3]))
-                elif m[0] == 'wind':
+                    break
+                elif m[0] == 'simulate':
+                    if m[1] == 'GPIO':
+                        if m[2].lower() == "btnnext":
+                            self.event_btn_next.emit(0)
+                        break
+                    if m[1] == 'base':
+                        address[0] = m[2]
+                        for i in range(0, 3):
+                            del(m[0])
+                    elif m[1] == 'wBtn':
+                        address[0] = m[2]
+                        del(m[2])
+                        del(m[0])
+                    else:
+                        del(m[0])
+
+                if m[0] == 'wind':
                     self.event_wind.emit(int(m[2]), int(m[1]))
                 elif m[0] == 'rain':
                     self.event_rain.emit(bool(m[1] == 'True'))
-
                 elif m[0] == 'info':
                     self.event_accu.emit(float(m[1]))
                     self.event_rssi.emit(int(m[2]), int(m[3]))
                 elif m[0] == 'wBtn':
                     self._wbtn_function(address[0], int(m[1]))
                 else:
-                    self._base_function(data.decode("utf-8").lower(), address[0], False)
+                    self._base_function(m[0].lower(), address[0])
             except socket.error as msg:
                 print('udp receive error {}'.format(msg))
                 logging.warning('udp receive error {}'.format(msg))
                 continue
 
-    def _base_function(self, event, ip, simulate):
+    def _base_function(self, event, ip):
         find, base = self._find_ip_function(ip)
-        if simulate and base == ip:
+        if not find:
             self.simulate_base_sig.emit(ip)
+            base = ip
         else:
             self.event_chrono.emit("udpreceive", event, base)
         return find, base
@@ -131,22 +142,25 @@ class udpreceive(QThread):
         else:
             self.simulate_wbtn_sig.emit(ip)
 
-    def _find_ip_function(self, ip, shortpush=False):  # return True if find in lists, "function"; False not find, "ip"
-        if ip in self.ipbaseA or ip in self.ipwBtn_baseA[shortpush]:
-            print("baseA")
-            return True, "baseA"
-        elif ip in self.ipbaseB or ip in self.ipwBtn_baseB[shortpush]:
-            print("baseB")
-            return True, "baseB"
-        elif ip in self.ipwBtn_btnNext[shortpush]:
-            print("btn_next")
-            return True, "btn_next"
-        elif ip in self.ipwBtn_SwitchMode[shortpush]:
-            print("switch mode")
-            return True, "switch_mode"
+    def _find_ip_function(self, ip, shortpush=0):  # return True if find in lists, "function"; False not find, "ip"
+        if shortpush<=len(self.ipwBtn_baseA) and shortpush<=len(self.ipwBtn_baseB) \
+                and shortpush<=len(self.ipwBtn_btnNext) and shortpush<=len(self.ipwBtn_SwitchMode):
+            if ip in self.ipbaseA or ip in self.ipwBtn_baseA[shortpush]:
+                print("baseA")
+                return True, "baseA"
+            elif ip in self.ipbaseB or ip in self.ipwBtn_baseB[shortpush]:
+                print("baseB")
+                return True, "baseB"
+            elif ip in self.ipwBtn_btnNext[shortpush]:
+                print("btn_next")
+                return True, "btn_next"
+            elif ip in self.ipwBtn_SwitchMode[shortpush]:
+                print("switch mode")
+                return True, "switch_mode"
+            else:
+                return False, ip
         else:
             return False, ip
-
 
 if __name__ == '__main__':
     print("Main start")

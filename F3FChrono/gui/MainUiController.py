@@ -93,6 +93,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['config'].btn_settings_sig.connect(self.set_show_settings)
         self.controllers['config'].btn_next_sig.connect(self.start)
         self.controllers['config'].contest_sig.connect(self.contest_changed)
+        self.controllers['config'].contest_valuechanged_sig.connect(self.context_valuechanged)
         self.controllers['config'].btn_random_sig.connect(self.random_bib_start)
         self.controllers['config'].btn_day_1_sig.connect(self.bib_day_1)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
@@ -315,6 +316,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.reset_ui()
         self.vocal.signal_pilotname.emit(int(self.event.get_current_round().get_current_competitor().get_bib_number()))
 
+    def context_valuechanged(self):
+        self.getcontextparameters(False)
+
     def random_bib_start(self):
         self.getcontextparameters(False)
         self.event.random_bib()
@@ -359,7 +363,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.vocal.signal_pilotname.emit(int(current_competitor.get_bib_number()))
             self.chronoHard.set_mode(training=False)
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
-            self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False)
+            self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False,
+                                                          to_launch=True)
             self.controllers['round'].wChronoCtrl.reset_ui()
             self.set_signal_mode(training=False)
             self.show_chrono()
@@ -384,7 +389,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def next_action(self):
         if self.controllers['round'].is_show():
             self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
-        elif  self.controllers['training'].is_show():
+        elif self.controllers['training'].is_show():
             self.controllers['training'].btn_reset()
 
         self.rpigpio.signal_buzzer_next.emit()
@@ -468,7 +473,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         eventData = self.controllers['config'].view.ContestList.currentData()
         if eventData is not None:
             self.event = self.daoEvent.get(eventData.id, fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
+            self.controllers['config'].contest_valuechanged_sig.disconnect()
             self.controllers['config'].set_data(self.event)
+            self.controllers['config'].contest_valuechanged_sig.connect(self.context_valuechanged)
 
     def slot_switch_mode(self):
         if self.controllers['config'].is_show():
@@ -501,7 +508,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 self.low_voltage_ask=False
 
         if (status==chronoStatus.WaitLaunch):
-            self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False)
+            self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, to_launch=True)
         if (status == chronoStatus.Launched):
             self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launched_time'], False)
         if (status==chronoStatus.InStart):

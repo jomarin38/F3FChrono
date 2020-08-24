@@ -36,7 +36,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
 
         self.__addbase_List(self.baseAList, self.ui.listBaseA, 3, 20, self.send_base_A)
         self.__addbase_List(self.baseBList, self.ui.listBaseB, 5, 50, self.send_base_B)
-        self.__addwBtn_List(self.wBtnList, self.ui.listWBtn, 3, 70, self.send_wbtnSP, self.send_wbtnLP)
+        self.__addwBtn_List(self.wBtnList, self.ui.listWBtn, 3, 70, self.send_wbtnClicked, self.send_wbtnSP, self.send_wbtnLP)
 
 
     def send_base_A(self):
@@ -46,10 +46,17 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
     def send_base_B(self):
         self.__sendbase(self.udpbeep,
                         self.__getWidgetinQlistWidget(self.baseBList, self.ui.listBaseB, self.sender().parent().pos()))
+
+    def send_wbtnClicked(self):
+        self.__sendwBtn(self.udpbeep,
+                        self.__getWidgetinQlistWidget(self.wBtnList, self.ui.listWBtn, self.sender().parent().pos()),
+                        '2')
+
     def send_wbtnSP(self):
         self.__sendwBtn(self.udpbeep,
                         self.__getWidgetinQlistWidget(self.wBtnList, self.ui.listWBtn, self.sender().parent().pos()),
                         '1')
+
     def send_wbtnLP(self):
         self.__sendwBtn(self.udpbeep,
                         self.__getWidgetinQlistWidget(self.wBtnList, self.ui.listWBtn, self.sender().parent().pos()),
@@ -112,7 +119,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
             uilist.setItemWidget(list[-1]['QlistWidgetItem'], list[-1]['QWidget'])
 
     @staticmethod
-    def __addwBtn_List (list, uilist, nb, ip_base, eventSP, eventLP):
+    def __addwBtn_List (list, uilist, nb, ip_base, eventClicked, eventSP, eventLP):
         for i in range(nb):
             collect = collections.OrderedDict()
             collect['QlistWidgetItem'] = QtWidgets.QListWidgetItem()
@@ -123,6 +130,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
 
             list[-1]['ui_widget'].setupUi(list[-1]['QWidget'])
             list[-1]['ui_widget'].ipAddress.setText("192.168.1."+str(i+ip_base))
+            list[-1]['ui_widget'].buttonSendClicked.clicked.connect(eventClicked)
             list[-1]['ui_widget'].buttonSendSP.clicked.connect(eventSP)
             list[-1]['ui_widget'].buttonSendLP.clicked.connect(eventLP)
             uilist.setItemWidget(list[-1]['QlistWidgetItem'], list[-1]['QWidget'])

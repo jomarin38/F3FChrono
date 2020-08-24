@@ -25,7 +25,7 @@ class Ui_wBtn_widget(object):
         self.buttonSendSP.setSizePolicy(sizePolicy)
         self.buttonSendSP.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.buttonSendSP.setObjectName("buttonSendSP")
-        self.gridLayout.addWidget(self.buttonSendSP, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.buttonSendSP, 0, 2, 1, 1)
         self.ipAddress = QtWidgets.QLineEdit(wBtn_widget)
         self.ipAddress.setObjectName("ipAddress")
         self.gridLayout.addWidget(self.ipAddress, 0, 0, 1, 1)
@@ -37,7 +37,16 @@ class Ui_wBtn_widget(object):
         self.buttonSendLP.setSizePolicy(sizePolicy)
         self.buttonSendLP.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.buttonSendLP.setObjectName("buttonSendLP")
-        self.gridLayout.addWidget(self.buttonSendLP, 0, 2, 1, 1)
+        self.gridLayout.addWidget(self.buttonSendLP, 0, 3, 1, 1)
+        self.buttonSendClicked = QtWidgets.QPushButton(wBtn_widget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.buttonSendClicked.sizePolicy().hasHeightForWidth())
+        self.buttonSendClicked.setSizePolicy(sizePolicy)
+        self.buttonSendClicked.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.buttonSendClicked.setObjectName("buttonSendClicked")
+        self.gridLayout.addWidget(self.buttonSendClicked, 0, 1, 1, 1)
 
         self.retranslateUi(wBtn_widget)
         QtCore.QMetaObject.connectSlotsByName(wBtn_widget)
@@ -46,9 +55,10 @@ class Ui_wBtn_widget(object):
     def retranslateUi(self, wBtn_widget):
         _translate = QtCore.QCoreApplication.translate
         wBtn_widget.setWindowTitle(_translate("wBtn_widget", "Form"))
-        self.buttonSendSP.setText(_translate("wBtn_widget", "SP"))
+        self.buttonSendSP.setText(_translate("wBtn_widget", "ShortP"))
         self.ipAddress.setText(_translate("wBtn_widget", "192.168.0.16"))
-        self.buttonSendLP.setText(_translate("wBtn_widget", "LP"))
+        self.buttonSendLP.setText(_translate("wBtn_widget", "LongP"))
+        self.buttonSendClicked.setText(_translate("wBtn_widget", "Clicked"))
 
 
 if __name__ == "__main__":

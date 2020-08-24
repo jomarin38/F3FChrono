@@ -1,10 +1,12 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include "localSSID.h"
 
 #ifndef STASSID
   #define STASSID "F3FCtrl"
   #define STAPSK  "F3FPassword"
 #endif
+
 
 
 // buffers for receiving and sending data
@@ -16,6 +18,7 @@ int remotePort = 4445;
 const int buttonPin = 2;
 int buttonState = 0;
 int count=0;
+int i=0;
 WiFiUDP Udp;
 
 bool buttonReleased;
@@ -31,9 +34,20 @@ void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);
+  count=0;
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
     delay(500);
+    #ifdef LOCAL_STASSID
+      if (count!=-1) {
+        count++;
+      }
+      Serial.println(count);
+      if (count>=20) {  
+        WiFi.begin(LOCAL_STASSID, LOCAL_STAPSK);
+        count=-1;
+      }
+    #endif
   }
   Serial.print("Connected! IP address: ");
   Serial.println(WiFi.localIP());
@@ -63,6 +77,7 @@ void sendMessage(Event e) {
   Udp.beginPacket(remoteIP, remotePort);
   Udp.write(message_wBtn);
   Udp.endPacket();
+  Serial.println(message_wBtn);
 }
 
 void loop() {

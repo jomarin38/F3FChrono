@@ -38,7 +38,7 @@ class chronoQSound(QThread):
     signal_base = pyqtSignal(int)
     signal_entry = pyqtSignal()
     signal_time = pyqtSignal(float)
-    signal_elapsedTime = pyqtSignal(int)
+    signal_elapsedTime = pyqtSignal(int, bool)
     signal_start = pyqtSignal(int)
     signal_pilotname = pyqtSignal(int)
     signal_lowVoltage = pyqtSignal()
@@ -67,12 +67,18 @@ class chronoQSound(QThread):
         self.index_penalty = 104
         self.index_lowvoltage = 105
         self.index_seconds = 106
+        self.seconds_thirty = 107
+        self.seconds_twentyfive = 108
+        self.seconds_twenty = 109
+        self.seconds_fifteen = 110
+        self.seconds_ten = 111
+        self.to_launch = 112
 
 
     def loadwav(self):
         try:
             self.time = []
-            for i in range(0, 107):
+            for i in range(0, 113):
                 self.time.append(QSoundEffect())
                 self.time[i].setSource(QUrl.fromLocalFile(
                     os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav')))
@@ -137,13 +143,24 @@ class chronoQSound(QThread):
             self.sound_list.append(self.index_penalty)
             self.__start_play()
 
-    def sound_elapsedTime(self, cmd):
-        self.stop_all()
+    def sound_elapsedTime(self, cmd, to_launch):
         if self.play_sound:
-            self.sound_list.append(cmd)
-            if cmd > 25:
-                self.sound_list.append(self.index_seconds)
-            self.__start_play()
+            if 10 <= cmd <= 30:
+                self.stop_all()
+                if cmd == 30:
+                    self.sound_list.append(self.seconds_thirty)
+                    if to_launch:
+                        self.sound_list.append(self.to_launch)
+                elif cmd == 25:
+                    self.sound_list.append(self.seconds_twentyfive)
+                elif cmd == 20:
+                    self.sound_list.append(self.seconds_twenty)
+                elif cmd == 15:
+                    self.sound_list.append(self.seconds_fifteen)
+                elif cmd == 10:
+                    self.sound_list.append(self.seconds_ten)
+                if len(self.sound_list) > 0:
+                    self.__start_play()
 
     def stop_all(self):
         if len(self.sound_list) > 0:

@@ -334,6 +334,7 @@ class WChronoCtrl(QTimer):
         self.startTime = time.time()
         self.time = 0
         self.time_up = True
+        self.to_launch = False
 
     def get_widget(self):
         return (self.widget)
@@ -367,7 +368,8 @@ class WChronoCtrl(QTimer):
         self.set_penalty_value(0)
         self.set_null_flight(False)
 
-    def settime(self, settime, count_up, starttimer=True):
+    def settime(self, settime, count_up, starttimer=True, to_launch=False):
+        self.to_launch = to_launch
         self.time = settime
         self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000))
         self.time_up = count_up
@@ -385,35 +387,35 @@ class WChronoCtrl(QTimer):
             self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000 - (time.time() - self.startTime)))
             timeval = self.time / 1000 - (time.time() - self.startTime)
             if timeval >= 29.8:
-                self.vocal_elapsedTime_sig.emit(30)
+                self.vocal_elapsedTime_sig.emit(30, self.to_launch)
             if 25.9 <= timeval <= 26:
-                self.vocal_elapsedTime_sig.emit(25)
+                self.vocal_elapsedTime_sig.emit(25, self.to_launch)
             if 20.9 <= timeval <= 21:
-                self.vocal_elapsedTime_sig.emit(20)
+                self.vocal_elapsedTime_sig.emit(20, self.to_launch)
             if 15.9 <= timeval <= 16:
-                self.vocal_elapsedTime_sig.emit(15)
+                self.vocal_elapsedTime_sig.emit(15, self.to_launch)
             if 10.9 <= timeval <= 11:
-                self.vocal_elapsedTime_sig.emit(10)
+                self.vocal_elapsedTime_sig.emit(10, self.to_launch)
             if 9.9 <= timeval <= 10:
-                self.vocal_elapsedTime_sig.emit(9)
+                self.vocal_elapsedTime_sig.emit(9, self.to_launch)
             if 8.9 <= timeval <= 9:
-                self.vocal_elapsedTime_sig.emit(8)
+                self.vocal_elapsedTime_sig.emit(8, self.to_launch)
             if 7.9 <= timeval <= 8:
-                self.vocal_elapsedTime_sig.emit(7)
+                self.vocal_elapsedTime_sig.emit(7, self.to_launch)
             if 6.9 <= timeval <= 7:
-                self.vocal_elapsedTime_sig.emit(6)
+                self.vocal_elapsedTime_sig.emit(6, self.to_launch)
             if 5.9 <= timeval <= 6:
-                self.vocal_elapsedTime_sig.emit(5)
+                self.vocal_elapsedTime_sig.emit(5, self.to_launch)
             if 4.9 <= timeval <= 5:
-                self.vocal_elapsedTime_sig.emit(4)
+                self.vocal_elapsedTime_sig.emit(4, self.to_launch)
             if 3.9 <= timeval <= 4:
-                self.vocal_elapsedTime_sig.emit(3)
+                self.vocal_elapsedTime_sig.emit(3, self.to_launch)
             if 2.9 <= timeval <= 3:
-                self.vocal_elapsedTime_sig.emit(2)
+                self.vocal_elapsedTime_sig.emit(2, self.to_launch)
             if 1.9 <= timeval <= 2:
-                self.vocal_elapsedTime_sig.emit(1)
+                self.vocal_elapsedTime_sig.emit(1, self.to_launch)
             if timeval < 0:
-                self.vocal_elapsedTime_sig.emit(0)
+                self.vocal_elapsedTime_sig.emit(0, self.to_launch)
                 self.time_elapsed_sig.emit()
 
     def penalty_100(self):
@@ -544,6 +546,7 @@ class WChronoTrainingCtrl(QObject):
 class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()
     contest_sig = pyqtSignal()
+    contest_valuechanged_sig = pyqtSignal()
     chrono_sig = pyqtSignal()
     btn_settings_sig = pyqtSignal()
     btn_random_sig = pyqtSignal()
@@ -564,6 +567,14 @@ class WConfigCtrl(QObject):
         self.view.StartBtn.clicked.connect(self.btn_next)
         self.view.ContestList.currentIndexChanged.connect(self.contest_sig.emit)
         self.view.btn_settings.clicked.connect(self.btn_settings_sig.emit)
+        self.view.WindMinValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.WindMaxValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.OrientationValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.RevolValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.bib_start.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.MaxInterruptValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.daydurationvalue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+
         self.view.randombtn.clicked.connect(self.btn_random_sig.emit)
         self.view.day_1btn.clicked.connect(self.btn_day_1_sig.emit)
 
@@ -759,10 +770,12 @@ class WSettingsBase(QObject):
 
     def slot_udp(self, address):
         print(address)
-        if self.baseInProgress == 'A' and self.__ipNotPresent(self.baseAList, address):
+        if self.baseInProgress == 'A' and self.__ipNotPresent(self.baseAList, address) \
+                and self.__ipNotPresent(self.baseBList, address):
             self.__addbase_List(self.baseAList, self.view.listWidget_baseA, address, self.deleteItemBaseA,
                                 self.moveItemBaseA)
-        elif self.baseInProgress == 'B' and self.__ipNotPresent(self.baseBList, address):
+        elif self.baseInProgress == 'B' and self.__ipNotPresent(self.baseAList, address) \
+                and self.__ipNotPresent(self.baseBList, address):
             self.__addbase_List(self.baseBList, self.view.listWidget_baseB, address, self.deleteItemBaseB,
                                 self.moveItemBaseB)
 
@@ -1036,10 +1049,10 @@ class WSettingswBtn(QObject):
 
     @staticmethod
     def __getAllIp(list):
-        baseA = [[], []]
-        baseB = [[], []]
-        btn_next = [[], []]
-        switchMode = [[], []]
+        baseA = [[], [], []]
+        baseB = [[], [], []]
+        btn_next = [[], [], []]
+        switchMode = [[], [], []]
         for i in list:
             index = i['ui_widget'].comboBox_LP.currentIndex()
             if index == 1:
@@ -1060,6 +1073,16 @@ class WSettingswBtn(QObject):
                 btn_next[1].append(i['ui_widget'].ipAddress.text())
             elif index == 4:
                 switchMode[1].append(i['ui_widget'].ipAddress.text())
+
+            index = i['ui_widget'].comboBox_CL.currentIndex()
+            if index == 1:
+                baseA[2].append(i['ui_widget'].ipAddress.text())
+            elif index == 2:
+                baseB[2].append(i['ui_widget'].ipAddress.text())
+            elif index == 3:
+                btn_next[2].append(i['ui_widget'].ipAddress.text())
+            elif index == 4:
+                switchMode[2].append(i['ui_widget'].ipAddress.text())
 
         return baseA, baseB, btn_next, switchMode
 
