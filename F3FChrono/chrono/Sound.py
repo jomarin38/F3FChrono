@@ -83,7 +83,7 @@ class chronoQSound(QThread):
                 self.time[i].setSource(QUrl.fromLocalFile(
                     os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav')))
                 self.time[i].playingChanged.connect(self.slot_sound_playing_changed)
-            self.time[0].setVolume(volume)
+                self.time[i].setVolume(volume)
         except TypeError as e:
             print("QSoundError : ", e)
 
