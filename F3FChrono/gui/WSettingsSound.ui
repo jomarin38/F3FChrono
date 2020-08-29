@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>432</width>
-    <height>236</height>
+    <height>239</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -112,7 +112,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Noise Volume</string>
+      <string>Noise Volume (%)</string>
      </property>
     </widget>
    </item>
@@ -189,23 +189,6 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
-    <widget class="QSpinBox" name="noisevolume">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="maximum">
-      <number>100</number>
-     </property>
-     <property name="value">
-      <number>5</number>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1">
     <widget class="QSpinBox" name="soundvolume">
      <property name="font">
@@ -233,7 +216,27 @@
       </font>
      </property>
      <property name="text">
-      <string>Volume</string>
+      <string>Volume (%)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QDoubleSpinBox" name="noisevolume">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <double>100.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
      </property>
     </widget>
    </item>
