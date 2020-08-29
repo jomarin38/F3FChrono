@@ -40,7 +40,8 @@ class rs232_arduino (QObject):
         self.inRun = False
         self.kill_aduino()
         self.training = False
-        self.__debug = True
+        self.__debug = False
+        self.finaltime = 0.0
 
     @staticmethod
     def get_serial_port():
@@ -54,6 +55,7 @@ class rs232_arduino (QObject):
         self.set_buzzerTime(self.buzzerTime)
         #self.debug()
         self.set_mode(training=False)
+        self.finaltime = 0.0
 
     def receive(self):
         while not self.terminated:
@@ -69,11 +71,12 @@ class rs232_arduino (QObject):
                             self.inRun = False
                         if self.status == Chrono.chronoStatus.InProgressB or self.status == Chrono.chronoStatus.InProgressA:
                             if not self.inRun:
+                                self.finaltime = 0.0
                                 self.run_started_sig.emit()
                                 self.set_inRun()
 
                         if self.status == Chrono.chronoStatus.Finished:
-                            self.wait_alt_sig.emit()
+                            self.wait_alt_sig.emit(self.finaltime)
                     if data[0] == "lap":
                         if self.training:
                             if int(data[1]) >= 10:
@@ -90,7 +93,8 @@ class rs232_arduino (QObject):
                                 tmp = 0.
                                 for i in range(2, int(data[1])+2):
                                     tmp += int(data[i])/1000
-                                self.run_finished_sig.emit(tmp)
+                                self.finaltime = tmp
+                                self.run_finished_sig.emit(self.finaltime)
                     if data[0] == "climbout_time":
                         self.climbout_time_sig.emit(int(data[1])/1000)
                     if data[0] == "voltage":

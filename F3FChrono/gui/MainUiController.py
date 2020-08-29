@@ -35,7 +35,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             _translator.load(_path)
             QtWidgets.QApplication.instance().installTranslator(_translator)
 
-        self.vocal = chronoQSound(os.getcwd(), ConfigReader.config.conf['language'], ConfigReader.config.conf['sound'])
+        self.vocal = chronoQSound(os.getcwd(), ConfigReader.config.conf['language'],
+                                  ConfigReader.config.conf['sound'], ConfigReader.config.conf['soundvolume'])
         self.noise = noiseGenerator(ConfigReader.config.conf['noisesound'], ConfigReader.config.conf['noisevolume'])
 
         self.initUI()
@@ -261,6 +262,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.lap_finished.disconnect(self.slot_lap_finished)
             self.chronoHard.run_finished.disconnect(self.slot_run_finished)
             self.chronoHard.run_validated.disconnect(self.slot_run_validated)
+            self.chronoHard.altitude_finished.disconnect(self.slot_altitude_finished)
             self.signal_race = None
         if training==True:
             self.chronoHard.run_training.connect(self.controllers['training'].wChronoCtrl.set_time)
@@ -273,6 +275,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.lap_finished.connect(self.slot_lap_finished)
             self.chronoHard.run_finished.connect(self.slot_run_finished)
             self.chronoHard.run_validated.connect(self.slot_run_validated)
+            self.chronoHard.altitude_finished.connect(self.slot_altitude_finished)
             self.signal_race = True
 
 
@@ -517,6 +520,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         #    self.vocal.signal_base.emit(0)
 
     def slot_run_started(self):
+        self.vocal.stop_all()
         self.controllers['round'].wChronoCtrl.settime(0, True)
 
     def slot_lap_finished(self, lap, last_lap_time):
@@ -529,11 +533,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         print ('final time : ' + str(run_time))
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         self.controllers['round'].widgetBtn.update()
+
+    def slot_altitude_finished(self, run_time):
+        print("slot altitude")
         if ConfigReader.config.conf["voice"]:
             self.vocal.signal_time.emit(run_time)
-
-    def slot_altitude_finished(self):
-        print("slot altitude")
 
     def slot_run_validated(self):
         #print("run validated")

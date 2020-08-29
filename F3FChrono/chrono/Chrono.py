@@ -42,7 +42,7 @@ class ChronoHard(QObject):
     rain_signal = pyqtSignal(bool)
     accu_signal = pyqtSignal(float)
     rssi_signal = pyqtSignal(int, int)
-    altitude_finished = pyqtSignal()
+    altitude_finished = pyqtSignal(float)
     
     def __init__(self, signal_btnnext):
         super().__init__()

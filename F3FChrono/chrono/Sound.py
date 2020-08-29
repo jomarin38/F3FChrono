@@ -44,13 +44,13 @@ class chronoQSound(QThread):
     signal_lowVoltage = pyqtSignal()
 
 
-    def __init__(self, pathname, langage, playsound):
+    def __init__(self, pathname, langage, playsound, volume):
         super().__init__()
         self._translate = QtCore.QCoreApplication.translate
         self.pathname = pathname
         self.langage = langage
         self.play_sound = playsound
-        self.loadwav()
+        self.loadwav(volume)
         self.signal_elapsedTime.connect(self.sound_elapsedTime)
         self.signal_entry.connect(self.sound_entry)
         self.signal_base.connect(self.sound_base)
@@ -75,7 +75,7 @@ class chronoQSound(QThread):
         self.to_launch = 112
 
 
-    def loadwav(self):
+    def loadwav(self, volume):
         try:
             self.time = []
             for i in range(0, 113):
@@ -83,7 +83,7 @@ class chronoQSound(QThread):
                 self.time[i].setSource(QUrl.fromLocalFile(
                     os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav')))
                 self.time[i].playingChanged.connect(self.slot_sound_playing_changed)
-            self.time[0].setVolume(1.0)
+            self.time[0].setVolume(volume)
         except TypeError as e:
             print("QSoundError : ", e)
 
@@ -164,7 +164,8 @@ class chronoQSound(QThread):
 
     def stop_all(self):
         if len(self.sound_list) > 0:
-            self.time[0].stop()
+            for i in self.sound_list:
+                self.time[i].stop()
             self.sound_list.clear()
 
     def __start_play(self):
@@ -180,11 +181,14 @@ class chronoQSound(QThread):
             self.time[self.sound_list[0]].play()
 
     def slot_sound_playing_changed(self):
-        if not self.time[self.sound_list[0]].isPlaying():
-            self.time[self.sound_list[0]].stop()
-            del self.sound_list[0]
-            if len(self.sound_list) > 0:
-                self.time[self.sound_list[0]].play()
+        if len(self.sound_list) > 0:
+            if not self.time[self.sound_list[0]].isPlaying():
+                self.time[self.sound_list[0]].stop()
+                del self.sound_list[0]
+                if len(self.sound_list) > 0:
+                    self.time[self.sound_list[0]].play()
+
+
 if __name__ == '__main__':
     app = QCoreApplication(sys.argv)
     Vocal = chronoQSound("French", 1, 1, 0)

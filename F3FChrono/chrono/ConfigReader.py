@@ -44,6 +44,7 @@ default_config = \
     "competition_mode" : False,
     "simulatemode": False,
     "sound": False,
+    "soundvolume" : 1.0,
     "voice": False,
     "voltage_min": 9.9,
     "btn_baseA": 5,

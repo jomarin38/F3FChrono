@@ -1119,22 +1119,24 @@ class WSettingsSound(QObject):
 
     def set_data(self):
         self.view.sound.setChecked(ConfigReader.config.conf['sound'])
+        self.view.soundvolume.setValue(ConfigReader.config.conf['soundvolume']*100)
         self.view.voice.setChecked(ConfigReader.config.conf['voice'])
         self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
         self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
         self.view.lowVoltage.setChecked(ConfigReader.config.conf['lowvoltage_sound'])
         self.view.noiseSound.setChecked(ConfigReader.config.conf['noisesound'])
-        self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume'])
+        self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume']*100)
 
 
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
+        ConfigReader.config.conf['soundvolume'] = self.view.soundvolume.value() / 100
         ConfigReader.config.conf['voice'] = self.view.voice.isChecked()
         ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
         ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
         ConfigReader.config.conf['lowvoltage_sound'] = self.view.lowVoltage.isChecked()
         ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
-        ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()
+        ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()/100
 
 class WSettings(QObject):
     btn_settingsadvanced_sig = pyqtSignal()
