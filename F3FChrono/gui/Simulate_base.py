@@ -81,7 +81,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
 
     def run(self):
         self.udpbeep.sendData("wind " + str(self.ui.wind_dir.value()) + " " + \
-                              str(self.ui.wind_speed.value()))
+                              str(self.ui.wind_speed.value()), "m/s")
         self.udpbeep.sendData("rain " + str(self.ui.rain.isChecked()))
         self.udpbeep.sendData("simulate info " + str(self.ui.AccuVoltage.value()) + " " + \
                               str(self.ui.rssi_picam1.value()) + " " + str(self.ui.rssi_picam2.value()))

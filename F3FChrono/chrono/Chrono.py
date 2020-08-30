@@ -38,7 +38,7 @@ class ChronoHard(QObject):
     run_training = pyqtSignal(int, float)
     buzzer_validated = pyqtSignal()
     chrono_signal = pyqtSignal(str, str, str)
-    wind_signal = pyqtSignal(int, int)
+    wind_signal = pyqtSignal(float, float, str)
     rain_signal = pyqtSignal(bool)
     accu_signal = pyqtSignal(float)
     rssi_signal = pyqtSignal(int, int)
@@ -76,9 +76,10 @@ class ChronoHard(QObject):
     def getPenalty(self):
         return (self.penalty)
 
-    def wind_info(self, speed, orientation):
+    def wind_info(self, orientation, speed, unit):
         self.wind['speed_nb']+=1
         self.wind['speed_sum']+=speed
+        self.wind['unit'] = unit
 
         if speed<self.wind['speed_min']:
             self.wind['speed_min']=speed
@@ -113,12 +114,12 @@ class ChronoHard(QObject):
         return self.wind['rain']
 
     def reset_wind(self):
-        self.wind['speed_sum'] = 0
-        self.wind['speed_nb'] = 0
-        self.wind['speed_min']=0
-        self.wind['speed_max']=0
-        self.wind['orientation_sum']=0
-        self.wind['orientation_nb']=0
+        self.wind['speed_sum'] = 0.0
+        self.wind['speed_nb'] = 0.0
+        self.wind['speed_min'] = 0.0
+        self.wind['speed_max'] = 0.0
+        self.wind['orientation_sum'] = 0.0
+        self.wind['orientation_nb'] = 0.0
 
         self.wind['rain']=False
 

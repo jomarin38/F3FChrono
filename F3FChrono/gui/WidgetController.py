@@ -146,9 +146,10 @@ class WWindCtrl():
         self.view.btn_clear.clicked.connect(self.clear_alarm)
         self.widgetList.append(self.widget)
         self.rules = collections.OrderedDict()
-        self.rules['dir'] = 0
-        self.rules['speed'] = 0
-        self.rules['rain'] = 0
+        self.rules['dir'] = 0.0
+        self.rules['speed'] = 0.0
+        self.rules['unit'] = ""
+        self.rules['rain'] = 0.0
         self.rules['starttime'] = datetime.now()
         self.rules['time(s)'] = time.time()
         self.rules['detected'] = False
@@ -172,9 +173,10 @@ class WWindCtrl():
     def hide(self):
         self.widget.hide()
 
-    def set_wind(self, speed, angle):
+    def set_wind(self, speed, angle, unit):
         self.rules['dir'] = angle
         self.rules['speed'] = speed
+        self.rules['unit'] = unit
         self.__set_data()
 
     def set_rain(self, rain):
@@ -187,8 +189,8 @@ class WWindCtrl():
         else:
             strrain = self._translate("No Rain", "No Rain")
         self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + str(self.rules['speed']) +
-                                   self._translate("m/s, Angle : ", "m/s, Angle : ") + str(self.rules['dir'])
-                                   + '°' + ', ' + strrain)
+                                   self.rules['unit'] + self._translate(", Angle : ", ", Angle : ") +
+                                   str(self.rules['dir']) + '°' + ', ' + strrain)
 
 
     def check_rules(self, limit_angle, speed_min, speed_max, time_limit):

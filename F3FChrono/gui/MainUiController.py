@@ -141,7 +141,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.show_config()
         self.MainWindow.show()
         self.controllers['config'].set_contest(self.daoEvent.get_list())
-        self.controllers['wind'].set_wind(0, 0)
+        self.controllers['wind'].set_wind(0, 0, "")
         self.controllers['wind'].set_rain(0)
         self.controllers['wind'].set_signal(self.signal_lowvoltage_ask)
         self.signal_lowvoltage_ask.connect(self.slot_low_voltage_ask)
@@ -579,9 +579,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['config'].piCamB_config=False
             self.controllers['config'].set_piCamB(address)
     '''
-    def slot_wind_ui(self, wind, angle):
+    def slot_wind_ui(self, wind, angle, unit):
         #print("Wind UI")
-        self.controllers['wind'].set_wind(wind, angle)
+        self.controllers['wind'].set_wind(wind, angle, unit)
         if self.event is not None:
             self.controllers['wind'].check_rules(self.event.max_wind_dir_dev,\
                                         self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,\
