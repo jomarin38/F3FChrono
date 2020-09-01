@@ -49,6 +49,8 @@ class chronoQSound(QThread):
         self._translate = QtCore.QCoreApplication.translate
         self.pathname = pathname
         self.langage = langage
+        self.finaltime_timer = QtCore.QTimer()
+        self.finaltime_timer.timeout.connect(self.__final_time)
         self.play_sound = playsound
         self.loadwav(volume)
         self.signal_elapsedTime.connect(self.sound_elapsedTime)
@@ -88,11 +90,16 @@ class chronoQSound(QThread):
             print("QSoundError : ", e)
 
     def sound_time(self, run_time):
+        self.finaltime_timer.start(2500)
+        self.run_time = run_time
+
+    def __final_time(self):
         self.stop_all()
+        self.finaltime_timer.stop()
         if self.play_sound:
             # decompose numeric time to find cent, diz, 1/100
-            cent, diz = divmod(int(run_time), 100)
-            x = int(Decimal("{:>6.2f}".format(run_time)) % 1 * 100)
+            cent, diz = divmod(int(self.run_time), 100)
+            x = int(Decimal("{:>6.2f}".format(self.run_time)) % 1 * 100)
 
             # create sequence sound
             if int(cent) > 0:

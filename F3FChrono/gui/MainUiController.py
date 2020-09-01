@@ -530,14 +530,15 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_run_finished(self, run_time):
         #print("Main UI Controller slot run finished : ", time.time())
         self.controllers['round'].wChronoCtrl.stoptime()
-        print ('final time : ' + str(run_time))
+        #print ('final time : ' + str(run_time))
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         self.controllers['round'].widgetBtn.update()
+        if ConfigReader.config.conf["voice"]:
+            self.vocal.signal_time.emit(run_time)
 
     def slot_altitude_finished(self, run_time):
         print("slot altitude")
-        if ConfigReader.config.conf["voice"]:
-            self.vocal.signal_time.emit(run_time)
+
 
     def slot_run_validated(self):
         #print("run validated")

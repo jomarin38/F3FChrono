@@ -84,7 +84,7 @@ class udpreceive(QThread):
             try:
                 data, address_temp = self.sock.recvfrom(1024)
                 address = list(address_temp)
-                print(data, address)
+                #print(data, address)
                 dt = time.time()
                 m = re.split(r'\s', data.decode('utf-8'))
                 if (m[0] == 'terminated'):
