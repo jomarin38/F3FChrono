@@ -120,7 +120,7 @@ void baseCheckRace(byte base){
     if (chrono.lapCount >= 10) {
       chronostatus.runStatus = WaitAltitude;
       chrono.startaltitudetime = millis();
-      buzzerSet(3);
+      buzzerSet(2);
     } else {
       chronostatus.runStatus = InProgressB;
     }

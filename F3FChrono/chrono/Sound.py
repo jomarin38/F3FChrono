@@ -90,7 +90,7 @@ class chronoQSound(QThread):
             print("QSoundError : ", e)
 
     def sound_time(self, run_time):
-        self.finaltime_timer.start(2500)
+        self.finaltime_timer.start(2000)
         self.run_time = run_time
 
     def __final_time(self):
