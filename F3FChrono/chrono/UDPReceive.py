@@ -107,7 +107,7 @@ class udpreceive(QThread):
                         del(m[0])
 
                 if m[0] == 'wind':
-                    self.event_wind.emit(float(m[2]), float(m[1]), str(m[3]))
+                    self.event_wind.emit(float(m[1]), float(m[2]), str(m[3]))
                 elif m[0] == 'rain':
                     self.event_rain.emit(bool(m[1] == 'True'))
                 elif m[0] == 'info':

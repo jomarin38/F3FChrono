@@ -580,7 +580,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['config'].piCamB_config=False
             self.controllers['config'].set_piCamB(address)
     '''
-    def slot_wind_ui(self, wind, angle, unit):
+    def slot_wind_ui(self, angle, wind, unit):
         #print("Wind UI")
         self.controllers['wind'].set_wind(wind, angle, unit)
         if self.event is not None:
