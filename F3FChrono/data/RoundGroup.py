@@ -1,4 +1,6 @@
 import os
+
+from F3FChrono.data.dao.RoundDAO import RoundDAO
 from F3FChrono.data.dao.RunDAO import RunDAO
 import sys
 
@@ -11,7 +13,26 @@ class RoundGroup:
         self.start_time = None
         self.end_time = None
         self.group_number = group_number
+        self._current_competitor_index = 0
+        self._flight_order = []
+        self.valid = False
         self.runs = {}
+
+    def set_flight_order_(self, flight_order):
+        self._flight_order = flight_order
+        self._current_competitor_index = 0
+
+    def has_competitor(self, competitor):
+        return competitor.bib_number in self._flight_order
+
+    def set_current_competitor(self, competitor):
+        self._current_competitor_index = self._current_competitor_index + \
+                                        self._flight_order[self._current_competitor_index:].index(competitor.bib_number)
+
+    def give_refly(self, competitor):
+        self._flight_order.insert(self._current_competitor_index + self.event.get_flights_before_refly() + 1,
+                                  competitor.get_bib_number())
+        RoundDAO().update(self)
 
     def add_run(self, run, insert_database=False):
         if run.competitor in self.runs:

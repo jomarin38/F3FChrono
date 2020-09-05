@@ -21,6 +21,8 @@ class Round:
         self._current_competitor_index = 0
         self._flight_order = []
         self.valid = False
+        self.pilot_group = {}
+        self._current_group_index = 0
 
     @staticmethod
     def new_round(event, add_initial_group=True):
@@ -66,13 +68,16 @@ class Round:
             self._flight_order.append(int(str_bib_number))
 
     def set_flight_order_from_scratch(self):
-        self._flight_order.clear()
+        flight_order = []
         for bib in [bib_number for bib_number in sorted(self.event.competitors)
                     if bib_number >= self.event.bib_start]:
-            self._flight_order += [bib]
+            flight_order += [bib]
         for bib in [bib_number for bib_number in sorted(self.event.competitors)
                     if bib_number < self.event.bib_start]:
-            self._flight_order += [bib]
+            flight_order += [bib]
+        if len(self.groups) > 0:
+            self.groups[0].set_flight_order(flight_order)
+
 
     def handle_terminated_flight(self, competitor, chrono, penalty, valid, insert_database=False):
         run = Run()
@@ -100,20 +105,24 @@ class Round:
         self.give_refly(self.get_current_competitor())
 
     def give_refly(self, competitor):
-        self._flight_order.insert(self._current_competitor_index + self.event.get_flights_before_refly() + 1,
-                                  competitor.get_bib_number())
-        RoundDAO().update(self)
+        group = self.find_group(competitor)
+        group.give_refly(competitor)
 
     def _add_run(self, run, insert_database=False):
-        # TODO : search in which group the run has to be added
-        run.round_group = self.groups[-1]
-        self.groups[-1].add_run(run, insert_database)
+        group = self.find_group(run.competitor)
+        run.round_group = group
+        group.add_run(run, insert_database)
         self.set_current_competitor(run.competitor)
 
     def add_run_from_web(self, run):
-        # TODO : search in which group the run has to be added
-        run.round_group = self.groups[-1]
-        self.groups[-1].add_run(run, True)
+        group = self.find_group(run.competitor)
+        run.round_group = group
+        group.add_run(run, True)
+
+    def find_group(self, competitor):
+        for group in self.groups:
+            if group.has_competitor(competitor):
+                return group
 
     def to_string(self):
         result = os.linesep + 'Round number ' + str(self.round_number) + os.linesep
