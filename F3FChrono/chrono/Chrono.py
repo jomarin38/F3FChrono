@@ -271,6 +271,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.reset_wind()
         self.clearPenalty()
         self.valid = True
+        self.refly = False
 
     def set_buzzer_time(self, time):
         self.arduino.set_buzzerTime(time)
