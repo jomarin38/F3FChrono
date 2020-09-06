@@ -120,6 +120,7 @@ class rs232_arduino (QObject):
 
     def set_inRun(self):
         self.inRun = True
+        self.event_Base('a')
 
     def debug(self):
         self.check_request_time()

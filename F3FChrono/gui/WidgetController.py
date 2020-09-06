@@ -188,7 +188,7 @@ class WWindCtrl():
             strrain = self._translate("Rain", "Rain")
         else:
             strrain = self._translate("No Rain", "No Rain")
-        self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + str(self.rules['speed']) +
+        self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + '{:.1f}'.format(self.rules['speed']) +
                                    self.rules['unit'] + self._translate(", Angle : ", ", Angle : ") +
                                    str(self.rules['dir']) + '°' + ', ' + strrain)
 
@@ -388,17 +388,18 @@ class WChronoCtrl(QTimer):
         else:
             self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000 - (time.time() - self.startTime)))
             timeval = self.time / 1000 - (time.time() - self.startTime)
-            if timeval >= 29.8:
+            if timeval >= 29.5:
                 self.vocal_elapsedTime_sig.emit(30, self.to_launch)
-            if 25.9 <= timeval <= 26:
+            if 25.5 <= timeval <= 26:
                 self.vocal_elapsedTime_sig.emit(25, self.to_launch)
-            if 20.9 <= timeval <= 21:
+            if 20.5 <= timeval <= 21:
                 self.vocal_elapsedTime_sig.emit(20, self.to_launch)
-            if 15.9 <= timeval <= 16:
+            if 15.5 <= timeval <= 16:
                 self.vocal_elapsedTime_sig.emit(15, self.to_launch)
-            if 10.9 <= timeval <= 11:
+            if 10.5 <= timeval <= 11:
                 self.vocal_elapsedTime_sig.emit(10, self.to_launch)
-            if 9.9 <= timeval <= 10:
+            '''
+            if 9 <= timeval <= 10:
                 self.vocal_elapsedTime_sig.emit(9, self.to_launch)
             if 8.9 <= timeval <= 9:
                 self.vocal_elapsedTime_sig.emit(8, self.to_launch)
@@ -416,6 +417,7 @@ class WChronoCtrl(QTimer):
                 self.vocal_elapsedTime_sig.emit(2, self.to_launch)
             if 1.9 <= timeval <= 2:
                 self.vocal_elapsedTime_sig.emit(1, self.to_launch)
+            '''
             if timeval < 0:
                 self.vocal_elapsedTime_sig.emit(0, self.to_launch)
                 self.time_elapsed_sig.emit()
