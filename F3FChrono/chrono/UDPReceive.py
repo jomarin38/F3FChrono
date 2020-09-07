@@ -24,12 +24,13 @@ class udpreceive(QThread):
     simulate_wbtn_sig = pyqtSignal(str)
     switchMode_sig = pyqtSignal()
 
-    def __init__(self, udpport, signal_chrono, signal_btnnext, signal_wind, signal_rain, signal_accu, signal_rssi):
+    def __init__(self, udpport, signal_chrono, signal_btnnext, signal_windspeed, signal_winddir, signal_rain, signal_accu, signal_rssi):
         super().__init__()
         self.port = udpport
         self.event_chrono = signal_chrono
         self.event_btn_next = signal_btnnext
-        self.event_wind = signal_wind
+        self.event_wind_speed = signal_windspeed
+        self.event_wind_dir = signal_winddir
         self.event_rain = signal_rain
         self.event_accu = signal_accu
         self.event_rssi = signal_rssi
@@ -106,8 +107,10 @@ class udpreceive(QThread):
                     else:
                         del(m[0])
 
-                if m[0] == 'wind':
-                    self.event_wind.emit(float(m[1]), float(m[2]), str(m[3]))
+                if m[0] == 'wind_speed':
+                    self.event_wind_speed.emit(float(m[1]), str(m[2]))
+                elif m[0] == 'wind_dir':
+                    self.event_wind_dir.emit(float(m[1]))
                 elif m[0] == 'rain':
                     self.event_rain.emit(bool(m[1] == 'True'))
                 elif m[0] == 'info':

@@ -43,7 +43,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.signal_btnnext.connect(self.btn_next_action)
 
-        self.chronoHard.wind_signal.connect(self.slot_wind_ui)
+        self.chronoHard.windspeed_signal.connect(self.slot_windspeed_ui)
+        self.chronoHard.winddir_signal.connect(self.slot_winddir_ui)
         self.chronoHard.rain_signal.connect(self.slot_rain_ui)
         self.chronoHard.rssi_signal.connect(self.slot_rssi)
         self.chronoHard.accu_signal.connect(self.slot_accu)
@@ -141,7 +142,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.show_config()
         self.MainWindow.show()
         self.controllers['config'].set_contest(self.daoEvent.get_list())
-        self.controllers['wind'].set_wind(0, 0, "")
+        self.controllers['wind'].set_wind_speed(-1, "")
+        self.controllers['wind'].set_wind_dir(-1)
         self.controllers['wind'].set_rain(0)
         self.controllers['wind'].set_signal(self.signal_lowvoltage_ask)
         self.signal_lowvoltage_ask.connect(self.slot_low_voltage_ask)
@@ -580,9 +582,18 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['config'].piCamB_config=False
             self.controllers['config'].set_piCamB(address)
     '''
-    def slot_wind_ui(self, angle, wind, unit):
-        #print("Wind UI")
-        self.controllers['wind'].set_wind(wind, angle, unit)
+
+    def slot_windspeed_ui(self, wind, unit):
+        #print("Wind speed UI")
+        self.controllers['wind'].set_wind_speed(wind, unit)
+        if self.event is not None:
+            self.controllers['wind'].check_rules(self.event.max_wind_dir_dev,\
+                                        self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,\
+                                        self.event.max_interruption_time)
+
+    def slot_winddir_ui(self, angle):
+        #print("Wind dir UI")
+        self.controllers['wind'].set_wind_dir(angle)
         if self.event is not None:
             self.controllers['wind'].check_rules(self.event.max_wind_dir_dev,\
                                         self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,\

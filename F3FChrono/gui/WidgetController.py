@@ -173,10 +173,13 @@ class WWindCtrl():
     def hide(self):
         self.widget.hide()
 
-    def set_wind(self, speed, angle, unit):
-        self.rules['dir'] = angle
+    def set_wind_speed(self, speed, unit):
         self.rules['speed'] = speed
         self.rules['unit'] = unit
+        self.__set_data()
+
+    def set_wind_dir(self, angle):
+        self.rules['dir'] = angle
         self.__set_data()
 
     def set_rain(self, rain):
