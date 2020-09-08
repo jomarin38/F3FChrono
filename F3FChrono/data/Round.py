@@ -287,9 +287,24 @@ class Round:
                       '&event_round_score_status=' + str(valid_integer_code)
         response = requests.post(request_url)
 
+    def export_to_csv(self, csv_writer):
+        csv_writer.writerow(['bib_number', 'pilot_name', 'pilot_firstname', 'round', 'seconds', 'penalty',
+                            'sub1', 'sub2', 'sub3', 'sub4', 'sub5', 'sub6', 'sub7', 'sub8', 'sub9', 'sub10'])
+        for group in self.groups:
+            for bib_number in sorted(self.event.competitors):
+                competitor = self.event.competitors[bib_number]
+                fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
+                valid_run = group.get_valid_run(fetched_competitor)
 
-
-
-
-
+                row = [str(fetched_competitor.bib_number), fetched_competitor.get_pilot().name,
+                        fetched_competitor.get_pilot().first_name, str(self.valid_round_number)]
+                if valid_run is not None:
+                    row.append(str(valid_run.get_flight_time()))
+                else:
+                    row.append('DNF')
+                row.append(str(group.get_penalty(competitor)))
+                if valid_run is not None:
+                    for i in range(0, 10):
+                        row.append(str(valid_run.chrono.get_lap_time(i)))
+                csv_writer.writerow(row)
 
