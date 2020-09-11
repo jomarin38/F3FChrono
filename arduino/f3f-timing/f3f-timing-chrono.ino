@@ -122,13 +122,15 @@ void baseCheckRace(byte base){
     chronostart(startRace);
     buzzerSet(1);
     time1=millis();
-    chrono.climbout_time = time1 - chrono.oldtime;
+    chrono.climbout_time = time1 - chrono.startlaunchtime;
+    printclimbout_time();      
     chrono.oldtime=time1;
     chronostatus.runStatus = InProgressB;
   }else if (chronostatus.runStatus==InStart_Late and (BASEAPIN == base or base == BTNNEXTPIN)){
     chronostatus.runStatus = InProgressB;
     time1=millis();
     chrono.climbout_time = time1 - chrono.startlaunchtime;
+    printclimbout_time();      
     buzzerSet(1);
   }else if (chronostatus.runStatus==InProgressA and (base == BASEAPIN or base == BTNNEXTPIN)) {
     time1 = millis();

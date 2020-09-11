@@ -34,12 +34,8 @@ void serial_run(void) {
   if (temp != 0){
     memcpy(&chrono_old, &chrono, sizeof(chrono));
     printchrono();
-    if (chrono.climbout_time!=chrono.oldclimbout_time){
-      printclimbout_time();      
-      chrono.oldclimbout_time=chrono.climbout_time;
-    }
-
   }
+  
   //Process serial request
   if (serial.data_available) {
     char tmp = serial.data_read[0];
