@@ -76,7 +76,7 @@ class chronoQSound(QThread):
         self.seconds_ten = 111
         self.to_launch = 112
         self.loadwav(volume)
-
+        self.__debug = False
 
     def loadwav(self, volume):
         try:
@@ -150,7 +150,10 @@ class chronoQSound(QThread):
             self.time[self.index_penalty].play()
 
     def sound_elapsedTime(self, cmd, to_launch):
-        print(cmd, " 30s : ", self.sound_isplaying[self.seconds_thirty], " 25s : ", self.sound_isplaying[self.seconds_twentyfive])
+        if self.__debug:
+            print(cmd, " 30s : ", self.sound_isplaying[self.seconds_thirty], " 25s : ",
+                  self.sound_isplaying[self.seconds_twentyfive])
+
         if self.play_sound:
             if 10 <= cmd <= 30:
                 if cmd == 30:
@@ -187,7 +190,7 @@ class chronoQSound(QThread):
                             self.__start_play()
 
     def stop_all(self):
-        print("stop_all")
+        #print("stop_all")
         if len(self.sound_list) > 0:
             for i in range(len(self.sound_list)-1, -1, -1):
                 self.sound_isplaying[self.sound_list[i]] = False
@@ -195,7 +198,8 @@ class chronoQSound(QThread):
             self.sound_list.clear()
 
     def __start_play(self):
-        print("start play")
+        if self.__debug:
+            print("start play")
         self.sound_isplaying[self.sound_list[0]] = True
         self.time[self.sound_list[0]].play()
         '''#debug sound list to play
@@ -204,12 +208,14 @@ class chronoQSound(QThread):
         print(self.time[self.sound_list[0]].isPlaying())
         '''
         if not self.time[self.sound_list[0]].isPlaying():
-            print("not playing")
+            if self.__debug:
+                print("not playing")
             self.time[self.sound_list[0]].stop()
             self.time[self.sound_list[0]].play()
 
     def slot_sound_playing_changed(self):
-        print("slot sound")
+        if self.__debug:
+            print("slot sound")
         if len(self.sound_list) > 0:
             if not self.time[self.sound_list[0]].isPlaying():
                 self.time[self.sound_list[0]].stop()

@@ -6,6 +6,7 @@ typedef struct{
 
 volatile serialStr serial;
 
+
 void serial_setup(void){
   memset (&serial,0, sizeof(serial));
   Serial.begin(57600);
@@ -54,7 +55,7 @@ void serial_run(void) {
     }else if (tmp=='s'){  //Start chrono
       chronostatus.runStatus=byte(serial.data_read[1]-'0');
       if (chronostatus.runStatus==Launched) {
-        chronostart();
+        chronostart(startLaunched);
         buzzerSet(1);
       }
       printstatus();

@@ -409,7 +409,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['round'].wChronoCtrl.stoptime()
             self.chronoHard.set_status(chronoStatus.InWait)
 
-        if self.chronoHard.get_status() == chronoStatus.Launched:
+        '''if self.chronoHard.get_status() == chronoStatus.Launched:
             print("handle time elapsed status Launched")
             self.controllers['round'].wChronoCtrl.stoptime()
             self.chronoHard.set_status(chronoStatus.Late)
@@ -420,6 +420,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['round'].wChronoCtrl.stoptime()
             self.chronoHard.set_status(chronoStatus.InStartLate)
             self.chronoHard.run_started.emit()
+        '''
 
     def slot_buzzer(self):
         self.rpigpio.signal_buzzer.emit(1)
@@ -511,18 +512,17 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             if self.low_voltage_ask:
                 self.vocal.signal_lowVoltage.emit()
                 self.low_voltage_ask=False
-
         if (status==chronoStatus.WaitLaunch):
             self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, to_launch=True)
         if (status == chronoStatus.Launched):
             self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launched_time'], False)
         if (status==chronoStatus.InStart):
             self.vocal.signal_entry.emit()
+
         #if (status == chronoStatus.InProgressA or status == chronoStatus.InProgressB):
         #    self.vocal.signal_base.emit(0)
 
     def slot_run_started(self):
-        self.vocal.stop_all()
         self.controllers['round'].wChronoCtrl.settime(0, True)
 
     def slot_lap_finished(self, lap, last_lap_time):

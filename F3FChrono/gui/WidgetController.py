@@ -424,6 +424,7 @@ class WChronoCtrl(QTimer):
             if timeval < 0:
                 self.vocal_elapsedTime_sig.emit(0, self.to_launch)
                 self.time_elapsed_sig.emit()
+                self.stoptime()
 
     def penalty_100(self):
         self.btn_penalty_100_sig.emit()
