@@ -63,9 +63,8 @@ class ChronoHard(QObject):
                                      self.winddir_signal, self.rain_signal, self.accu_signal, self.rssi_signal)
         self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
         self.valid = True
-        self.refly=False
-
-
+        self.refly = False
+        self.__debug = False
 
     def addPenalty(self, value):
         self.penalty += value
@@ -194,7 +193,6 @@ class ChronoArduino(ChronoHard, QTimer):
 
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
-        print("chronoArduino init")
         self.status = chronoStatus.InWait
         self.chrono_signal.connect(self.handle_chrono_event)
         self.lap_finished.connect(self.handle_lap_finished)
@@ -236,7 +234,8 @@ class ChronoArduino(ChronoHard, QTimer):
             self.run_validated.emit()
         elif caller.lower() == "btnnext":
             if not self.competition_mode:
-                print("demande event btn Next")
+                if self.__debug:
+                    print("demande event btn Next")
                 self.arduino.event_Base('n')
 
         if caller.lower()=="udpreceive" and data == "event" and address == "baseA":
@@ -250,7 +249,8 @@ class ChronoArduino(ChronoHard, QTimer):
                 ChronoArduino._last_event_time = time.time()
 
         if caller.lower()=="udpreceive" and data == "event" and address == "baseB":
-            print("demande event base B")
+            if self.__debug:
+                print("demande event base B")
             self.arduino.event_Base('b')
         ChronoArduino._lock.release()
 
@@ -260,7 +260,8 @@ class ChronoArduino(ChronoHard, QTimer):
 
     def handle_climbout_time(self, time):
         self.climbout_time=time
-        print("climbout Time : ", time)
+        if self.__debug:
+            print("climbout Time : ", time)
 
     def handle_lap_finished(self, lap, time):
         self.chronoLap.append(time)

@@ -108,10 +108,12 @@ class rs232_arduino (QObject):
                     if data[0] == "resetµc":
                         self.reset_arduino_sig.emit()
             except serial.SerialException as e:
-                print("serial exception")
+                if self.__debug:
+                    print("serial exception")
                 return None
             except TypeError as e:
-                print("bus close : ", e)
+                if self.__debug:
+                    print("bus close : ", e)
                 self.bus.close()
                 self.bus = None
                 return None
