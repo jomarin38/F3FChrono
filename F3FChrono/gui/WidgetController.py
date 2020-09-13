@@ -145,15 +145,6 @@ class WWindCtrl():
         self.view.setupUi(self.widget)
         self.view.btn_clear.clicked.connect(self.clear_alarm)
         self.widgetList.append(self.widget)
-        self.rules = collections.OrderedDict()
-        self.rules['dir'] = 0.0
-        self.rules['speed'] = 0.0
-        self.rules['unit'] = ""
-        self.rules['rain'] = 0.0
-        self.rules['starttime'] = datetime.now()
-        self.rules['time(s)'] = time.time()
-        self.rules['detected'] = False
-        self.rules['alarm'] = False
         self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
         self.windstylesheet = "background-color:rgba( 255, 255, 255, 0% );"
         self.lowVoltage_sig = None
@@ -173,56 +164,20 @@ class WWindCtrl():
     def hide(self):
         self.widget.hide()
 
-    def set_wind_speed(self, speed, unit):
-        self.rules['speed'] = speed
-        self.rules['unit'] = unit
-        self.__set_data()
-
-    def set_wind_dir(self, angle):
-        self.rules['dir'] = angle
-        self.__set_data()
-
-    def set_rain(self, rain):
-        self.rules['rain'] = rain
-        self.__set_data()
-
-    def __set_data(self):
-        if self.rules['rain']:
+    def display_wind_info(self, wind_speed, wind_speed_unit,  wind_dir, rain, alarm):
+        if rain:
             strrain = self._translate("Rain", "Rain")
         else:
             strrain = self._translate("No Rain", "No Rain")
-        self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + '{:.1f}'.format(self.rules['speed']) +
-                                   self.rules['unit'] + self._translate(", Angle : ", ", Angle : ") +
-                                   str(self.rules['dir']) + '°' + ', ' + strrain)
+        self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + '{:.1f}'.format(wind_speed) +
+                                   wind_speed_unit + self._translate(", Angle : ", ", Angle : ") +
+                                   str(wind_dir) + '°' + ', ' + strrain)
 
-
-    def check_rules(self, limit_angle, speed_min, speed_max, time_limit):
-        if abs(self.rules['dir']) > limit_angle or self.rules['speed'] < speed_min or self.rules['speed'] > speed_max \
-                or self.rules['rain']:
-            if self.rules['detected'] == False:
-                self.rules['starttime'] = datetime.now()
-                self.rules['time(s)'] = time.time()
-                self.rules['detected'] = True
-            else:
-                if ((time.time() - self.rules['time(s)']) > 20):
-                    self.view.WindInfo.setStyleSheet('background-color:red;')
-                    self.view.Elapsedtime.setVisible(True)
-                    if (time.time() - self.rules['time(s)']) > (time_limit * 60):
-                        self.view.Elapsedtime.setStyleSheet('background-color:red;')
-                        self.view.btn_clear.setVisible(True)
-                        self.rules['alarm'] = True
-
-                    self.view.Elapsedtime.setText(self._translate("time : ", "time : ") + \
-                                                  time.strftime("%H:%M:%S",
-                                                                time.gmtime(time.time() - self.rules['time(s)'])) \
-                                                  + self.cancelroundtostr())
-
+        if alarm:
+            self.view.WindInfo.setStyleSheet('background-color:red;')
         else:
             self.view.WindInfo.setStyleSheet('background-color:rgba( 255, 255, 255, 0% );')
-            self.rules['detected'] = False
-            if not self.rules['alarm']:
-                self.view.Elapsedtime.setStyleSheet('background-color:rgba( 255, 255, 255, 0% );')
-                self.view.Elapsedtime.setVisible(False)
+
 
     def clear_alarm(self):
         self.rules['alarm'] = False

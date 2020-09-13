@@ -11,10 +11,12 @@ from F3FChrono.chrono.rs232_arduino import rs232_arduino
 IPUDPBEEP = '255.255.255.255'
 UDPPORT = 4445
 
+
 class chronoType():
     wire = 0
     wireless = 1
     none = 2
+
 
 class chronoStatus():
     InWait = 0
@@ -28,6 +30,126 @@ class chronoStatus():
     WaitAltitude = 8
     Finished = 9
 
+
+class Weather(QTimer):
+    windspeed_signal = pyqtSignal(float, str)
+    winddir_signal = pyqtSignal(float)
+    rain_signal = pyqtSignal(bool)
+    # gui_weather_signal parameters wind_speed, wind_speed_unit,  wind_dir, rain, alarm
+    gui_weather_signal = pyqtSignal(float, str, float, bool, bool)
+
+    def __init__(self):
+        super().__init__()
+        self.windspeed_signal.connect(self.slot_wind_speed)
+        self.winddir_signal.connect(self.slot_wind_dir)
+        self.rain_signal.connect(self.rain_info)
+        self.wind = collections.OrderedDict()
+        self.rules = collections.OrderedDict()
+        self.reset_wind()
+        self.__debug = False
+        self.rules['starttime'] = time.time()
+        self.rules['endtime'] = time.time()
+        self.rules['detected'] = False
+        self.rules['alarm'] = False
+        self.__rules_enable = False
+        self.timeout.connect(self.refresh_gui)
+        self.start(1000)
+
+    def __checkrules(self):
+        print("checkrules")
+        if self.__rules_enable and self.rules['speed_limit_min'] is not -1.0 and \
+                self.rules['speed_limit_max'] is not -1.0 and \
+                self.rules['dir_limit'] is not -1.0:
+            if abs(self.wind['orientation']) > self.rules['dir_limit'] or \
+                    self.wind['speed'] < self.rules['speed_limit_min'] or \
+                    self.wind['speed'] > self.rules['speed_limit_max'] or self.rain:
+                if not self.rules['detected']:
+                    self.rules['starttime'] = time.time()
+                    self.rules['detected'] = True
+                    self.rules['alarm'] = False
+                else:
+                    self.rules['endtime'] = time.time()
+                    if (time.time() - self.rules['starttime']) > 20:
+                        self.rules['alarm'] = True
+                        print("weather alarm")
+                    else:
+                        print("weather not condition")
+            else:
+                self.rules['detected'] = False
+                self.rules['alarm'] = False
+                if (time.time() - self.rules['endtime']) > 20:
+                    print("weather ok for DC")
+
+    def enable_rules(self, enable=False):
+        self.__rules_enable = enable
+
+    def refresh_gui(self):
+        self.gui_weather_signal.emit(self.wind['speed'], self.wind['unit'], self.wind['orientation'],
+                                     self.rain, self.rules['alarm'])
+
+    def slot_wind_speed(self, speed, unit):
+        self.wind['speed'] = speed
+        self.wind['unit'] = unit
+        self.wind['speed_nb'] += 1
+        self.wind['speed_sum'] += speed
+
+        if speed < self.wind['speed_min']:
+            self.wind['speed_min'] = speed
+        if speed > self.wind['speed_max']:
+            self.wind['speed_max'] = speed
+        self.__checkrules()
+
+    def slot_wind_dir(self, orientation):
+        self.wind['orientation'] = orientation
+        self.wind['orientation_sum'] += orientation
+        self.wind['orientation_nb'] += 1
+        self.__checkrules()
+
+    def getMaxWindSpeed(self):
+        return self.wind['speed_max']
+
+    def getMinWindSpeed(self):
+        return self.wind['speed_min']
+
+    def getMeanWindSpeed(self):
+        if (self.wind['speed_nb'] != 0):
+            return self.wind['speed_sum'] / self.wind['speed_nb']
+        else:
+            return 0
+
+    def getWindDir(self):
+        if (self.wind['orientation_nb'] != 0):
+            return self.wind['orientation_sum'] / self.wind['orientation_nb']
+        else:
+            return 0
+
+    def rain_info(self, rain):
+        self.rain = (rain == True)
+
+    def getRain(self):
+        return self.rain
+
+    def set_rules_limit(self, speed_min, speed_max, dir):
+        self.rules['speed_limit_min'] = speed_min
+        self.rules['speed_limit_max'] = speed_max
+        self.rules['dir_limit'] = dir
+
+    def reset_wind(self):
+        self.wind['speed'] = 0.0
+        self.wind['unit'] = "m/s"
+        self.wind['speed_sum'] = 0.0
+        self.wind['speed_nb'] = 0.0
+        self.wind['speed_min'] = 0.0
+        self.wind['speed_max'] = 0.0
+        self.wind['orientation'] = 0.0
+        self.wind['orientation_sum'] = 0.0
+        self.wind['orientation_nb'] = 0.0
+        self.rules['speed_limit_min'] = -1.0
+        self.rules['speed_limit_max'] = -1.0
+        self.rules['dir_limit'] = -1.0
+        self.rain = False
+
+
 class ChronoHard(QObject):
     status_changed = pyqtSignal(int)
     run_started = pyqtSignal()
@@ -38,13 +160,10 @@ class ChronoHard(QObject):
     run_training = pyqtSignal(int, float)
     buzzer_validated = pyqtSignal()
     chrono_signal = pyqtSignal(str, str, str)
-    windspeed_signal = pyqtSignal(float, str)
-    winddir_signal = pyqtSignal(float)
-    rain_signal = pyqtSignal(bool)
     accu_signal = pyqtSignal(float)
     rssi_signal = pyqtSignal(int, int)
     altitude_finished = pyqtSignal(float)
-    
+
     def __init__(self, signal_btnnext):
         super().__init__()
         self.penalty = 0.0
@@ -52,15 +171,12 @@ class ChronoHard(QObject):
         self.endTime = None
         self.climbout_time = 0
         self.signal_btnnext = signal_btnnext
-        self.windspeed_signal.connect(self.slot_wind_speed)
-        self.winddir_signal.connect(self.slot_wind_dir)
-        self.rain_signal.connect(self.rain_info)
-        self.wind= collections.OrderedDict()
-        self.reset_wind()
         self.chronoLap = []
         self.timelost = []
-        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.windspeed_signal,
-                                     self.winddir_signal, self.rain_signal, self.accu_signal, self.rssi_signal)
+        self.weather = Weather()
+        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.weather.windspeed_signal,
+                                     self.weather.winddir_signal, self.weather.rain_signal, self.accu_signal,
+                                     self.rssi_signal)
         self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
         self.valid = True
         self.refly = False
@@ -71,59 +187,11 @@ class ChronoHard(QObject):
         return (self.penalty)
 
     def clearPenalty(self):
-        self.penalty=0.0
+        self.penalty = 0.0
         return (self.penalty)
 
     def getPenalty(self):
         return (self.penalty)
-
-    def slot_wind_speed(self, speed, unit):
-        self.wind['speed_nb']+=1
-        self.wind['speed_sum']+=speed
-        self.wind['unit'] = unit
-
-        if speed<self.wind['speed_min']:
-            self.wind['speed_min']=speed
-        if speed>self.wind['speed_max']:
-            self.wind['speed_max'] = speed
-
-    def slot_wind_dir(self, orientation):
-        self.wind['orientation_sum']+=orientation
-        self.wind['orientation_nb']+=1
-
-    def rain_info(self, rain):
-        self.wind['rain']=(rain==True)
-
-    def getMaxWindSpeed(self):
-        return self.wind['speed_max']
-
-    def getMinWindSpeed(self):
-        return self.wind['speed_min']
-
-    def getMeanWindSpeed(self):
-        if (self.wind['speed_nb']!=0):
-            return self.wind['speed_sum']/self.wind['speed_nb']
-        else:
-            return 0
-
-    def getWindDir(self):
-        if (self.wind['orientation_nb']!=0):
-            return self.wind['orientation_sum']/self.wind['orientation_nb']
-        else:
-            return 0
-
-    def getRain(self):
-        return self.wind['rain']
-
-    def reset_wind(self):
-        self.wind['speed_sum'] = 0.0
-        self.wind['speed_nb'] = 0.0
-        self.wind['speed_min'] = 0.0
-        self.wind['speed_max'] = 0.0
-        self.wind['orientation_sum'] = 0.0
-        self.wind['orientation_nb'] = 0.0
-
-        self.wind['rain']=False
 
     def get_status(self):
         return self.status
@@ -139,8 +207,8 @@ class ChronoHard(QObject):
         self.refly = False
 
     def getLastLapTime(self):
-        if self.getLapCount()>0:
-            return self.chronoLap[self.getLapCount()-1]
+        if self.getLapCount() > 0:
+            return self.chronoLap[self.getLapCount() - 1]
         else:
             return 0
 
@@ -148,9 +216,9 @@ class ChronoHard(QObject):
         return (self.climbout_time)
 
     def get_time(self):
-        time=0
+        time = 0
         for i in range(self.getLapCount()):
-            time=time+self.chronoLap[i]
+            time = time + self.chronoLap[i]
         return time
 
     def getLaps(self):
@@ -166,28 +234,27 @@ class ChronoHard(QObject):
         return len(self.chronoLap)
 
     def to_string(self):
-        result=os.linesep+"Chrono Data : "+os.linesep+"\tStart Time : "+ str(self.startTime)+\
-               os.linesep+"\tEnd Time : "+str(self.endTime)+os.linesep+"\tRun Time : "+\
-               "{:0>6.3f}".format(self.get_time())+os.linesep+"\tLapTime : "
+        result = os.linesep + "Chrono Data : " + os.linesep + "\tStart Time : " + str(self.startTime) + \
+                 os.linesep + "\tEnd Time : " + str(self.endTime) + os.linesep + "\tRun Time : " + \
+                 "{:0>6.3f}".format(self.get_time()) + os.linesep + "\tLapTime : "
         for lap in self.getLaps():
-            result+="{:0>6.3f}".format(lap)+","
-        result+=os.linesep+"\tPenalty : "+str(self.penalty)+os.linesep
-        result+="Wind Speed :"+os.linesep+"\tMean : "+"{:0>6.1f}".format(self.getMeanWindSpeed())+os.linesep+\
-                "\tMin : "+"{:0>6.1f}".format(self.getMinWindSpeed())+os.linesep+\
-                "\tMax : " + "{:0>6.1f}".format(self.getMaxWindSpeed()) + os.linesep +\
-                "Wind Orientation : " + "{:0>6.1f}".format(self.getMaxWindSpeed()) + os.linesep +\
-                "rain : " + str(self.getRain()) + os.linesep
+            result += "{:0>6.3f}".format(lap) + ","
+        result += os.linesep + "\tPenalty : " + str(self.penalty) + os.linesep
+        result += "Wind Speed :" + os.linesep + "\tMean : " + "{:0>6.1f}".format(self.getMeanWindSpeed()) + os.linesep + \
+                  "\tMin : " + "{:0>6.1f}".format(self.getMinWindSpeed()) + os.linesep + \
+                  "\tMax : " + "{:0>6.1f}".format(self.getMaxWindSpeed()) + os.linesep + \
+                  "Wind Orientation : " + "{:0>6.1f}".format(self.getMaxWindSpeed()) + os.linesep + \
+                  "rain : " + str(self.getRain()) + os.linesep
         return (result)
 
     def setrefly(self):
-        self.refly=True
+        self.refly = True
 
     def isRefly(self):
-        return(self.refly)
+        return (self.refly)
 
 
 class ChronoArduino(ChronoHard, QTimer):
-
     _lock = threading.Lock()
     _last_event_time = 0
 
@@ -200,9 +267,12 @@ class ChronoArduino(ChronoHard, QTimer):
         self.run_started.connect(self.handle_run_started)
         self.run_finished.connect(self.handle_run_finished)
 
-        self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'], ConfigReader.config.conf['rebound_btn_time'],
-                                   ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started, self.climbout,
-                                     self.lap_finished, self.run_finished, self.run_training, self.altitude_finished, self.accu_signal)
+        self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef'],
+                                     ConfigReader.config.conf['rebound_btn_time'],
+                                     ConfigReader.config.conf['buzzer_duration'], self.status_changed, self.run_started,
+                                     self.climbout,
+                                     self.lap_finished, self.run_finished, self.run_training, self.altitude_finished,
+                                     self.accu_signal)
 
         self.status_changed.connect(self.slot_status)
         self.climbout.connect(self.handle_climbout_time)
@@ -228,7 +298,7 @@ class ChronoArduino(ChronoHard, QTimer):
         ChronoArduino._lock.acquire()
         if caller.lower() == "btnnext" and \
                 (self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.InWait):
-            self.arduino.set_status(self.status+1)
+            self.arduino.set_status(self.status + 1)
         elif caller.lower() == "btnnext" and self.status == chronoStatus.InStart:
             self.arduino.set_status(self.status + 1)
         elif caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
@@ -239,17 +309,17 @@ class ChronoArduino(ChronoHard, QTimer):
                     print("demande event btn Next")
                 self.arduino.event_Base('n')
 
-        if caller.lower()=="udpreceive" and data == "event" and address == "baseA":
+        if caller.lower() == "udpreceive" and data == "event" and address == "baseA":
             if not self.competition_mode:
                 if not self.in_start_blackout_enabled or self.status > chronoStatus.InStart or \
-                        ChronoArduino._last_event_time+self.in_start_blackout_second < time.time():
+                        ChronoArduino._last_event_time + self.in_start_blackout_second < time.time():
                     self.arduino.event_Base('a')
             else:
                 self.arduino.event_Base('a')
             if self.in_start_blackout_enabled:
                 ChronoArduino._last_event_time = time.time()
 
-        if caller.lower()=="udpreceive" and data == "event" and address == "baseB":
+        if caller.lower() == "udpreceive" and data == "event" and address == "baseB":
             if self.__debug:
                 print("demande event base B")
             self.arduino.event_Base('b')
@@ -257,10 +327,10 @@ class ChronoArduino(ChronoHard, QTimer):
 
     def handle_run_started(self):
         self.startTime = datetime.now()
-        self.arduino.set_inRun ()
+        self.arduino.set_inRun()
 
     def handle_climbout_time(self, time):
-        self.climbout_time=time
+        self.climbout_time = time
         if self.__debug:
             print("climbout Time : ", time)
 
@@ -273,7 +343,7 @@ class ChronoArduino(ChronoHard, QTimer):
     def reset(self):
         self.arduino.reset()
         self.chronoLap.clear()
-        self.reset_wind()
+        self.weather.reset_wind()
         self.clearPenalty()
         self.valid = True
         self.refly = False
@@ -284,8 +354,9 @@ class ChronoArduino(ChronoHard, QTimer):
     def stop(self):
         self.arduino.stop()
 
-    def set_mode (self, training=True):
+    def set_mode(self, training=True):
         self.arduino.set_mode(training)
+
 
 '''
 class ChronoRpi(ChronoHard):
@@ -390,12 +461,11 @@ class ChronoRpi(ChronoHard):
 '''
 
 
-def main ():
-
-    print ('Chrono Test')
-    chrono=ChronoArduino()
+def main():
+    print('Chrono Test')
+    chrono = ChronoArduino()
     chrono.reset()
-    chrono.chrono_signal.emit("test","test1","test2")
+    chrono.chrono_signal.emit("test", "test1", "test2")
 
 
 if __name__ == '__main__':
