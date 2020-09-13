@@ -43,9 +43,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         self.signal_btnnext.connect(self.btn_next_action)
 
-        self.chronoHard.windspeed_signal.connect(self.slot_windspeed_ui)
-        self.chronoHard.winddir_signal.connect(self.slot_winddir_ui)
-        self.chronoHard.rain_signal.connect(self.slot_rain_ui)
         self.chronoHard.rssi_signal.connect(self.slot_rssi)
         self.chronoHard.accu_signal.connect(self.slot_accu)
         self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
@@ -142,9 +139,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.show_config()
         self.MainWindow.show()
         self.controllers['config'].set_contest(self.daoEvent.get_list())
-        self.controllers['wind'].set_wind_speed(-1, "")
-        self.controllers['wind'].set_wind_dir(-1)
-        self.controllers['wind'].set_rain(0)
+        self.controllers['wind'].display_wind_info(-1.0, "m/s", -1.0, False, False)
+        self.chronoHard.weather.gui_weather_signal.connect(self.controllers['wind'].display_wind_info)
         self.controllers['wind'].set_signal(self.signal_lowvoltage_ask)
         self.signal_lowvoltage_ask.connect(self.slot_low_voltage_ask)
 
@@ -307,6 +303,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.vocal.stop_all()
         self.show_config()
         self.set_signal_mode(training=None)
+        self.chronoHard.weather.enable_rules(enable=False)
         self.noise.stop()
 
     def home_training(self):
@@ -371,6 +368,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False,
                                                           to_launch=True)
             self.controllers['round'].wChronoCtrl.reset_ui()
+            self.chronoHard.weather.set_rules_limit(self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,
+                                              self.event.max_wind_dir_dev)
+            self.chronoHard.weather.enable_rules(enable=True)
             self.set_signal_mode(training=False)
             self.show_chrono()
         else:
@@ -408,19 +408,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.vocal.signal_penalty.emit()
             self.controllers['round'].wChronoCtrl.stoptime()
             self.chronoHard.set_status(chronoStatus.InWait)
-
-        '''if self.chronoHard.get_status() == chronoStatus.Launched:
-            print("handle time elapsed status Launched")
-            self.controllers['round'].wChronoCtrl.stoptime()
-            self.chronoHard.set_status(chronoStatus.Late)
-            self.chronoHard.run_started.emit()
-
-        if self.chronoHard.get_status() == chronoStatus.InStart:
-            print("handle time elapsed status InStart")
-            self.controllers['round'].wChronoCtrl.stoptime()
-            self.chronoHard.set_status(chronoStatus.InStartLate)
-            self.chronoHard.run_started.emit()
-        '''
 
     def slot_buzzer(self):
         self.rpigpio.signal_buzzer.emit(1)
@@ -519,9 +506,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if (status==chronoStatus.InStart):
             self.vocal.signal_entry.emit()
 
-        #if (status == chronoStatus.InProgressA or status == chronoStatus.InProgressB):
-        #    self.vocal.signal_base.emit(0)
-
     def slot_run_started(self):
         self.controllers['round'].wChronoCtrl.settime(0, True)
         self.vocal.stop_all()
@@ -572,42 +556,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         for lap in chronoHard.getLaps():
             chrono.add_lap_time(lap)
         print(chrono.to_string())
-
-    '''def process_ui(self, caller, data, address):
-        print("process ui : \n"+"\tdata : "+data+"\n\taddress : "+address)
-        #config page Wait detection on picam
-        if (self.controllers['config'].is_piCamA_onConfig()):
-            self.controllers['config'].piCamA_config=False
-            self.controllers['config'].set_piCamA(address)
-        elif (self.controllers['config'].is_piCamB_onConfig()):
-            self.controllers['config'].piCamB_config=False
-            self.controllers['config'].set_piCamB(address)
-    '''
-
-    def slot_windspeed_ui(self, wind, unit):
-        #print("Wind speed UI")
-        self.controllers['wind'].set_wind_speed(wind, unit)
-        if self.event is not None:
-            self.controllers['wind'].check_rules(self.event.max_wind_dir_dev,\
-                                        self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,\
-                                        self.event.max_interruption_time)
-
-    def slot_winddir_ui(self, angle):
-        #print("Wind dir UI")
-        self.controllers['wind'].set_wind_dir(angle)
-        if self.event is not None:
-            self.controllers['wind'].check_rules(self.event.max_wind_dir_dev,\
-                                        self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,\
-                                        self.event.max_interruption_time)
-
-    def slot_rain_ui(self, rain=False):
-        #print("Rain UI")
-        self.controllers['wind'].set_rain(rain)
-        if self.event is not None:
-            self.controllers['wind'].check_rules(self.event.max_wind_dir_dev,\
-                                        self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,\
-                                        self.event.max_interruption_time)
-
 
     def slot_accu(self, voltage):
         self.controllers['wind'].set_voltage(voltage)
