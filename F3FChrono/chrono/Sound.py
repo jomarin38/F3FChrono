@@ -193,8 +193,9 @@ class chronoQSound(QThread):
         #print("stop_all")
         if len(self.sound_list) > 0:
             for i in range(len(self.sound_list)-1, -1, -1):
-                self.sound_isplaying[self.sound_list[i]] = False
-                self.time[self.sound_list[i]].stop()
+                if self.sound_list[i] < len(self.sound_isplaying):
+                    self.sound_isplaying[self.sound_list[i]] = False
+                    self.time[self.sound_list[i]].stop()
             self.sound_list.clear()
 
     def __start_play(self):
