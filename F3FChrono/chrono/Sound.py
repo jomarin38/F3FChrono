@@ -201,7 +201,7 @@ class chronoQSound(QThread):
         if self.__debug:
             print("start play")
         if len(self.sound_list) > 0:
-            if self.sound_list[0] <= len(self.sound_isplaying):
+            if self.sound_list[0] < len(self.sound_isplaying):
                 self.sound_isplaying[self.sound_list[0]] = True
                 self.time[self.sound_list[0]].play()
                 '''#debug sound list to play
