@@ -200,18 +200,19 @@ class chronoQSound(QThread):
     def __start_play(self):
         if self.__debug:
             print("start play")
-        self.sound_isplaying[self.sound_list[0]] = True
-        self.time[self.sound_list[0]].play()
-        '''#debug sound list to play
-        print(self.sound_list)
-        print(str(self.time[self.sound_list[0]].status()) + ', ' + str(QSoundEffect.Ready))
-        print(self.time[self.sound_list[0]].isPlaying())
-        '''
-        if not self.time[self.sound_list[0]].isPlaying():
-            if self.__debug:
-                print("not playing")
-            self.time[self.sound_list[0]].stop()
+        if len(self.sound_list) > 0:
+            self.sound_isplaying[self.sound_list[0]] = True
             self.time[self.sound_list[0]].play()
+            '''#debug sound list to play
+            print(self.sound_list)
+            print(str(self.time[self.sound_list[0]].status()) + ', ' + str(QSoundEffect.Ready))
+            print(self.time[self.sound_list[0]].isPlaying())
+            '''
+            if not self.time[self.sound_list[0]].isPlaying():
+                if self.__debug:
+                    print("not playing")
+                self.time[self.sound_list[0]].stop()
+                self.time[self.sound_list[0]].play()
 
     def slot_sound_playing_changed(self):
         if self.__debug:
