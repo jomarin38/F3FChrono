@@ -262,6 +262,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.run_validated.disconnect(self.slot_run_validated)
             self.chronoHard.altitude_finished.disconnect(self.slot_altitude_finished)
             if self.rpigpio.buzzer_next is not None:
+                self.chronoHard.weather.beep_signal.emit("stop",0,1000)
                 self.chronoHard.weather.beep_signal.disconnect(self.rpigpio.buzzer_next.slot_blink)
             self.signal_race = None
         if training==True:
@@ -401,7 +402,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         elif self.controllers['training'].is_show():
             self.controllers['training'].btn_reset()
 
-        self.rpigpio.signal_buzzer_next.emit()
+        self.rpigpio.signal_buzzer_next.emit(1)
 
     def btn_next_action(self, port):
         self.next_action()
@@ -584,6 +585,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         event.accept()
 
     def shutdown_app(self):
+        self.rpigpio.buzzer_next.slot_blink("stop",0)
         self.chronoHard.stop()
         if self.webserver_process is not None:
             print('Kill process ' + str(self.webserver_process.pid))

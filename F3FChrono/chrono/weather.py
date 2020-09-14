@@ -19,21 +19,23 @@ class Weather(QTimer):
         self.wind = collections.OrderedDict()
         self.rules = collections.OrderedDict()
         self.reset_wind()
-        self.__debug = False
+        self.__debug = True
         self.rules['starttime'] = time.time()
         self.rules['endtime'] = time.time()
         self.rules['detected'] = False
         self.rules['alarm'] = False
+        self.rules['ok_dc'] = False
+        self.rules['beep_state'] = ""
         self.__rules_enable = False
         self.timeout.connect(self.refresh_gui)
         self.start(1000)
 
     def __checkrules(self):
-        if self.__debug:
-            print("checkrules")
         if self.__rules_enable and self.rules['speed_limit_min'] is not -1.0 and \
                 self.rules['speed_limit_max'] is not -1.0 and \
                 self.rules['dir_limit'] is not -1.0:
+            if self.__debug:
+                print("checkrules")
             if abs(self.wind['orientation']) > self.rules['dir_limit'] or \
                     self.wind['speed'] < self.rules['speed_limit_min'] or \
                     self.wind['speed'] > self.rules['speed_limit_max'] or self.rain:
@@ -41,29 +43,46 @@ class Weather(QTimer):
                     self.rules['starttime'] = time.time()
                     self.rules['detected'] = True
                     self.rules['alarm'] = False
+                    self.rules['ok_dc'] = False
                 else:
                     self.rules['endtime'] = time.time()
                     if (time.time() - self.rules['starttime']) > 20:
                         self.rules['alarm'] = True
-                        self.beep_signal.emit("permanent", -1, 1000)
-                        if self.__debug:
-                            print("weather alarm")
+                        if self.rules['beep_state'] is not "alarm":
+                            self.beep_signal.emit("permanent", -1, 1000)
+                            self.rules['beep_state'] = "alarm"
+                            if self.__debug:
+                                print("weather alarm")
                     else:
-                        self.beep_signal.emit("blink", -1, 1000)
+                        self.beep_signal.emit("blink", 1, 500)
                         if self.__debug:
                             print("weather not condition")
             else:
-                self.rules['detected'] = False
-                self.rules['alarm'] = False
-                self.beep_signal.emit("stop", -1, 1000)
-                if (time.time() - self.rules['endtime']) > 20:
-                    self.beep_signal.emit("blink", 5, 500)
-                    if self.__debug:
-                        print("weather ok for DC")
-
+                if (time.time() - self.rules['endtime']) > 20 and not self.rules['ok_dc']:
+                    if self.rules['beep_state'] is not "ok_dc":
+                        self.beep_signal.emit("blink", 5, 250)
+                        self.rules['beep_state'] = "ok_dc"
+                        self.rules['ok_dc'] = True
+                        if self.__debug:
+                            print("weather ok for DC")
+                else:
+                    self.rules['detected'] = False
+                    self.rules['alarm'] = False
+                    if self.rules['beep_state'] is not "stop":
+                        self.beep_signal.emit("stop", -1, 1000)
+                        self.rules['beep_state'] = "stop"
+                        if self.__debug:
+                            print("stop beep")
+                            
     def enable_rules(self, enable=False):
         self.__rules_enable = enable
-
+        self.rules['starttime'] = time.time()
+        self.rules['endtime'] = time.time()
+        self.rules['detected'] = False
+        self.rules['alarm'] = False
+        self.rules['ok_dc'] = False
+        self.rules['beep_state'] = ""
+        
     def refresh_gui(self):
         self.gui_weather_signal.emit(self.wind['speed'], self.wind['unit'], self.wind['orientation'],
                                      self.rain, self.rules['alarm'])
@@ -84,7 +103,6 @@ class Weather(QTimer):
         self.wind['orientation'] = orientation
         self.wind['orientation_sum'] += orientation
         self.wind['orientation_nb'] += 1
-        self.__checkrules()
 
     def getMaxWindSpeed(self):
         return self.wind['speed_max']
