@@ -261,6 +261,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.run_finished.disconnect(self.slot_run_finished)
             self.chronoHard.run_validated.disconnect(self.slot_run_validated)
             self.chronoHard.altitude_finished.disconnect(self.slot_altitude_finished)
+            if self.rpigpio.buzzer_next is not None:
+                self.chronoHard.weather.beep_signal.disconnect(self.rpigpio.buzzer_next.slot_blink)
             self.signal_race = None
         if training==True:
             self.chronoHard.run_training.connect(self.controllers['training'].wChronoCtrl.set_time)
@@ -274,6 +276,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.run_finished.connect(self.slot_run_finished)
             self.chronoHard.run_validated.connect(self.slot_run_validated)
             self.chronoHard.altitude_finished.connect(self.slot_altitude_finished)
+            if self.rpigpio.buzzer_next is not None:
+                self.chronoHard.weather.beep_signal.connect(self.rpigpio.buzzer_next.slot_blink)
             self.signal_race = True
 
 
