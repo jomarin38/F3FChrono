@@ -57,6 +57,9 @@ class gpioPort(QTimer):
 
         self.__deactivate()
 
+    def __del__(self):
+        self.__deactivate()
+
     def slot_blink(self, mode, numbers, duration=-1):
         if mode.lower() == "permanent":
             self.__activate()
