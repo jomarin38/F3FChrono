@@ -18,6 +18,9 @@ class ResultPage:
     def add_table(self, table):
         self._tables.append(table)
 
+    def add_text(self, text):
+        self._tables.append(text)
+
     def to_html(self):
         res = "<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">" + \
               "<style>" + ResultPage.get_css_string() + "</style></head><body>"

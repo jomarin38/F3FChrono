@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from F3FChrono.data.dao.EventDAO import EventDAO
 from F3FChrono.data.dao.RoundDAO import RoundDAO
+from F3FChrono.data.web.HTMLText import HTMLText
 from F3FChrono.data.web.ResultPage import ResultPage
 from F3FChrono.data.web.ResultTable import ResultTable
 from F3FChrono.data.web.Header import Header
@@ -84,6 +85,11 @@ def event_view_html(event_id):
 
     if len(event.valid_rounds) > 0:
         event.compute_ranking()
+
+        warning = HTMLText('WARNING : These results are not official. '
+                           'They are based on raw data and does not have been validated')
+
+        page.add_text(warning)
 
         #Evolutive ranking table
         table = ResultTable(title='Evolutive ranking', css_id="ranking")
