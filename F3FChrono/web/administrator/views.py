@@ -317,7 +317,7 @@ def manage_event(request):
 
     for f3f_round in event.rounds:
         row = Line(name=Link(str(f3f_round.display_name()), 'manage_round?event_id=' +
-                             str(event.id)+'&round_number='+str(f3f_round.round_number)))
+                             str(event.id)+'&round_number='+str(f3f_round.round_number), new_tab=True))
         row.add_cell(Link('Export to csv', 'download_csv?event_id=' + str(event.id) +
                           '&round_number='+str(f3f_round.round_number)))
         row.add_cell(Link('Export to F3XVault', 'login_to_export_round_f3x_vault?event_id=' + str(event.id) +
