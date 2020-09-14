@@ -53,7 +53,7 @@ class gpioPort(QTimer):
             self.activate = GPIO.LOW
             self.deactivate = GPIO.HIGH
         if start_blinks > 0:
-            self.blink("blink", start_blinks)
+            self.slot_blink("blink", start_blinks)
 
         self.__deactivate()
 
