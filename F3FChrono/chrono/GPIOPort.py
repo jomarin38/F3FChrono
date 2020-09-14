@@ -80,10 +80,10 @@ class gpioPort(QTimer):
             if self.nbevent > 0 or self.nbevent == -1:
                 if self.state:
                     self.__deactivate()
+                    if self.nbevent > 0:
+                        self.nbevent = self.nbevent - 1
                 else:
                     self.__activate()
-                if self.nbevent > 0:
-                    self.nbevent = self.nbevent - 1
                 if self.nbevent == 0:
                     self.stop()
 
