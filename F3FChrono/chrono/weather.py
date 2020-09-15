@@ -26,6 +26,9 @@ class Weather(QTimer):
         self.rules['alarm'] = False
         self.rules['ok_dc'] = False
         self.rules['beep_state'] = ""
+        self.rules['speed_limit_min'] = -1.0
+        self.rules['speed_limit_max'] = -1.0
+        self.rules['dir_limit'] = -1.0
         self.__rules_enable = False
         self.timeout.connect(self.refresh_gui)
         self.start(1000)
@@ -146,8 +149,5 @@ class Weather(QTimer):
         self.wind['orientation'] = -1.0
         self.wind['orientation_sum'] = -1.0
         self.wind['orientation_nb'] = -1.0
-        self.rules['speed_limit_min'] = -1.0
-        self.rules['speed_limit_max'] = -1.0
-        self.rules['dir_limit'] = -1.0
         self.rain = False
 
