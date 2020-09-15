@@ -479,6 +479,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def slot_weather_alarm(self):
         self.chronoHard.weather.enable_rules(self.controllers['round'].isalarm_enable())
+        print("alarm enable : ", self.controllers['round'].isalarm_enable())
 
     def slot_switch_mode(self):
         if self.controllers['config'].is_show():

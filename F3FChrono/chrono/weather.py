@@ -82,6 +82,9 @@ class Weather(QTimer):
         self.rules['alarm'] = False
         self.rules['ok_dc'] = False
         self.rules['beep_state'] = ""
+        if not self.__rules_enable:
+            self.beep_signal.emit("stop", -1, 1000)
+            self.rules['beep_state'] = "stop"
         
     def refresh_gui(self):
         self.gui_weather_signal.emit(self.wind['speed'], self.wind['unit'], self.wind['orientation'],
