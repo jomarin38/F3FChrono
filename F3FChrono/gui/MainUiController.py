@@ -261,6 +261,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.run_finished.disconnect(self.slot_run_finished)
             self.chronoHard.run_validated.disconnect(self.slot_run_validated)
             self.chronoHard.altitude_finished.disconnect(self.slot_altitude_finished)
+            self.controllers['round'].get_alarm_sig().disconnect(self.slot_weather_alarm)
             if self.rpigpio.buzzer_next is not None:
                 self.chronoHard.weather.beep_signal.emit("stop",0,1000)
                 self.chronoHard.weather.beep_signal.disconnect(self.rpigpio.buzzer_next.slot_blink)
@@ -277,6 +278,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.run_finished.connect(self.slot_run_finished)
             self.chronoHard.run_validated.connect(self.slot_run_validated)
             self.chronoHard.altitude_finished.connect(self.slot_altitude_finished)
+            self.controllers['round'].get_alarm_sig().connect(self.slot_weather_alarm)
             if self.rpigpio.buzzer_next is not None:
                 self.chronoHard.weather.beep_signal.connect(self.rpigpio.buzzer_next.slot_blink)
             self.signal_race = True
@@ -375,7 +377,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['round'].wChronoCtrl.reset_ui()
             self.chronoHard.weather.set_rules_limit(self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,
                                               self.event.max_wind_dir_dev)
-            self.chronoHard.weather.enable_rules(enable=True)
+            self.chronoHard.weather.enable_rules(self.controllers['round'].isalarm_enable())
             self.set_signal_mode(training=False)
             self.show_chrono()
         else:
@@ -474,6 +476,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['config'].contest_valuechanged_sig.disconnect()
             self.controllers['config'].set_data(self.event)
             self.controllers['config'].contest_valuechanged_sig.connect(self.context_valuechanged)
+
+    def slot_weather_alarm(self):
+        self.chronoHard.weather.enable_rules(self.controllers['round'].isalarm_enable())
 
     def slot_switch_mode(self):
         if self.controllers['config'].is_show():
@@ -585,7 +590,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         event.accept()
 
     def shutdown_app(self):
-        self.rpigpio.buzzer_next.slot_blink("stop",0)
+        if self.rpigpio.buzzer_next is not None:
+            self.rpigpio.buzzer_next.slot_blink("stop",0)
         self.chronoHard.stop()
         if self.webserver_process is not None:
             print('Kill process ' + str(self.webserver_process.pid))
