@@ -233,7 +233,7 @@ class WPilotCtrl(QObject):
         self.view.Btn_Alarm.clicked.connect(self.btn_alarm)
         self.str_alarm_enable = self._translate("Enable Alarm", "Enable Alarm")
         self.str_alarm_disable = self._translate("Disable Alarm", "Disable Alarm")
-        self.view.Btn_Alarm.setText(self.str_alarm_enable)
+        self.view.Btn_Alarm.setText(self.str_alarm_disable)
         self.alarm_enable = True
 
     def get_widget(self):
@@ -251,9 +251,9 @@ class WPilotCtrl(QObject):
     def btn_alarm(self):
         self.alarm_enable = not self.alarm_enable
         if self.alarm_enable:
-            self.view.Btn_Alarm.setText(self.str_alarm_enable)
-        else:
             self.view.Btn_Alarm.setText(self.str_alarm_disable)
+        else:
+            self.view.Btn_Alarm.setText(self.str_alarm_enable)
         self.btn_alarm_sig.emit()
 
     def isalarm_enable(self):
