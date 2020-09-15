@@ -90,12 +90,12 @@ class gpioPort(QTimer):
     def __activate(self):
         GPIO.output(self.port, self.activate)
         self.state = True
-        print("gpio__activate")
+        #print("gpio__activate")
         
     def __deactivate(self):
         GPIO.output(self.port, self.deactivate)
         self.state = False
-        print("gpio__deactivate")
+        #print("gpio__deactivate")
 
 
 def event_detected(port):
