@@ -96,7 +96,7 @@ class Weather(QTimer):
         self.wind['speed_nb'] += 1
         self.wind['speed_sum'] += speed
 
-        if speed < self.wind['speed_min']:
+        if speed < self.wind['speed_min'] or self.wind['speed_min']==-1:
             self.wind['speed_min'] = speed
         if speed > self.wind['speed_max']:
             self.wind['speed_max'] = speed
@@ -137,15 +137,15 @@ class Weather(QTimer):
         self.rules['dir_limit'] = dir
 
     def reset_wind(self):
-        self.wind['speed'] = 0.0
+        self.wind['speed'] = -1.0
         self.wind['unit'] = "m/s"
         self.wind['speed_sum'] = 0.0
-        self.wind['speed_nb'] = 0.0
-        self.wind['speed_min'] = 0.0
-        self.wind['speed_max'] = 0.0
-        self.wind['orientation'] = 0.0
-        self.wind['orientation_sum'] = 0.0
-        self.wind['orientation_nb'] = 0.0
+        self.wind['speed_nb'] = -1.0
+        self.wind['speed_min'] = -1.0
+        self.wind['speed_max'] = -1.0
+        self.wind['orientation'] = -1.0
+        self.wind['orientation_sum'] = -1.0
+        self.wind['orientation_nb'] = -1.0
         self.rules['speed_limit_min'] = -1.0
         self.rules['speed_limit_max'] = -1.0
         self.rules['dir_limit'] = -1.0
