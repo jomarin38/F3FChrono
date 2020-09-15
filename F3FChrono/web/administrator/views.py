@@ -22,6 +22,8 @@ from F3FChrono.data.Event import Event
 from F3FChrono.data.Pilot import Pilot
 from F3FChrono.data.Round import Round
 
+import csv
+
 
 def sign_in(request):
     if not request.user.is_authenticated:
@@ -315,7 +317,9 @@ def manage_event(request):
 
     for f3f_round in event.rounds:
         row = Line(name=Link(str(f3f_round.display_name()), 'manage_round?event_id=' +
-                             str(event.id)+'&round_number='+str(f3f_round.round_number)))
+                             str(event.id)+'&round_number='+str(f3f_round.round_number), new_tab=True))
+        row.add_cell(Link('Export to csv', 'download_csv?event_id=' + str(event.id) +
+                          '&round_number='+str(f3f_round.round_number)))
         row.add_cell(Link('Export to F3XVault', 'login_to_export_round_f3x_vault?event_id=' + str(event.id) +
                           '&round_number='+str(f3f_round.round_number)))
         if f3f_round.valid:
@@ -546,6 +550,38 @@ def give_penalty(request):
     RoundDAO().update(f3f_round)
 
     return HttpResponseRedirect('manage_round?event_id='+event_id+'&round_number='+round_number)
+
+
+def download_csv(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    round_number = request.GET.get('round_number')
+
+
+    #We must fetch full event to get correct valid round number
+    event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
+    requested_f3f_round = None
+    for f3f_round in event.rounds:
+        if f3f_round.round_number == int(round_number):
+            requested_f3f_round = f3f_round
+
+    if requested_f3f_round is not None:
+        # Create the HttpResponse object with the appropriate CSV header.
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="round'+\
+                                          str(requested_f3f_round.valid_round_number)+'.csv"'
+
+        csv_writer = csv.writer(response)
+
+        requested_f3f_round.export_to_csv(csv_writer)
+
+        return response
+    else:
+        return HttpResponse('Round not found')
 
 
 def set_competitor_presence(request):

@@ -6,6 +6,7 @@ typedef struct{
 
 volatile serialStr serial;
 
+
 void serial_setup(void){
   memset (&serial,0, sizeof(serial));
   Serial.begin(57600);
@@ -33,12 +34,8 @@ void serial_run(void) {
   if (temp != 0){
     memcpy(&chrono_old, &chrono, sizeof(chrono));
     printchrono();
-    if (chrono.climbout_time!=chrono.oldclimbout_time){
-      printclimbout_time();      
-      chrono.oldclimbout_time=chrono.climbout_time;
-    }
-
   }
+  
   //Process serial request
   if (serial.data_available) {
     char tmp = serial.data_read[0];
@@ -54,7 +51,7 @@ void serial_run(void) {
     }else if (tmp=='s'){  //Start chrono
       chronostatus.runStatus=byte(serial.data_read[1]-'0');
       if (chronostatus.runStatus==Launched) {
-        chronostart();
+        chronostart(startLaunched);
         buzzerSet(1);
       }
       printstatus();

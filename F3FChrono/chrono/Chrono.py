@@ -38,11 +38,12 @@ class ChronoHard(QObject):
     run_training = pyqtSignal(int, float)
     buzzer_validated = pyqtSignal()
     chrono_signal = pyqtSignal(str, str, str)
-    wind_signal = pyqtSignal(int, int)
+    windspeed_signal = pyqtSignal(float, str)
+    winddir_signal = pyqtSignal(float)
     rain_signal = pyqtSignal(bool)
     accu_signal = pyqtSignal(float)
     rssi_signal = pyqtSignal(int, int)
-    altitude_finished = pyqtSignal()
+    altitude_finished = pyqtSignal(float)
     
     def __init__(self, signal_btnnext):
         super().__init__()
@@ -51,17 +52,19 @@ class ChronoHard(QObject):
         self.endTime = None
         self.climbout_time = 0
         self.signal_btnnext = signal_btnnext
-        self.wind_signal.connect(self.wind_info)
+        self.windspeed_signal.connect(self.slot_wind_speed)
+        self.winddir_signal.connect(self.slot_wind_dir)
         self.rain_signal.connect(self.rain_info)
         self.wind= collections.OrderedDict()
         self.reset_wind()
         self.chronoLap = []
         self.timelost = []
-        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.wind_signal,
-                                     self.rain_signal, self.accu_signal, self.rssi_signal)
+        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.windspeed_signal,
+                                     self.winddir_signal, self.rain_signal, self.accu_signal, self.rssi_signal)
         self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
         self.valid = True
-
+        self.refly = False
+        self.__debug = False
 
     def addPenalty(self, value):
         self.penalty += value
@@ -74,15 +77,17 @@ class ChronoHard(QObject):
     def getPenalty(self):
         return (self.penalty)
 
-    def wind_info(self, speed, orientation):
+    def slot_wind_speed(self, speed, unit):
         self.wind['speed_nb']+=1
         self.wind['speed_sum']+=speed
+        self.wind['unit'] = unit
 
         if speed<self.wind['speed_min']:
             self.wind['speed_min']=speed
         if speed>self.wind['speed_max']:
             self.wind['speed_max'] = speed
 
+    def slot_wind_dir(self, orientation):
         self.wind['orientation_sum']+=orientation
         self.wind['orientation_nb']+=1
 
@@ -111,12 +116,12 @@ class ChronoHard(QObject):
         return self.wind['rain']
 
     def reset_wind(self):
-        self.wind['speed_sum'] = 0
-        self.wind['speed_nb'] = 0
-        self.wind['speed_min']=0
-        self.wind['speed_max']=0
-        self.wind['orientation_sum']=0
-        self.wind['orientation_nb']=0
+        self.wind['speed_sum'] = 0.0
+        self.wind['speed_nb'] = 0.0
+        self.wind['speed_min'] = 0.0
+        self.wind['speed_max'] = 0.0
+        self.wind['orientation_sum'] = 0.0
+        self.wind['orientation_nb'] = 0.0
 
         self.wind['rain']=False
 
@@ -131,6 +136,7 @@ class ChronoHard(QObject):
         self.penalty = 0.0
         self.reset_wind()
         self.valid = True
+        self.refly = False
 
     def getLastLapTime(self):
         if self.getLapCount()>0:
@@ -173,6 +179,11 @@ class ChronoHard(QObject):
                 "rain : " + str(self.getRain()) + os.linesep
         return (result)
 
+    def setrefly(self):
+        self.refly=True
+
+    def isRefly(self):
+        return(self.refly)
 
 
 class ChronoArduino(ChronoHard, QTimer):
@@ -182,7 +193,7 @@ class ChronoArduino(ChronoHard, QTimer):
 
     def __init__(self, signal_btnnext):
         super().__init__(signal_btnnext)
-        print("chronoArduino init")
+        self.__debug = False
         self.status = chronoStatus.InWait
         self.chrono_signal.connect(self.handle_chrono_event)
         self.lap_finished.connect(self.handle_lap_finished)
@@ -224,7 +235,8 @@ class ChronoArduino(ChronoHard, QTimer):
             self.run_validated.emit()
         elif caller.lower() == "btnnext":
             if not self.competition_mode:
-                print("demande event btn Next")
+                if self.__debug:
+                    print("demande event btn Next")
                 self.arduino.event_Base('n')
 
         if caller.lower()=="udpreceive" and data == "event" and address == "baseA":
@@ -238,7 +250,8 @@ class ChronoArduino(ChronoHard, QTimer):
                 ChronoArduino._last_event_time = time.time()
 
         if caller.lower()=="udpreceive" and data == "event" and address == "baseB":
-            print("demande event base B")
+            if self.__debug:
+                print("demande event base B")
             self.arduino.event_Base('b')
         ChronoArduino._lock.release()
 
@@ -248,7 +261,8 @@ class ChronoArduino(ChronoHard, QTimer):
 
     def handle_climbout_time(self, time):
         self.climbout_time=time
-        print("climbout Time : ", time)
+        if self.__debug:
+            print("climbout Time : ", time)
 
     def handle_lap_finished(self, lap, time):
         self.chronoLap.append(time)
@@ -262,6 +276,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.reset_wind()
         self.clearPenalty()
         self.valid = True
+        self.refly = False
 
     def set_buzzer_time(self, time):
         self.arduino.set_buzzerTime(time)

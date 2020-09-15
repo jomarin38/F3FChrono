@@ -41,6 +41,7 @@ class rs232_arduino (QObject):
         self.kill_aduino()
         self.training = False
         self.__debug = False
+        self.finaltime = 0.0
 
     @staticmethod
     def get_serial_port():
@@ -54,6 +55,7 @@ class rs232_arduino (QObject):
         self.set_buzzerTime(self.buzzerTime)
         #self.debug()
         self.set_mode(training=False)
+        self.finaltime = 0.0
 
     def receive(self):
         while not self.terminated:
@@ -67,13 +69,20 @@ class rs232_arduino (QObject):
                         self.status_changed_sig.emit(self.status)
                         if self.status == Chrono.chronoStatus.InWait:
                             self.inRun = False
+                        if self.status == Chrono.chronoStatus.Late or self.status == Chrono.chronoStatus.InStartLate:
+                            if not self.inRun:
+                                self.finaltime = 0.0
+                                self.run_started_sig.emit()
+                                self.set_inRun()
+
                         if self.status == Chrono.chronoStatus.InProgressB or self.status == Chrono.chronoStatus.InProgressA:
                             if not self.inRun:
+                                self.finaltime = 0.0
                                 self.run_started_sig.emit()
                                 self.set_inRun()
 
                         if self.status == Chrono.chronoStatus.Finished:
-                            self.wait_alt_sig.emit()
+                            self.wait_alt_sig.emit(self.finaltime)
                     if data[0] == "lap":
                         if self.training:
                             if int(data[1]) >= 10:
@@ -90,7 +99,8 @@ class rs232_arduino (QObject):
                                 tmp = 0.
                                 for i in range(2, int(data[1])+2):
                                     tmp += int(data[i])/1000
-                                self.run_finished_sig.emit(tmp)
+                                self.finaltime = tmp
+                                self.run_finished_sig.emit(self.finaltime)
                     if data[0] == "climbout_time":
                         self.climbout_time_sig.emit(int(data[1])/1000)
                     if data[0] == "voltage":
@@ -98,10 +108,12 @@ class rs232_arduino (QObject):
                     if data[0] == "resetµc":
                         self.reset_arduino_sig.emit()
             except serial.SerialException as e:
-                print("serial exception")
+                if self.__debug:
+                    print("serial exception")
                 return None
             except TypeError as e:
-                print("bus close : ", e)
+                if self.__debug:
+                    print("bus close : ", e)
                 self.bus.close()
                 self.bus = None
                 return None
@@ -116,6 +128,7 @@ class rs232_arduino (QObject):
 
     def set_inRun(self):
         self.inRun = True
+        #self.event_Base('a')
 
     def debug(self):
         self.check_request_time()
@@ -139,6 +152,8 @@ class rs232_arduino (QObject):
         return 0
 
     def event_Base(self, base='a'):
+        if self.__debug:
+            print("force base : ", base)
         self.check_request_time()
         self.bus.write(("e"+base+"\n").encode())
         return 0

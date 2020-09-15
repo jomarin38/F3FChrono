@@ -1,4 +1,4 @@
-enum chronoStatus {
+enum chronoStatusEnum {
   InWait = 0,
   WaitLaunch,
   Launched,
@@ -11,16 +11,23 @@ enum chronoStatus {
   Finished
 };
 
-enum chronoMode{
+enum chronoModeEnum{
   Race = 0,
   Training
 };
 
+enum chronoStartEnum{
+  startLaunched = 0,
+  startRace
+};
+
 typedef struct {
   byte lapCount;
-  byte started;
+  byte racetime_started;
+  byte launchtime_started;
   unsigned long lap[10];
   unsigned long oldtime;
+  unsigned long startlaunchtime;
   unsigned long starttime;
   unsigned long startaltitudetime;
   unsigned long climbout_time, oldclimbout_time;
@@ -32,7 +39,7 @@ typedef struct {
 
 volatile chronoStr chrono = {0}, chrono_old = {0};
 volatile chronoStatusStr chronostatus, chronostatus_old;
-volatile chronoMode chrono_mode = Race;
+volatile chronoModeEnum chrono_mode = Race;
 
 extern void buzzerSet(byte nb);
 
@@ -46,7 +53,20 @@ void chrono_setup(void){
 }
 
 void chrono_run(void){
-  if (chronostatus.runStatus == WaitAltitude) {
+  unsigned long time1=0;
+  time1 = millis();
+  if (chronostatus.runStatus==Launched or chronostatus.runStatus==InStart){
+    if (time1-chrono.startlaunchtime>30000){
+        if (chronostatus.runStatus==Launched){
+          chronostatus.runStatus=Late;
+          buzzerSet(1);
+        }else if (chronostatus.runStatus==InStart){
+          chronostatus.runStatus=InStart_Late;
+          buzzerSet(1);
+        }
+        chronostart(startRace);
+    }
+  }else if (chronostatus.runStatus == WaitAltitude){
     baseCheck(0);
   } 
 }
@@ -99,16 +119,18 @@ void baseCheckRace(byte base){
     chronostatus.runStatus = InStart_Late;
     buzzerSet(1);
   }else if (chronostatus.runStatus==InStart and (BASEAPIN == base or base == BTNNEXTPIN)) {
+    chronostart(startRace);
     buzzerSet(1);
     time1=millis();
-    chrono.climbout_time = time1 - chrono.oldtime;
+    chrono.climbout_time = time1 - chrono.startlaunchtime;
+    printclimbout_time();      
     chrono.oldtime=time1;
     chronostatus.runStatus = InProgressB;
   }else if (chronostatus.runStatus==InStart_Late and (BASEAPIN == base or base == BTNNEXTPIN)){
     chronostatus.runStatus = InProgressB;
     time1=millis();
-    chrono.climbout_time = time1 - chrono.oldtime;
-    chrono.oldtime=time1;
+    chrono.climbout_time = time1 - chrono.startlaunchtime;
+    printclimbout_time();      
     buzzerSet(1);
   }else if (chronostatus.runStatus==InProgressA and (base == BASEAPIN or base == BTNNEXTPIN)) {
     time1 = millis();
@@ -120,7 +142,7 @@ void baseCheckRace(byte base){
     if (chrono.lapCount >= 10) {
       chronostatus.runStatus = WaitAltitude;
       chrono.startaltitudetime = millis();
-      buzzerSet(3);
+      buzzerSet(2);
     } else {
       chronostatus.runStatus = InProgressB;
     }
@@ -150,14 +172,19 @@ void baseCheckRace(byte base){
   }
 }
 
-void chronostart(void){
-  if (chrono.started==false){
+void chronostart(byte mode){
+  if (mode==startLaunched and chrono.launchtime_started==false){
+    chrono.startlaunchtime=millis();
+    chrono.launchtime_started=true;
+    Serial.println("chrono launched started,");
+    chrono.lapCount=0;    
+  }else if (mode==startRace and chrono.racetime_started==false){
     chrono.starttime=millis();
-    chrono.started=true;
+    chrono.racetime_started=true;
     chrono.oldtime=chrono.starttime;
-    Serial.println("chrono started,");
+    Serial.println("chrono race started,");
+    chrono.lapCount=0;
   }
-  chrono.lapCount=0;
 }
 
 void printstatus(void){

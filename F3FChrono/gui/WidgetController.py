@@ -17,6 +17,8 @@ from F3FChrono.gui.WSettings_ui import Ui_WSettings
 from F3FChrono.gui.WSettingsAdvanced_ui import Ui_WSettingsAdvanced
 from F3FChrono.gui.WSettingsBase_ui import Ui_WSettingsBase
 from F3FChrono.gui.WSettingsBase_item_ui import Ui_WSettingBase_item
+from F3FChrono.gui.WSettingswBtn_ui import Ui_WSettingswBtn
+from F3FChrono.gui.WSettingswBtn_item_ui import Ui_WSettingwBtn_item
 from F3FChrono.gui.WSettingsSound_ui import Ui_WSettingsSound
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.web.Utils import Utils
@@ -26,7 +28,6 @@ class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
     cancel_round_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()
-    btn_refly_sig = pyqtSignal()
     btn_gscoring_sig = pyqtSignal()
     widgetList = []
 
@@ -51,7 +52,6 @@ class WRoundCtrl(QObject):
         # Event connect
         self.wBtnCtrl.Btn_Home.clicked.connect(self.btn_home_sig.emit)
         self.wBtnCtrl.Btn_Next.clicked.connect(self.btn_next_sig.emit)
-        self.wBtnCtrl.Btn_reflight.clicked.connect(self.btn_refly_sig.emit)
         self.wBtnCtrl.Btn_gscoring.clicked.connect(self.btn_gscoring_sig.emit)
         self.wBtnCancel.Btn_Next.clicked.connect(self.cancel_next)
         self.wBtnCancel.Btn_Home.clicked.connect(self.cancel_home)
@@ -146,9 +146,10 @@ class WWindCtrl():
         self.view.btn_clear.clicked.connect(self.clear_alarm)
         self.widgetList.append(self.widget)
         self.rules = collections.OrderedDict()
-        self.rules['dir'] = 0
-        self.rules['speed'] = 0
-        self.rules['rain'] = 0
+        self.rules['dir'] = 0.0
+        self.rules['speed'] = 0.0
+        self.rules['unit'] = ""
+        self.rules['rain'] = 0.0
         self.rules['starttime'] = datetime.now()
         self.rules['time(s)'] = time.time()
         self.rules['detected'] = False
@@ -172,9 +173,13 @@ class WWindCtrl():
     def hide(self):
         self.widget.hide()
 
-    def set_wind(self, speed, angle):
-        self.rules['dir'] = angle
+    def set_wind_speed(self, speed, unit):
         self.rules['speed'] = speed
+        self.rules['unit'] = unit
+        self.__set_data()
+
+    def set_wind_dir(self, angle):
+        self.rules['dir'] = angle
         self.__set_data()
 
     def set_rain(self, rain):
@@ -186,9 +191,9 @@ class WWindCtrl():
             strrain = self._translate("Rain", "Rain")
         else:
             strrain = self._translate("No Rain", "No Rain")
-        self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + str(self.rules['speed']) +
-                                   self._translate("m/s, Angle : ", "m/s, Angle : ") + str(self.rules['dir'])
-                                   + '°' + ', ' + strrain)
+        self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + '{:.1f}'.format(self.rules['speed']) +
+                                   self.rules['unit'] + self._translate(", Angle : ", ", Angle : ") +
+                                   str(self.rules['dir']) + '°' + ', ' + strrain)
 
 
     def check_rules(self, limit_angle, speed_min, speed_max, time_limit):
@@ -290,6 +295,7 @@ class WChronoCtrl(QTimer):
     btn_penalty_1000_sig = pyqtSignal()
     btn_clear_penalty_sig = pyqtSignal()
     time_elapsed_sig = pyqtSignal()
+    btn_refly_sig = pyqtSignal()
 
     def __init__(self, name, parent, vocal_elapsedTime_sig):
         super().__init__()
@@ -317,29 +323,23 @@ class WChronoCtrl(QTimer):
         self.lap = []
         # initialize labels for status
         self.current_lap = 0
+        self.current_status = 0
         self.view.setupUi(self.widget)
-        self.lap.append(self.view.Lap1)
-        self.lap.append(self.view.Lap2)
-        self.lap.append(self.view.Lap3)
-        self.lap.append(self.view.Lap4)
-        self.lap.append(self.view.Lap5)
-        self.lap.append(self.view.Lap6)
-        self.lap.append(self.view.Lap7)
-        self.lap.append(self.view.Lap8)
-        self.lap.append(self.view.Lap9)
-        self.lap.append(self.view.Lap10)
 
         self.view.nullFlight.clicked.connect(self.null_flight)
+
         self.view.btn_penalty_100.clicked.connect(self.penalty_100)
         self.view.btn_penalty_1000.clicked.connect(self.penalty_1000)
         self.view.btn_clear_penalty.clicked.connect(self.clear_penalty)
+        self.view.Btn_reflight.clicked.connect(self.btn_refly_sig.emit)
 
         self.timerEvent = QTimer()
         self.timerEvent.timeout.connect(self.run)
-        self.duration = 10
+        self.duration = 100
         self.startTime = time.time()
         self.time = 0
         self.time_up = True
+        self.to_launch = False
 
     def get_widget(self):
         return (self.widget)
@@ -355,60 +355,76 @@ class WChronoCtrl(QTimer):
 
     def set_status(self, status):
         if status < len(self.statusText):
+            self.current_status = status
             self.view.Status.setText(self.statusText[status])
 
     def set_laptime(self, laptime):
-        # self.view.Time_label.setText("{:0>6.3f}".format(time)
-        print("current lap : " + str(self.current_lap))
-        if self.current_lap < len(self.lap):
-            self.lap[self.current_lap].setText("{:d} : {:0>6.1f}".format(self.current_lap + 1, laptime))
-            self.current_lap += 1
+        self.current_lap += 1
+        if self.current_lap<10:
+            self.view.Status.setText(self.statusText[self.current_status]+"  {:d}".format(self.current_lap))
 
     def set_finaltime(self, data_time):
         print("Widget chrono set final time : ", time.time())
-        self.view.Time_label.setText("{:0>6.2f}".format(data_time))
+        self.view.Time_label.setText("{:>6.2f}".format(data_time))
 
     def reset_ui(self):
-        # self.view.Time_label.setText("{:0>6.3f}".format(0.0))
-        for lap in self.lap:
-            lap.setText("")
-        # for ctrl in self.lap_list:
-        #    ctrl.setText("")
+        self.stoptime()
         self.current_lap = 0
         self.set_penalty_value(0)
         self.set_null_flight(False)
 
-    def settime(self, settime, count_up, starttimer=True):
+    def settime(self, settime, count_up, starttimer=True, to_launch=False):
+        self.to_launch = to_launch
         self.time = settime
-        self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000))
+        self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000))
         self.time_up = count_up
         self.startTime = time.time()
         if starttimer:
             self.timerEvent.start(self.duration)
-            self.vocal_elapsedTime_sig.emit('end')
 
     def stoptime(self):
         self.timerEvent.stop()
 
     def run(self):
         if self.time_up:
-            self.view.Time_label.setText("{:0>6.2f}".format(time.time() - self.startTime))
+            self.view.Time_label.setText("{:>6.0f}".format(time.time() - self.startTime))
         else:
-            self.view.Time_label.setText("{:0>6.2f}".format(self.time / 1000 - (time.time() - self.startTime)))
+            self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000 - (time.time() - self.startTime)))
             timeval = self.time / 1000 - (time.time() - self.startTime)
-            if timeval >= 29.8:
-                self.vocal_elapsedTime_sig.emit('30s')
-            if 25.9 <= timeval <= 26.1:
-                self.vocal_elapsedTime_sig.emit('25s')
-            if 20.9 <= timeval <= 21.1:
-                self.vocal_elapsedTime_sig.emit('20s')
-            if 15.9 <= timeval <= 16.1:
-                self.vocal_elapsedTime_sig.emit('15s')
-            if 10.9 <= timeval <= 11.1:
-                self.vocal_elapsedTime_sig.emit('10s')
+            if timeval >= 29.5:
+                self.vocal_elapsedTime_sig.emit(30, self.to_launch)
+            if 25.5 <= timeval <= 26:
+                self.vocal_elapsedTime_sig.emit(25, self.to_launch)
+            if 20.5 <= timeval <= 21:
+                self.vocal_elapsedTime_sig.emit(20, self.to_launch)
+            if 15.5 <= timeval <= 16:
+                self.vocal_elapsedTime_sig.emit(15, self.to_launch)
+            if 10.5 <= timeval <= 11:
+                self.vocal_elapsedTime_sig.emit(10, self.to_launch)
+            '''
+            if 9 <= timeval <= 10:
+                self.vocal_elapsedTime_sig.emit(9, self.to_launch)
+            if 8.9 <= timeval <= 9:
+                self.vocal_elapsedTime_sig.emit(8, self.to_launch)
+            if 7.9 <= timeval <= 8:
+                self.vocal_elapsedTime_sig.emit(7, self.to_launch)
+            if 6.9 <= timeval <= 7:
+                self.vocal_elapsedTime_sig.emit(6, self.to_launch)
+            if 5.9 <= timeval <= 6:
+                self.vocal_elapsedTime_sig.emit(5, self.to_launch)
+            if 4.9 <= timeval <= 5:
+                self.vocal_elapsedTime_sig.emit(4, self.to_launch)
+            if 3.9 <= timeval <= 4:
+                self.vocal_elapsedTime_sig.emit(3, self.to_launch)
+            if 2.9 <= timeval <= 3:
+                self.vocal_elapsedTime_sig.emit(2, self.to_launch)
+            if 1.9 <= timeval <= 2:
+                self.vocal_elapsedTime_sig.emit(1, self.to_launch)
+            '''
             if timeval < 0:
-                self.vocal_elapsedTime_sig.emit('end')
+                self.vocal_elapsedTime_sig.emit(0, self.to_launch)
                 self.time_elapsed_sig.emit()
+                self.stoptime()
 
     def penalty_100(self):
         self.btn_penalty_100_sig.emit()
@@ -428,6 +444,12 @@ class WChronoCtrl(QTimer):
     def set_null_flight(self, value=False):
         if (value):
             self.view.nullFlightLabel.setText(self._translate("Null Flight", "Null Flight"))
+        else:
+            self.view.nullFlightLabel.setText("")
+
+    def set_refly(self, value=False):
+        if (value):
+            self.view.nullFlightLabel.setText(self._translate("Refly", "Refly"))
         else:
             self.view.nullFlightLabel.setText("")
 
@@ -532,6 +554,7 @@ class WChronoTrainingCtrl(QObject):
 class WConfigCtrl(QObject):
     btn_next_sig = pyqtSignal()
     contest_sig = pyqtSignal()
+    contest_valuechanged_sig = pyqtSignal()
     chrono_sig = pyqtSignal()
     btn_settings_sig = pyqtSignal()
     btn_random_sig = pyqtSignal()
@@ -552,6 +575,14 @@ class WConfigCtrl(QObject):
         self.view.StartBtn.clicked.connect(self.btn_next)
         self.view.ContestList.currentIndexChanged.connect(self.contest_sig.emit)
         self.view.btn_settings.clicked.connect(self.btn_settings_sig.emit)
+        self.view.WindMinValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.WindMaxValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.OrientationValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.RevolValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.bib_start.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.MaxInterruptValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.daydurationvalue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+
         self.view.randombtn.clicked.connect(self.btn_random_sig.emit)
         self.view.day_1btn.clicked.connect(self.btn_day_1_sig.emit)
 
@@ -694,6 +725,8 @@ class WSettingsBase(QObject):
         self.udp_sig_connected = False
         self.ipbaseinvert_sig = None
         self.baseInProgress = None
+        self.Detect_label = self._translate("Detect", "Detect")
+        self.inprogress_label = self._translate("In Progress...", "In Progress...")
 
     def get_widget(self):
         return (self.widgetList)
@@ -722,38 +755,35 @@ class WSettingsBase(QObject):
         self.ipbaseinvert_sig = invert
 
     def baseA_detect(self):
+        self.__baseB_release()
         if self.udp_sig is not None and self.ipbaseclear_sig is not None and self.baseInProgress == None:
             self.udp_sig.connect(self.slot_udp)
             self.ipbaseclear_sig.emit()
-            self.view.buttonBaseADetect.setText(self._translate("In Progress...", "In Progress..."))
+            self.view.buttonBaseADetect.setText(self.inprogress_label)
             self.udp_sig_connected = True
             self.baseInProgress = 'A'
-        elif self.baseInProgress == 'A':
-            self.baseInProgress = None
-            self.udp_sig.disconnect(self.slot_udp)
-            self.udp_sig_connected = False
-            self.view.buttonBaseADetect.setText(self._translate("Detect", "Detect"))
+        else:
+            self.__baseA_release()
 
     def baseB_detect(self):
+        self.__baseA_release()
         if self.udp_sig is not None and self.ipbaseclear_sig is not None and self.baseInProgress == None:
             self.udp_sig.connect(self.slot_udp)
             self.ipbaseclear_sig.emit()
-            self.view.buttonBaseBDetect.setText(self._translate("In Progress...", "In Progress..."))
+            self.view.buttonBaseBDetect.setText(self.inprogress_label)
             self.udp_sig_connected = True
             self.baseInProgress = 'B'
-        elif self.baseInProgress == 'B':
-            self.baseInProgress = None
-            self.udp_sig.disconnect(self.slot_udp)
-            self.udp_sig_connected = False
-            self.view.buttonBaseBDetect.setText(self._translate("Detect", "Detect"))
+        else:
+            self.__baseB_release()
 
-
-    def slot_udp(self, caller, data, address):
-        print(caller, data, address)
-        if self.baseInProgress == 'A' and self.__ipNotPresent(self.baseAList, address):
+    def slot_udp(self, address):
+        print(address)
+        if self.baseInProgress == 'A' and self.__ipNotPresent(self.baseAList, address) \
+                and self.__ipNotPresent(self.baseBList, address):
             self.__addbase_List(self.baseAList, self.view.listWidget_baseA, address, self.deleteItemBaseA,
                                 self.moveItemBaseA)
-        elif self.baseInProgress == 'B' and self.__ipNotPresent(self.baseBList, address):
+        elif self.baseInProgress == 'B' and self.__ipNotPresent(self.baseAList, address) \
+                and self.__ipNotPresent(self.baseBList, address):
             self.__addbase_List(self.baseBList, self.view.listWidget_baseB, address, self.deleteItemBaseB,
                                 self.moveItemBaseB)
 
@@ -801,20 +831,38 @@ class WSettingsBase(QObject):
         return self.__getAllIp(self.baseBList)
 
     def btn_cancel(self):
+        self.__baseA_release()
+        self.__baseB_release()
         if self.udp_sig is not None and self.udp_sig_connected:
             self.udp_sig.disconnect(self.slot_udp)
             self.udp_sig_connected = False
-            if self.udp_sig is not None:
+            if self.ipbaseclear_sig is not None:
                 self.ipbaseclear_sig.emit()
                 self.clearA()
                 self.clearB()
 
     def btn_valid(self):
+        self.__baseA_release()
+        self.__baseB_release()
         if self.udp_sig is not None and self.udp_sig_connected:
             self.udp_sig.disconnect(self.slot_udp)
             self.udp_sig_connected = False
         if self.ipset_sig is not None:
             self.ipset_sig.emit(self.get_ipbaseA(), self.get_ipbaseB())
+
+    def __baseA_release(self):
+        if self.baseInProgress == 'A':
+            self.baseInProgress = None
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            self.view.buttonBaseADetect.setText(self.Detect_label)
+
+    def __baseB_release(self):
+        if self.baseInProgress == 'B':
+            self.baseInProgress = None
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            self.view.buttonBaseBDetect.setText(self.Detect_label)
 
     @staticmethod
     def __addbase_List (list, uilist, ip, deleteEvent, moveEvent):
@@ -866,6 +914,186 @@ class WSettingsBase(QObject):
             ip.append(i['ui_widget'].ipAddress.text())
         return ip
 
+class WSettingswBtn(QObject):
+    btn_settings_sig = pyqtSignal()
+    btn_valid_sig = pyqtSignal()
+    btn_cancel_sig = pyqtSignal()
+    widgetList = []
+    wBtnList = []
+    viewwBtnList = []
+    widgetwBtnList = []
+
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WSettingswBtn()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.buttonDetect.clicked.connect(self.wBtn_detect)
+        self.view.buttonClear.clicked.connect(self.clearwBtn)
+        self.view.btn_back.clicked.connect(self.btn_settings_sig.emit)
+        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
+        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self._translate = QtCore.QCoreApplication.translate
+        self.udp_sig = None
+        self.ipset_sig = None
+        self.ipwBtnclear_sig = None
+        self.udp_sig_connected = False
+        self.wBtnInProgress = None
+        self.Detect_label = self._translate("Detect", "Detect")
+        self.inprogress_label = self._translate("In Progress...", "In Progress...")
+
+    def get_widget(self):
+        return (self.widgetList)
+
+    def show(self):
+        self.widget.show()
+
+    def is_show(self):
+        return self.widget.isVisible()
+
+    def hide(self):
+        self.widget.hide()
+
+    def set_data(self):
+        print("Settings wBtn set_data")
+
+    def get_data(self):
+        print("Settings wBtn get_data")
+
+    def set_udp_sig(self, udp, set, clear):
+        self.udp_sig = udp
+        self.ipset_sig = set
+        self.ipwBtnclear_sig = clear
+
+
+    def wBtn_detect(self):
+        if self.udp_sig is not None and self.ipwBtnclear_sig is not None and self.wBtnInProgress == None:
+            self.udp_sig.connect(self.slot_udp)
+            self.ipwBtnclear_sig.emit()
+            self.view.buttonDetect.setText(self.inprogress_label)
+            self.udp_sig_connected = True
+            self.wBtnInProgress = True
+        else:
+            self.__release_detect()
+
+    def slot_udp(self, address):
+        if self.wBtnInProgress and self.__ipNotPresent(self.wBtnList, address):
+            self.__addwBtn_List(self.wBtnList, self.view.listWidget_wBtn, address, self.deleteItemwBtn)
+
+    def clearwBtn(self):
+        self.view.listWidget_wBtn.clear()
+        self.wBtnList.clear()
+        if self.ipwBtnclear_sig is not None:
+            self.ipwBtnclear_sig.emit()
+
+    def deleteItemwBtn(self):
+        self.__deleteWidgetinQlistWidget(self.wBtnList, self.view.listWidget_wBtn, self.sender().parent().pos())
+
+    def get_ipwBtn(self):
+        return self.__getAllIp(self.wBtnList)
+
+
+    def btn_cancel(self):
+        self.__release_detect()
+        self.clearwBtn()
+
+    def btn_valid(self):
+        self.__release_detect()
+        if self.ipset_sig is not None:
+            ip = self.get_ipwBtn()
+            self.ipset_sig.emit(ip[0], ip[1], ip[2], ip[3])
+
+    def __release_detect(self):
+        if self.wBtnInProgress:
+            self.wBtnInProgress = None
+            self.udp_sig.disconnect(self.slot_udp)
+            self.udp_sig_connected = False
+            self.view.buttonDetect.setText(self.Detect_label)
+
+    @staticmethod
+    def __addwBtn_List (list, uilist, ip, deleteEvent):
+        collect = collections.OrderedDict()
+        collect['QlistWidgetItem'] = QtWidgets.QListWidgetItem()
+        collect['QWidget'] = QtWidgets.QWidget()
+        collect['ui_widget'] = Ui_WSettingwBtn_item()
+        list.append(collect)
+        uilist.addItem(list[-1]['QlistWidgetItem'])
+
+        list[-1]['ui_widget'].setupUi(list[-1]['QWidget'])
+        list[-1]['ui_widget'].ipAddress.setText(ip)
+        list[-1]['ui_widget'].buttonDelete.clicked.connect(deleteEvent)
+        uilist.setItemWidget(list[-1]['QlistWidgetItem'], list[-1]['QWidget'])
+
+    @staticmethod
+    def __getWidgetinQlistWidget (list, uilist, pos):
+        item = uilist.itemAt(pos)
+        for index in list:
+            if index['QlistWidgetItem'] == item:
+                return index['ui_widget']
+
+    @staticmethod
+    def __deleteWidgetinQlistWidget (list, uilist, pos):
+        ip = ""
+        item = uilist.itemAt(pos)
+        itemdelete = None
+        for i in range(len(list)):
+            if list[i]['QlistWidgetItem'] == item:
+                itemdelete = i
+        if itemdelete is not None:
+            ip = list[itemdelete]['ui_widget'].ipAddress.text()
+            del(list[itemdelete])
+            uilist.takeItem(itemdelete)
+        return ip
+
+    @staticmethod
+    def __ipNotPresent(list, ip):
+        for i in range(len(list)):
+            if list[i]['ui_widget'].ipAddress.text() == ip:
+                return False
+        return True
+
+    @staticmethod
+    def __getAllIp(list):
+        baseA = [[], [], []]
+        baseB = [[], [], []]
+        btn_next = [[], [], []]
+        switchMode = [[], [], []]
+        for i in list:
+            index = i['ui_widget'].comboBox_LP.currentIndex()
+            if index == 1:
+                baseA[0].append(i['ui_widget'].ipAddress.text())
+            elif index == 2:
+                baseB[0].append(i['ui_widget'].ipAddress.text())
+            elif index == 3:
+                btn_next[0].append(i['ui_widget'].ipAddress.text())
+            elif index == 4:
+                switchMode[0].append(i['ui_widget'].ipAddress.text())
+
+            index = i['ui_widget'].comboBox_SP.currentIndex()
+            if index == 1:
+                baseA[1].append(i['ui_widget'].ipAddress.text())
+            elif index == 2:
+                baseB[1].append(i['ui_widget'].ipAddress.text())
+            elif index == 3:
+                btn_next[1].append(i['ui_widget'].ipAddress.text())
+            elif index == 4:
+                switchMode[1].append(i['ui_widget'].ipAddress.text())
+
+            index = i['ui_widget'].comboBox_CL.currentIndex()
+            if index == 1:
+                baseA[2].append(i['ui_widget'].ipAddress.text())
+            elif index == 2:
+                baseB[2].append(i['ui_widget'].ipAddress.text())
+            elif index == 3:
+                btn_next[2].append(i['ui_widget'].ipAddress.text())
+            elif index == 4:
+                switchMode[2].append(i['ui_widget'].ipAddress.text())
+
+        return baseA, baseB, btn_next, switchMode
+
 class WSettingsSound(QObject):
     btn_settings_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
@@ -899,26 +1127,29 @@ class WSettingsSound(QObject):
 
     def set_data(self):
         self.view.sound.setChecked(ConfigReader.config.conf['sound'])
+        self.view.soundvolume.setValue(ConfigReader.config.conf['soundvolume']*100)
         self.view.voice.setChecked(ConfigReader.config.conf['voice'])
         self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
         self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
         self.view.lowVoltage.setChecked(ConfigReader.config.conf['lowvoltage_sound'])
         self.view.noiseSound.setChecked(ConfigReader.config.conf['noisesound'])
-        self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume'])
+        self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume']*100)
 
 
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
+        ConfigReader.config.conf['soundvolume'] = self.view.soundvolume.value() / 100
         ConfigReader.config.conf['voice'] = self.view.voice.isChecked()
         ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
         ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
         ConfigReader.config.conf['lowvoltage_sound'] = self.view.lowVoltage.isChecked()
         ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
-        ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()
+        ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()/100
 
 class WSettings(QObject):
     btn_settingsadvanced_sig = pyqtSignal()
     btn_settingsbase_sig = pyqtSignal()
+    btn_settingswBtn_sig = pyqtSignal()
     btn_settingssound_sig = pyqtSignal()
     btn_cancel_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
@@ -936,6 +1167,7 @@ class WSettings(QObject):
         self.widgetList.append(self.widget)
         self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
         self.view.btn_base_settings.clicked.connect(self.btn_settingsbase_sig.emit)
+        self.view.wbtn_settings.clicked.connect(self.btn_settingswBtn_sig.emit)
         self.view.btn_sound_settings.clicked.connect(self.btn_settingssound_sig.emit)
 
         self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)

@@ -1,5 +1,6 @@
 const byte VOLTAGEPIN = A1;
 const int VOLTAGE_TIME = 2000;
+const int INITIAL_RAW_VOLTAGE = 900;
 
 typedef struct {
   int readTime;
@@ -17,7 +18,13 @@ void analog_setup(void){
   memset (&accu, 0, sizeof(accu));
   accu.Pin = VOLTAGEPIN;
   accu.readTime = VOLTAGE_TIME;
-  accu.rawData= 900; //Initalize @12V for the first measurements
+  //Initalize @12V for the first measurements
+  accu.rawData = INITIAL_RAW_VOLTAGE;
+  accu.sum = INITIAL_RAW_VOLTAGE*sizeof(accu.data)/sizeof(int);
+  int i;
+  for (i=0; i<sizeof(accu.data)/sizeof(int);i++){
+    accu.data[i]=INITIAL_RAW_VOLTAGE;
+  }
 }
 
 void analogRun(void)

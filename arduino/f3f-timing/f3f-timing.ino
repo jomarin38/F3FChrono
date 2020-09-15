@@ -4,7 +4,7 @@
 */
 #include <Wire.h>
 
-const float VERSION = 0.91;
+const float VERSION = 0.92;
 const byte LOOPDELAY = 5;
 
 const byte BUZZERPIN = 12;
@@ -46,11 +46,11 @@ void serial_run(void);
 void setup() {
   //Initialize chrono var.
   memset (&debug, 0, sizeof(debug));
+  serial_setup();
   chrono_setup();
   output_setup();
   analog_setup();
   base_setup();
-  serial_setup();
 
 }
 
