@@ -99,9 +99,9 @@ class Weather(QTimer):
         self.wind['speed_nb'] += 1
         self.wind['speed_sum'] += speed
 
-        if speed < self.wind['speed_min'] or self.wind['speed_min']==-1:
+        if speed < self.wind['speed_min'] or self.wind['speed_min'] == -1:
             self.wind['speed_min'] = speed
-        if speed > self.wind['speed_max']:
+        if speed > self.wind['speed_max'] or self.wind['speed_max'] == -1:
             self.wind['speed_max'] = speed
         self.__checkrules()
 
