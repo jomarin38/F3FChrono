@@ -87,6 +87,13 @@ class WRoundCtrl(QObject):
     def cancel_home(self):
         self.set_cancelmode(False)
 
+    def isalarm_enable(self):
+        return self.wPilotCtrl.isalarm_enable()
+
+    def get_alarm_sig(self):
+        return self.wPilotCtrl.btn_alarm_sig
+
+
 class WTrainingCtrl(QObject):
     btn_next_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()
@@ -212,6 +219,7 @@ class WWindCtrl():
 
 class WPilotCtrl(QObject):
     btn_cancel_flight_sig = pyqtSignal()
+    btn_alarm_sig = pyqtSignal()
 
     def __init__(self, name, parent):
         super().__init__()
@@ -222,6 +230,9 @@ class WPilotCtrl(QObject):
         self.view.setupUi(self.widget)
         self._translate = QtCore.QCoreApplication.translate
         self.view.Btn_CancelRound.clicked.connect(self.btn_cancel_flight)
+        self.view.Btn_Alarm.clicked.connect(self.btn_alarm)
+        self.alarm_enable = True
+        self.view.Btn_Alarm.setText(self._translate("Enable Alarm", "Enable Alarm"))
 
     def get_widget(self):
         return (self.widget)
@@ -234,6 +245,17 @@ class WPilotCtrl(QObject):
 
     def hide(self):
         self.widget.hide()
+
+    def btn_alarm(self):
+        self.alarm_enable = not self.alarm_enable
+        if self.alarm_enable:
+            self.view.Btn_Alarm.setText(self._translate("Enable Alarm", "Enable Alarm"))
+        else:
+            self.view.Btn_Alarm.setText(self._translate("Disable Alarm", "Disable Alarm"))
+        self.btn_alarm_sig.emit()
+
+    def isalarm_enable(self):
+        return self.alarm_enable
 
     def btn_cancel_flight(self):
         self.btn_cancel_flight_sig.emit()
