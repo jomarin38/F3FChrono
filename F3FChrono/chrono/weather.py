@@ -3,6 +3,7 @@ import collections
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 
 
+
 class Weather(QTimer):
     windspeed_signal = pyqtSignal(float, str)
     winddir_signal = pyqtSignal(float)
@@ -96,19 +97,38 @@ class Weather(QTimer):
     def slot_wind_speed(self, speed, unit):
         self.wind['speed'] = speed
         self.wind['unit'] = unit
-        self.wind['speed_nb'] += 1
-        self.wind['speed_sum'] += speed
+        if self.inRun:
+            self.wind['speed_nb'] += 1
+            self.wind['speed_sum'] += speed
 
-        if speed < self.wind['speed_min'] or self.wind['speed_min'] == -1:
-            self.wind['speed_min'] = speed
-        if speed > self.wind['speed_max'] or self.wind['speed_max'] == -1:
-            self.wind['speed_max'] = speed
+            if speed < self.wind['speed_min'] or self.wind['speed_min'] == -1:
+                self.wind['speed_min'] = speed
+            if speed > self.wind['speed_max'] or self.wind['speed_max'] == -1:
+                self.wind['speed_max'] = speed
+
         self.__checkrules()
 
     def slot_wind_dir(self, orientation):
         self.wind['orientation'] = orientation
-        self.wind['orientation_sum'] += orientation
-        self.wind['orientation_nb'] += 1
+        if self.inRun:
+            self.wind['orientation_sum'] += orientation
+            self.wind['orientation_nb'] += 1
+
+    def setInRun(self, inRun):
+        if inRun:
+            self.inRun = True
+            self.wind['speed_sum'] = 0.0
+            self.wind['speed_nb'] = 0.0
+            self.wind['speed_min'] = -1.0
+            self.wind['speed_max'] = -1.0
+            self.wind['orientation_sum'] = 0.0
+            self.wind['orientation_nb'] = 0.0
+            if self.__debug:
+                print("Wind InRun")
+        else:
+            self.inRun = False
+            if self.__debug:
+                print("Wind not InRun")
 
     def getMaxWindSpeed(self):
         return self.wind['speed_max']
@@ -143,11 +163,12 @@ class Weather(QTimer):
         self.wind['speed'] = -1.0
         self.wind['unit'] = "m/s"
         self.wind['speed_sum'] = 0.0
-        self.wind['speed_nb'] = -1.0
+        self.wind['speed_nb'] = 0.0
         self.wind['speed_min'] = -1.0
         self.wind['speed_max'] = -1.0
         self.wind['orientation'] = -1.0
-        self.wind['orientation_sum'] = -1.0
-        self.wind['orientation_nb'] = -1.0
+        self.wind['orientation_sum'] = 0.0
+        self.wind['orientation_nb'] = 0.0
         self.rain = False
+        self.inRun = False
 

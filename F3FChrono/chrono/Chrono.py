@@ -169,6 +169,10 @@ class ChronoArduino(ChronoHard, QTimer):
 
     def slot_status(self, status):
         self.status = status
+        if status == chronoStatus.Launched:
+            self.weather.setInRun(True)
+        elif status == chronoStatus.WaitAltitude:
+            self.weather.setInRun(False)
 
     def event_voltage(self):
         self.arduino.get_voltage()
