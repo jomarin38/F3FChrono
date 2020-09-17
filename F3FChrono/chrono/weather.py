@@ -20,7 +20,7 @@ class Weather(QTimer):
         self.wind = collections.OrderedDict()
         self.rules = collections.OrderedDict()
         self.reset_wind()
-        self.__debug = False
+        self.__debug = True
         self.rules['starttime'] = time.time()
         self.rules['endtime'] = time.time()
         self.rules['detected'] = False
@@ -54,7 +54,7 @@ class Weather(QTimer):
                         self.rules['alarm'] = True
                         if self.rules['beep_state'] is not "alarm":
                             self.beep_signal.emit("permanent", -1, 1000)
-                            self.rules['beep_state'] = "alarm"
+                            self.rules['beep_state'] = "alarm_wait"
                             if self.__debug:
                                 print("weather alarm")
                     else:
