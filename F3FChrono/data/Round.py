@@ -262,8 +262,9 @@ class Round:
                     for i in range(0, 10):
                         request_url += '&sub' + str(i + 2) + '=' + str(valid_run.chrono.get_lap_time(i))
                     if valid_run is not None:
-                        request_url += '&wind_avg=' + str(valid_run.chrono.mean_wind_speed)
-                        request_url += '&dir_avg=' + str(valid_run.chrono.mean_wind_speed)
+                        if valid_run.chrono is not None:
+                            request_url += '&wind_avg=' + str(valid_run.chrono.mean_wind_speed)
+                            request_url += '&dir_avg=' + str(valid_run.chrono.mean_wind_speed)
                 else:
                     #Competitor did not finish its run (or even did not start it !)
                     request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
@@ -278,8 +279,9 @@ class Round:
                         request_url += '&sub' + str(i + 2) + '=' + str(0.0)
                     request_url += '&dnf=' + str(True)
                     if valid_run is not None:
-                        request_url += '&wind_avg=' + str(valid_run.chrono.mean_wind_speed)
-                        request_url += '&dir_avg=' + str(valid_run.chrono.mean_wind_speed)
+                        if valid_run.chrono is not None:
+                            request_url += '&wind_avg=' + str(valid_run.chrono.mean_wind_speed)
+                            request_url += '&dir_avg=' + str(valid_run.chrono.mean_wind_speed)
                 response = requests.post(request_url)
 
         #Update event score status
