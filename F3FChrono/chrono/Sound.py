@@ -101,8 +101,9 @@ class chronoQSound(QThread):
         self.finaltime_timer.stop()
         if self.play_sound:
             # decompose numeric time to find cent, diz, 1/100
-            cent, diz = divmod(int(self.run_time), 100)
-            x = int(Decimal("{:>6.2f}".format(self.run_time)) % 1 * 100)
+            var_time = Decimal("{:0.2f}".format(self.run_time))
+            cent, diz = divmod(var_time, 100)
+            x = int(var_time % 1 * 100)
 
             # create sequence sound
             if int(cent) > 0:

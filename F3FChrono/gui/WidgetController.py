@@ -344,7 +344,7 @@ class WChronoCtrl(QTimer):
 
     def set_finaltime(self, data_time):
         print("Widget chrono set final time : ", time.time())
-        self.view.Time_label.setText("{:>6.2f}".format(data_time))
+        self.view.Time_label.setText("{:0.2f}".format(data_time))
 
     def reset_ui(self):
         self.stoptime()

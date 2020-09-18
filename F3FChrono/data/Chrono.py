@@ -52,4 +52,4 @@ class Chrono:
         return result
 
     def run_time_as_string(self):
-        return "{:6.2f}".format(self.run_time)
+        return "{:6.3f}".format(self.run_time)
