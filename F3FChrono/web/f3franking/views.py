@@ -155,6 +155,7 @@ def event_view_html(event_id):
         page.add_table(table)
 
     result = page.to_html()
+
     return result
 
 

@@ -87,6 +87,13 @@ class WRoundCtrl(QObject):
     def cancel_home(self):
         self.set_cancelmode(False)
 
+    def isalarm_enable(self):
+        return self.wPilotCtrl.isalarm_enable()
+
+    def get_alarm_sig(self):
+        return self.wPilotCtrl.btn_alarm_sig
+
+
 class WTrainingCtrl(QObject):
     btn_next_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()
@@ -145,15 +152,6 @@ class WWindCtrl():
         self.view.setupUi(self.widget)
         self.view.btn_clear.clicked.connect(self.clear_alarm)
         self.widgetList.append(self.widget)
-        self.rules = collections.OrderedDict()
-        self.rules['dir'] = 0.0
-        self.rules['speed'] = 0.0
-        self.rules['unit'] = ""
-        self.rules['rain'] = 0.0
-        self.rules['starttime'] = datetime.now()
-        self.rules['time(s)'] = time.time()
-        self.rules['detected'] = False
-        self.rules['alarm'] = False
         self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
         self.windstylesheet = "background-color:rgba( 255, 255, 255, 0% );"
         self.lowVoltage_sig = None
@@ -173,56 +171,20 @@ class WWindCtrl():
     def hide(self):
         self.widget.hide()
 
-    def set_wind_speed(self, speed, unit):
-        self.rules['speed'] = speed
-        self.rules['unit'] = unit
-        self.__set_data()
-
-    def set_wind_dir(self, angle):
-        self.rules['dir'] = angle
-        self.__set_data()
-
-    def set_rain(self, rain):
-        self.rules['rain'] = rain
-        self.__set_data()
-
-    def __set_data(self):
-        if self.rules['rain']:
+    def display_wind_info(self, wind_speed, wind_speed_unit,  wind_dir, rain, alarm):
+        if rain:
             strrain = self._translate("Rain", "Rain")
         else:
             strrain = self._translate("No Rain", "No Rain")
-        self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + '{:.1f}'.format(self.rules['speed']) +
-                                   self.rules['unit'] + self._translate(", Angle : ", ", Angle : ") +
-                                   str(self.rules['dir']) + '°' + ', ' + strrain)
+        self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + '{:.1f}'.format(wind_speed) +
+                                   wind_speed_unit + self._translate(", Angle : ", ", Angle : ") +
+                                   str(wind_dir) + '°' + ', ' + strrain)
 
-
-    def check_rules(self, limit_angle, speed_min, speed_max, time_limit):
-        if abs(self.rules['dir']) > limit_angle or self.rules['speed'] < speed_min or self.rules['speed'] > speed_max \
-                or self.rules['rain']:
-            if self.rules['detected'] == False:
-                self.rules['starttime'] = datetime.now()
-                self.rules['time(s)'] = time.time()
-                self.rules['detected'] = True
-            else:
-                if ((time.time() - self.rules['time(s)']) > 20):
-                    self.view.WindInfo.setStyleSheet('background-color:red;')
-                    self.view.Elapsedtime.setVisible(True)
-                    if (time.time() - self.rules['time(s)']) > (time_limit * 60):
-                        self.view.Elapsedtime.setStyleSheet('background-color:red;')
-                        self.view.btn_clear.setVisible(True)
-                        self.rules['alarm'] = True
-
-                    self.view.Elapsedtime.setText(self._translate("time : ", "time : ") + \
-                                                  time.strftime("%H:%M:%S",
-                                                                time.gmtime(time.time() - self.rules['time(s)'])) \
-                                                  + self.cancelroundtostr())
-
+        if alarm:
+            self.view.WindInfo.setStyleSheet('background-color:red;')
         else:
             self.view.WindInfo.setStyleSheet('background-color:rgba( 255, 255, 255, 0% );')
-            self.rules['detected'] = False
-            if not self.rules['alarm']:
-                self.view.Elapsedtime.setStyleSheet('background-color:rgba( 255, 255, 255, 0% );')
-                self.view.Elapsedtime.setVisible(False)
+
 
     def clear_alarm(self):
         self.rules['alarm'] = False
@@ -257,6 +219,7 @@ class WWindCtrl():
 
 class WPilotCtrl(QObject):
     btn_cancel_flight_sig = pyqtSignal()
+    btn_alarm_sig = pyqtSignal()
 
     def __init__(self, name, parent):
         super().__init__()
@@ -267,6 +230,11 @@ class WPilotCtrl(QObject):
         self.view.setupUi(self.widget)
         self._translate = QtCore.QCoreApplication.translate
         self.view.Btn_CancelRound.clicked.connect(self.btn_cancel_flight)
+        self.view.Btn_Alarm.clicked.connect(self.btn_alarm)
+        self.str_alarm_enable = self._translate("Enable Alarm", "Enable Alarm")
+        self.str_alarm_disable = self._translate("Disable Alarm", "Disable Alarm")
+        self.view.Btn_Alarm.setText(self.str_alarm_disable)
+        self.alarm_enable = True
 
     def get_widget(self):
         return (self.widget)
@@ -279,6 +247,17 @@ class WPilotCtrl(QObject):
 
     def hide(self):
         self.widget.hide()
+
+    def btn_alarm(self):
+        self.alarm_enable = not self.alarm_enable
+        if self.alarm_enable:
+            self.view.Btn_Alarm.setText(self.str_alarm_disable)
+        else:
+            self.view.Btn_Alarm.setText(self.str_alarm_enable)
+        self.btn_alarm_sig.emit()
+
+    def isalarm_enable(self):
+        return self.alarm_enable
 
     def btn_cancel_flight(self):
         self.btn_cancel_flight_sig.emit()
@@ -365,7 +344,7 @@ class WChronoCtrl(QTimer):
 
     def set_finaltime(self, data_time):
         print("Widget chrono set final time : ", time.time())
-        self.view.Time_label.setText("{:>6.2f}".format(data_time))
+        self.view.Time_label.setText("{:0.2f}".format(data_time))
 
     def reset_ui(self):
         self.stoptime()
