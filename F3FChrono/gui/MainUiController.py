@@ -294,7 +294,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settingswBtn'].btn_valid()
         ConfigReader.config.write('config.json')
         self.show_config()
-        #self.vocal.settings(ConfigReader.config.conf['sound'], ConfigReader.config.conf['voice'])
+        #self.vocal.settings(ConfigReader.config.conf['sound'])
         self.noise.settings(ConfigReader.config.conf['noisesound'],
                            ConfigReader.config.conf['noisevolume'])
         self.chronoHard.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
@@ -531,7 +531,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         #print ('final time : ' + str(run_time))
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         self.controllers['round'].widgetBtn.update()
-        if ConfigReader.config.conf["voice"]:
+        if ConfigReader.config.conf["sound"]:
             self.vocal.signal_time.emit(run_time)
 
     def slot_altitude_finished(self, run_time):

@@ -558,7 +558,8 @@ class WConfigCtrl(QObject):
         self.view.WindMaxValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
         self.view.OrientationValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
         self.view.RevolValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
-        self.view.bib_start.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.bib_start.valueChanged.connect(self.bib_start_changed)
+        self.view.bib_startslider.valueChanged.connect(self.bib_start_slider_changed)
         self.view.MaxInterruptValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
         self.view.daydurationvalue.valueChanged.connect(self.contest_valuechanged_sig.emit)
 
@@ -580,11 +581,19 @@ class WConfigCtrl(QObject):
     def btn_next(self):
         self.btn_next_sig.emit()
 
+    def bib_start_changed(self):
+        self.view.bib_startslider.setValue(self.view.bib_start.value())
+        self.contest_valuechanged_sig.emit()
+
+    def bib_start_slider_changed(self):
+        self.view.bib_start.setValue(self.view.bib_startslider.value())
+
     def set_data(self, event):
         self.view.WindMinValue.setValue(event.min_allowed_wind_speed)
         self.view.WindMaxValue.setValue(event.max_allowed_wind_speed)
         self.view.OrientationValue.setValue(event.max_wind_dir_dev)
         self.view.RevolValue.setValue(event.flights_before_refly)
+        self.view.bib_startslider.setMaximum(event.get_nb_competitors())
         self.view.bib_start.setValue(event.bib_start)
         self.view.MaxInterruptValue.setValue(event.max_interruption_time / 60)
         self.view.daydurationvalue.setValue(event.dayduration)
@@ -1091,6 +1100,10 @@ class WSettingsSound(QObject):
         self._translate = QtCore.QCoreApplication.translate
         self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
         self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self.view.soundslider.valueChanged.connect(self.soundslider_changed)
+        self.view.soundvolume.valueChanged.connect(self.soundvolume_changed)
+        self.view.noiseslider.valueChanged.connect(self.noiseslider_changed)
+        self.view.noisevolume.valueChanged.connect(self.noisevolume_changed)
 
     def get_widget(self):
         return (self.widgetList)
@@ -1104,10 +1117,21 @@ class WSettingsSound(QObject):
     def hide(self):
         self.widget.hide()
 
+    def soundvolume_changed(self):
+        self.view.soundslider.setValue(self.view.soundvolume.value())
+
+    def soundslider_changed(self):
+        self.view.soundvolume.setValue(self.view.soundslider.value())
+
+    def noisevolume_changed(self):
+        self.view.noiseslider.setValue(self.view.noisevolume.value())
+
+    def noiseslider_changed(self):
+        self.view.noisevolume.setValue(self.view.noiseslider.value())
+
     def set_data(self):
         self.view.sound.setChecked(ConfigReader.config.conf['sound'])
         self.view.soundvolume.setValue(ConfigReader.config.conf['soundvolume']*100)
-        self.view.voice.setChecked(ConfigReader.config.conf['voice'])
         self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
         self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
         self.view.lowVoltage.setChecked(ConfigReader.config.conf['lowvoltage_sound'])
@@ -1118,7 +1142,6 @@ class WSettingsSound(QObject):
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
         ConfigReader.config.conf['soundvolume'] = self.view.soundvolume.value() / 100
-        ConfigReader.config.conf['voice'] = self.view.voice.isChecked()
         ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
         ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
         ConfigReader.config.conf['lowvoltage_sound'] = self.view.lowVoltage.isChecked()
