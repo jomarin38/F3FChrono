@@ -99,8 +99,10 @@ class rs232_arduino (QObject):
                                 tmp = 0.
                                 for i in range(2, int(data[1])+2):
                                     tmp += int(data[i])/1000
-                                self.finaltime = tmp
+                                self.finaltime = int(data[12])/1000
                                 self.run_finished_sig.emit(self.finaltime)
+                                if self.__debug:
+                                    print("finaltime : ", self.finaltime, " finaltime with laps : ", tmp)
                     if data[0] == "climbout_time":
                         self.climbout_time_sig.emit(int(data[1])/1000)
                     if data[0] == "voltage":
