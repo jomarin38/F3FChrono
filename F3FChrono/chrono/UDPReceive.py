@@ -67,7 +67,7 @@ class udpreceive(QThread):
         self.ipbaseB = self.ipbaseA
         self.ipbaseA = tmp
 
-    def set_ipwBtn(self, baseA, baseB, btnNext, switchMode, plan):
+    def set_ipwBtn(self, baseA, baseB, btnNext, switchMode, penalty):
         self.ipwBtn_baseA = baseA
         self.ipwBtn_baseB = baseB
         self.ipwBtn_btnNext = btnNext

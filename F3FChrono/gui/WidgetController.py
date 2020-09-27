@@ -1050,7 +1050,7 @@ class WSettingswBtn(QObject):
         baseB = [[], [], []]
         btn_next = [[], [], []]
         switchMode = [[], [], []]
-        plan = [[], [], []]
+        penalty = [[], [], []]
         for i in list:
             index = i['ui_widget'].comboBox_LP.currentIndex()
             if index == 1:
@@ -1062,7 +1062,7 @@ class WSettingswBtn(QObject):
             elif index == 4:
                 switchMode[0].append(i['ui_widget'].ipAddress.text())
             elif index == 5:
-                plan[0].append(i['ui_widget'].ipAddress.text())
+                penalty[0].append(i['ui_widget'].ipAddress.text())
 
             index = i['ui_widget'].comboBox_SP.currentIndex()
             if index == 1:
@@ -1074,7 +1074,7 @@ class WSettingswBtn(QObject):
             elif index == 4:
                 switchMode[1].append(i['ui_widget'].ipAddress.text())
             elif index == 5:
-                plan[1].append(i['ui_widget'].ipAddress.text())
+                penalty[1].append(i['ui_widget'].ipAddress.text())
 
             index = i['ui_widget'].comboBox_CL.currentIndex()
             if index == 1:
@@ -1086,9 +1086,9 @@ class WSettingswBtn(QObject):
             elif index == 4:
                 switchMode[2].append(i['ui_widget'].ipAddress.text())
             elif index == 5:
-                plan[2].append(i['ui_widget'].ipAddress.text())
+                penalty[2].append(i['ui_widget'].ipAddress.text())
 
-        return baseA, baseB, btn_next, switchMode, plan
+        return baseA, baseB, btn_next, switchMode, penalty
 
 class WSettingsSound(QObject):
     btn_settings_sig = pyqtSignal()

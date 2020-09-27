@@ -116,20 +116,20 @@ class Ui_WSettingwBtn_item(object):
         self.comboBox_LP.setItemText(2, _translate("WSettingwBtn_item", "Base B"))
         self.comboBox_LP.setItemText(3, _translate("WSettingwBtn_item", "Next Btn"))
         self.comboBox_LP.setItemText(4, _translate("WSettingwBtn_item", "Switch Mode"))
-        self.comboBox_LP.setItemText(5, _translate("WSettingwBtn_item", "Plan"))
+        self.comboBox_LP.setItemText(5, _translate("WSettingwBtn_item", "Penalty"))
         self.label_3.setText(_translate("WSettingwBtn_item", "C"))
         self.comboBox_CL.setItemText(0, _translate("WSettingwBtn_item", "None"))
         self.comboBox_CL.setItemText(1, _translate("WSettingwBtn_item", "Base A"))
         self.comboBox_CL.setItemText(2, _translate("WSettingwBtn_item", "Base B"))
         self.comboBox_CL.setItemText(3, _translate("WSettingwBtn_item", "Next Btn"))
         self.comboBox_CL.setItemText(4, _translate("WSettingwBtn_item", "Switch Mode"))
-        self.comboBox_CL.setItemText(5, _translate("WSettingwBtn_item", "Plan"))
+        self.comboBox_CL.setItemText(5, _translate("WSettingwBtn_item", "Penalty"))
         self.comboBox_SP.setItemText(0, _translate("WSettingwBtn_item", "None"))
         self.comboBox_SP.setItemText(1, _translate("WSettingwBtn_item", "Base A"))
         self.comboBox_SP.setItemText(2, _translate("WSettingwBtn_item", "Base B"))
         self.comboBox_SP.setItemText(3, _translate("WSettingwBtn_item", "Next Btn"))
         self.comboBox_SP.setItemText(4, _translate("WSettingwBtn_item", "Switch Mode"))
-        self.comboBox_SP.setItemText(5, _translate("WSettingwBtn_item", "Plan"))
+        self.comboBox_SP.setItemText(5, _translate("WSettingwBtn_item", "Penalty"))
 
 
 if __name__ == "__main__":
