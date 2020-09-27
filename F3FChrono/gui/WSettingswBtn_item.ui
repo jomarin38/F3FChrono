@@ -136,6 +136,11 @@
        <string>Switch Mode</string>
       </property>
      </item>
+     <item>
+      <property name="text">
+       <string>Plan</string>
+      </property>
+     </item>
     </widget>
    </item>
    <item row="0" column="2" rowspan="3">
@@ -185,6 +190,11 @@
        <string>Switch Mode</string>
       </property>
      </item>
+     <item>
+      <property name="text">
+       <string>Plan</string>
+      </property>
+     </item>
     </widget>
    </item>
    <item row="0" column="5" rowspan="3">
@@ -217,6 +227,11 @@
      <item>
       <property name="text">
        <string>Switch Mode</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Plan</string>
       </property>
      </item>
     </widget>

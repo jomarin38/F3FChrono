@@ -824,10 +824,11 @@ class WSettingsBase(QObject):
         if self.udp_sig is not None and self.udp_sig_connected:
             self.udp_sig.disconnect(self.slot_udp)
             self.udp_sig_connected = False
-            if self.ipbaseclear_sig is not None:
-                self.ipbaseclear_sig.emit()
-                self.clearA()
-                self.clearB()
+        '''if self.ipbaseclear_sig is not None:
+            self.ipbaseclear_sig.emit()
+            self.clearA()
+            self.clearB()
+        '''
 
     def btn_valid(self):
         self.__baseA_release()
@@ -986,13 +987,13 @@ class WSettingswBtn(QObject):
 
     def btn_cancel(self):
         self.__release_detect()
-        self.clearwBtn()
+        #self.clearwBtn()
 
     def btn_valid(self):
         self.__release_detect()
         if self.ipset_sig is not None:
             ip = self.get_ipwBtn()
-            self.ipset_sig.emit(ip[0], ip[1], ip[2], ip[3])
+            self.ipset_sig.emit(ip[0], ip[1], ip[2], ip[3], ip[4])
 
     def __release_detect(self):
         if self.wBtnInProgress:
@@ -1049,6 +1050,7 @@ class WSettingswBtn(QObject):
         baseB = [[], [], []]
         btn_next = [[], [], []]
         switchMode = [[], [], []]
+        plan = [[], [], []]
         for i in list:
             index = i['ui_widget'].comboBox_LP.currentIndex()
             if index == 1:
@@ -1059,6 +1061,8 @@ class WSettingswBtn(QObject):
                 btn_next[0].append(i['ui_widget'].ipAddress.text())
             elif index == 4:
                 switchMode[0].append(i['ui_widget'].ipAddress.text())
+            elif index == 5:
+                plan[0].append(i['ui_widget'].ipAddress.text())
 
             index = i['ui_widget'].comboBox_SP.currentIndex()
             if index == 1:
@@ -1069,6 +1073,8 @@ class WSettingswBtn(QObject):
                 btn_next[1].append(i['ui_widget'].ipAddress.text())
             elif index == 4:
                 switchMode[1].append(i['ui_widget'].ipAddress.text())
+            elif index == 5:
+                plan[1].append(i['ui_widget'].ipAddress.text())
 
             index = i['ui_widget'].comboBox_CL.currentIndex()
             if index == 1:
@@ -1079,8 +1085,10 @@ class WSettingswBtn(QObject):
                 btn_next[2].append(i['ui_widget'].ipAddress.text())
             elif index == 4:
                 switchMode[2].append(i['ui_widget'].ipAddress.text())
+            elif index == 5:
+                plan[2].append(i['ui_widget'].ipAddress.text())
 
-        return baseA, baseB, btn_next, switchMode
+        return baseA, baseB, btn_next, switchMode, plan
 
 class WSettingsSound(QObject):
     btn_settings_sig = pyqtSignal()
