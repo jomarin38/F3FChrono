@@ -23,7 +23,7 @@ class udpreceive(QThread):
     simulate_base_sig = pyqtSignal(str)
     simulate_wbtn_sig = pyqtSignal(str)
     switchMode_sig = pyqtSignal()
-    plan_sig = pyqtSignal()
+    penalty_sig = pyqtSignal()
 
     def __init__(self, udpport, signal_chrono, signal_btnnext, signal_windspeed, signal_winddir, signal_rain, signal_accu, signal_rssi):
         super().__init__()
@@ -72,16 +72,16 @@ class udpreceive(QThread):
         self.ipwBtn_baseB = baseB
         self.ipwBtn_btnNext = btnNext
         self.ipwBtn_SwitchMode = switchMode
-        self.ipwBtn_plan = plan
+        self.ipwBtn_penalty = penalty
         print("baseA : ", baseA, "\nbaseB : ", baseB, "\nBtn Next : ", btnNext, "\nSwitchMode : ", switchMode,
-              "\nPlan : ", plan)
+              "\nPenalty : ", penalty)
 
     def clear_ipwBtn(self):
         self.ipwBtn_baseA = [[], [], []]
         self.ipwBtn_baseB = [[], [], []]
         self.ipwBtn_btnNext = [[], [], []]
         self.ipwBtn_SwitchMode = [[], [], []]
-        self.ipwBtn_plan = [[], [], []]
+        self.ipwBtn_penalty = [[], [], []]
 
     def run(self):
         while (not self.isFinished()):
@@ -146,15 +146,15 @@ class udpreceive(QThread):
             self.event_btn_next.emit(0)
         elif find and base == "switch_mode":
             self.switchMode_sig.emit()
-        elif find and base == "plan":
-            self.plan_sig.emit()
+        elif find and base == "penalty":
+            self.penalty_sig.emit()
         else:
             self.simulate_wbtn_sig.emit(ip)
 
     def _find_ip_function(self, ip, shortpush=0):  # return True if find in lists, "function"; False not find, "ip"
         if shortpush <= len(self.ipwBtn_baseA) and shortpush <= len(self.ipwBtn_baseB) \
                 and shortpush <= len(self.ipwBtn_btnNext) and shortpush <= len(self.ipwBtn_SwitchMode) and\
-                shortpush <= len(self.ipwBtn_plan):
+                shortpush <= len(self.ipwBtn_penalty):
             if ip in self.ipbaseA or ip in self.ipwBtn_baseA[shortpush]:
                 print("baseA")
                 return True, "baseA"
@@ -167,9 +167,9 @@ class udpreceive(QThread):
             elif ip in self.ipwBtn_SwitchMode[shortpush]:
                 print("switch mode")
                 return True, "switch_mode"
-            elif ip in self.ipwBtn_plan[shortpush]:
-                print("Plan")
-                return True, "plan"
+            elif ip in self.ipwBtn_penalty[shortpush]:
+                print("Penalty")
+                return True, "penalty"
             else:
                 return False, ip
         else:

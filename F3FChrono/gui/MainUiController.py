@@ -261,7 +261,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.run_finished.disconnect(self.slot_run_finished)
             self.chronoHard.run_validated.disconnect(self.slot_run_validated)
             self.chronoHard.altitude_finished.disconnect(self.slot_altitude_finished)
-            self.chronoHard.udpReceive.plan_sig.disconnect(self.penalty_100)
+            self.chronoHard.udpReceive.penalty_sig.disconnect(self.penalty_100)
             self.controllers['round'].get_alarm_sig().disconnect(self.slot_weather_alarm)
             if self.rpigpio.buzzer_next is not None:
                 self.chronoHard.weather.beep_signal.emit("stop",0,1000)
@@ -279,7 +279,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.run_finished.connect(self.slot_run_finished)
             self.chronoHard.run_validated.connect(self.slot_run_validated)
             self.chronoHard.altitude_finished.connect(self.slot_altitude_finished)
-            self.chronoHard.udpReceive.plan_sig.connect(self.penalty_100)
+            self.chronoHard.udpReceive.penalty_sig.connect(self.penalty_100)
             self.controllers['round'].get_alarm_sig().connect(self.slot_weather_alarm)
             if self.rpigpio.buzzer_next is not None:
                 self.chronoHard.weather.beep_signal.connect(self.rpigpio.buzzer_next.slot_blink)
