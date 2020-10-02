@@ -15,7 +15,7 @@ class rs232_arduino (QObject):
     def __init__(self, voltageCoef, rebundTimeBtn, buzzerTime, status_changed, run_started, climbout_time, lap_finished,
                  run_finished, run_training, wait_alt_sig, accu_sig):
         super().__init__()
-        self.bus = serial.Serial(port=rs232_arduino.get_serial_port(), baudrate = 57600, parity=serial.PARITY_NONE,
+        self.bus = serial.Serial(port=rs232_arduino.get_serial_port(), baudrate=57600, parity=serial.PARITY_NONE,
                                  stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=0.2)
 
         self.status_changed_sig = status_changed
@@ -26,8 +26,8 @@ class rs232_arduino (QObject):
         self.climbout_time_sig = climbout_time
         self.wait_alt_sig = wait_alt_sig
         self.accu_sig = accu_sig
-        self.status=0
-        self.lastrequest=0.0
+        self.status = 0
+        self.lastrequest = 0.0
         self.rebundTime = rebundTimeBtn
         self.buzzerTime = buzzerTime
         self.lastrequest = 0.0
@@ -99,8 +99,10 @@ class rs232_arduino (QObject):
                                 tmp = 0.
                                 for i in range(2, int(data[1])+2):
                                     tmp += int(data[i])/1000
-                                self.finaltime = tmp
+                                self.finaltime = round(int(data[12])/1000,2)
                                 self.run_finished_sig.emit(self.finaltime)
+                                if self.__debug:
+                                    print("finaltime : ", self.finaltime, " finaltime with laps : ", tmp)
                     if data[0] == "climbout_time":
                         self.climbout_time_sig.emit(int(data[1])/1000)
                     if data[0] == "voltage":

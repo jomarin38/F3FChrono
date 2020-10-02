@@ -30,6 +30,7 @@ typedef struct {
   unsigned long startlaunchtime;
   unsigned long starttime;
   unsigned long startaltitudetime;
+  unsigned long finaltime;
   unsigned long climbout_time, oldclimbout_time;
 }chronoStr;
 
@@ -140,8 +141,10 @@ void baseCheckRace(byte base){
     chrono.oldtime = time1;
     buzzerSet(1);
     if (chrono.lapCount >= 10) {
+      time1 =millis();
       chronostatus.runStatus = WaitAltitude;
-      chrono.startaltitudetime = millis();
+      chrono.startaltitudetime = time1;
+      chrono.finaltime = time1 - chrono.starttime;
       buzzerSet(2);
     } else {
       chronostatus.runStatus = InProgressB;
@@ -205,6 +208,10 @@ void printchrono(void){
   for (i = 0; i < (chrono.lapCount<=10?chrono.lapCount:10); i++) {
     Serial.print(",");
     Serial.print(chrono.lap[i]);
+  }
+  if (chrono.finaltime>0){
+    Serial.print(",");
+    Serial.print(chrono.finaltime);
   }
   Serial.println(",");
 }
