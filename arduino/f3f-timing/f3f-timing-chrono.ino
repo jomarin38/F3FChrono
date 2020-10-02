@@ -84,10 +84,10 @@ void baseCheck(byte base) {
 }
 
 void baseCheckTraining(byte base){
-  if (chronostatus.runStatus==InStart and (base == BASEAPIN or base == BTNNEXTPIN)){
+  if (chronostatus.runStatus<InProgressA and (base == BASEAPIN or base == BTNNEXTPIN)){
     chrono.oldtime=millis();
     chronostatus.runStatus=InProgressB;
-  }else if (chronostatus.runStatus==InStart and (base == BASEBPIN or base == BTNNEXTPIN)) {
+  }else if (chronostatus.runStatus<InProgressA and (base == BASEBPIN or base == BTNNEXTPIN)) {
     chrono.oldtime=millis();
     chronostatus.runStatus=InProgressA;
   }else if (chronostatus.runStatus==InProgressA and (base == BASEAPIN or base == BTNNEXTPIN)){
