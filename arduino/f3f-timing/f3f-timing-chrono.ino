@@ -54,22 +54,25 @@ void chrono_setup(void){
 }
 
 void chrono_run(void){
-  unsigned long time1=0;
-  time1 = millis();
-  if (chronostatus.runStatus==Launched or chronostatus.runStatus==InStart){
-    if (time1-chrono.startlaunchtime>30000){
-        if (chronostatus.runStatus==Launched){
-          chronostatus.runStatus=Late;
-          buzzerSet(1);
-        }else if (chronostatus.runStatus==InStart){
-          chronostatus.runStatus=InStart_Late;
-          buzzerSet(1);
-        }
-        chronostart(startRace);
-    }
-  }else if (chronostatus.runStatus == WaitAltitude){
-    baseCheck(0);
-  } 
+  if (chrono_mode==Race){
+    unsigned long time1=0;
+ 
+    time1 = millis();
+    if (chronostatus.runStatus==Launched or chronostatus.runStatus==InStart){
+      if (time1-chrono.startlaunchtime>30000){
+          if (chronostatus.runStatus==Launched){
+            chronostatus.runStatus=Late;
+            buzzerSet(1);
+          }else if (chronostatus.runStatus==InStart){
+            chronostatus.runStatus=InStart_Late;
+            buzzerSet(1);
+          }
+          chronostart(startRace);
+      }
+    }else if (chronostatus.runStatus == WaitAltitude){
+      baseCheck(0);
+    } 
+  }
 }
 
 void baseCheck(byte base) {

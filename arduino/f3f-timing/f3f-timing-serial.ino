@@ -87,7 +87,7 @@ void serial_run(void) {
       if (chrono_mode==Training){
         memset(&chronostatus, 0, sizeof(chronostatus));
         memset(&chrono, 0, sizeof(chrono));
-        chronostatus.runStatus=InStart;        
+        chronostatus.runStatus=InProgressA;        
       }
       if (chrono_mode==Race){
         memset(&chronostatus, 0, sizeof(chronostatus));
