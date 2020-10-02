@@ -558,7 +558,8 @@ class WConfigCtrl(QObject):
         self.view.WindMaxValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
         self.view.OrientationValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
         self.view.RevolValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
-        self.view.bib_start.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.bib_start.valueChanged.connect(self.bib_start_changed)
+        self.view.bib_startslider.valueChanged.connect(self.bib_start_slider_changed)
         self.view.MaxInterruptValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
         self.view.daydurationvalue.valueChanged.connect(self.contest_valuechanged_sig.emit)
 
@@ -580,11 +581,19 @@ class WConfigCtrl(QObject):
     def btn_next(self):
         self.btn_next_sig.emit()
 
+    def bib_start_changed(self):
+        self.view.bib_startslider.setValue(self.view.bib_start.value())
+        self.contest_valuechanged_sig.emit()
+
+    def bib_start_slider_changed(self):
+        self.view.bib_start.setValue(self.view.bib_startslider.value())
+
     def set_data(self, event):
         self.view.WindMinValue.setValue(event.min_allowed_wind_speed)
         self.view.WindMaxValue.setValue(event.max_allowed_wind_speed)
         self.view.OrientationValue.setValue(event.max_wind_dir_dev)
         self.view.RevolValue.setValue(event.flights_before_refly)
+        self.view.bib_startslider.setMaximum(event.get_nb_competitors())
         self.view.bib_start.setValue(event.bib_start)
         self.view.MaxInterruptValue.setValue(event.max_interruption_time / 60)
         self.view.daydurationvalue.setValue(event.dayduration)
@@ -815,10 +824,11 @@ class WSettingsBase(QObject):
         if self.udp_sig is not None and self.udp_sig_connected:
             self.udp_sig.disconnect(self.slot_udp)
             self.udp_sig_connected = False
-            if self.ipbaseclear_sig is not None:
-                self.ipbaseclear_sig.emit()
-                self.clearA()
-                self.clearB()
+        '''if self.ipbaseclear_sig is not None:
+            self.ipbaseclear_sig.emit()
+            self.clearA()
+            self.clearB()
+        '''
 
     def btn_valid(self):
         self.__baseA_release()
@@ -977,13 +987,13 @@ class WSettingswBtn(QObject):
 
     def btn_cancel(self):
         self.__release_detect()
-        self.clearwBtn()
+        #self.clearwBtn()
 
     def btn_valid(self):
         self.__release_detect()
         if self.ipset_sig is not None:
             ip = self.get_ipwBtn()
-            self.ipset_sig.emit(ip[0], ip[1], ip[2], ip[3])
+            self.ipset_sig.emit(ip[0], ip[1], ip[2], ip[3], ip[4])
 
     def __release_detect(self):
         if self.wBtnInProgress:
@@ -1040,6 +1050,7 @@ class WSettingswBtn(QObject):
         baseB = [[], [], []]
         btn_next = [[], [], []]
         switchMode = [[], [], []]
+        penalty = [[], [], []]
         for i in list:
             index = i['ui_widget'].comboBox_LP.currentIndex()
             if index == 1:
@@ -1050,6 +1061,8 @@ class WSettingswBtn(QObject):
                 btn_next[0].append(i['ui_widget'].ipAddress.text())
             elif index == 4:
                 switchMode[0].append(i['ui_widget'].ipAddress.text())
+            elif index == 5:
+                penalty[0].append(i['ui_widget'].ipAddress.text())
 
             index = i['ui_widget'].comboBox_SP.currentIndex()
             if index == 1:
@@ -1060,6 +1073,8 @@ class WSettingswBtn(QObject):
                 btn_next[1].append(i['ui_widget'].ipAddress.text())
             elif index == 4:
                 switchMode[1].append(i['ui_widget'].ipAddress.text())
+            elif index == 5:
+                penalty[1].append(i['ui_widget'].ipAddress.text())
 
             index = i['ui_widget'].comboBox_CL.currentIndex()
             if index == 1:
@@ -1070,8 +1085,10 @@ class WSettingswBtn(QObject):
                 btn_next[2].append(i['ui_widget'].ipAddress.text())
             elif index == 4:
                 switchMode[2].append(i['ui_widget'].ipAddress.text())
+            elif index == 5:
+                penalty[2].append(i['ui_widget'].ipAddress.text())
 
-        return baseA, baseB, btn_next, switchMode
+        return baseA, baseB, btn_next, switchMode, penalty
 
 class WSettingsSound(QObject):
     btn_settings_sig = pyqtSignal()
@@ -1091,6 +1108,10 @@ class WSettingsSound(QObject):
         self._translate = QtCore.QCoreApplication.translate
         self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
         self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self.view.soundslider.valueChanged.connect(self.soundslider_changed)
+        self.view.soundvolume.valueChanged.connect(self.soundvolume_changed)
+        self.view.noiseslider.valueChanged.connect(self.noiseslider_changed)
+        self.view.noisevolume.valueChanged.connect(self.noisevolume_changed)
 
     def get_widget(self):
         return (self.widgetList)
@@ -1104,10 +1125,21 @@ class WSettingsSound(QObject):
     def hide(self):
         self.widget.hide()
 
+    def soundvolume_changed(self):
+        self.view.soundslider.setValue(self.view.soundvolume.value())
+
+    def soundslider_changed(self):
+        self.view.soundvolume.setValue(self.view.soundslider.value())
+
+    def noisevolume_changed(self):
+        self.view.noiseslider.setValue(self.view.noisevolume.value())
+
+    def noiseslider_changed(self):
+        self.view.noisevolume.setValue(self.view.noiseslider.value())
+
     def set_data(self):
         self.view.sound.setChecked(ConfigReader.config.conf['sound'])
         self.view.soundvolume.setValue(ConfigReader.config.conf['soundvolume']*100)
-        self.view.voice.setChecked(ConfigReader.config.conf['voice'])
         self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
         self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
         self.view.lowVoltage.setChecked(ConfigReader.config.conf['lowvoltage_sound'])
@@ -1118,7 +1150,6 @@ class WSettingsSound(QObject):
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
         ConfigReader.config.conf['soundvolume'] = self.view.soundvolume.value() / 100
-        ConfigReader.config.conf['voice'] = self.view.voice.isChecked()
         ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
         ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
         ConfigReader.config.conf['lowvoltage_sound'] = self.view.lowVoltage.isChecked()

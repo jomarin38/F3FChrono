@@ -19,7 +19,7 @@
  "ledB": 26,
  "lowvoltage_sound": true,
  "noisesound": true,
- "noisevolume": 0.005,
+ "noisevolume": 0.05,
  "rebound_btn_time": 500,
  "run_webserver": true,
  "simulatemode": false,
