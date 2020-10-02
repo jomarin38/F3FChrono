@@ -27,6 +27,7 @@ class udpreceive(QThread):
 
     def __init__(self, udpport, signal_chrono, signal_btnnext, signal_windspeed, signal_winddir, signal_rain, signal_accu, signal_rssi):
         super().__init__()
+        self.__debug = False
         self.port = udpport
         self.event_chrono = signal_chrono
         self.event_btn_next = signal_btnnext
@@ -50,13 +51,15 @@ class udpreceive(QThread):
         self.sock.bind(('', self.port))
         self.start()
 
+
     def __del__(self):
         self.wait()
 
     def set_ipbase(self, baseA, baseB):
         self.ipbaseA = baseA
         self.ipbaseB = baseB
-        print("baseA : ", baseA, "\nbaseB : ", baseB)
+        if self.__debug:
+            print("baseA : ", baseA, "\nbaseB : ", baseB)
 
     def clear_ipbase(self):
         self.ipbaseA = []
@@ -73,8 +76,9 @@ class udpreceive(QThread):
         self.ipwBtn_btnNext = btnNext
         self.ipwBtn_SwitchMode = switchMode
         self.ipwBtn_penalty = penalty
-        print("baseA : ", baseA, "\nbaseB : ", baseB, "\nBtn Next : ", btnNext, "\nSwitchMode : ", switchMode,
-              "\nPenalty : ", penalty)
+        if self.__debug:
+            print("baseA : ", baseA, "\nbaseB : ", baseB, "\nBtn Next : ", btnNext, "\nSwitchMode : ", switchMode,
+                  "\nPenalty : ", penalty)
 
     def clear_ipwBtn(self):
         self.ipwBtn_baseA = [[], [], []]
@@ -89,7 +93,8 @@ class udpreceive(QThread):
             try:
                 data, address_temp = self.sock.recvfrom(1024)
                 address = list(address_temp)
-                #print(data, address)
+                if self.__debug:
+                    print(data, address)
                 dt = time.time()
                 m = re.split(r'\s', data.decode('utf-8'))
                 if (m[0] == 'terminated'):
@@ -156,19 +161,24 @@ class udpreceive(QThread):
                 and shortpush <= len(self.ipwBtn_btnNext) and shortpush <= len(self.ipwBtn_SwitchMode) and\
                 shortpush <= len(self.ipwBtn_penalty):
             if ip in self.ipbaseA or ip in self.ipwBtn_baseA[shortpush]:
-                print("baseA")
+                if self.__debug:
+                    print("baseA")
                 return True, "baseA"
             elif ip in self.ipbaseB or ip in self.ipwBtn_baseB[shortpush]:
-                print("baseB")
+                if self.__debug:
+                    print("baseB")
                 return True, "baseB"
             elif ip in self.ipwBtn_btnNext[shortpush]:
-                print("btn_next")
+                if self.__debug:
+                    print("btn_next")
                 return True, "btn_next"
             elif ip in self.ipwBtn_SwitchMode[shortpush]:
-                print("switch mode")
+                if self.__debug:
+                    print("switch mode")
                 return True, "switch_mode"
             elif ip in self.ipwBtn_penalty[shortpush]:
-                print("Penalty")
+                if self.__debug:
+                    print("Penalty")
                 return True, "penalty"
             else:
                 return False, ip
@@ -176,6 +186,7 @@ class udpreceive(QThread):
             return False, ip
 
 if __name__ == '__main__':
+    UDP_PORT = 4445
     print("Main start")
     udpreceive = udpreceive(UDP_PORT, None, None, None)
     udpreceive.start()
