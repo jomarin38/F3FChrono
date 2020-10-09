@@ -1,6 +1,5 @@
 from F3FChrono.data.dao.Dao import Dao
 from F3FChrono.data.dao.RunDAO import RunDAO
-from F3FChrono.data.Round import RoundGroup
 
 
 class RoundDAO(Dao):
@@ -21,7 +20,8 @@ class RoundDAO(Dao):
 
     def get(self, f3f_round, fetch_runs=False):
         from F3FChrono.data.Round import Round
-        sql = 'SELECT r.valid, rg.group_number, rg.start_date, rg.end_date, r.flight_order ' \
+        from F3FChrono.data.Round import RoundGroup
+        sql = 'SELECT r.valid, rg.group_number, rg.start_date, rg.end_date, rg.flight_order ' \
               'FROM round r LEFT JOIN roundgroup rg ON r.event_id=rg.event_id AND r.round_number=rg.round_number ' \
               'WHERE r.event_id=%s AND r.round_number=%s'
         query_result = self._execute_query(sql, f3f_round.event.id, f3f_round.round_number)
@@ -32,14 +32,14 @@ class RoundDAO(Dao):
         for row in query_result:
             if first_time_in_loop:
                 fetched_f3f_round.valid = row[0]
-                if row[4] is not None:
-                    fetched_f3f_round.set_flight_order_from_db(row[4])
-                else:
-                    fetched_f3f_round.set_flight_order_from_scratch()
                 first_time_in_loop = False
             round_group = RoundGroup(fetched_f3f_round, group_number=row[1])
             round_group.start_time = row[2]
             round_group.end_time = row[3]
+            if row[4] is not None:
+                round_group.set_flight_order_from_db(row[4])
+            else:
+                round_group.set_flight_order_from_scratch()
             fetched_f3f_round.add_group(round_group)
             if fetch_runs:
                 RoundDAO._fetch_runs(round_group)
@@ -65,9 +65,9 @@ class RoundDAO(Dao):
             round_group.add_run(fetched_run)
         #Warning : will not work if different groups are present ... maybe
         if len(runs)>0:
-            round_group.round.set_flight_order_index(len(runs)-1)
+            round_group.set_flight_order_index(len(runs)-1)
         else:
-            round_group.round.set_flight_order_index(0)
+            round_group.set_flight_order_index(0)
 
     def insert(self, f3f_round):
         sql = 'INSERT INTO round (round_number, event_id, valid, flight_order) VALUES (%s, %s, %s, %s)'

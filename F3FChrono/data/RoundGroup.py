@@ -15,15 +15,94 @@ class RoundGroup:
         self.group_number = group_number
         self._current_competitor_index = 0
         self._flight_order = []
-        self.valid = False
         self.runs = {}
+
+    def set_flight_order_index(self, index):
+        self._current_competitor_index = index
 
     def set_flight_order_(self, flight_order):
         self._flight_order = flight_order
         self._current_competitor_index = 0
 
+    def set_flight_order_from_db(self, serialized_flight_order):
+        splitted_line = serialized_flight_order.split(',')
+        self._flight_order.clear()
+        for str_bib_number in splitted_line:
+            self._flight_order.append(int(str_bib_number))
+
+    def set_flight_order_from_scratch(self):
+        flight_order = []
+        for bib in [bib_number for bib_number in sorted(self.round.event.competitors)
+                    if bib_number >= self.round.event.bib_start
+                       and self.round.event.get_competitor(bib_number).group == self.group_number]:
+            flight_order += [bib]
+        for bib in [bib_number for bib_number in sorted(self.round.event.competitors)
+                    if bib_number < self.round.event.bib_start
+                       and self.round.event.get_competitor(bib_number).group == self.group_number]:
+            flight_order += [bib]
+        self._flight_order = flight_order
+
+    def get_serialized_flight_order(self):
+        res = ''
+        for bib_number in self._flight_order:
+            res += str(bib_number) + ','
+        return res.rstrip(',')
+
+    def get_flight_order(self):
+        return self._flight_order
+
+    def get_remaining_bibs_to_fly(self):
+        if not self.valid:
+            if self.has_run():
+                currently_flying_bib = self._current_competitor_index+1
+            else:
+                currently_flying_bib = self._current_competitor_index
+            return self._flight_order[currently_flying_bib:]
+        else:
+            return []
+
+    def next_pilot(self, insert_database=False, visited_competitors=[]):
+        if self._current_competitor_index < len(self._flight_order) - 1:
+            self._current_competitor_index += 1
+            current_competitor = self.get_current_competitor()
+
+            if current_competitor.present:
+                return current_competitor
+            else:
+                if current_competitor not in visited_competitors:
+                    # Give him a 0
+                    self.set_null_flight(current_competitor)
+                    visited_competitors.append(current_competitor)
+                    return self.next_pilot(insert_database, visited_competitors)
+                else:
+                    # In this case, nobody is set to present ...
+                    return current_competitor
+        else:
+            return None
+
+    def number_of_performed_runs(self):
+        result = 0
+        for bib_number, runs_list in self.runs.items():
+            result += len(runs_list)
+        return result
+
+    def next_pilot_database(self):
+        nb_run = self.number_of_performed_runs()
+        # if self._current_competitor_index < len(self._flight_order) - 1:
+        if nb_run < len(self._flight_order):
+            self._current_competitor_index = nb_run
+            return self.get_current_competitor()
+        else:
+            return None
+
+    def validate_group(self, insert_database=False):
+        self.valid = True
+
     def has_competitor(self, competitor):
         return competitor.bib_number in self._flight_order
+
+    def get_current_competitor(self):
+        return self.round.event.get_competitor(self._flight_order[self._current_competitor_index])
 
     def set_current_competitor(self, competitor):
         self._current_competitor_index = self._current_competitor_index + \
@@ -39,7 +118,7 @@ class RoundGroup:
             self.runs[run.competitor].append(run)
         else:
             self.runs[run.competitor] = [run]
-        if (insert_database):
+        if insert_database:
             RoundGroup.rundao.insert(run)
 
     def get_valid_run(self, competitor):
