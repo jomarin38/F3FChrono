@@ -37,7 +37,7 @@ class chronoQSound(QThread):
     signal_penalty = pyqtSignal()
     signal_base = pyqtSignal(int)
     signal_entry = pyqtSignal()
-    signal_time = pyqtSignal(float)
+    signal_time = pyqtSignal(float, bool)
     signal_elapsedTime = pyqtSignal(int, bool)
     signal_start = pyqtSignal(int)
     signal_pilotname = pyqtSignal(int)
@@ -92,9 +92,12 @@ class chronoQSound(QThread):
         except TypeError as e:
             print("QSoundError : ", e)
 
-    def sound_time(self, run_time):
-        self.finaltime_timer.start(2000)
+    def sound_time(self, run_time, training=False):
         self.run_time = run_time
+        if not training:
+            self.finaltime_timer.start(2000)
+        else:
+            self.finaltime_timer.start(300)
 
     def __final_time(self):
         self.stop_all()

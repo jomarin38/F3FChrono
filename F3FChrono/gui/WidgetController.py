@@ -434,7 +434,7 @@ class WChronoCtrl(QTimer):
 
 
 class WChronoTrainingCtrl(QObject):
-    training_voice_sig = pyqtSignal(float)
+    training_voice_sig = pyqtSignal(float, bool)
 
     def __init__(self, name, parent, speech_interval):
         super().__init__()
@@ -515,7 +515,7 @@ class WChronoTrainingCtrl(QObject):
                 self.run[i].setText("{:d} : {:0>6.2f}".format(i + 1, self.run_time[i]))
 
             if (lapcount - 10) / 2 % self.training_speech_interval == 0:
-                self.training_voice_sig.emit(finaltime)
+                self.training_voice_sig.emit(finaltime, True)
 
     def reset(self):
         for run in self.run:

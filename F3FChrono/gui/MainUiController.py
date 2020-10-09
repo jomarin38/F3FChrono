@@ -534,7 +534,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         self.controllers['round'].widgetBtn.update()
         if ConfigReader.config.conf["sound"]:
-            self.vocal.signal_time.emit(run_time)
+            self.vocal.signal_time.emit(run_time, False)
 
     def slot_altitude_finished(self, run_time):
         print("slot altitude")
