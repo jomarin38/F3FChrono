@@ -230,6 +230,7 @@ class WPilotCtrl(QObject):
         self.view.setupUi(self.widget)
         self._translate = QtCore.QCoreApplication.translate
         self.view.Btn_CancelRound.clicked.connect(self.btn_cancel_flight)
+        self.view.Btn_CancelRound.setStyleSheet('background-color:red;')
         self.view.Btn_Alarm.clicked.connect(self.btn_alarm)
         self.str_alarm_enable = self._translate("Enable Alarm", "Enable Alarm")
         self.str_alarm_disable = self._translate("Disable Alarm", "Disable Alarm")
@@ -305,12 +306,18 @@ class WChronoCtrl(QTimer):
         self.current_status = 0
         self.view.setupUi(self.widget)
 
+        # connect event btn
         self.view.nullFlight.clicked.connect(self.null_flight)
-
         self.view.btn_penalty_100.clicked.connect(self.penalty_100)
         self.view.btn_penalty_1000.clicked.connect(self.penalty_1000)
         self.view.btn_clear_penalty.clicked.connect(self.clear_penalty)
         self.view.Btn_reflight.clicked.connect(self.btn_refly_sig.emit)
+
+        # change background color for important buttons
+        self.view.btn_penalty_100.setStyleSheet('background-color:red;')
+        self.view.btn_penalty_1000.setStyleSheet('background-color:red;')
+        self.view.Btn_reflight.setStyleSheet('background-color:red;')
+        self.view.nullFlight.setStyleSheet('background-color:red;')
 
         self.timerEvent = QTimer()
         self.timerEvent.timeout.connect(self.run)

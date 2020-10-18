@@ -45,9 +45,7 @@ void buzzerRun(void) {
 
 void buzzerSet(byte nb)
 {
-  if (buzzer.Cmd>0){
-    buzzer.Cmd+=nb;
-  }else{
+  if (buzzer.Cmd==0){
     buzzer.Cmd=nb;
     buzzer.State=true;
   }
