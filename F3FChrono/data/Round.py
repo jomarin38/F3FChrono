@@ -20,6 +20,7 @@ class Round:
         self.groups = []
         self.valid = False
         self._current_group_index = 0
+        self.group_scoring_enabled = False
 
     @staticmethod
     def new_round(event, add_initial_group=True):
@@ -36,8 +37,51 @@ class Round:
 
         return f3f_round
 
+    def set_flight_order_from_scratch(self):
+        number_of_groups = len(self.groups)
+        pilots_per_group = int(len(self.round.event.competitors)/number_of_groups)
+        counter = 0
+        current_group_index = 0
+
+        flight_order = []
+        for bib in [bib_number for bib_number in sorted(self.round.event.competitors)
+                    if bib_number >= self.round.event.bib_start
+                       and self.round.event.get_competitor(bib_number).group == self.group_number]:
+            if counter <= pilots_per_group:
+                flight_order += [bib]
+                counter += 1
+            else:
+                self.groups[current_group_index].set_flight_order(flight_order)
+                flight_order=[]
+                counter = 0
+                self.groups.append(RoundGroup(self, len(self.groups) + 1))
+                current_group_index += 1
+        for bib in [bib_number for bib_number in sorted(self.round.event.competitors)
+                    if bib_number < self.round.event.bib_start
+                       and self.round.event.get_competitor(bib_number).group == self.group_number]:
+            if counter <= pilots_per_group:
+                flight_order += [bib]
+                counter += 1
+            else:
+                self.groups[current_group_index].set_flight_order(flight_order)
+                flight_order = []
+                counter = 0
+                self.groups.append(RoundGroup(self, len(self.groups) + 1))
+                current_group_index += 1
+        self.groups[current_group_index].set_flight_order(flight_order)
+
     def add_group(self, round_group):
         self.groups.append(round_group)
+
+    def enable_group_scoring(self):
+        if not self.group_scoring_enabled and len(self.groups) == 1:
+            group = self.groups[0]
+            for i in range(1, self.event.group_numbers):
+                self.groups.append(RoundGroup(self, i+1))
+        pass
+
+    def disable_group_scoring(self):
+        pass
 
     def get_serialized_flight_order(self):
         res = ''
@@ -153,7 +197,7 @@ class Round:
         if next_pilot is not None:
             return next_pilot
         else:
-            if self._current_group_index < len(self.groups):
+            if self._current_group_index < len(self.groups) - 1:
                 self._current_group_index += 1
                 return self.groups[self._current_group_index].current_competitor()
             else:
@@ -242,6 +286,7 @@ class Round:
                 valid_run = group.get_valid_run(fetched_competitor)
                 #TODO : compute global penalty for this round
                 if valid_run is not None:
+                    #TODO : handle the case if one competitor has valid flights in several groups
                     request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
                                   '&password=' + password + \
                                   '&function=postScore&event_id=' + str(self.event.f3x_vault_id) + \

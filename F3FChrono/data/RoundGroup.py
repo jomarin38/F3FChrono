@@ -20,7 +20,7 @@ class RoundGroup:
     def set_flight_order_index(self, index):
         self._current_competitor_index = index
 
-    def set_flight_order_(self, flight_order):
+    def set_flight_order(self, flight_order):
         self._flight_order = flight_order
         self._current_competitor_index = 0
 
@@ -29,18 +29,6 @@ class RoundGroup:
         self._flight_order.clear()
         for str_bib_number in splitted_line:
             self._flight_order.append(int(str_bib_number))
-
-    def set_flight_order_from_scratch(self):
-        flight_order = []
-        for bib in [bib_number for bib_number in sorted(self.round.event.competitors)
-                    if bib_number >= self.round.event.bib_start
-                       and self.round.event.get_competitor(bib_number).group == self.group_number]:
-            flight_order += [bib]
-        for bib in [bib_number for bib_number in sorted(self.round.event.competitors)
-                    if bib_number < self.round.event.bib_start
-                       and self.round.event.get_competitor(bib_number).group == self.group_number]:
-            flight_order += [bib]
-        self._flight_order = flight_order
 
     def get_serialized_flight_order(self):
         res = ''

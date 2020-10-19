@@ -280,6 +280,7 @@ def manage_event(request):
 
     table = ResultTable(title='Pilots', css_id="ranking")
     header = Header(name=Cell('Bib'))
+    header.add_cell(Cell('Group'))
     header.add_cell(Cell('Name'))
     header.add_cell(Cell(''))
     header.add_cell(Cell(''))
@@ -287,6 +288,7 @@ def manage_event(request):
 
     for competitor in sorted([competitor for bib, competitor in event.competitors.items()], key=lambda c: c.bib_number):
         row = Line(name=Cell(str(competitor.bib_number)))
+        row.add_cell(Cell(str(competitor.group)))
         row.add_cell(Cell(competitor.display_name()))
         if not event.has_run_competitor(competitor):
             row.add_cell(Link('Remove', 'remove_competitor?event_id='+str(event.id)+
