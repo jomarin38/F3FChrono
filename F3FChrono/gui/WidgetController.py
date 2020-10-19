@@ -307,7 +307,7 @@ class WChronoCtrl(QTimer):
         self.view.setupUi(self.widget)
 
         # connect event btn
-        self.view.nullFlight.clicked.connect(self.null_flight)
+        self.view.nullFlight.mousePressEvent = self.null_flight
         self.view.btn_penalty_100.clicked.connect(self.penalty_100)
         self.view.btn_penalty_1000.clicked.connect(self.penalty_1000)
         self.view.btn_clear_penalty.clicked.connect(self.clear_penalty)
@@ -424,7 +424,7 @@ class WChronoCtrl(QTimer):
     def set_penalty_value(self, value):
         self.view.penalty_value.setText(str(value))
 
-    def null_flight(self):
+    def null_flight(self, event):
         self.btn_null_flight_sig.emit()
 
     def set_null_flight(self, value=False):
