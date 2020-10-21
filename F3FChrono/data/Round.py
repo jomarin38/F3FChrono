@@ -39,14 +39,14 @@ class Round:
 
     def set_flight_order_from_scratch(self):
         number_of_groups = len(self.groups)
-        pilots_per_group = int(len(self.round.event.competitors)/number_of_groups)
+        pilots_per_group = int(len(self.event.competitors)/number_of_groups)
         counter = 0
         current_group_index = 0
 
         flight_order = []
-        for bib in [bib_number for bib_number in sorted(self.round.event.competitors)
-                    if bib_number >= self.round.event.bib_start
-                       and self.round.event.get_competitor(bib_number).group == self.group_number]:
+        for bib in [bib_number for bib_number in sorted(self.event.competitors)
+                    if bib_number >= self.event.bib_start
+                       and self.event.get_competitor(bib_number).group == current_group_index+1]:
             if counter <= pilots_per_group:
                 flight_order += [bib]
                 counter += 1
@@ -56,9 +56,9 @@ class Round:
                 counter = 0
                 self.groups.append(RoundGroup(self, len(self.groups) + 1))
                 current_group_index += 1
-        for bib in [bib_number for bib_number in sorted(self.round.event.competitors)
-                    if bib_number < self.round.event.bib_start
-                       and self.round.event.get_competitor(bib_number).group == self.group_number]:
+        for bib in [bib_number for bib_number in sorted(self.event.competitors)
+                    if bib_number < self.event.bib_start
+                       and self.event.get_competitor(bib_number).group == current_group_index+1]:
             if counter <= pilots_per_group:
                 flight_order += [bib]
                 counter += 1

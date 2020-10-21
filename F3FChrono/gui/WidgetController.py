@@ -277,6 +277,7 @@ class WPilotCtrl(QObject):
         self.view.pilotName.setText(competitor.display_name())
         self.view.bib.setText(self._translate("BIB : ", "BIB : ") + str(competitor.get_bib_number()))
         self.view.round.setText(self._translate("Round : ", "Round : ") + str(len(round.event.valid_rounds) + 1))
+        self.view.group.setText(self._translate("Group : ", "Group : ") + )
 
 
 class WChronoCtrl(QTimer):

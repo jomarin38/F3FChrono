@@ -39,7 +39,7 @@ class RoundDAO(Dao):
             if row[4] is not None:
                 round_group.set_flight_order_from_db(row[4])
             else:
-                round_group.set_flight_order_from_scratch()
+                round_group.set_flight_order([])
             fetched_f3f_round.add_group(round_group)
             if fetch_runs:
                 RoundDAO._fetch_runs(round_group)
