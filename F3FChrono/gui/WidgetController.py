@@ -23,7 +23,11 @@ from F3FChrono.gui.WSettingsSound_ui import Ui_WSettingsSound
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.web.Utils import Utils
 
-director_btn_sheetstyle = 'background-color:red;border-radius: 10px;'
+director_btn_stylesheet = 'background-color:red;border-radius: 10px;'
+refly_btn_stylesheet = 'background-color:#66ccff;border-radius: 10px;'
+penalty100_btn_stylesheet = 'background-color:#ffd633;border-radius: 10px;'
+penalty1000_btn_stylesheet = 'background-color:#db4dff;border-radius: 10px;'
+clear_penalty_btn_stylesheet = 'background-color:#aaff80;border-radius: 10px;'
 
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
@@ -235,7 +239,7 @@ class WPilotCtrl(QObject):
         self.view.setupUi(self.widget)
         self._translate = QtCore.QCoreApplication.translate
         self.view.cancelRound.mousePressEvent = self.btn_cancel_flight
-        self.view.cancelRound.setStyleSheet(director_btn_sheetstyle)
+        self.view.cancelRound.setStyleSheet(director_btn_stylesheet)
         self.view.Btn_Alarm.clicked.connect(self.btn_alarm)
         #self.view.Btn_Alarm.setStyleSheet("border: 1px solid black;border-radius: 10px;")
         self.str_alarm_enable = self._translate("Enable Alarm", "Enable Alarm")
@@ -321,10 +325,11 @@ class WChronoCtrl(QTimer):
 
         # change background color for important buttons
 
-        self.view.penalty_100.setStyleSheet(director_btn_sheetstyle)
-        self.view.penalty_1000.setStyleSheet(director_btn_sheetstyle)
-        self.view.reflight.setStyleSheet(director_btn_sheetstyle)
-        self.view.nullFlight.setStyleSheet(director_btn_sheetstyle)
+        self.view.penalty_100.setStyleSheet(penalty100_btn_stylesheet)
+        self.view.penalty_1000.setStyleSheet(penalty1000_btn_stylesheet)
+        self.view.reflight.setStyleSheet(refly_btn_stylesheet)
+        self.view.nullFlight.setStyleSheet(director_btn_stylesheet)
+        self.view.btn_clear_penalty.setStyleSheet(clear_penalty_btn_stylesheet)
 
         self.timerEvent = QTimer()
         self.timerEvent.timeout.connect(self.run)
