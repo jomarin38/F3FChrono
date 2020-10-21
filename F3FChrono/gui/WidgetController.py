@@ -23,7 +23,7 @@ from F3FChrono.gui.WSettingsSound_ui import Ui_WSettingsSound
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.web.Utils import Utils
 
-director_btn_stylesheet = 'background-color:red;border-radius: 10px;'
+director_btn_stylesheet = 'background-color:#ff6666;border-radius: 10px;'
 refly_btn_stylesheet = 'background-color:#66ccff;border-radius: 10px;'
 penalty100_btn_stylesheet = 'background-color:#ffd633;border-radius: 10px;'
 penalty1000_btn_stylesheet = 'background-color:#db4dff;border-radius: 10px;'
