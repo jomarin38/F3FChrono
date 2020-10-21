@@ -57,8 +57,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.MainWindow.closeEvent = self.closeEvent
         self.ui = Ui_MainWindow()
 
-
-
         self.ui.setupUi(self.MainWindow)
         if ConfigReader.config.conf['fullscreen']:
             self.MainWindow.showFullScreen()

@@ -23,6 +23,7 @@ from F3FChrono.gui.WSettingsSound_ui import Ui_WSettingsSound
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.web.Utils import Utils
 
+director_btn_sheetstyle = 'background-color:red;border-radius: 10px;'
 
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
@@ -49,6 +50,8 @@ class WRoundCtrl(QObject):
         self.widgetList.append(self.widgetBtnCancel)
         self.wBtnCtrl.Btn_gscoring.setEnabled(False)
         self.set_cancelmode(False)
+        for widget in self.widgetList:
+            widget.setStyleSheet("QPushButton{border: 1px solid black;border-radius: 10px;}")
         # Event connect
         self.wBtnCtrl.Btn_Home.clicked.connect(self.btn_home_sig.emit)
         self.wBtnCtrl.Btn_Next.clicked.connect(self.btn_next_sig.emit)
@@ -227,11 +230,14 @@ class WPilotCtrl(QObject):
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
+
+
         self.view.setupUi(self.widget)
         self._translate = QtCore.QCoreApplication.translate
-        self.view.Btn_CancelRound.clicked.connect(self.btn_cancel_flight)
-        self.view.Btn_CancelRound.setStyleSheet('color:red;')
+        self.view.cancelRound.mousePressEvent = self.btn_cancel_flight
+        self.view.cancelRound.setStyleSheet(director_btn_sheetstyle)
         self.view.Btn_Alarm.clicked.connect(self.btn_alarm)
+        #self.view.Btn_Alarm.setStyleSheet("border: 1px solid black;border-radius: 10px;")
         self.str_alarm_enable = self._translate("Enable Alarm", "Enable Alarm")
         self.str_alarm_disable = self._translate("Disable Alarm", "Disable Alarm")
         self.view.Btn_Alarm.setText(self.str_alarm_disable)
@@ -260,7 +266,7 @@ class WPilotCtrl(QObject):
     def isalarm_enable(self):
         return self.alarm_enable
 
-    def btn_cancel_flight(self):
+    def btn_cancel_flight(self, event):
         self.btn_cancel_flight_sig.emit()
 
     def set_data(self, competitor, round):
@@ -308,16 +314,17 @@ class WChronoCtrl(QTimer):
 
         # connect event btn
         self.view.nullFlight.mousePressEvent = self.null_flight
-        self.view.btn_penalty_100.clicked.connect(self.penalty_100)
-        self.view.btn_penalty_1000.clicked.connect(self.penalty_1000)
+        self.view.penalty_100.mousePressEvent = self.penalty_100
+        self.view.penalty_1000.mousePressEvent = self.penalty_1000
         self.view.btn_clear_penalty.clicked.connect(self.clear_penalty)
-        self.view.Btn_reflight.clicked.connect(self.btn_refly_sig.emit)
+        self.view.reflight.mousePressEvent = self.btn_refly
 
         # change background color for important buttons
-        self.view.btn_penalty_100.setStyleSheet('color:green;')
-        self.view.btn_penalty_1000.setStyleSheet('color:blue;')
-        self.view.Btn_reflight.setStyleSheet('color:red;')
-        self.view.nullFlight.setStyleSheet('background-color:#ff0000;')
+
+        self.view.penalty_100.setStyleSheet(director_btn_sheetstyle)
+        self.view.penalty_1000.setStyleSheet(director_btn_sheetstyle)
+        self.view.reflight.setStyleSheet(director_btn_sheetstyle)
+        self.view.nullFlight.setStyleSheet(director_btn_sheetstyle)
 
         self.timerEvent = QTimer()
         self.timerEvent.timeout.connect(self.run)
@@ -412,10 +419,13 @@ class WChronoCtrl(QTimer):
                 self.time_elapsed_sig.emit()
                 self.stoptime()
 
-    def penalty_100(self):
+    def btn_refly(self, event):
+        self.btn_refly_sig.emit()
+
+    def penalty_100(self, event):
         self.btn_penalty_100_sig.emit()
 
-    def penalty_1000(self):
+    def penalty_1000(self, event):
         self.btn_penalty_1000_sig.emit()
 
     def clear_penalty(self):
