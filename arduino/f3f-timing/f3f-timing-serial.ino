@@ -95,8 +95,6 @@ void serial_run(void) {
         memset(&chrono, 0, sizeof(chrono));
       }
     }
-    
-    
     memset(&serial, 0, sizeof(serial));
   }
   //buzzerRun(&led);
