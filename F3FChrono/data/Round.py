@@ -38,33 +38,31 @@ class Round:
         return f3f_round
 
     def set_flight_order_from_scratch(self):
-        number_of_groups = len(self.groups)
+        number_of_groups = self.event.group_numbers
         pilots_per_group = int(len(self.event.competitors)/number_of_groups)
         counter = 0
         current_group_index = 0
 
         flight_order = []
         for bib in [bib_number for bib_number in sorted(self.event.competitors)
-                    if bib_number >= self.event.bib_start
-                       and self.event.get_competitor(bib_number).group == current_group_index+1]:
-            if counter <= pilots_per_group:
+                    if bib_number >= self.event.bib_start]:
+            if counter < pilots_per_group:
                 flight_order += [bib]
                 counter += 1
             else:
                 self.groups[current_group_index].set_flight_order(flight_order)
-                flight_order=[]
+                flight_order = [bib]
                 counter = 0
                 self.groups.append(RoundGroup(self, len(self.groups) + 1))
                 current_group_index += 1
         for bib in [bib_number for bib_number in sorted(self.event.competitors)
-                    if bib_number < self.event.bib_start
-                       and self.event.get_competitor(bib_number).group == current_group_index+1]:
+                    if bib_number < self.event.bib_start]:
             if counter <= pilots_per_group:
                 flight_order += [bib]
                 counter += 1
             else:
                 self.groups[current_group_index].set_flight_order(flight_order)
-                flight_order = []
+                flight_order = [bib]
                 counter = 0
                 self.groups.append(RoundGroup(self, len(self.groups) + 1))
                 current_group_index += 1
@@ -193,16 +191,18 @@ class Round:
             Chrono(), 0, False, insert_database=True)
 
     def next_pilot_database(self):
-        next_pilot = self.groups[self._current_group_index].next_pilot_database()
+        next_pilot = None
+
+        current_group_index = 0
+        while current_group_index < len(self.groups) and next_pilot is None:
+            next_pilot = self.groups[current_group_index].next_pilot_database()
+            current_group_index += 1
+
         if next_pilot is not None:
             return next_pilot
         else:
-            if self._current_group_index < len(self.groups) - 1:
-                self._current_group_index += 1
-                return self.groups[self._current_group_index].current_competitor()
-            else:
-                self.event.create_new_round(insert_database=True)
-                return None
+            self.event.create_new_round(insert_database=True)
+            return None
 
     def cancel_round(self):
         self.do_cancel_round()

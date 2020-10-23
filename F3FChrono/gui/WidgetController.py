@@ -275,9 +275,12 @@ class WPilotCtrl(QObject):
 
     def set_data(self, competitor, round):
         self.view.pilotName.setText(competitor.display_name())
-        self.view.bib.setText(self._translate("BIB : ", "BIB : ") + str(competitor.get_bib_number()))
-        self.view.round.setText(self._translate("Round : ", "Round : ") + str(len(round.event.valid_rounds) + 1))
-        self.view.group.setText(self._translate("Group : ", "Group : ") + )
+        self.view.bib.setText(self._translate("BIB : ", "BIB : ")
+                              + str(competitor.get_bib_number()))
+        self.view.round.setText(self._translate("Round : ", "Round : ")
+                                + str(len(round.event.valid_rounds) + 1))
+        self.view.group.setText(self._translate("Group : ", "Group : ") +
+                                str(round.find_group(competitor).group_number))
 
 
 class WChronoCtrl(QTimer):
