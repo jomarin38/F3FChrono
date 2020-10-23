@@ -136,7 +136,7 @@ def event_view_html(event_id):
             row = Line(name=Cell(str(competitor.bib_number)))
             row.add_cell(Cell(competitor.pilot.to_string()))
             for f3f_round in event.valid_rounds:
-                round_group = f3f_round.groups[0]
+                round_group = f3f_round.find_group(competitor)
                 run = round_group.get_valid_run(competitor)
                 if run is None:
                     score = 0
@@ -186,6 +186,7 @@ def round_view_html(event_id, round_number):
 
     table = ResultTable(title=best_runs_string, css_id='ranking')
     header = Header(name=Cell('Bib'))
+    header.add_cell(Cell('Group'))
     header.add_cell(Cell('Name'))
     header.add_cell(Cell('Flight time'))
     header.add_cell(Cell('Score'))
@@ -193,23 +194,27 @@ def round_view_html(event_id, round_number):
 
     #Later loop on rounds and round groups
     round_group = f3f_round.groups[0]
-    round_group.compute_scores()
-    for competitor in sorted(round_group.runs):
-        row = Line(name=Cell(str(competitor.bib_number)))
-        row.add_cell(Cell(competitor.pilot.to_string()))
-        row.add_cell(Cell(round_group.run_value_as_string(competitor)))
-        row.add_cell(Cell(str(round_group.run_score_as_string(competitor))))
-        table.add_line(row)
+    for round_group in f3f_round.groups:
+        round_group.compute_scores()
+        for competitor in sorted(round_group.runs):
+            row = Line(name=Cell(str(competitor.bib_number)))
+            row.add_cell(Cell(str(round_group.group_number)))
+            row.add_cell(Cell(competitor.pilot.to_string()))
+            row.add_cell(Cell(round_group.run_value_as_string(competitor)))
+            row.add_cell(Cell(str(round_group.run_score_as_string(competitor))))
+            table.add_line(row)
 
     page.add_table(table)
 
     table = ResultTable(title='Remaining pilots to fly', css_id='ranking')
     header = Header(name=Cell('Bib'))
+    header.add_cell(Cell('Group'))
     header.add_cell(Cell('Name'))
     table.set_header(header)
 
     for bib_number in f3f_round.get_remaining_bibs_to_fly():
         row = Line(name=Cell(str(bib_number)))
+        row.add_cell(Cell(str(f3f_round.find_group(f3f_round.event.competitors[bib_number]).group_number)))
         row.add_cell(Cell(f3f_round.event.competitors[bib_number].display_name()))
         table.add_line(row)
 

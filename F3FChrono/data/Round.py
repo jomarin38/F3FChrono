@@ -38,6 +38,7 @@ class Round:
         return f3f_round
 
     def set_flight_order_from_scratch(self):
+        self.groups = [RoundGroup(self, 1)]
         number_of_groups = self.event.group_numbers
         pilots_per_group = int(len(self.event.competitors)/number_of_groups)
         counter = 0

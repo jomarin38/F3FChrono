@@ -87,7 +87,7 @@ class RoundGroup:
         self.valid = True
 
     def has_competitor(self, competitor):
-        return competitor.bib_number in self._flight_order
+        return (competitor.bib_number in self._flight_order) or (competitor in self.runs.keys())
 
     def get_current_competitor(self):
         return self.round.event.get_competitor(self._flight_order[self._current_competitor_index])
@@ -97,9 +97,9 @@ class RoundGroup:
                                         self._flight_order[self._current_competitor_index:].index(competitor.bib_number)
 
     def give_refly(self, competitor):
-        self._flight_order.insert(self._current_competitor_index + self.event.get_flights_before_refly() + 1,
+        self._flight_order.insert(self._current_competitor_index + self.round.event.get_flights_before_refly() + 1,
                                   competitor.get_bib_number())
-        RoundDAO().update(self)
+        RoundDAO().update(self.round)
 
     def add_run(self, run, insert_database=False):
         if run.competitor in self.runs:

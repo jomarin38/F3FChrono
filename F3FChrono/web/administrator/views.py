@@ -425,6 +425,7 @@ def manage_round(request):
 
     table = ResultTable(title=best_runs_string, css_id='ranking')
     header = Header(name=Cell('Bib'))
+    header.add_cell(Cell('Group'))
     header.add_cell(Cell('Name'))
     header.add_cell(Cell('Flight time'))
     header.add_cell(Cell('Score'))
@@ -437,40 +438,44 @@ def manage_round(request):
     table.set_header(header)
 
     # Later loop on rounds and round groups
-    round_group = f3f_round.groups[0]
-    round_group.compute_scores()
-    for competitor in sorted(round_group.runs):
-        row = Line(name=Cell(str(competitor.bib_number)))
-        row.add_cell(Cell(competitor.pilot.to_string()))
-        row.add_cell(Cell(round_group.run_value_as_string(competitor)))
-        row.add_cell(Cell(str(round_group.run_score_as_string(competitor))))
-        row.add_cell(Cell(str(round_group.get_penalty(competitor))))
-        row.add_cell(Link('Refly', 'give_refly?event_id='+str(event_id)+'&round_number='+str(round_number)+
-                          '&bib_number='+str(competitor.bib_number)))
-        row.add_cell(Link('Give 0', 'give_zero?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
-                          '&bib_number=' + str(competitor.bib_number)))
-        row.add_cell(Link('Give 100 penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
-                          '&bib_number=' + str(competitor.bib_number)+'&penalty=100'))
-        row.add_cell(Link('Give 1000 penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
-                          '&bib_number=' + str(competitor.bib_number)+'&penalty=1000'))
-        row.add_cell(Link('Cancel penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
-                          '&bib_number=' + str(competitor.bib_number)+'&penalty=0'))
-        table.add_line(row)
+    for round_group in f3f_round.groups:
+        round_group.compute_scores()
+        for competitor in sorted(round_group.runs):
+            row = Line(name=Cell(str(competitor.bib_number)))
+            row.add_cell(Cell(str(round_group.group_number)))
+            row.add_cell(Cell(competitor.pilot.to_string()))
+            row.add_cell(Cell(round_group.run_value_as_string(competitor)))
+            row.add_cell(Cell(str(round_group.run_score_as_string(competitor))))
+            row.add_cell(Cell(str(round_group.get_penalty(competitor))))
+            row.add_cell(Link('Refly', 'give_refly?event_id='+str(event_id)+'&round_number='+str(round_number)+
+                              '&bib_number='+str(competitor.bib_number)))
+            row.add_cell(Link('Give 0', 'give_zero?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+                              '&bib_number=' + str(competitor.bib_number)))
+            row.add_cell(Link('Give 100 penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+                              '&bib_number=' + str(competitor.bib_number)+'&penalty=100'))
+            row.add_cell(Link('Give 1000 penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+                              '&bib_number=' + str(competitor.bib_number)+'&penalty=1000'))
+            row.add_cell(Link('Cancel penalty', 'give_penalty?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+                              '&bib_number=' + str(competitor.bib_number)+'&penalty=0'))
+            table.add_line(row)
 
     page.add_table(table)
 
     table = ResultTable(title='Flight order', css_id='ranking')
     header = Header(name=Cell('Bib'))
+    header.add_cell(Cell('Group'))
     header.add_cell(Cell('Name'))
     header.add_cell(Cell(''))
     table.set_header(header)
 
-    for bib_number in f3f_round.get_flight_order():
-        row = Line(name=Cell(str(bib_number)))
-        row.add_cell(Cell(f3f_round.event.competitors[bib_number].display_name()))
-        row.add_cell(Link('Set time', 'set_time?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
-                          '&bib_number=' + str(bib_number)))
-        table.add_line(row)
+    for group in f3f_round.groups:
+        for bib_number in group.get_flight_order():
+            row = Line(name=Cell(str(bib_number)))
+            row.add_cell(Cell(str(group.group_number)))
+            row.add_cell(Cell(f3f_round.event.competitors[bib_number].display_name()))
+            row.add_cell(Link('Set time', 'set_time?event_id=' + str(event_id) + '&round_number=' + str(round_number) +
+                              '&bib_number=' + str(bib_number)))
+            table.add_line(row)
 
     page.add_table(table)
 
