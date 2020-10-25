@@ -248,22 +248,23 @@ class Event:
                 for group in f3f_round.groups:
                     group.compute_scores()
                     for bib_number, competitor in self.competitors.items():
-                        valid_run = group.get_valid_run(competitor)
-                        if valid_run is not None:
-                            competitor.score += valid_run.score
-                            competitor.update_jokers(f3f_round.valid_round_number, valid_run.score)
-                        else:
-                            competitor.update_jokers(f3f_round.valid_round_number, 0)
+                        if group.has_competitor(competitor):
+                            valid_run = group.get_valid_run(competitor)
+                            if valid_run is not None:
+                                competitor.score += valid_run.score
+                                competitor.update_jokers(f3f_round.valid_round_number, valid_run.score)
+                            else:
+                                competitor.update_jokers(f3f_round.valid_round_number, 0)
 
-                        #Get penalties
-                        competitor.penalty += group.get_penalty(competitor)
+                            #Get penalties
+                            competitor.penalty += group.get_penalty(competitor)
 
-                    bibs = sorted(self.competitors)
-                    pilots_ranks = ss.rankdata([-self.competitors[bib].score_with_jokers(self.number_of_valid_rounds)
-                                                for bib in bibs])
-                    for i in range(0, len(bibs)):
-                        self.competitors[bibs[i]].rank = pilots_ranks[i]
-                        self.competitors[bibs[i]].evolutive_rank.append(pilots_ranks[i])
+                bibs = sorted(self.competitors)
+                pilots_ranks = ss.rankdata([-self.competitors[bib].score_with_jokers(self.number_of_valid_rounds)
+                                            for bib in bibs])
+                for i in range(0, len(bibs)):
+                    self.competitors[bibs[i]].rank = pilots_ranks[i]
+                    self.competitors[bibs[i]].evolutive_rank.append(pilots_ranks[i])
             else:
                 #penalties applies also for cancelled rounds
                 for group in f3f_round.groups:
