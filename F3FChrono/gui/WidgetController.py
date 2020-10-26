@@ -588,6 +588,7 @@ class WConfigCtrl(QObject):
         self.view.bib_startslider.valueChanged.connect(self.bib_start_slider_changed)
         self.view.MaxInterruptValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
         self.view.daydurationvalue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.groups_number_value.valueChanged.connect(self.contest_valuechanged_sig.emit)
 
         self.view.randombtn.clicked.connect(self.btn_random_sig.emit)
         self.view.day_1btn.clicked.connect(self.btn_day_1_sig.emit)
@@ -623,6 +624,7 @@ class WConfigCtrl(QObject):
         self.view.bib_start.setValue(event.bib_start)
         self.view.MaxInterruptValue.setValue(event.max_interruption_time / 60)
         self.view.daydurationvalue.setValue(event.dayduration)
+        self.view.groups_number_value.setValue(event.groups_number)
 
     def set_contest(self, contest_list):
         _translate = QtCore.QCoreApplication.translate
@@ -643,6 +645,7 @@ class WConfigCtrl(QObject):
         self.bib_start = self.view.bib_start.value()
         self.dayduration = self.view.daydurationvalue.value()
         self.contest = self.view.ContestList.currentIndex()
+        self.groups_number = self.view.groups_number_value.value()
 
 
 class WSettingsAdvanced(QObject):

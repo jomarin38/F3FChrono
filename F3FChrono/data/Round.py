@@ -39,7 +39,7 @@ class Round:
 
     def set_flight_order_from_scratch(self):
         self.groups = [RoundGroup(self, 1)]
-        number_of_groups = self.event.group_numbers
+        number_of_groups = self.event.groups_number
         pilots_per_group = int(len(self.event.competitors)/number_of_groups)
         counter = 0
         current_group_index = 0
@@ -75,7 +75,7 @@ class Round:
     def enable_group_scoring(self):
         if not self.group_scoring_enabled and len(self.groups) == 1:
             group = self.groups[0]
-            for i in range(1, self.event.group_numbers):
+            for i in range(1, self.event.groups_number):
                 self.groups.append(RoundGroup(self, i+1))
         pass
 

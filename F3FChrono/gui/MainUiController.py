@@ -395,6 +395,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.event.flights_before_refly = self.controllers['config'].flights_before_refly
         self.event.bib_start = self.controllers['config'].bib_start
         self.event.dayduration = self.controllers['config'].dayduration
+        self.event.groups_number = self.controllers['config'].groups_number
         if updateBDD:
             self.daoEvent.update(self.event)
 

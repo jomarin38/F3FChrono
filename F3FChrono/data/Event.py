@@ -37,7 +37,7 @@ class Event:
         self.number_of_valid_rounds = 0
         self.first_joker_round_number = 4
         self.second_joker_round_number = 15
-        self.group_numbers = 2
+        self.groups_number = 1
 
 
     @staticmethod
