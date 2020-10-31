@@ -40,8 +40,9 @@ class RoundGroup:
         return self._flight_order
 
     def get_remaining_bibs_to_fly(self):
-        if not self.valid:
-            if self.has_run():
+        if not self.valid and self._current_competitor_index < len(self._flight_order):
+            current_competitor = self.round.event.get_competitor(self._flight_order[self._current_competitor_index])
+            if self.get_valid_run(current_competitor) is not None:
                 currently_flying_bib = self._current_competitor_index+1
             else:
                 currently_flying_bib = self._current_competitor_index
@@ -86,8 +87,11 @@ class RoundGroup:
     def validate_group(self, insert_database=False):
         self.valid = True
 
+    def remove_from_flight_order(self, competitor):
+        self._flight_order = list(filter(lambda bib: bib != competitor.bib_number, self._flight_order))
+
     def has_competitor(self, competitor):
-        return (competitor.bib_number in self._flight_order) or (competitor in self.runs.keys())
+        return (competitor.bib_number in self._flight_order) or (self.get_valid_run(competitor) is not None)
 
     def get_current_competitor(self):
         return self.round.event.get_competitor(self._flight_order[self._current_competitor_index])
@@ -124,6 +128,11 @@ class RoundGroup:
             return len(self.runs[competitor]) > 0
         else:
             return False
+
+    def cancel_runs_competitor(self, competitor):
+        if competitor in self.runs:
+            for run in self.runs[competitor]:
+                run.valid = False
 
     def get_penalty(self, competitor):
         penalty = 0

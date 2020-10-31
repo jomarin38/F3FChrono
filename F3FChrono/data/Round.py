@@ -20,7 +20,6 @@ class Round:
         self.groups = []
         self.valid = False
         self._current_group_index = 0
-        self.group_scoring_enabled = False
 
     @staticmethod
     def new_round(event, add_initial_group=True):
@@ -38,9 +37,17 @@ class Round:
         return f3f_round
 
     def set_flight_order_from_scratch(self):
-        self.groups = [RoundGroup(self, 1)]
-        number_of_groups = self.event.groups_number
-        pilots_per_group = int(len(self.event.competitors)/number_of_groups)
+        self.groups = self.get_groups_from_scratch(1)
+
+    def get_current_group_index(self):
+        return self._current_group_index
+
+    def set_current_group_index(self, group_index):
+        self._current_group_index = group_index
+
+    def get_groups_from_scratch(self, number_of_groups):
+        groups = [RoundGroup(self, 1)]
+        pilots_per_group = int(len(self.event.competitors) / number_of_groups)
         counter = 0
         current_group_index = 0
 
@@ -51,10 +58,10 @@ class Round:
                 flight_order += [bib]
                 counter += 1
             else:
-                self.groups[current_group_index].set_flight_order(flight_order)
+                groups[current_group_index].set_flight_order(flight_order)
                 flight_order = [bib]
                 counter = 0
-                self.groups.append(RoundGroup(self, len(self.groups) + 1))
+                groups.append(RoundGroup(self, len(groups) + 1))
                 current_group_index += 1
         for bib in [bib_number for bib_number in sorted(self.event.competitors)
                     if bib_number < self.event.bib_start]:
@@ -62,22 +69,53 @@ class Round:
                 flight_order += [bib]
                 counter += 1
             else:
-                self.groups[current_group_index].set_flight_order(flight_order)
+                groups[current_group_index].set_flight_order(flight_order)
                 flight_order = [bib]
                 counter = 0
-                self.groups.append(RoundGroup(self, len(self.groups) + 1))
+                groups.append(RoundGroup(self, len(groups) + 1))
                 current_group_index += 1
-        self.groups[current_group_index].set_flight_order(flight_order)
+        groups[current_group_index].set_flight_order(flight_order)
+        return groups
 
     def add_group(self, round_group):
         self.groups.append(round_group)
 
+    def group_scoring_enabled(self):
+        return len(self.groups) > 1
+
     def enable_group_scoring(self):
-        if not self.group_scoring_enabled and len(self.groups) == 1:
+        if len(self.groups) == 1:
             group = self.groups[0]
-            for i in range(1, self.event.groups_number):
-                self.groups.append(RoundGroup(self, i+1))
-        pass
+
+            new_groups = self.get_groups_from_scratch(self.event.groups_number)
+
+            #Cancel flights of competitors that need to refly
+            for bib_number in group.get_flight_order():
+                competitor = self.event.get_competitor(bib_number)
+                if not new_groups[0].has_competitor(competitor):
+                    group.cancel_runs_competitor(competitor)
+                    group.remove_from_flight_order(competitor)
+
+            #Check if current group is finished
+            first_group_maybe_finished = True
+            counter = 0
+            while first_group_maybe_finished and counter < len(new_groups[0].get_flight_order()):
+                bib_number = new_groups[0].get_flight_order()[counter]
+                first_group_maybe_finished = not (bib_number in group.get_remaining_bibs_to_fly())
+                counter += 1
+
+            if first_group_maybe_finished:
+                group.validate_group()
+
+            self.groups += new_groups[1:]
+            #Add new groups in database
+            for group in new_groups[1:]:
+                Round.round_dao.add_group(group)
+
+            if first_group_maybe_finished:
+                self._current_group_index += 1
+
+            Round.round_dao.update(self)
 
     def disable_group_scoring(self):
         pass

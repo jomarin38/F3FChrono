@@ -137,11 +137,14 @@ def event_view_html(event_id):
             row.add_cell(Cell(competitor.pilot.to_string()))
             for f3f_round in event.valid_rounds:
                 round_group = f3f_round.find_group(competitor)
-                run = round_group.get_valid_run(competitor)
-                if run is None:
-                    score = 0
+                if round_group is not None:
+                    run = round_group.get_valid_run(competitor)
+                    if run is None:
+                        score = 0
+                    else:
+                        score = run.score
                 else:
-                    score = run.score
+                    score = 0
                 winner = score >= 1000
                 joker = (event.number_of_valid_rounds >= event.first_joker_round_number and
                          f3f_round.valid_round_number == competitor.first_joker_round_number) \

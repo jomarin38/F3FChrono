@@ -103,6 +103,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.time_elapsed_sig.connect(self.handle_time_elapsed)
         self.controllers['round'].wChronoCtrl.btn_refly_sig.connect(self.refly)
         self.controllers['round'].wPilotCtrl.btn_cancel_flight_sig.connect(self.display_cancel_round)
+        self.controllers['round'].btn_gscoring_sig.connect(self.enable_group_scoring)
         self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
         self.controllers['settings'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
@@ -319,11 +320,16 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.noise.stop()
 
     def next_pilot(self, insert_database=False):
-        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().next_pilot(insert_database,
-                                                                                                visited_competitors=[]),
-                                                      self.event.get_current_round())
+        current_round = self.event.get_current_round()
+        self.controllers['round'].wPilotCtrl.set_data(current_round.next_pilot(insert_database,visited_competitors=[]),
+                                                      current_round)
         self.controllers['round'].wChronoCtrl.reset_ui()
         self.vocal.signal_pilotname.emit(int(self.event.get_current_round().get_current_competitor().get_bib_number()))
+        if self.event.get_current_round().group_scoring_enabled(): #Can't use current_group because it has changed
+            self.controllers['round'].handle_group_scoring_enabled(True)
+        else:
+            self.controllers['round'].handle_group_scoring_enabled(False)
+
 
     def context_valuechanged(self):
         self.getcontextparameters(False)
@@ -360,7 +366,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.event = self.daoEvent.get(eventData.id,
                         fetch_competitors=True, fetch_rounds=True, fetch_runs=True, fetch_runs_lastround=True)
             current_round = self.event.get_current_round()
-            if not current_round.has_run():
+            if not current_round.has_run() and not current_round.group_scoring_enabled():
                 current_round.set_flight_order_from_scratch()
                 Round.round_dao.update(current_round)
             current_competitor = current_round.get_current_competitor()
@@ -375,6 +381,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False,
                                                           to_launch=True)
             self.controllers['round'].wChronoCtrl.reset_ui()
+            if current_round.group_scoring_enabled():
+                self.controllers['round'].handle_group_scoring_enabled(True)
+            else:
+                self.controllers['round'].handle_group_scoring_enabled(False)
             self.chronoHard.weather.set_rules_limit(self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,
                                               self.event.max_wind_dir_dev)
             self.chronoHard.weather.enable_rules(self.controllers['round'].isalarm_enable())
@@ -437,6 +447,11 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def display_cancel_round(self):
         self.controllers['round'].set_cancelmode(True)
+
+    def enable_group_scoring(self):
+        self.event.get_current_round().enable_group_scoring()
+        self.start()
+        self.controllers['round'].handle_group_scoring_enabled(True)
 
     def cancel_round(self):
         self.event.get_current_round().cancel_round()

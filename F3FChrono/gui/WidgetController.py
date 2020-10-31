@@ -52,7 +52,6 @@ class WRoundCtrl(QObject):
         self.widgetList.append(self.wChronoCtrl.get_widget())
         self.widgetList.append(self.widgetBtn)
         self.widgetList.append(self.widgetBtnCancel)
-        self.wBtnCtrl.Btn_gscoring.setEnabled(False)
         self.set_cancelmode(False)
         for widget in self.widgetList:
             widget.setStyleSheet("QPushButton{border: 1px solid black;border-radius: 10px;}")
@@ -99,6 +98,15 @@ class WRoundCtrl(QObject):
 
     def get_alarm_sig(self):
         return self.wPilotCtrl.btn_alarm_sig
+
+    def handle_group_scoring_enabled(self, enabled):
+        _translate = QtCore.QCoreApplication.translate
+        if enabled:
+            self.wBtnCtrl.Btn_gscoring.setText(_translate("WChronoBtn", "GS Enabled"))
+            self.wBtnCtrl.Btn_gscoring.setEnabled(False)
+        else:
+            self.wBtnCtrl.Btn_gscoring.setText(_translate("WChronoBtn", "G Scoring"))
+            self.wBtnCtrl.Btn_gscoring.setEnabled(True)
 
 
 class WTrainingCtrl(QObject):
