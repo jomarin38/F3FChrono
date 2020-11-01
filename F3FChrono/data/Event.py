@@ -162,6 +162,13 @@ class Event:
     def next_available_bib_number(self):
         return max(self.competitors.keys())+1
 
+    def get_last_round_number(self):
+        round_numbers = [f3f_round.round_number for f3f_round in self.rounds]
+        if len(round_numbers) > 0:
+            return max([f3f_round.round_number for f3f_round in self.rounds])
+        else:
+            return 0
+
     def competitor_from_f3x_vault_id(self, f3x_vault_id):
         for key, competitor in self.competitors.items():
             if competitor.get_pilot().get_f3x_vault_id() == f3x_vault_id:

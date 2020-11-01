@@ -116,6 +116,11 @@ class RunDAO(Dao):
             run.competitor = CompetitorDAO().get(run.round_group.round.event, run.competitor.bib_number)
         self._execute_insert(sql, run.competitor.pilot.id, chrono_id, run.penalty, run.valid, run.reason,
                              run.round_group.round.event.id, run.round_group.group_id)
+        sql = 'SELECT LAST_INSERT_ID()'
+        query_result = self._execute_query(sql)
+        for row in query_result:
+            run_id = row[0]
+        return run_id, chrono_id
 
     def update(self, run):
         sql = 'UPDATE run SET competitor_id=%s, event_id=%s, chrono_id=%s, penalty=%s, valid=%s, group_id=%s ' \

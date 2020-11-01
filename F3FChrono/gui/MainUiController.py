@@ -454,7 +454,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].handle_group_scoring_enabled(True)
 
     def cancel_round(self):
-        self.event.get_current_round().cancel_round()
+        self.event.get_current_round().cancel_current_group()
         self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor(),
                                                       self.event.get_current_round())
         self.chronoHard.reset()

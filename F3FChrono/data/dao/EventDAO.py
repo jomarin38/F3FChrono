@@ -67,7 +67,7 @@ class EventDAO(Dao):
         if len(round_numbers) < 1:
             event.create_new_round(insert_database=True)
         else:
-            event.current_round = max([f3f_round.round_number for f3f_round in rounds])-1
+            event.current_round = len(rounds)-1
             if (event.get_current_round().has_run()):
                 #Switch to next Pilot
                 event.get_current_round().next_pilot_database()

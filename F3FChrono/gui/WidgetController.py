@@ -101,12 +101,15 @@ class WRoundCtrl(QObject):
 
     def handle_group_scoring_enabled(self, enabled):
         _translate = QtCore.QCoreApplication.translate
+        self.wPilotCtrl.handle_group_scoring_enabled(enabled)
         if enabled:
             self.wBtnCtrl.Btn_gscoring.setText(_translate("WChronoBtn", "GS Enabled"))
             self.wBtnCtrl.Btn_gscoring.setEnabled(False)
+            self.wBtnCancel.label_cancelround.setText(_translate("WChronoCancelBtn", "Cancel Group ?"))
         else:
             self.wBtnCtrl.Btn_gscoring.setText(_translate("WChronoBtn", "G Scoring"))
             self.wBtnCtrl.Btn_gscoring.setEnabled(True)
+            self.wBtnCancel.label_cancelround.setText(_translate("WChronoCancelBtn", "Cancel Round ?"))
 
 
 class WTrainingCtrl(QObject):
@@ -289,6 +292,12 @@ class WPilotCtrl(QObject):
                                 + str(len(round.event.valid_rounds) + 1))
         self.view.group.setText(self._translate("Group : ", "Group : ") +
                                 str(round.find_group(competitor).group_number))
+
+    def handle_group_scoring_enabled(self, enabled):
+        if enabled:
+            self.view.cancelRound.setText(self._translate("Cancel Group", "Cancel Group"))
+        else:
+            self.view.cancelRound.setText(self._translate("Cancel Round", "Cancel Round"))
 
 
 class WChronoCtrl(QTimer):

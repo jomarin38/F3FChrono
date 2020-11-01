@@ -113,7 +113,9 @@ class RoundGroup:
         else:
             self.runs[run.competitor] = [run]
         if insert_database:
-            RoundGroup.rundao.insert(run)
+            run_id, chrono_id = RoundGroup.rundao.insert(run)
+            run.id = run_id
+            run.chrono.id = chrono_id
 
     def get_valid_run(self, competitor):
         if competitor in self.runs:

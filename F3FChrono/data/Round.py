@@ -9,7 +9,6 @@ import requests
 
 class Round:
 
-    round_counters = {}
     valid_round_counters = {}
     round_dao = RoundDAO()
 
@@ -25,12 +24,7 @@ class Round:
     def new_round(event, add_initial_group=True):
         f3f_round = Round()
         f3f_round.event = event
-        if event in Round.round_counters:
-            previous_round = Round.round_counters[event]
-        else:
-            previous_round = 0
-        Round.round_counters[event] = previous_round+1
-        f3f_round.round_number = Round.round_counters[event]
+        f3f_round.round_number = event.get_last_round_number()+1
         if add_initial_group:
             f3f_round.groups.append(RoundGroup(f3f_round, 1))
 
@@ -121,8 +115,20 @@ class Round:
 
             Round.round_dao.update(self)
 
-    def disable_group_scoring(self):
-        pass
+    def cancel_current_group(self):
+        if self.group_scoring_enabled():
+            current_group = self.groups[self._current_group_index]
+            new_group = RoundGroup(self, current_group.group_number)
+            new_group.set_flight_order(current_group.get_flight_order())
+            current_group.cancelled = True
+            Round.round_dao.update(self)
+            Round.round_dao.add_group(new_group)
+            new_group.group_id = Round.round_dao.get_not_cancelled_group_id(self.event.id, self.round_number,
+                                                                            new_group.group_number)
+            self.groups[self._current_group_index] = new_group
+            return self.get_current_competitor()
+        else:
+            return self.cancel_round()
 
     def get_serialized_flight_order(self):
         res = ''
