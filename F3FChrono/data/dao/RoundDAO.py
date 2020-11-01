@@ -18,13 +18,15 @@ class RoundDAO(Dao):
             result.append(f3f_round)
         return result
 
-    def get(self, f3f_round, fetch_runs=False):
+    def get(self, f3f_round, fetch_runs=False, fetch_cancelled_groups=False):
         from F3FChrono.data.Round import Round
         from F3FChrono.data.Round import RoundGroup
         sql = 'SELECT r.valid, rg.group_number, rg.start_date, rg.end_date, rg.flight_order, ' \
-              'r.current_group, rg.valid ' \
+              'r.current_group, rg.valid, rg.cancelled, rg.group_id ' \
               'FROM round r LEFT JOIN roundgroup rg ON r.event_id=rg.event_id AND r.round_number=rg.round_number ' \
               'WHERE r.event_id=%s AND r.round_number=%s'
+        if not fetch_cancelled_groups:
+            sql += ' AND rg.cancelled=0'
         query_result = self._execute_query(sql, f3f_round.event.id, f3f_round.round_number)
         fetched_f3f_round = Round.new_round(f3f_round.event, add_initial_group=False)
         fetched_f3f_round.event = f3f_round.event
@@ -42,6 +44,8 @@ class RoundDAO(Dao):
             else:
                 round_group.set_flight_order([])
             round_group.valid = row[6]
+            round_group.cancelled = row[7]
+            round_group.group_id = row[8]
             fetched_f3f_round.add_group(round_group)
             if fetch_runs:
                 RoundDAO._fetch_runs(round_group)
@@ -79,8 +83,8 @@ class RoundDAO(Dao):
         self._execute_insert(sql, f3f_round.round_number, f3f_round.event.id, f3f_round.valid,
                              f3f_round.get_serialized_flight_order(), f3f_round.get_current_group_index())
         sql = 'INSERT INTO roundgroup ' \
-              '(event_id, round_number, group_number, start_date, end_date, flight_order, valid) ' \
-              'VALUES (%s, %s, %s, %s, %s, %s, %s)'
+              '(event_id, round_number, group_number, start_date, end_date, flight_order, valid, cancelled) ' \
+              'VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
         for group in f3f_round.groups:
             if group.start_time is not None:
                 start_time = group.start_time.strftime('%Y-%m-%d %H:%M:%S')
@@ -91,15 +95,16 @@ class RoundDAO(Dao):
             else:
                 end_time = None
             self._execute_insert(sql, f3f_round.event.id, f3f_round.round_number, group.group_number,
-                                 start_time, end_time, group.get_serialized_flight_order(), group.valid)
+                                 start_time, end_time, group.get_serialized_flight_order(), group.valid,
+                                 group.cancelled)
             for competitor, runs in group.runs.items():
                 for run in runs:
                     RoundDAO.run_dao.insert(run)
 
     def add_group(self, group):
         sql = 'INSERT INTO roundgroup ' \
-              '(event_id, round_number, group_number, start_date, end_date, flight_order, valid) ' \
-              'VALUES (%s, %s, %s, %s, %s, %s, %s)'
+              '(event_id, round_number, group_number, start_date, end_date, flight_order, valid, cancelled) ' \
+              'VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
         if group.start_time is not None:
             start_time = group.start_time.strftime('%Y-%m-%d %H:%M:%S')
         else:
@@ -109,23 +114,33 @@ class RoundDAO(Dao):
         else:
             end_time = None
         self._execute_insert(sql, group.round.event.id, group.round.round_number, group.group_number,
-                             start_time, end_time, group.get_serialized_flight_order(), group.valid)
+                             start_time, end_time, group.get_serialized_flight_order(), group.valid,
+                             group.cancelled)
 
+    def get_not_cancelled_group_id(self, event_id, round_number, group_number):
+        from F3FChrono.data.Round import Round
+        from F3FChrono.data.Round import RoundGroup
+        sql = 'SELECT rg.group_id FROM roundgroup rg ' \
+              'WHERE rg.event_id=%s AND rg.round_number=%s AND rg.group_number=%s'
+        query_result = self._execute_query(sql, event_id, round_number, group_number)
+        for row in query_result:
+            return row[0]
 
     def update(self, f3f_round):
         sql = 'UPDATE round SET valid=%s, flight_order=%s, current_group=%s WHERE round_number=%s AND event_id=%s'
         self._execute_update(sql, f3f_round.valid, f3f_round.get_serialized_flight_order(),
                              f3f_round.get_current_group_index(), f3f_round.round_number, f3f_round.event.id)
-        sql = 'UPDATE roundgroup SET start_date=%s, end_date=%s, flight_order=%s, valid=%s ' \
-              'WHERE event_id=%s AND round_number=%s AND group_number=%s'
+        sql = 'UPDATE roundgroup SET start_date=%s, end_date=%s, flight_order=%s, valid=%s, cancelled=%s ' \
+              'WHERE group_id=%s'
         for group in f3f_round.groups:
             self._execute_update(sql, group.start_time, group.end_time, group.get_serialized_flight_order(),
-                                 group.valid, f3f_round.event.id, f3f_round.round_number, group.group_number)
+                                 group.valid, group.cancelled, group.group_id)
             for competitor, runs in group.runs.items():
                 for run in runs:
                     RoundDAO.run_dao.update(run)
 
     def delete(self, f3f_round):
+        #Delete is intentionally not using group_id to directly delete all cancelled groups
         sql = 'DELETE FROM roundgroup WHERE event_id=%s AND round_number=%s AND group_number=%s'
         for group in f3f_round.groups:
             for competitor, runs in group.runs.items():

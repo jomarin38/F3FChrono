@@ -16,6 +16,8 @@ class RoundGroup:
         self._current_competitor_index = 0
         self._flight_order = []
         self.runs = {}
+        self.cancelled = False
+        self.group_id = None
 
     def set_flight_order_index(self, index):
         self._current_competitor_index = index

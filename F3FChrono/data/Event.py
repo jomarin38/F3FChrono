@@ -171,11 +171,13 @@ class Event:
     def create_new_round(self, insert_database=False):
         f3f_round = Round.new_round(self)
         f3f_round.set_flight_order_from_scratch()
-        self.add_existing_round(f3f_round)
         if insert_database:
             Round.round_dao.insert(f3f_round)
 
-        return f3f_round
+        #Get round from database to get group ids
+        fully_fetched_round = Round.round_dao.get(f3f_round)
+        self.add_existing_round(fully_fetched_round)
+        return fully_fetched_round
 
     def add_existing_round(self, f3f_round):
         self.rounds.append(f3f_round)

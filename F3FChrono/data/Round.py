@@ -37,7 +37,9 @@ class Round:
         return f3f_round
 
     def set_flight_order_from_scratch(self):
+        group_id = self.groups[0].group_id
         self.groups = self.get_groups_from_scratch(1)
+        self.groups[0].group_id = group_id
 
     def get_current_group_index(self):
         return self._current_group_index
@@ -111,6 +113,8 @@ class Round:
             #Add new groups in database
             for group in new_groups[1:]:
                 Round.round_dao.add_group(group)
+                group.group_id = Round.round_dao.get_not_cancelled_group_id(self.event.id, self.round_number,
+                                                                            group.group_number)
 
             if first_group_maybe_finished:
                 self._current_group_index += 1
@@ -205,6 +209,8 @@ class Round:
             if self._current_group_index < len(self.groups) - 1:
                 self.groups[self._current_group_index].validate_group()
                 self._current_group_index += 1
+                if insert_database:
+                    Round.round_dao.update(self)
                 current_competitor = self.groups[self._current_group_index].get_current_competitor()
             else:
                 #All groups are finished ... need to create a new round
