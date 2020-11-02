@@ -13,11 +13,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_WConfig(object):
     def setupUi(self, WConfig):
         WConfig.setObjectName("WConfig")
-        WConfig.resize(472, 283)
+        WConfig.resize(446, 279)
         font = QtGui.QFont()
         font.setPointSize(12)
         WConfig.setFont(font)
         self.horizontalLayout = QtWidgets.QHBoxLayout(WConfig)
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.gridLayout_2 = QtWidgets.QGridLayout()
         self.gridLayout_2.setSpacing(2)
@@ -215,13 +217,13 @@ class Ui_WConfig(object):
         self.ContestList.setItemText(0, _translate("WConfig", "Training"))
         self.WindMaxLabel.setText(_translate("WConfig", "WindMax (m/s)"))
         self.bib_start_label.setText(_translate("WConfig", "BIB Starting"))
-        self.MaxInterruptLabel.setText(_translate("WConfig", "Max Interrupt (mn)"))
+        self.MaxInterruptLabel.setText(_translate("WConfig", "Max Interrupt"))
         self.StartBtn.setText(_translate("WConfig", "Start"))
         self.btn_settings.setText(_translate("WConfig", "Race Management Settings"))
         self.dayduratiolabel.setText(_translate("WConfig", "Day duration"))
         self.WindMinLabel.setText(_translate("WConfig", "WindMin (m/s)"))
         self.OrientationLabel.setText(_translate("WConfig", "Orientation (°)"))
-        self.randombtn.setText(_translate("WConfig", "Random"))
+        self.randombtn.setText(_translate("WConfig", "Rand"))
         self.label.setText(_translate("WConfig", "Groups number"))
 
 
