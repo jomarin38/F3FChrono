@@ -61,7 +61,7 @@ class Round:
                 current_group_index += 1
         for bib in [bib_number for bib_number in sorted(self.event.competitors)
                     if bib_number < self.event.bib_start]:
-            if counter <= pilots_per_group:
+            if counter < pilots_per_group:
                 flight_order += [bib]
                 counter += 1
             else:
