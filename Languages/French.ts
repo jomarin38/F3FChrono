@@ -62,7 +62,7 @@
     <message>
         <location filename="../F3FChrono/gui/WidgetController.py" line="293"/>
         <source>Group : </source>
-        <translation>Groupe :</translation>
+        <translation>Groupe : </translation>
     </message>
 </context>
 <context>
@@ -126,7 +126,7 @@
     <message>
         <location filename="../F3FChrono/gui/WidgetController.py" line="196"/>
         <source>No Rain</source>
-        <translation>Soleil</translation>
+        <translation>Sec</translation>
     </message>
 </context>
 <context>
