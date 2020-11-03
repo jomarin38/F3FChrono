@@ -62,7 +62,7 @@ class RoundGroup:
             else:
                 if current_competitor not in visited_competitors:
                     # Give him a 0
-                    self.group.set_null_flight(current_competitor)
+                    self.round.set_null_flight(current_competitor)
                     visited_competitors.append(current_competitor)
                     return self.next_pilot(insert_database, visited_competitors)
                 else:
