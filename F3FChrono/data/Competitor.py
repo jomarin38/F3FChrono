@@ -16,7 +16,6 @@ class Competitor:
         self.second_joker_score = None
         self.penalty = 0.0
         self.present = True
-        self.group = 1
 
     @staticmethod
     def register_pilot(event, bib_number, pilot, team=None, present=True):
