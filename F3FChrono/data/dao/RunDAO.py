@@ -12,9 +12,8 @@ class RunDAO(Dao):
         sql = 'SELECT r.run_id, c.pilot_id, c.bib_number, c.team, p.name, p.first_name FROM run r ' \
               'LEFT JOIN competitor c ON r.competitor_id=c.pilot_id AND r.event_id=c.event_id ' \
               'LEFT JOIN pilot p ON c.pilot_id=p.pilot_id ' \
-              'WHERE r.event_id=%s AND r.round_number=%s AND r.group_number=%s ORDER BY c.bib_number'
-        query_result = self._execute_query(sql, round_group.round.event.id, round_group.round.round_number,
-                                           round_group.group_number)
+              'WHERE r.group_id=%s ORDER BY c.bib_number'
+        query_result = self._execute_query(sql, round_group.group_id)
         result = []
         for row in query_result:
             f3f_run = Run()
@@ -41,18 +40,18 @@ class RunDAO(Dao):
     def get(self, run_id, round_group):
         from F3FChrono.data.Round import Round
         sql = 'SELECT r.run_id, c.pilot_id, c.bib_number, c.team, p.name, p.first_name, ' \
-              'r.penalty, r.round_number, r.group_number, r.event_id, ' \
+              'r.penalty, rg.round_number, rg.group_number, rg.event_id, ' \
               'r.valid, r.reason, ' \
               'ch.run_time, ch.min_wind_speed, ch.max_wind_speed, ch.mean_wind_speed, ch.wind_direction, ' \
               'ch.start_date, ch.end_date, ch.lap1, ch.lap2, ch.lap3, ch.lap4, ch.lap5, ch.lap6, ch.lap7, ch.lap8, ' \
               'ch.lap9, ch.lap10, ch.climbout_time, ch.chrono_id ' \
               'FROM run r ' \
+              'LEFT JOIN roundgroup rg ON r.group_id=rg.group_id ' \
               'LEFT JOIN competitor c ON r.competitor_id=c.pilot_id AND r.event_id=c.event_id ' \
               'LEFT JOIN pilot p ON c.pilot_id=p.pilot_id ' \
               'LEFT JOIN chrono ch ON r.chrono_id=ch.chrono_id ' \
-              'WHERE r.run_id=%s AND r.event_id=%s AND r.round_number=%s AND r.group_number=%s '
-        query_result = self._execute_query(sql, run_id, round_group.round.event.id, round_group.round.round_number,
-                                           round_group.group_number)
+              'WHERE r.run_id=%s AND r.group_id=%s '
+        query_result = self._execute_query(sql, run_id, round_group.group_id)
         f3f_run = Run()
         f3f_run.id = run_id
         for row in query_result:
@@ -111,25 +110,27 @@ class RunDAO(Dao):
         else:
             chrono_id = None
 
-        sql = 'INSERT INTO run (competitor_id, chrono_id, penalty, valid, reason, round_number, group_number, ' \
-              'event_id) ' \
-              'VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
+        sql = 'INSERT INTO run (competitor_id, chrono_id, penalty, valid, reason, event_id, group_id) ' \
+              'VALUES (%s, %s, %s, %s, %s, %s, %s)'
         if run.competitor.pilot.id is None:
             run.competitor = CompetitorDAO().get(run.round_group.round.event, run.competitor.bib_number)
         self._execute_insert(sql, run.competitor.pilot.id, chrono_id, run.penalty, run.valid, run.reason,
-                             run.round_group.round.round_number, run.round_group.group_number,
-                             run.round_group.round.event.id)
+                             run.round_group.round.event.id, run.round_group.group_id)
+        sql = 'SELECT LAST_INSERT_ID()'
+        query_result = self._execute_query(sql)
+        for row in query_result:
+            run_id = row[0]
+        return run_id, chrono_id
 
     def update(self, run):
-        sql = 'UPDATE run SET competitor_id=%s, event_id=%s, chrono_id=%s, penalty=%s, valid=%s, round_number=%s, ' \
-              'group_number=%s ' \
+        sql = 'UPDATE run SET competitor_id=%s, event_id=%s, chrono_id=%s, penalty=%s, valid=%s, group_id=%s ' \
               'WHERE run_id=%s'
         if run.chrono is not None:
             chrono_id = run.chrono.id
         else:
             chrono_id = None
         self._execute_update(sql, run.competitor.pilot.id, run.round_group.round.event.id, chrono_id, run.penalty,
-                             run.valid, run.round_group.round.round_number, run.round_group.group_number, run.id)
+                             run.valid, run.round_group.group_id, run.id)
 
     def delete(self, run):
         sql = 'DELETE FROM run WHERE run_id=%s'

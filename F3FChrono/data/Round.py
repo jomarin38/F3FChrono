@@ -9,7 +9,6 @@ import requests
 
 class Round:
 
-    round_counters = {}
     valid_round_counters = {}
     round_dao = RoundDAO()
 
@@ -18,61 +17,138 @@ class Round:
         self.round_number = None
         self.valid_round_number = None
         self.groups = []
-        self._current_competitor_index = 0
-        self._flight_order = []
         self.valid = False
+        self._current_group_index = 0
 
     @staticmethod
     def new_round(event, add_initial_group=True):
         f3f_round = Round()
         f3f_round.event = event
-        if event in Round.round_counters:
-            previous_round = Round.round_counters[event]
-        else:
-            previous_round = 0
-        Round.round_counters[event] = previous_round+1
-        f3f_round.round_number = Round.round_counters[event]
+        f3f_round.round_number = event.get_last_round_number()+1
         if add_initial_group:
             f3f_round.groups.append(RoundGroup(f3f_round, 1))
 
         return f3f_round
 
+    def set_flight_order_from_scratch(self):
+        group_id = self.groups[0].group_id
+        self.groups = self.get_groups_from_scratch(1)
+        self.groups[0].group_id = group_id
+
+    def get_current_group_index(self):
+        return self._current_group_index
+
+    def set_current_group_index(self, group_index):
+        self._current_group_index = group_index
+
+    def get_groups_from_scratch(self, number_of_groups):
+        groups = [RoundGroup(self, 1)]
+        pilots_per_group = int(len(self.event.competitors) / number_of_groups)
+        counter = 0
+        current_group_index = 0
+
+        flight_order = []
+        for bib in [bib_number for bib_number in sorted(self.event.competitors)
+                    if bib_number >= self.event.bib_start]:
+            if counter < pilots_per_group:
+                flight_order += [bib]
+                counter += 1
+            else:
+                groups[current_group_index].set_flight_order(flight_order)
+                flight_order = [bib]
+                counter = 0
+                groups.append(RoundGroup(self, len(groups) + 1))
+                current_group_index += 1
+        for bib in [bib_number for bib_number in sorted(self.event.competitors)
+                    if bib_number < self.event.bib_start]:
+            if counter < pilots_per_group:
+                flight_order += [bib]
+                counter += 1
+            else:
+                groups[current_group_index].set_flight_order(flight_order)
+                flight_order = [bib]
+                counter = 0
+                groups.append(RoundGroup(self, len(groups) + 1))
+                current_group_index += 1
+        groups[current_group_index].set_flight_order(flight_order)
+        return groups
+
     def add_group(self, round_group):
         self.groups.append(round_group)
 
+    def group_scoring_enabled(self):
+        return len(self.groups) > 1
+
+    def enable_group_scoring(self):
+        if len(self.groups) == 1:
+            group = self.groups[0]
+
+            new_groups = self.get_groups_from_scratch(self.event.groups_number)
+
+            #Cancel flights of competitors that need to refly
+            for bib_number in group.get_flight_order():
+                competitor = self.event.get_competitor(bib_number)
+                if not new_groups[0].has_competitor(competitor):
+                    group.cancel_runs_competitor(competitor)
+                    group.remove_from_flight_order(competitor)
+
+            #Check if current group is finished
+            first_group_maybe_finished = True
+            counter = 0
+            while first_group_maybe_finished and counter < len(new_groups[0].get_flight_order()):
+                bib_number = new_groups[0].get_flight_order()[counter]
+                first_group_maybe_finished = not (bib_number in group.get_remaining_bibs_to_fly())
+                counter += 1
+
+            if first_group_maybe_finished:
+                group.validate_group()
+
+            self.groups += new_groups[1:]
+            #Add new groups in database
+            for group in new_groups[1:]:
+                Round.round_dao.add_group(group)
+                group.group_id = Round.round_dao.get_not_cancelled_group_id(self.event.id, self.round_number,
+                                                                            group.group_number)
+
+            if first_group_maybe_finished:
+                self._current_group_index += 1
+
+            Round.round_dao.update(self)
+
+    def cancel_current_group(self):
+        if self.group_scoring_enabled():
+            current_group = self.groups[self._current_group_index]
+            new_group = RoundGroup(self, current_group.group_number)
+            new_group.set_flight_order(current_group.get_flight_order())
+            current_group.cancelled = True
+            Round.round_dao.update(self)
+            Round.round_dao.add_group(new_group)
+            new_group.group_id = Round.round_dao.get_not_cancelled_group_id(self.event.id, self.round_number,
+                                                                            new_group.group_number)
+            self.groups[self._current_group_index] = new_group
+            return self.get_current_competitor()
+        else:
+            return self.cancel_round()
+
     def get_serialized_flight_order(self):
         res = ''
-        for bib_number in self._flight_order:
-            res += str(bib_number) + ','
+        for group in self.groups:
+            res += group.get_serialized_flight_order() + ','
         return res.rstrip(',')
 
     def get_flight_order(self):
-        return self._flight_order
+        res = []
+        for group in self.groups:
+            res += group.get_flight_order()
+        return res
 
     def get_remaining_bibs_to_fly(self):
-        if not self.valid:
-            if self.has_run():
-                currently_flying_bib = self._current_competitor_index+1
-            else:
-                currently_flying_bib = self._current_competitor_index
-            return self._flight_order[currently_flying_bib:]
-        else:
-            return []
+        res = []
+        for group in self.groups:
+            res += group.get_remaining_bibs_to_fly()
 
-    def set_flight_order_from_db(self, serialized_flight_order):
-        splitted_line = serialized_flight_order.split(',')
-        self._flight_order.clear()
-        for str_bib_number in splitted_line:
-            self._flight_order.append(int(str_bib_number))
+        return res
 
-    def set_flight_order_from_scratch(self):
-        self._flight_order.clear()
-        for bib in [bib_number for bib_number in sorted(self.event.competitors)
-                    if bib_number >= self.event.bib_start]:
-            self._flight_order += [bib]
-        for bib in [bib_number for bib_number in sorted(self.event.competitors)
-                    if bib_number < self.event.bib_start]:
-            self._flight_order += [bib]
 
     def handle_terminated_flight(self, competitor, chrono, penalty, valid, insert_database=False):
         run = Run()
@@ -100,20 +176,24 @@ class Round:
         self.give_refly(self.get_current_competitor())
 
     def give_refly(self, competitor):
-        self._flight_order.insert(self._current_competitor_index + self.event.get_flights_before_refly() + 1,
-                                  competitor.get_bib_number())
-        RoundDAO().update(self)
+        group = self.find_group(competitor)
+        group.give_refly(competitor)
 
     def _add_run(self, run, insert_database=False):
-        # TODO : search in which group the run has to be added
-        run.round_group = self.groups[-1]
-        self.groups[-1].add_run(run, insert_database)
-        self.set_current_competitor(run.competitor)
+        group = self.find_group(run.competitor)
+        run.round_group = group
+        group.add_run(run, insert_database)
+        group.set_current_competitor(run.competitor)
 
     def add_run_from_web(self, run):
-        # TODO : search in which group the run has to be added
-        run.round_group = self.groups[-1]
-        self.groups[-1].add_run(run, True)
+        group = self.find_group(run.competitor)
+        run.round_group = group
+        group.add_run(run, True)
+
+    def find_group(self, competitor):
+        for group in self.groups:
+            if group.has_competitor(competitor):
+                return group
 
     def to_string(self):
         result = os.linesep + 'Round number ' + str(self.round_number) + os.linesep
@@ -122,24 +202,28 @@ class Round:
         return result
 
     def get_current_competitor(self):
-        return self.event.get_competitor(self._flight_order[self._current_competitor_index])
-
-    def set_current_competitor(self, competitor):
-        self._current_competitor_index = self._current_competitor_index + \
-                                        self._flight_order[self._current_competitor_index:].index(competitor.bib_number)
-
-    def set_flight_order_index(self, index):
-        self._current_competitor_index = index
+        return self.groups[self._current_group_index].get_current_competitor()
 
     def next_pilot(self, insert_database=False, visited_competitors=[]):
-        if self._current_competitor_index < len(self._flight_order) - 1:
-            self._current_competitor_index += 1
-            current_competitor = self.get_current_competitor()
-            current_round = self
-        else:
-            self.validate_round(insert_database)
-            current_round = self.event.create_new_round(insert_database)
-            current_competitor = current_round.get_current_competitor()
+
+        current_competitor = self.groups[self._current_group_index].next_pilot()
+
+        current_round = self
+
+        if current_competitor is None:
+            #Round group is finished, need to switch to next group
+            if self._current_group_index < len(self.groups) - 1:
+                self.groups[self._current_group_index].validate_group()
+                self._current_group_index += 1
+                if insert_database:
+                    Round.round_dao.update(self)
+                current_competitor = self.groups[self._current_group_index].get_current_competitor()
+            else:
+                #All groups are finished ... need to create a new round
+                self.validate_round(insert_database)
+                current_round = self.event.create_new_round(insert_database)
+                current_competitor = current_round.get_current_competitor()
+
         if current_competitor.present:
             return current_competitor
         else:
@@ -157,21 +241,19 @@ class Round:
             competitor,
             Chrono(), 0, False, insert_database=True)
 
-    def number_of_performed_runs(self):
-        result = 0
-        for bib_number, runs_list in self.groups[-1].runs.items():
-            result += len(runs_list)
-        return result
-
     def next_pilot_database(self):
-        nb_run = self.number_of_performed_runs()
-        # if self._current_competitor_index < len(self._flight_order) - 1:
-        if nb_run < len(self._flight_order):
-            self._current_competitor_index = nb_run
+        next_pilot = None
+
+        current_group_index = 0
+        while current_group_index < len(self.groups) and next_pilot is None:
+            next_pilot = self.groups[current_group_index].next_pilot_database()
+            current_group_index += 1
+
+        if next_pilot is not None:
+            return next_pilot
         else:
             self.event.create_new_round(insert_database=True)
-            self._current_competitor_index = 0
-        return self.get_current_competitor()
+            return None
 
     def cancel_round(self):
         self.do_cancel_round()
@@ -182,10 +264,14 @@ class Round:
     def do_cancel_round(self):
         self.valid = False
         self.valid_round_number = None
+        for group in self.groups:
+            group.valid = False
         Round.round_dao.update(self)
 
     def validate_round(self, insert_database=False):
         self.valid = True
+        for group in self.groups:
+            group.validate_group(insert_database)
         if self.event in Round.valid_round_counters:
             previous_round = Round.valid_round_counters[self.event]
         else:
@@ -251,13 +337,15 @@ class Round:
                 valid_run = group.get_valid_run(fetched_competitor)
                 #TODO : compute global penalty for this round
                 if valid_run is not None:
+                    #TODO : handle the case if one competitor has valid flights in several groups
                     request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
                                   '&password=' + password + \
                                   '&function=postScore&event_id=' + str(self.event.f3x_vault_id) + \
                                   '&pilot_id=' + str(fetched_competitor.get_pilot().f3x_vault_id) + \
                                   '&round=' + str(self.valid_round_number) + \
                                   '&seconds=' + str(valid_run.get_flight_time()) + \
-                                  '&penalty=' + str(group.get_penalty(competitor)) #take also penalties from non valid flights
+                                  '&penalty=' + str(group.get_penalty(competitor)) + \
+                                  '&group=' + str(group.group_number)
                     request_url += '&sub1=' + str(valid_run.chrono.climbout_time)
                     for i in range(0, 10):
                         request_url += '&sub' + str(i + 2) + '=' + str(valid_run.chrono.get_lap_time(i))
@@ -273,7 +361,8 @@ class Round:
                                   '&pilot_id=' + str(fetched_competitor.get_pilot().f3x_vault_id) + \
                                   '&round=' + str(self.valid_round_number) + \
                                   '&seconds=' + str(0.0) + \
-                                  '&penalty=' + str(group.get_penalty(competitor))
+                                  '&penalty=' + str(group.get_penalty(competitor)) + \
+                                  '&group=' + str(group.group_number)
                     request_url += '&sub1=' + str(0.0)
                     for i in range(0, 10):
                         request_url += '&sub' + str(i + 2) + '=' + str(0.0)

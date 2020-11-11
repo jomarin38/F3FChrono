@@ -1,4 +1,6 @@
 import os
+
+from F3FChrono.data.dao.RoundDAO import RoundDAO
 from F3FChrono.data.dao.RunDAO import RunDAO
 import sys
 
@@ -11,15 +13,109 @@ class RoundGroup:
         self.start_time = None
         self.end_time = None
         self.group_number = group_number
+        self._current_competitor_index = 0
+        self._flight_order = []
         self.runs = {}
+        self.cancelled = False
+        self.group_id = None
+
+    def set_flight_order_index(self, index):
+        self._current_competitor_index = index
+
+    def set_flight_order(self, flight_order):
+        self._flight_order = flight_order
+        self._current_competitor_index = 0
+
+    def set_flight_order_from_db(self, serialized_flight_order):
+        splitted_line = serialized_flight_order.split(',')
+        self._flight_order.clear()
+        for str_bib_number in splitted_line:
+            self._flight_order.append(int(str_bib_number))
+
+    def get_serialized_flight_order(self):
+        res = ''
+        for bib_number in self._flight_order:
+            res += str(bib_number) + ','
+        return res.rstrip(',')
+
+    def get_flight_order(self):
+        return self._flight_order
+
+    def get_remaining_bibs_to_fly(self):
+        if not self.valid and self._current_competitor_index < len(self._flight_order):
+            current_competitor = self.round.event.get_competitor(self._flight_order[self._current_competitor_index])
+            if self.get_valid_run(current_competitor) is not None:
+                currently_flying_bib = self._current_competitor_index+1
+            else:
+                currently_flying_bib = self._current_competitor_index
+            return self._flight_order[currently_flying_bib:]
+        else:
+            return []
+
+    def next_pilot(self, insert_database=False, visited_competitors=[]):
+        if self._current_competitor_index < len(self._flight_order) - 1:
+            self._current_competitor_index += 1
+            current_competitor = self.get_current_competitor()
+
+            if current_competitor.present:
+                return current_competitor
+            else:
+                if current_competitor not in visited_competitors:
+                    # Give him a 0
+                    self.round.set_null_flight(current_competitor)
+                    visited_competitors.append(current_competitor)
+                    return self.next_pilot(insert_database, visited_competitors)
+                else:
+                    # In this case, nobody is set to present ...
+                    return current_competitor
+        else:
+            return None
+
+    def number_of_performed_runs(self):
+        result = 0
+        for bib_number, runs_list in self.runs.items():
+            result += len(runs_list)
+        return result
+
+    def next_pilot_database(self):
+        nb_run = self.number_of_performed_runs()
+        # if self._current_competitor_index < len(self._flight_order) - 1:
+        if nb_run < len(self._flight_order):
+            self._current_competitor_index = nb_run
+            return self.get_current_competitor()
+        else:
+            return None
+
+    def validate_group(self, insert_database=False):
+        self.valid = True
+
+    def remove_from_flight_order(self, competitor):
+        self._flight_order = list(filter(lambda bib: bib != competitor.bib_number, self._flight_order))
+
+    def has_competitor(self, competitor):
+        return (competitor.bib_number in self._flight_order) or (self.get_valid_run(competitor) is not None)
+
+    def get_current_competitor(self):
+        return self.round.event.get_competitor(self._flight_order[self._current_competitor_index])
+
+    def set_current_competitor(self, competitor):
+        self._current_competitor_index = self._current_competitor_index + \
+                                        self._flight_order[self._current_competitor_index:].index(competitor.bib_number)
+
+    def give_refly(self, competitor):
+        self._flight_order.insert(self._current_competitor_index + self.round.event.get_flights_before_refly() + 1,
+                                  competitor.get_bib_number())
+        RoundDAO().update(self.round)
 
     def add_run(self, run, insert_database=False):
         if run.competitor in self.runs:
             self.runs[run.competitor].append(run)
         else:
             self.runs[run.competitor] = [run]
-        if (insert_database):
-            RoundGroup.rundao.insert(run)
+        if insert_database:
+            run_id, chrono_id = RoundGroup.rundao.insert(run)
+            run.id = run_id
+            run.chrono.id = chrono_id
 
     def get_valid_run(self, competitor):
         if competitor in self.runs:
@@ -36,6 +132,11 @@ class RoundGroup:
             return len(self.runs[competitor]) > 0
         else:
             return False
+
+    def cancel_runs_competitor(self, competitor):
+        if competitor in self.runs:
+            for run in self.runs[competitor]:
+                run.valid = False
 
     def get_penalty(self, competitor):
         penalty = 0

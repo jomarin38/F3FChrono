@@ -37,6 +37,7 @@ class Event:
         self.number_of_valid_rounds = 0
         self.first_joker_round_number = 4
         self.second_joker_round_number = 15
+        self.groups_number = 1
 
 
     @staticmethod
@@ -161,6 +162,13 @@ class Event:
     def next_available_bib_number(self):
         return max(self.competitors.keys())+1
 
+    def get_last_round_number(self):
+        round_numbers = [f3f_round.round_number for f3f_round in self.rounds]
+        if len(round_numbers) > 0:
+            return max([f3f_round.round_number for f3f_round in self.rounds])
+        else:
+            return 0
+
     def competitor_from_f3x_vault_id(self, f3x_vault_id):
         for key, competitor in self.competitors.items():
             if competitor.get_pilot().get_f3x_vault_id() == f3x_vault_id:
@@ -170,11 +178,13 @@ class Event:
     def create_new_round(self, insert_database=False):
         f3f_round = Round.new_round(self)
         f3f_round.set_flight_order_from_scratch()
-        self.add_existing_round(f3f_round)
         if insert_database:
             Round.round_dao.insert(f3f_round)
 
-        return f3f_round
+        #Get round from database to get group ids
+        fully_fetched_round = Round.round_dao.get(f3f_round)
+        self.add_existing_round(fully_fetched_round)
+        return fully_fetched_round
 
     def add_existing_round(self, f3f_round):
         self.rounds.append(f3f_round)
@@ -247,22 +257,23 @@ class Event:
                 for group in f3f_round.groups:
                     group.compute_scores()
                     for bib_number, competitor in self.competitors.items():
-                        valid_run = group.get_valid_run(competitor)
-                        if valid_run is not None:
-                            competitor.score += valid_run.score
-                            competitor.update_jokers(f3f_round.valid_round_number, valid_run.score)
-                        else:
-                            competitor.update_jokers(f3f_round.valid_round_number, 0)
+                        if group.has_competitor(competitor):
+                            valid_run = group.get_valid_run(competitor)
+                            if valid_run is not None:
+                                competitor.score += valid_run.score
+                                competitor.update_jokers(f3f_round.valid_round_number, valid_run.score)
+                            else:
+                                competitor.update_jokers(f3f_round.valid_round_number, 0)
 
-                        #Get penalties
-                        competitor.penalty += group.get_penalty(competitor)
+                            #Get penalties
+                            competitor.penalty += group.get_penalty(competitor)
 
-                    bibs = sorted(self.competitors)
-                    pilots_ranks = ss.rankdata([-self.competitors[bib].score_with_jokers(self.number_of_valid_rounds)
-                                                for bib in bibs])
-                    for i in range(0, len(bibs)):
-                        self.competitors[bibs[i]].rank = pilots_ranks[i]
-                        self.competitors[bibs[i]].evolutive_rank.append(pilots_ranks[i])
+                bibs = sorted(self.competitors)
+                pilots_ranks = ss.rankdata([-self.competitors[bib].score_with_jokers(self.number_of_valid_rounds)
+                                            for bib in bibs])
+                for i in range(0, len(bibs)):
+                    self.competitors[bibs[i]].rank = pilots_ranks[i]
+                    self.competitors[bibs[i]].evolutive_rank.append(pilots_ranks[i])
             else:
                 #penalties applies also for cancelled rounds
                 for group in f3f_round.groups:

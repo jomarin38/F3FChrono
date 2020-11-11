@@ -52,7 +52,6 @@ class WRoundCtrl(QObject):
         self.widgetList.append(self.wChronoCtrl.get_widget())
         self.widgetList.append(self.widgetBtn)
         self.widgetList.append(self.widgetBtnCancel)
-        self.wBtnCtrl.Btn_gscoring.setEnabled(False)
         self.set_cancelmode(False)
         for widget in self.widgetList:
             widget.setStyleSheet("QPushButton{border: 1px solid black;border-radius: 10px;}")
@@ -99,6 +98,18 @@ class WRoundCtrl(QObject):
 
     def get_alarm_sig(self):
         return self.wPilotCtrl.btn_alarm_sig
+
+    def handle_group_scoring_enabled(self, enabled):
+        _translate = QtCore.QCoreApplication.translate
+        self.wPilotCtrl.handle_group_scoring_enabled(enabled)
+        if enabled:
+            self.wBtnCtrl.Btn_gscoring.setText(_translate("WChronoBtn", "GS Enabled"))
+            self.wBtnCtrl.Btn_gscoring.setEnabled(False)
+            self.wBtnCancel.label_cancelround.setText(_translate("WChronoCancelBtn", "Cancel Group ?"))
+        else:
+            self.wBtnCtrl.Btn_gscoring.setText(_translate("WChronoBtn", "G Scoring"))
+            self.wBtnCtrl.Btn_gscoring.setEnabled(True)
+            self.wBtnCancel.label_cancelround.setText(_translate("WChronoCancelBtn", "Cancel Round ?"))
 
 
 class WTrainingCtrl(QObject):
@@ -275,8 +286,18 @@ class WPilotCtrl(QObject):
 
     def set_data(self, competitor, round):
         self.view.pilotName.setText(competitor.display_name())
-        self.view.bib.setText(self._translate("BIB : ", "BIB : ") + str(competitor.get_bib_number()))
-        self.view.round.setText(self._translate("Round : ", "Round : ") + str(len(round.event.valid_rounds) + 1))
+        self.view.bib.setText(self._translate("BIB : ", "BIB : ")
+                              + str(competitor.get_bib_number()))
+        self.view.round.setText(self._translate("Round : ", "Round : ")
+                                + str(len(round.event.valid_rounds) + 1))
+        self.view.group.setText(self._translate("Group : ", "Group : ") +
+                                str(round.find_group(competitor).group_number))
+
+    def handle_group_scoring_enabled(self, enabled):
+        if enabled:
+            self.view.cancelRound.setText(self._translate("Cancel Group", "Cancel Group"))
+        else:
+            self.view.cancelRound.setText(self._translate("Cancel Round", "Cancel Round"))
 
 
 class WChronoCtrl(QTimer):
@@ -584,6 +605,7 @@ class WConfigCtrl(QObject):
         self.view.bib_startslider.valueChanged.connect(self.bib_start_slider_changed)
         self.view.MaxInterruptValue.valueChanged.connect(self.contest_valuechanged_sig.emit)
         self.view.daydurationvalue.valueChanged.connect(self.contest_valuechanged_sig.emit)
+        self.view.groups_number_value.valueChanged.connect(self.contest_valuechanged_sig.emit)
 
         self.view.randombtn.clicked.connect(self.btn_random_sig.emit)
         self.view.day_1btn.clicked.connect(self.btn_day_1_sig.emit)
@@ -619,6 +641,7 @@ class WConfigCtrl(QObject):
         self.view.bib_start.setValue(event.bib_start)
         self.view.MaxInterruptValue.setValue(event.max_interruption_time / 60)
         self.view.daydurationvalue.setValue(event.dayduration)
+        self.view.groups_number_value.setValue(event.groups_number)
 
     def set_contest(self, contest_list):
         _translate = QtCore.QCoreApplication.translate
@@ -639,6 +662,7 @@ class WConfigCtrl(QObject):
         self.bib_start = self.view.bib_start.value()
         self.dayduration = self.view.daydurationvalue.value()
         self.contest = self.view.ContestList.currentIndex()
+        self.groups_number = self.view.groups_number_value.value()
 
 
 class WSettingsAdvanced(QObject):
