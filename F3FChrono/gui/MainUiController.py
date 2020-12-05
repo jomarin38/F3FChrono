@@ -11,7 +11,7 @@ from F3FChrono.chrono.GPIOPort import rpi_gpio
 import os
 
 
-class MainUiCtrl (QtWidgets.QMainWindow):
+class MainUiCtrl(QtWidgets.QMainWindow):
     close_signal = pyqtSignal()
     signal_btnnext = pyqtSignal(int)
     signal_lowvoltage_ask = pyqtSignal()
@@ -31,7 +31,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
         if ConfigReader.config.conf['language'] != "English":
             _translator = QtCore.QTranslator()
-            _path = os.path.join(os.getcwd(), 'Languages', ConfigReader.config.conf['language']+'.qm')
+            _path = os.path.join(os.getcwd(), 'Languages', ConfigReader.config.conf['language'] + '.qm')
             _translator.load(_path)
             QtWidgets.QApplication.instance().installTranslator(_translator)
 
@@ -85,14 +85,15 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.ui.verticalLayout.setStretchFactor(round_widgets_list[1], 12)
         self.ui.verticalLayout.setStretchFactor(round_widgets_list[2], 3)
 
-
-        #connect signal event to method
+        # connect signal event to method
         self.controllers['config'].btn_settings_sig.connect(self.set_show_settings)
         self.controllers['config'].btn_next_sig.connect(self.start)
         self.controllers['config'].contest_sig.connect(self.contest_changed)
         self.controllers['config'].contest_valuechanged_sig.connect(self.context_valuechanged)
         self.controllers['config'].btn_random_sig.connect(self.random_bib_start)
         self.controllers['config'].btn_day_1_sig.connect(self.bib_day_1)
+        self.controllers['config'].btn_quitapp_sig.connect(self.shutdown_app)
+        self.controllers['config'].btn_shutdown_sig.connect(self.shutdown_rpi)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.home_action)
         self.controllers['round'].cancel_round_sig.connect(self.cancel_round)
@@ -107,18 +108,17 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
         self.controllers['settings'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
-        self.controllers['settings'].btn_quitapp_sig.connect(self.shutdown_app)
         self.controllers['settings'].btn_settingsbase_sig.connect(self.show_settingsbase)
         self.controllers['settings'].btn_settingswBtn_sig.connect(self.show_settingswBtn)
         self.controllers['settings'].btn_settingssound_sig.connect(self.show_settingssound)
 
         self.controllers['settingsbase'].set_udp_sig(self.chronoHard.udpReceive.simulate_base_sig,
-                                                 self.chronoHard.udpReceive.ipbase_set_sig,
-                                                 self.chronoHard.udpReceive.ipbase_clear_sig,
-                                                 self.chronoHard.udpReceive.ipbase_invert_sig)
+                                                     self.chronoHard.udpReceive.ipbase_set_sig,
+                                                     self.chronoHard.udpReceive.ipbase_clear_sig,
+                                                     self.chronoHard.udpReceive.ipbase_invert_sig)
         self.controllers['settingswBtn'].set_udp_sig(self.chronoHard.udpReceive.simulate_wbtn_sig,
-                                                 self.chronoHard.udpReceive.ipwBtn_set_sig,
-                                                 self.chronoHard.udpReceive.ipwBtn_clear_sig)
+                                                     self.chronoHard.udpReceive.ipwBtn_set_sig,
+                                                     self.chronoHard.udpReceive.ipwBtn_clear_sig)
         self.controllers['settingsadvanced'].btn_settings_sig.connect(self.show_settings)
         self.controllers['settingsadvanced'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settingsadvanced'].btn_valid_sig.connect(self.settings_valid)
@@ -263,10 +263,10 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.chronoHard.udpReceive.penalty_sig.disconnect(self.penalty_100)
             self.controllers['round'].get_alarm_sig().disconnect(self.slot_weather_alarm)
             if self.rpigpio.buzzer_next is not None:
-                self.chronoHard.weather.beep_signal.emit("stop",0,1000)
+                self.chronoHard.weather.beep_signal.emit("stop", 0, 1000)
                 self.chronoHard.weather.beep_signal.disconnect(self.rpigpio.buzzer_next.slot_blink)
             self.signal_race = None
-        if training==True:
+        if training == True:
             self.chronoHard.run_training.connect(self.controllers['training'].wChronoCtrl.set_time)
             self.chronoHard.status_changed.connect(self.controllers['training'].wChronoCtrl.set_status)
             self.controllers['training'].wChronoCtrl.training_voice_sig.connect(self.vocal.sound_time)
@@ -284,7 +284,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 self.chronoHard.weather.beep_signal.connect(self.rpigpio.buzzer_next.slot_blink)
             self.signal_race = True
 
-
     def settings_valid(self):
         self.controllers['settings'].get_data()
         self.controllers['settingssound'].get_data()
@@ -295,9 +294,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['settingswBtn'].btn_valid()
         ConfigReader.config.write('config.json')
         self.show_config()
-        #self.vocal.settings(ConfigReader.config.conf['sound'])
+        # self.vocal.settings(ConfigReader.config.conf['sound'])
         self.noise.settings(ConfigReader.config.conf['noisesound'],
-                           ConfigReader.config.conf['noisevolume'])
+                            ConfigReader.config.conf['noisevolume'])
         self.chronoHard.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
 
     def settings_cancel(self):
@@ -306,7 +305,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.show_config()
 
     def home_action(self):
-        #print event data
+        # print event data
         self.controllers['round'].wChronoCtrl.stoptime()
         self.vocal.stop_all()
         self.show_config()
@@ -321,15 +320,15 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def next_pilot(self, insert_database=False):
         current_round = self.event.get_current_round()
-        self.controllers['round'].wPilotCtrl.set_data(current_round.next_pilot(insert_database,visited_competitors=[]),
+        self.controllers['round'].wPilotCtrl.set_data(current_round.next_pilot(insert_database, visited_competitors=[]),
                                                       current_round)
         self.controllers['round'].wChronoCtrl.reset_ui()
         self.vocal.signal_pilotname.emit(int(self.event.get_current_round().get_current_competitor().get_bib_number()))
-        if self.event.get_current_round().group_scoring_enabled(): #Can't use current_group because it has changed
+        # Can't use current_group because it has changed
+        if self.event.get_current_round().group_scoring_enabled():
             self.controllers['round'].handle_group_scoring_enabled(True)
         else:
             self.controllers['round'].handle_group_scoring_enabled(False)
-
 
     def context_valuechanged(self):
         self.getcontextparameters(False)
@@ -345,7 +344,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if self.event:
             del self.event
         self.event = self.daoEvent.get(self.controllers['config'].view.ContestList.currentData().id,
-                    fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
+                                       fetch_competitors=True, fetch_rounds=True, fetch_runs=False)
 
         self.event.bib_day_1_compute()
         self.controllers['config'].set_data(self.event)
@@ -364,7 +363,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         eventData = self.controllers['config'].view.ContestList.currentData()
         if eventData is not None:
             self.event = self.daoEvent.get(eventData.id,
-                        fetch_competitors=True, fetch_rounds=True, fetch_runs=True, fetch_runs_lastround=True)
+                                           fetch_competitors=True, fetch_rounds=True, fetch_runs=True,
+                                           fetch_runs_lastround=True)
             current_round = self.event.get_current_round()
             if not current_round.has_run() and not current_round.group_scoring_enabled():
                 current_round.set_flight_order_from_scratch()
@@ -385,8 +385,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
                 self.controllers['round'].handle_group_scoring_enabled(True)
             else:
                 self.controllers['round'].handle_group_scoring_enabled(False)
-            self.chronoHard.weather.set_rules_limit(self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,
-                                              self.event.max_wind_dir_dev)
+            self.chronoHard.weather.set_rules_limit(self.event.min_allowed_wind_speed,
+                                                    self.event.max_allowed_wind_speed,
+                                                    self.event.max_wind_dir_dev)
             self.chronoHard.weather.enable_rules(self.controllers['round'].isalarm_enable())
             self.set_signal_mode(training=False)
             self.show_chrono()
@@ -431,7 +432,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.rpigpio.signal_buzzer.emit(1)
 
     def penalty_100(self):
-        #print("penalty event 100")
+        # print("penalty event 100")
         self.vocal.signal_penalty.emit()
         self.chronoHard.addPenalty(100)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
@@ -470,7 +471,6 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['round'].wChronoCtrl.set_null_flight(True)
 
-
     def refly(self):
         # TODO : get penalty value if any
         self.chronoHard.set_status(chronoStatus.Finished)
@@ -501,7 +501,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         if self.controllers['config'].is_show():
             print('config')
             contest = self.controllers['config'].view.ContestList.count()
-            self.controllers['config'].view.ContestList.setCurrentIndex(contest-1)
+            self.controllers['config'].view.ContestList.setCurrentIndex(contest - 1)
             self.controllers['config'].contest_sig.emit()
             self.start()
         elif self.controllers['round'].is_show():
@@ -515,22 +515,23 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             print("mode training")
             self.controllers['training'].btn_home_sig.emit()
             contest = self.controllers['config'].view.ContestList.count()
-            self.controllers['config'].view.ContestList.setCurrentIndex(contest-1)
+            self.controllers['config'].view.ContestList.setCurrentIndex(contest - 1)
             self.controllers['config'].contest_sig.emit()
             self.start()
 
     def slot_status_changed(self, status):
-        #print ("slot status", status)
+        # print ("slot status", status)
         self.controllers['round'].wChronoCtrl.set_status(status)
-        if (status==chronoStatus.InWait):
+        if (status == chronoStatus.InWait):
             if self.low_voltage_ask:
                 self.vocal.signal_lowVoltage.emit()
-                self.low_voltage_ask=False
-        if (status==chronoStatus.WaitLaunch):
-            self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, to_launch=True)
+                self.low_voltage_ask = False
+        if (status == chronoStatus.WaitLaunch):
+            self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False,
+                                                          to_launch=True)
         if (status == chronoStatus.Launched):
             self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launched_time'], False)
-        if (status==chronoStatus.InStart):
+        if (status == chronoStatus.InStart):
             self.vocal.signal_entry.emit()
 
     def slot_run_started(self):
@@ -542,9 +543,9 @@ class MainUiCtrl (QtWidgets.QMainWindow):
         self.vocal.signal_base.emit(lap)
 
     def slot_run_finished(self, run_time):
-        #print("Main UI Controller slot run finished : ", time.time())
+        # print("Main UI Controller slot run finished : ", time.time())
         self.controllers['round'].wChronoCtrl.stoptime()
-        #print ('final time : ' + str(run_time))
+        # print ('final time : ' + str(run_time))
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         self.controllers['round'].widgetBtn.update()
         if ConfigReader.config.conf["sound"]:
@@ -553,9 +554,8 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_altitude_finished(self, run_time):
         print("slot altitude")
 
-
     def slot_run_validated(self):
-        #print("run validated")
+        # print("run validated")
         if self.chronoHard.isRefly():
             self.event.get_current_round().handle_refly(0, insert_database=True)
         else:
@@ -587,20 +587,20 @@ class MainUiCtrl (QtWidgets.QMainWindow):
     def slot_accu(self, voltage):
         self.controllers['wind'].set_voltage(voltage)
         print(voltage)
-        #adding for log voltage
+        # adding for log voltage
         f = open("voltage_log.txt", "a+")
-        f.write(str(self.startup_time)+','+str((time.time()-self.startup_time)/60.0) +
-                ',' + str(voltage)+'\n')
+        f.write(str(self.startup_time) + ',' + str((time.time() - self.startup_time) / 60.0) +
+                ',' + str(voltage) + '\n')
         f.close()
 
     def slot_rssi(self, rssi1, rssi2):
         self.controllers['wind'].set_rssi(rssi1, rssi2)
 
     def slot_low_voltage_ask(self):
-        if  not self.controllers['round'].is_show():
+        if not self.controllers['round'].is_show():
             self.vocal.signal_lowVoltage.emit()
         else:
-            self.low_voltage_ask=True
+            self.low_voltage_ask = True
 
     def closeEvent(self, event):
         self.close_signal.emit()
@@ -608,7 +608,7 @@ class MainUiCtrl (QtWidgets.QMainWindow):
 
     def shutdown_app(self):
         if self.rpigpio.buzzer_next is not None:
-            self.rpigpio.buzzer_next.slot_blink("stop",0)
+            self.rpigpio.buzzer_next.slot_blink("stop", 0)
         self.chronoHard.stop()
         if self.webserver_process is not None:
             print('Kill process ' + str(self.webserver_process.pid))
@@ -616,17 +616,23 @@ class MainUiCtrl (QtWidgets.QMainWindow):
             self.webserver_process.kill()
         exit()
 
-def main ():
+    def shutdown_rpi(self):
+        import os
+        os.system('shutdown now')
+        self.shutdown_app()
 
+
+def main():
     ConfigReader.init()
-    ConfigReader.config = ConfigReader.Configuration ('../../config.json')
+    ConfigReader.config = ConfigReader.Configuration('../../config.json')
     dao = EventDAO()
     chronodata = Chrono()
     app = QtWidgets.QApplication(sys.argv)
-    ui=MainUiCtrl(dao, chronodata, '')
-    #launched simulate mode
+    ui = MainUiCtrl(dao, chronodata, "")
+
+    # launched simulate mode
     if (ConfigReader.config.conf['simulate']):
-        ui_simulate=SimulateBase()
+        ui_simulate = SimulateBase()
         ui_simulate.close_signal.connect(ui.MainWindow.close)
         ui.close_signal.connect(ui_simulate.MainWindow.close)
 
@@ -639,7 +645,6 @@ def main ():
         pass
     finally:
         pass
-
 
 
 if __name__ == '__main__':
