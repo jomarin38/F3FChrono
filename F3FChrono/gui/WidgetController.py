@@ -210,10 +210,10 @@ class WWindCtrl():
         self.view.btn_clear.setVisible(False)
 
     def cancelroundtostr(self):
-        cancelstr = ''
+        cancelstr = ""
         if self.rules['alarm']:
             # cancelstr=', Cancel Round'
-            cancelstr = ''
+            cancelstr = ""
         return cancelstr
 
     def set_signal(self, voltage_sig):
@@ -581,6 +581,8 @@ class WConfigCtrl(QObject):
     btn_settings_sig = pyqtSignal()
     btn_random_sig = pyqtSignal()
     btn_day_1_sig = pyqtSignal()
+    btn_quitapp_sig = pyqtSignal()
+    btn_shutdown_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -609,6 +611,9 @@ class WConfigCtrl(QObject):
 
         self.view.randombtn.clicked.connect(self.btn_random_sig.emit)
         self.view.day_1btn.clicked.connect(self.btn_day_1_sig.emit)
+        self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
+        self.view.shutdownbtn.clicked.connect(self.btn_shutdown_sig.emit)
+
 
     def get_widget(self):
         return (self.widgetList)
@@ -1209,7 +1214,6 @@ class WSettings(QObject):
     btn_settingssound_sig = pyqtSignal()
     btn_cancel_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
-    btn_quitapp_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -1228,7 +1232,6 @@ class WSettings(QObject):
 
         self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
         self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
-        self.view.closebtn.clicked.connect(self.btn_quitapp_sig.emit)
 
         self.languages_available = []
 

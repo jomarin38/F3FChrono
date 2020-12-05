@@ -17,8 +17,4 @@ SOURCES      += F3FChrono/gui/WidgetController.py
 SOURCES      += F3FChrono/chrono/Sound.py
 SOURCES      += F3FChrono/gui/WChronoBtn_cancel_ui.py
 
-
 TRANSLATIONS = Languages/French.ts
-
-
-
