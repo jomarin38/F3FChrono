@@ -1,8 +1,8 @@
--- MySQL dump 10.16  Distrib 10.1.44-MariaDB, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.17  Distrib 10.3.25-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: 127.0.0.1    Database: f3f_chrono
 -- ------------------------------------------------------
--- Server version	10.1.44-MariaDB-0ubuntu0.18.04.1
+-- Server version	10.3.25-MariaDB-0ubuntu0.20.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -29,7 +29,7 @@ CREATE TABLE `chrono` (
   `max_wind_speed` double DEFAULT NULL,
   `mean_wind_speed` double DEFAULT NULL,
   `wind_direction` double DEFAULT NULL,
-  `start_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `start_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `end_date` timestamp NULL DEFAULT NULL,
   `lap1` double DEFAULT NULL,
   `lap2` double DEFAULT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE `chrono` (
   `lap10` double DEFAULT NULL,
   `climbout_time` double DEFAULT NULL,
   PRIMARY KEY (`chrono_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=453 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1002 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -83,12 +83,13 @@ CREATE TABLE `event` (
   `max_allowed_wind_speed` double DEFAULT NULL,
   `max_wind_dir_dev` double DEFAULT NULL,
   `max_interruption_time` double DEFAULT NULL,
-  `bib_start` int(11) DEFAULT '0',
-  `flights_before_refly` int(11) DEFAULT '5',
-  `dayduration` int(11) DEFAULT '1',
+  `bib_start` int(11) DEFAULT 0,
+  `flights_before_refly` int(11) DEFAULT 5,
+  `dayduration` int(11) DEFAULT 1,
   `f3x_vault_id` int(11) DEFAULT NULL,
+  `groups_number` int(11) DEFAULT NULL,
   PRIMARY KEY (`event_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -106,7 +107,7 @@ CREATE TABLE `pilot` (
   `national_id` varchar(45) DEFAULT NULL,
   `f3x_vault_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`pilot_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -120,7 +121,8 @@ CREATE TABLE `round` (
   `round_number` int(11) NOT NULL,
   `event_id` int(11) NOT NULL,
   `valid` tinyint(4) DEFAULT NULL,
-  `flight_order` text,
+  `flight_order` text DEFAULT NULL,
+  `current_group` int(11) DEFAULT 0,
   PRIMARY KEY (`round_number`,`event_id`),
   KEY `fk_round_event_idx` (`event_id`),
   CONSTRAINT `fk_round_event` FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -140,10 +142,14 @@ CREATE TABLE `roundgroup` (
   `group_number` int(11) NOT NULL,
   `start_date` timestamp NULL DEFAULT NULL,
   `end_date` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`round_number`,`group_number`,`event_id`),
+  `flight_order` text DEFAULT NULL,
+  `valid` tinyint(4) DEFAULT 0,
+  `cancelled` int(11) NOT NULL DEFAULT 0,
+  `group_id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`group_id`),
   KEY `fk_roundgroup_round_idx` (`round_number`,`event_id`),
   CONSTRAINT `fk_roundgroup_round` FOREIGN KEY (`round_number`, `event_id`) REFERENCES `round` (`round_number`, `event_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=181 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -160,17 +166,16 @@ CREATE TABLE `run` (
   `penalty` double DEFAULT NULL,
   `valid` tinyint(4) NOT NULL,
   `reason` varchar(200) DEFAULT NULL,
-  `round_number` int(11) DEFAULT NULL,
-  `group_number` int(11) DEFAULT NULL,
   `event_id` int(11) DEFAULT NULL,
+  `group_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`run_id`),
-  KEY `fk_run_roundgroup_idx` (`round_number`,`group_number`,`event_id`),
   KEY `fk_run_competitor_idx` (`competitor_id`,`event_id`),
   KEY `fk_run_chrono_idx` (`chrono_id`),
+  KEY `fk_run_group` (`group_id`),
   CONSTRAINT `fk_run_chrono` FOREIGN KEY (`chrono_id`) REFERENCES `chrono` (`chrono_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_run_competitor` FOREIGN KEY (`competitor_id`, `event_id`) REFERENCES `competitor` (`pilot_id`, `event_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_run_roundgroup` FOREIGN KEY (`round_number`, `group_number`, `event_id`) REFERENCES `roundgroup` (`round_number`, `group_number`, `event_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=453 DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `fk_run_group` FOREIGN KEY (`group_id`) REFERENCES `roundgroup` (`group_id`) ON DELETE NO ACTION ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1019 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -182,4 +187,4 @@ CREATE TABLE `run` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-07-14  9:34:19
+-- Dump completed on 2020-12-13 18:04:57
