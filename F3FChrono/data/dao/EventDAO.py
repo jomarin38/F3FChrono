@@ -21,11 +21,14 @@ class EventDAO(Dao):
             fetch_runs=False, fetch_runs_lastround=False):
         sql = 'SELECT event_id, begin_date, end_date, location, name, min_allowed_wind_speed, ' \
               'max_allowed_wind_speed, max_wind_dir_dev, max_interruption_time, bib_start, flights_before_refly, '\
-                'dayduration, f3x_vault_id, groups_number FROM event WHERE event_id=%s'
+                'dayduration, f3x_vault_id, groups_number, successive_pilot_flights FROM event WHERE event_id=%s'
         query_result = self._execute_query(sql, event_id)
         #Query should return only one row
         for row in query_result:
-            result = Event()
+            if row[14]<=1:
+                result = Event()
+            else:
+                result = WinterEvent()
             result.id = row[0]
             result.begin_date = row[1]
             result.end_date = row[2]
