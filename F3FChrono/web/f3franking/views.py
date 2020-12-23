@@ -75,7 +75,7 @@ def event_view_html(event_id):
 
     page = ResultPage(title=event.name)
 
-    if event.current_round is not None:
+    if event.has_ongoing_round():
         table = ResultTable('Ongoing round :', css_id='ranking')
         header = Header(name=Link('Round ' + str(len(event.valid_rounds)+1),
                                   'round_view?event_id=' + str(event_id) +

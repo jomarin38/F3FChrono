@@ -29,7 +29,7 @@ class Event:
         self.max_allowed_wind_speed = 25.0
         self.max_wind_dir_dev = 45.0
         self.max_interruption_time = 30 * 60
-        self.current_round = None
+        self._current_round = None
         self.bib_start = 1
         self.dayduration = 1
         self.flights_before_refly = 5
@@ -43,12 +43,15 @@ class Event:
     @staticmethod
     def from_csv(event_name, event_location, begin_date, end_date, csv_file):
         event = Event()
+        event._initialize_from_csv(event_name, event_location, begin_date, end_date, csv_file)
+        return event
 
-        event.name = event_name
-        event.location = event_location
+    def _initialize_from_csv(self, event_name, event_location, begin_date, end_date, csv_file):
+        self.name = event_name
+        self.location = event_location
 
-        event.begin_date = datetime.strptime(begin_date.strip('\"'), '%d/%m/%y')
-        event.end_date = datetime.strptime(end_date.strip('\"'), '%d/%m/%y')
+        self.begin_date = datetime.strptime(begin_date.strip('\"'), '%d/%m/%y')
+        self.end_date = datetime.strptime(end_date.strip('\"'), '%d/%m/%y')
 
         file_data = csv_file.read().decode("utf-8")
 
@@ -60,10 +63,8 @@ class Event:
                 pilot = Pilot(name=splitted_line[0].strip('\"'),
                               first_name=splitted_line[1].strip('\"')
                               )
-                event.register_pilot(pilot, next_bib_number)
+                self.register_pilot(pilot, next_bib_number)
                 next_bib_number += 1
-
-        return event
 
     @staticmethod
     def from_f3x_vault(login, password, contest_id, max_rounds=None):
@@ -75,6 +76,11 @@ class Event:
         :return:
         """
         event = Event()
+        event._initialize_from_f3x_vault(login, password, contest_id, max_rounds)
+        return event
+
+
+    def _initialize_from_f3x_vault(self, login, password, contest_id, max_rounds=None):
 
         #Getting general event info
         request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
@@ -88,13 +94,13 @@ class Event:
 
         splitted_line = splitted_response.pop(0).split(',')
 
-        event.id = splitted_line[0].strip('\"')
+        self.id = splitted_line[0].strip('\"')
         #dates have to be converted to datetime objects
-        event.name = splitted_line[1].strip('\"')
-        event.begin_date = datetime.strptime(splitted_line[3].strip('\"'), '%m/%d/%y')
-        event.end_date = datetime.strptime(splitted_line[4].strip('\"'), '%m/%d/%y')
-        event.location = splitted_line[2].strip('\"')
-        event.f3x_vault_id = contest_id
+        self.name = splitted_line[1].strip('\"')
+        self.begin_date = datetime.strptime(splitted_line[3].strip('\"'), '%m/%d/%y')
+        self.end_date = datetime.strptime(splitted_line[4].strip('\"'), '%m/%d/%y')
+        self.location = splitted_line[2].strip('\"')
+        self.f3x_vault_id = contest_id
 
         n_rounds = int(splitted_line[6].strip('\"'))
 
@@ -112,7 +118,7 @@ class Event:
                               )
                 bib_number = int(splitted_line[1].strip('\"'))
 
-                event.register_pilot(pilot, bib_number)
+                self.register_pilot(pilot, bib_number)
 
         if max_rounds is not None:
             n_rounds_to_get = min(max_rounds, n_rounds)
@@ -121,7 +127,7 @@ class Event:
 
         for round_id in range(1, n_rounds_to_get+1):
 
-            f3f_round = event.create_new_round()
+            f3f_round = self.create_new_round()
 
             request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
                           '&password=' + password + \
@@ -134,7 +140,7 @@ class Event:
             for index, row in df.iterrows():
                 #First put data in a dictionary to sort it on bib numbers
 
-                competitor = event.competitor_from_f3x_vault_id(row['Pilot_id'])
+                competitor = self.competitor_from_f3x_vault_id(row['Pilot_id'])
                 pilot_flight_time = row['seconds']
                 pilot_penalty = row['penalty']
                 pilot_flight_valid = (pilot_flight_time > 0.0)
@@ -156,8 +162,6 @@ class Event:
             f3f_round.validate_round()
 
             print(f3f_round.to_string())
-
-        return event
 
     def next_available_bib_number(self):
         return max(self.competitors.keys())+1
@@ -188,10 +192,10 @@ class Event:
 
     def add_existing_round(self, f3f_round):
         self.rounds.append(f3f_round)
-        if self.current_round is None:
-            self.current_round = 0
+        if self._current_round is None:
+            self._current_round = 0
         else:
-            self.current_round += 1
+            self._current_round += 1
 
     def register_pilot(self, pilot, bib_number, team=None):
         new_competitor = Competitor.register_pilot(self, bib_number, pilot, team)
@@ -217,7 +221,13 @@ class Event:
     def get_current_round(self):
         if len(self.rounds) < 1:
             self.create_new_round(insert_database=True)
-        return self.rounds[self.current_round]
+        return self.rounds[self._current_round]
+
+    def set_current_round(self, round_number):
+        self._current_round = round_number
+
+    def has_ongoing_round(self):
+        return self._current_round is not None
 
     def get_competitor(self, bib_number):
         return self.competitors[bib_number]
@@ -291,3 +301,9 @@ class Event:
     def export_to_f3x_vault(self, login, password):
         for f3f_round in self.rounds:
             f3f_round.export_to_f3x_vault(login, password)
+
+    def handle_valid_flight_registered(self):
+        pass
+
+    def get_successive_pilot_flights(self):
+        return 1

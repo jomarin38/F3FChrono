@@ -157,6 +157,7 @@ class Round:
         run.chrono = chrono
         run.valid = valid
         self._add_run(run, insert_database)
+        self.event.handle_valid_flight_registered()
 
     def display_name(self):
 
