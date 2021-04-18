@@ -12,7 +12,7 @@ from F3FChrono.Utils import is_running_on_pi
 class rs232_arduino (QObject):
     reset_arduino_sig = pyqtSignal()
 
-    def __init__(self, voltageCoef, rebundTimeBtn, buzzerTime, status_changed, run_started, climbout_time, lap_finished,
+    def __init__(self, voltageCoef1, voltageCoef2, rebundTimeBtn, buzzerTime, status_changed, run_started, climbout_time, lap_finished,
                  run_finished, run_training, wait_alt_sig, accu_sig):
         super().__init__()
         self.bus = serial.Serial(port=rs232_arduino.get_serial_port(), baudrate=57600, parity=serial.PARITY_NONE,
@@ -31,7 +31,8 @@ class rs232_arduino (QObject):
         self.rebundTime = rebundTimeBtn
         self.buzzerTime = buzzerTime
         self.lastrequest = 0.0
-        self.voltageCoef = voltageCoef
+        self.voltageCoef1 = voltageCoef1
+        self.voltageCoef2 = voltageCoef2
         self.reset_arduino_sig.connect(self.slot_arduino_reset)
         self.terminated = False
         self.event = threading.Thread(target=self.receive)
@@ -40,7 +41,7 @@ class rs232_arduino (QObject):
         self.inRun = False
         self.kill_aduino()
         self.training = False
-        self.__debug = False
+        self.__debug = True
         self.finaltime = 0.0
 
     @staticmethod
@@ -106,7 +107,7 @@ class rs232_arduino (QObject):
                     if data[0] == "climbout_time":
                         self.climbout_time_sig.emit(int(data[1])/1000)
                     if data[0] == "voltage":
-                        self.accu_sig.emit(int(data[1])*5/1024/self.voltageCoef)
+                        self.accu_sig.emit(int(data[1])*5/1024/self.voltageCoef1, int(data[2])*5/1024/self.voltageCoef2)
                     if data[0] == "resetµc":
                         self.reset_arduino_sig.emit()
             except serial.SerialException as e:

@@ -584,13 +584,13 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             chrono.add_lap_time(lap)
         print(chrono.to_string())
 
-    def slot_accu(self, voltage):
-        self.controllers['wind'].set_voltage(voltage)
-        print(voltage)
+    def slot_accu(self, voltage1, voltage2):
+        self.controllers['wind'].set_voltage(voltage1, voltage2)
+        print(voltage1, voltage2)
         # adding for log voltage
         f = open("voltage_log.txt", "a+")
         f.write(str(self.startup_time) + ',' + str((time.time() - self.startup_time) / 60.0) +
-                ',' + str(voltage) + '\n')
+                ',' + str(voltage1) + ',' + str(voltage2) + '\n')
         f.close()
 
     def slot_rssi(self, rssi1, rssi2):

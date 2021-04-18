@@ -219,15 +219,18 @@ class WWindCtrl():
     def set_signal(self, voltage_sig):
         self.lowVoltage_sig = voltage_sig
 
-    def set_voltage(self, voltage):
-        self.view.voltage.setText("{:0>3.1f}".format(voltage) + " V")
-        if voltage <= ConfigReader.config.conf['voltage_min'] and \
+    def set_voltage(self, voltage1, voltage2):
+        self.view.voltage.setText("{:0>3.1f}V, {:0>3.1f}V".format(voltage1, voltage2))
+        if voltage1 <= ConfigReader.config.conf['voltage_min_Accu1'] and \
+                voltage2 <= ConfigReader.config.conf['voltage_min_Accu2'] and \
                 self.voltagestylesheet == "background-color:rgba( 255, 255, 255, 0% );":
             self.voltagestylesheet = "background-color:red;"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
             if self.lowVoltage_sig is not None:
                 self.lowVoltage_sig.emit()
-        elif voltage > ConfigReader.config.conf['voltage_min'] and self.voltagestylesheet == "background-color:red;":
+        elif (voltage1 > ConfigReader.config.conf['voltage_min_Accu1'] or
+              voltage2 > ConfigReader.config.conf['voltage_min_Accu2']) and \
+                self.voltagestylesheet == "background-color:red;":
             self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
 
@@ -705,29 +708,29 @@ class WSettingsAdvanced(QObject):
         self.view.port_btn_baseA.setValue(ConfigReader.config.conf['btn_baseA'])
         self.view.port_btn_baseB.setValue(ConfigReader.config.conf['btn_baseB'])
         self.view.port_btn_next.setValue(ConfigReader.config.conf['btn_next'])
-        self.view.port_ledA.setValue(ConfigReader.config.conf['ledA'])
-        self.view.port_ledB.setValue(ConfigReader.config.conf['ledB'])
         self.view.port_buzzer.setValue(ConfigReader.config.conf['buzzer'])
         self.view.buzzer_duration.setValue(ConfigReader.config.conf['buzzer_duration'])
         self.view.port_buzzer_next.setValue(ConfigReader.config.conf['buzzer_next'])
         self.view.buzzer_next_duration.setValue(ConfigReader.config.conf['buzzer_next_duration'])
         self.view.udp_port.setValue(ConfigReader.config.conf['udpport'])
-        self.view.voltagemin.setValue(ConfigReader.config.conf['voltage_min'])
-        self.view.voltagecoef.setValue(ConfigReader.config.conf['voltage_coef'])
+        self.view.voltagemin_1.setValue(ConfigReader.config.conf['voltage_min_Accu1'])
+        self.view.voltagecoef_1.setValue(ConfigReader.config.conf['voltage_coef_Accu1'])
+        self.view.voltagemin_2.setValue(ConfigReader.config.conf['voltage_min_Accu2'])
+        self.view.voltagecoef_2.setValue(ConfigReader.config.conf['voltage_coef_Accu2'])
 
     def get_data(self):
         ConfigReader.config.conf['btn_baseA'] = self.view.port_btn_baseA.value()
         ConfigReader.config.conf['btn_baseB'] = self.view.port_btn_baseB.value()
         ConfigReader.config.conf['btn_next'] = self.view.port_btn_next.value()
-        ConfigReader.config.conf['ledA'] = self.view.port_ledA.value()
-        ConfigReader.config.conf['ledB'] = self.view.port_ledB.value()
         ConfigReader.config.conf['buzzer'] = self.view.port_buzzer.value()
         ConfigReader.config.conf['buzzer_duration'] = self.view.buzzer_duration.value()
         ConfigReader.config.conf['buzzer_next'] = self.view.port_buzzer_next.value()
         ConfigReader.config.conf['buzzer_next_duration'] = self.view.buzzer_next_duration.value()
         ConfigReader.config.conf['udpport'] = self.view.udp_port.value()
-        ConfigReader.config.conf['voltage_min'] = self.view.voltagemin.value()
-        ConfigReader.config.conf['voltage_coef'] = self.view.voltagecoef.value()
+        ConfigReader.config.conf['voltage_min_Accu1'] = self.view.voltagemin_1.value()
+        ConfigReader.config.conf['voltage_coef_Accu1'] = self.view.voltagecoef_1.value()
+        ConfigReader.config.conf['voltage_min_Accu2'] = self.view.voltagemin_2.value()
+        ConfigReader.config.conf['voltage_coef_Accu2'] = self.view.voltagecoef_2.value()
 
 
 class WSettingsBase(QObject):
