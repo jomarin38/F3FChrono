@@ -88,7 +88,7 @@ class Ui_WWind(object):
     def retranslateUi(self, WWind):
         _translate = QtCore.QCoreApplication.translate
         WWind.setWindowTitle(_translate("WWind", "Form"))
-        self.voltage.setText(_translate("WWind", "12.6 V"))
+        self.voltage.setText(_translate("WWind", "12.6V, 12,6V"))
         self.WindInfo.setText(_translate("WWind", "Wind : 6.2m/s, 10°, No rain"))
         self.Elapsedtime.setText(_translate("WWind", "Elapsed time : "))
         self.btn_clear.setText(_translate("WWind", "X"))
