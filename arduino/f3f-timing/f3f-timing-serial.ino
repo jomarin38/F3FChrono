@@ -94,6 +94,8 @@ void serial_run(void) {
         memset(&chronostatus, 0, sizeof(chronostatus));
         memset(&chrono, 0, sizeof(chrono));
       }
+    }else if (tmp=='o'){  //Manual output buzzer
+        buzzer_lowlevel(serial.data_read[1]=='1');
     }
     memset(&serial, 0, sizeof(serial));
   }

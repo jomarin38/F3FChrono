@@ -16,7 +16,7 @@ typedef struct {
 volatile analogStr accu[2] = {0, 0};
 
 void analog_setup(void){
-  memset (accu, 0, sizeof(accu)*2);
+  memset (accu, 0, sizeof(accu));
   accu[0].Pin = VOLTAGEPIN0;
   accu[0].readTime = VOLTAGE_TIME;
   //Initalize @12V for the first measurements

@@ -51,6 +51,20 @@ void buzzerSet(byte nb)
   }
 }
 
+void buzzer_lowlevel(int state){
+  Serial.print("buzzer lowlevel,");
+  Serial.print(state);
+  Serial.print(", pin : ");
+  Serial.println(BUZZERPIN);
+  
+  if (state){
+    digitalWrite(BUZZERPIN, HIGH);
+  }else{
+    digitalWrite(BUZZERPIN, LOW);
+  }
+}
+
+
 void printbuzzer(void){
   Serial.print("buzzertime,");
   Serial.print(buzzer.Time);
@@ -66,6 +80,8 @@ void printoutput(void){
   Serial.print(buzzer.Time);
   Serial.print(",state,");
   Serial.print(buzzer.State);
+  Serial.print(",pin,");
+  Serial.print(buzzer.Pin);
   Serial.print(",led,");
   Serial.print("cmd,");
   Serial.print(led.Cmd);
