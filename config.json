@@ -27,8 +27,8 @@
  "udpport": 4445,
  "voice": true,
  "voice_rate": 150,
- "voltage_coef_Accu1": 0.331,
- "voltage_coef_Accu2": 0.331,
+ "voltage_coef_Accu1": 0.357,
+ "voltage_coef_Accu2": 0.357,
  "voltage_min_Accu1": 9.9,
  "voltage_min_Accu2": 9.9,
  "webserver_port": 8000
