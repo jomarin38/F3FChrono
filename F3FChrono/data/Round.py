@@ -331,6 +331,7 @@ class Round:
             f3f_run.penalty += penalty
 
     def export_to_f3x_vault(self, login, password):
+        visited_competitors = []
         for group in self.groups:
             for bib_number, competitor in self.event.competitors.items():
                 fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
@@ -344,7 +345,7 @@ class Round:
                                   '&pilot_id=' + str(fetched_competitor.get_pilot().f3x_vault_id) + \
                                   '&round=' + str(self.valid_round_number) + \
                                   '&seconds=' + str(valid_run.get_flight_time()) + \
-                                  '&penalty=' + str(group.get_penalty(competitor)) + \
+                                  '&penalty=' + str(self.get_penalty(competitor)) + \
                                   '&group=' + str(group.group_number)
                     request_url += '&sub1=' + str(valid_run.chrono.climbout_time)
                     for i in range(0, 10):
@@ -353,25 +354,28 @@ class Round:
                         if valid_run.chrono is not None:
                             request_url += '&wind_avg=' + str(valid_run.chrono.mean_wind_speed)
                             request_url += '&dir_avg=' + str(valid_run.chrono.mean_wind_speed)
+                    response = requests.post(request_url)
+                    visited_competitors.append(competitor)
                 else:
-                    #Competitor did not finish its run (or even did not start it !)
-                    request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
-                                  '&password=' + password + \
-                                  '&function=postScore&event_id=' + str(self.event.f3x_vault_id) + \
-                                  '&pilot_id=' + str(fetched_competitor.get_pilot().f3x_vault_id) + \
-                                  '&round=' + str(self.valid_round_number) + \
-                                  '&seconds=' + str(0.0) + \
-                                  '&penalty=' + str(group.get_penalty(competitor)) + \
-                                  '&group=' + str(group.group_number)
-                    request_url += '&sub1=' + str(0.0)
-                    for i in range(0, 10):
-                        request_url += '&sub' + str(i + 2) + '=' + str(0.0)
-                    request_url += '&dnf=' + str(True)
-                    if valid_run is not None:
-                        if valid_run.chrono is not None:
-                            request_url += '&wind_avg=' + str(valid_run.chrono.mean_wind_speed)
-                            request_url += '&dir_avg=' + str(valid_run.chrono.mean_wind_speed)
-                response = requests.post(request_url)
+                    if competitor not in visited_competitors:
+                        #Competitor did not finish its run (or even did not start it !)
+                        request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
+                                      '&password=' + password + \
+                                      '&function=postScore&event_id=' + str(self.event.f3x_vault_id) + \
+                                      '&pilot_id=' + str(fetched_competitor.get_pilot().f3x_vault_id) + \
+                                      '&round=' + str(self.valid_round_number) + \
+                                      '&seconds=' + str(0.0) + \
+                                      '&penalty=' + str(self.get_penalty(competitor)) + \
+                                      '&group=' + str(group.group_number)
+                        request_url += '&sub1=' + str(0.0)
+                        for i in range(0, 10):
+                            request_url += '&sub' + str(i + 2) + '=' + str(0.0)
+                        request_url += '&dnf=' + str(True)
+                        if valid_run is not None:
+                            if valid_run.chrono is not None:
+                                request_url += '&wind_avg=' + str(valid_run.chrono.mean_wind_speed)
+                                request_url += '&dir_avg=' + str(valid_run.chrono.mean_wind_speed)
+                        response = requests.post(request_url)
 
         #Update event score status
         valid_integer_code = 0

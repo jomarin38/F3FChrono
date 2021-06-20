@@ -112,7 +112,10 @@ def event_view_html(event_id):
             row.add_cell(Cell('{:6.2f}'.format(competitor_score)))
             if best_score is None:
                 best_score = competitor_score
-            row.add_cell(Cell('{:2d}'.format(int(competitor_score / best_score * 1000))))
+            if best_score>0:
+                row.add_cell(Cell('{:2d}'.format(int(competitor_score / best_score * 1000))))
+            else:
+                row.add_cell(Cell('NaN'))
             row.add_cell(Cell(competitor.pilot.to_string()))
             for f3f_round in event.valid_rounds:
                 competitor_rank = int(competitor.evolutive_rank[f3f_round.valid_round_number-1])
