@@ -478,6 +478,14 @@ class WChronoCtrl(QTimer):
         else:
             self.view.nullFlightLabel.setText("")
 
+    def display_wind_info(self, wind_speed, wind_speed_unit,  wind_dir, rain, alarm):
+        self.view.WindInfo.setText('{:.1f}'.format(wind_speed) + wind_speed_unit + ', '+ str(wind_dir) + '°')
+
+        if alarm:
+            self.view.WindInfo.setStyleSheet('background-color:red;')
+        else:
+            self.view.WindInfo.setStyleSheet('background-color:rgba( 255, 255, 255, 0% );')
+
 
 class WChronoTrainingCtrl(QObject):
     training_voice_sig = pyqtSignal(float, bool)

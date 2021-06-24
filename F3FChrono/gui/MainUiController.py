@@ -140,6 +140,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['config'].set_contest(self.daoEvent.get_list())
         self.controllers['wind'].display_wind_info(-1.0, "m/s", -1.0, False, False)
         self.chronoHard.weather.gui_weather_signal.connect(self.controllers['wind'].display_wind_info)
+        self.chronoHard.weather.gui_weather_signal.connect(self.controllers['round'].wChronoCtrl.display_wind_info)
         self.controllers['wind'].set_signal(self.signal_lowvoltage_ask)
         self.signal_lowvoltage_ask.connect(self.slot_low_voltage_ask)
 
