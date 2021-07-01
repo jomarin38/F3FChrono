@@ -51,7 +51,6 @@ void setup() {
   output_setup();
   analog_setup();
   base_setup();
-
 }
 
 // the loop function runs over and over again forever
@@ -63,6 +62,7 @@ void loop() {
   buzzerRun();
   chrono_run();
   delay (LOOPDELAY);
+  
 }
 
 void printreset(void){

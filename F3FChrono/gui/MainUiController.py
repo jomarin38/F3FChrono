@@ -140,6 +140,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['config'].set_contest(self.daoEvent.get_list())
         self.controllers['wind'].display_wind_info(-1.0, "m/s", -1.0, False, False)
         self.chronoHard.weather.gui_weather_signal.connect(self.controllers['wind'].display_wind_info)
+        self.chronoHard.weather.gui_weather_signal.connect(self.controllers['round'].wChronoCtrl.display_wind_info)
         self.controllers['wind'].set_signal(self.signal_lowvoltage_ask)
         self.signal_lowvoltage_ask.connect(self.slot_low_voltage_ask)
 
@@ -584,13 +585,13 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             chrono.add_lap_time(lap)
         print(chrono.to_string())
 
-    def slot_accu(self, voltage):
-        self.controllers['wind'].set_voltage(voltage)
-        print(voltage)
+    def slot_accu(self, voltage1, voltage2):
+        self.controllers['wind'].set_voltage(voltage1, voltage2)
+        print(voltage1, voltage2)
         # adding for log voltage
         f = open("voltage_log.txt", "a+")
         f.write(str(self.startup_time) + ',' + str((time.time() - self.startup_time) / 60.0) +
-                ',' + str(voltage) + '\n')
+                ',' + str(voltage1) + ',' + str(voltage2) + '\n')
         f.close()
 
     def slot_rssi(self, rssi1, rssi2):
