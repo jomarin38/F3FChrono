@@ -52,6 +52,14 @@ class RoundGroup:
         else:
             return []
 
+    #Used in F3XVault export
+    def get_valid_flight_flight_order(self, competitor):
+        if competitor.bib_number in self._flight_order:
+            for run in self.runs[competitor]:
+                if run.valid:
+                    return run
+        return 0
+
     def next_pilot(self, insert_database=False, visited_competitors=[]):
         if self._current_competitor_index < len(self._flight_order) - 1:
             self._current_competitor_index += 1

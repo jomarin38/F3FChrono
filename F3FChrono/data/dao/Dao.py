@@ -4,7 +4,7 @@ import threading
 
 class Dao:
 
-    _db = pymysql.connect(host="localhost", user="f3f_ctrl", password="F3FCtrl", db="f3f_chrono")
+    _db = pymysql.connect(host="192.168.43.124", user="f3f_ctrl", password="F3FCtrl", db="f3f_chrono")
     _lock = threading.Lock()
 
     def __init__(self):
