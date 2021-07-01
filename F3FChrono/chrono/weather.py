@@ -20,7 +20,7 @@ class Weather(QTimer):
         self.wind = collections.OrderedDict()
         self.rules = collections.OrderedDict()
         self.reset_wind()
-        self.__debug = True
+        self.__debug = False
         self.rules['starttime'] = time.time()
         self.rules['endtime'] = time.time()
         self.rules['detected'] = False

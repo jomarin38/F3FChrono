@@ -339,6 +339,7 @@ class Round:
                 #TODO : compute global penalty for this round
                 if valid_run is not None:
                     #TODO : handle the case if one competitor has valid flights in several groups
+                    order = group.get_valid_flight_order(competitor)
                     request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
                                   '&password=' + password + \
                                   '&function=postScore&event_id=' + str(self.event.f3x_vault_id) + \
@@ -354,7 +355,9 @@ class Round:
                         if valid_run.chrono is not None:
                             request_url += '&wind_avg=' + str(valid_run.chrono.mean_wind_speed)
                             request_url += '&dir_avg=' + str(valid_run.chrono.mean_wind_speed)
-                    response = requests.post(request_url)
+                        if order is not None:
+                            request_url +='&order=' + str(order)
+                        response = requests.post(request_url)
                     visited_competitors.append(competitor)
                 else:
                     if competitor not in visited_competitors:

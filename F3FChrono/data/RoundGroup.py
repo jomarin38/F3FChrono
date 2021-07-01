@@ -1,4 +1,5 @@
 import os
+from collections import OrderedDict
 
 from F3FChrono.data.dao.RoundDAO import RoundDAO
 from F3FChrono.data.dao.RunDAO import RunDAO
@@ -51,6 +52,15 @@ class RoundGroup:
             return self._flight_order[currently_flying_bib:]
         else:
             return []
+
+    #Used in F3XVault export
+    def get_valid_flight_order(self, competitor):
+        if competitor.bib_number in self._flight_order:
+            #remove duplicates, keep last flight for each competitor
+            cleaned_flight_order = list(reversed(OrderedDict.fromkeys(reversed(self._flight_order))))
+            index = cleaned_flight_order.index(competitor.bib_number)
+            return index + 1
+        return None
 
     def next_pilot(self, insert_database=False, visited_competitors=[]):
         if self._current_competitor_index < len(self._flight_order) - 1:
