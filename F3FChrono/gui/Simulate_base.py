@@ -101,6 +101,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         self.udpbeep.sendData("wind_dir " + str(self.ui.wind_dir.value()))
         self.udpbeep.sendData("rain " + str(self.ui.rain.isChecked()))
         self.udpbeep.sendData("simulate info " + str(self.ui.AccuVoltage.value()) + " " + \
+                              str(self.ui.AccuVoltage_2.value()) + " " + \
                               str(self.ui.rssi_picam1.value()) + " " + str(self.ui.rssi_picam2.value()))
 
     def closeEvent(self, event):

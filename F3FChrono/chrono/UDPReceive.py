@@ -44,7 +44,7 @@ class udpreceive(QThread):
 
     def __init__(self, udpport, signal_chrono, signal_btnnext, signal_windspeed, signal_winddir, signal_rain, signal_accu, signal_rssi):
         super().__init__()
-        self.__debug = False
+        self.__debug = True
         self.port = udpport
         self.event_chrono = signal_chrono
         self.event_btn_next = signal_btnnext
@@ -121,8 +121,11 @@ class udpreceive(QThread):
                     if m[1] == 'GPIO':
                         if m[2].lower() == "btnnext":
                             self.event_btn_next.emit(0)
-                        break
-                    if m[1] == 'base':
+                        elif m[2] == 'baseA':
+                            self.event_chrono.emit("udpreceive", "event", "baseA")
+                        elif m[2] == 'baseB':
+                            self.event_chrono.emit("udpreceive", "event", "baseB")
+                    elif m[1] == 'base':
                         address[0] = m[2]
                         for i in range(0, 3):
                             del(m[0])
@@ -140,8 +143,8 @@ class udpreceive(QThread):
                 elif m[0] == 'rain':
                     self.event_rain.emit(bool(m[1] == 'True'))
                 elif m[0] == 'info':
-                    self.event_accu.emit(float(m[1]))
-                    self.event_rssi.emit(int(m[2]), int(m[3]))
+                    self.event_accu.emit(float(m[1]), float(m[2]))
+                    self.event_rssi.emit(int(m[3]), int(m[4]))
                 elif m[0] == 'wBtn':
                     self._wbtn_function(address[0], int(m[1]))
                 else:

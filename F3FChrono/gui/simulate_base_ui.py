@@ -152,6 +152,24 @@ class Ui_MainWindow(object):
         self.listBaseA = QtWidgets.QListWidget(self.centralwidget)
         self.listBaseA.setObjectName("listBaseA")
         self.gridLayout.addWidget(self.listBaseA, 2, 0, 7, 1)
+        self.AccuVoltage_2 = QtWidgets.QDoubleSpinBox(self.centralwidget)
+        self.AccuVoltage_2.setDecimals(1)
+        self.AccuVoltage_2.setMinimum(9.0)
+        self.AccuVoltage_2.setMaximum(12.6)
+        self.AccuVoltage_2.setSingleStep(0.1)
+        self.AccuVoltage_2.setProperty("value", 11.8)
+        self.AccuVoltage_2.setObjectName("AccuVoltage_2")
+        self.gridLayout.addWidget(self.AccuVoltage_2, 8, 4, 1, 1)
+        self.label_28 = QtWidgets.QLabel(self.centralwidget)
+        self.label_28.setMinimumSize(QtCore.QSize(0, 15))
+        self.label_28.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_28.setFont(font)
+        self.label_28.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_28.setObjectName("label_28")
+        self.gridLayout.addWidget(self.label_28, 7, 4, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -173,6 +191,7 @@ class Ui_MainWindow(object):
         self.label_5.setText(_translate("MainWindow", "Wireless btn"))
         self.label_14.setText(_translate("MainWindow", "Rain"))
         self.label_25.setText(_translate("MainWindow", "Accu"))
+        self.label_28.setText(_translate("MainWindow", "Accu2"))
 
 
 if __name__ == "__main__":
