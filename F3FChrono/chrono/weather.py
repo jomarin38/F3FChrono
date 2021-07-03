@@ -52,9 +52,9 @@ class Weather(QTimer):
         self.start(1000)
 
     def __checkrules(self):
-        if self.__rules_enable and self.rules['speed_limit_min'] is not -1.0 and \
-                self.rules['speed_limit_max'] is not -1.0 and \
-                self.rules['dir_limit'] is not -1.0:
+        if self.__rules_enable and self.rules['speed_limit_min'] != -1.0 and \
+                self.rules['speed_limit_max'] != -1.0 and \
+                self.rules['dir_limit'] != -1.0:
             if self.__debug:
                 print("checkrules")
             if abs(self.wind['orientation']) > self.rules['dir_limit'] or \
@@ -69,7 +69,7 @@ class Weather(QTimer):
                     self.rules['endtime'] = time.time()
                     if (time.time() - self.rules['starttime']) > 20:
                         self.rules['alarm'] = True
-                        if self.rules['beep_state'] is not "alarm":
+                        if self.rules['beep_state'] != "alarm":
                             self.beep_signal.emit("permanent", -1, 1000)
                             self.rules['beep_state'] = "alarm_wait"
                             if self.__debug:
@@ -80,7 +80,7 @@ class Weather(QTimer):
                             print("weather not condition")
             else:
                 if (time.time() - self.rules['endtime']) > 20 and not self.rules['ok_dc']:
-                    if self.rules['beep_state'] is not "ok_dc":
+                    if self.rules['beep_state'] != "ok_dc":
                         self.beep_signal.emit("blink", 5, 250)
                         self.rules['beep_state'] = "ok_dc"
                         self.rules['ok_dc'] = True
@@ -89,7 +89,7 @@ class Weather(QTimer):
                 else:
                     self.rules['detected'] = False
                     self.rules['alarm'] = False
-                    if self.rules['beep_state'] is not "stop":
+                    if self.rules['beep_state'] != "stop":
                         self.beep_signal.emit("stop", -1, 1000)
                         self.rules['beep_state'] = "stop"
                         if self.__debug:
