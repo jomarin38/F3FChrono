@@ -79,7 +79,7 @@ class Weather(QTimer):
                         if self.__debug:
                             print("weather not condition")
             else:
-                if (time.time() - self.rules['endtime']) > 20 and not self.rules['ok_dc']:
+                if (time.time() - self.rules['endtime']) > 20 and not self.rules['ok_dc'] and not self.inRun:
                     if self.rules['beep_state'] is not "ok_dc":
                         self.beep_signal.emit("blink", 5, 250)
                         self.rules['beep_state'] = "ok_dc"
@@ -140,6 +140,7 @@ class Weather(QTimer):
             self.wind['speed_max'] = -1.0
             self.wind['orientation_sum'] = 0.0
             self.wind['orientation_nb'] = 0.0
+            self.enable_rules(self.__rules_enable)
             if self.__debug:
                 print("Wind InRun")
         else:
