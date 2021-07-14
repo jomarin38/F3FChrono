@@ -140,7 +140,7 @@ class udpreceive(QThread):
                 elif m[0] == 'rain':
                     self.event_rain.emit(bool(m[1] == 'True'))
                 elif m[0] == 'info':
-                    self.event_accu.emit(float(m[1]))
+                    self.event_accu.emit(float(m[1]), float(m[1]))
                     self.event_rssi.emit(int(m[2]), int(m[3]))
                 elif m[0] == 'wBtn':
                     self._wbtn_function(address[0], int(m[1]))
