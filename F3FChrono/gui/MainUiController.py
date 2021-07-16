@@ -346,6 +346,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.controllers['round'].handle_group_scoring_enabled(True)
         else:
             self.controllers['round'].handle_group_scoring_enabled(False)
+        # Send this string using UDP ... using udpbeep ?
+        print(current_round.get_summary_as_json())
 
     def context_valuechanged(self):
         self.getcontextparameters(False)
