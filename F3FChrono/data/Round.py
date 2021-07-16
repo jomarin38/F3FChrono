@@ -433,8 +433,11 @@ class Round:
         result_dict = {}
         groups = []
         for group in self.groups:
-            group_dict = {'group_number': group.group_number,
-                          'best_run': group.get_best_run().to_string()}
+            if group.get_best_run() is not None:
+                group_dict = {'group_number': group.group_number,
+                              'best_run': group.get_best_run().to_string()}
+            else:
+                group_dict = {'group_number': group.group_number}
             groups.append(group_dict)
         result_dict['best_runs'] = groups
         remaining_pilots = []
