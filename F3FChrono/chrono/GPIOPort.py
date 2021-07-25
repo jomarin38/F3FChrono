@@ -159,9 +159,9 @@ class rpi_gpio(QObject):
             self.buzzer_next.slot_blink("blink", nb)
 
     def btn_next_action(self, port):
-        GPIO.remove_event_detect(port)
-        self.signal_btn_next.emit()
-
+        if port==ConfigReader.config.conf['btn_next']:
+            GPIO.remove_event_detect(port)
+            self.signal_btn_next.emit()
 
     def btn_next_event(self):
         self.btnNext_Timer.start(200)
