@@ -64,6 +64,7 @@ class rs232_arduino (QObject):
     @staticmethod
     def get_serial_port():
         if is_running_on_pi():
+            print ('/dev/ttyS0, rpi')
             return '/dev/ttyS0'
         else:
             return '/dev/ttyUSB0'

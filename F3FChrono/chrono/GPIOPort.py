@@ -127,8 +127,10 @@ def event_detected(port):
 class rpi_gpio(QObject):
     signal_buzzer = pyqtSignal(int)
     signal_buzzer_next = pyqtSignal(int)
+    signal_btn_next = pyqtSignal()
+    btnNext_Timer = QTimer()
 
-    def __init__(self, rpi, btn_next_action, btn_baseA, btn_baseB):
+    def __init__(self, rpi):
         super().__init__()
         self.signal_buzzer.connect(self.buzzer_fct)
         self.signal_buzzer_next.connect(self.buzzer_next_fct)
@@ -140,13 +142,11 @@ class rpi_gpio(QObject):
             self.buzzer_next = gpioPort(ConfigReader.config.conf['buzzer_next'],
                                         duration=ConfigReader.config.conf['buzzer_next_duration'], start_blinks=2)
             # btn_next callback
-            addCallback(ConfigReader.config.conf['btn_next'], btn_next_action, False)
-            # btn_baseA
-            if btn_baseA is not None:
-                addCallback(ConfigReader.config.conf['btn_baseA'], btn_baseA, False)
-            # btn_baseB
-            if btn_baseB is not None:
-                addCallback(ConfigReader.config.conf['btn_baseB'], btn_baseB, False)
+            addCallback(ConfigReader.config.conf['btn_next'], self.btn_next_action, True)
+            self.btnNext_Timer.timeout.connect(self.btn_next_check)
+            self.signal_btn_next.connect(self.btn_next_event)
+            
+
 
     def buzzer_fct(self, nb):
         print("buzzer base")
@@ -158,6 +158,18 @@ class rpi_gpio(QObject):
         if self.buzzer_next is not None:
             self.buzzer_next.slot_blink("blink", nb)
 
+    def btn_next_action(self, port):
+        GPIO.remove_event_detect(port)
+        self.signal_btn_next.emit()
+
+
+    def btn_next_event(self):
+        self.btnNext_Timer.start(200)
+        
+    def btn_next_check(self):
+        if GPIO.input(ConfigReader.config.conf['btn_next']):
+            addCallback(ConfigReader.config.conf['btn_next'], self.btn_next_action, True)
+            self.btnNext_Timer.stop()
 
 if __name__ == '__main__':
     led = gpioPort(19, duration=1000, start_blinks=2)

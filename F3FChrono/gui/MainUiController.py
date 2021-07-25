@@ -30,7 +30,6 @@ import os
 
 class MainUiCtrl(QtWidgets.QMainWindow):
     close_signal = pyqtSignal()
-    signal_btnnext = pyqtSignal(int)
     signal_lowvoltage_ask = pyqtSignal()
     startup_time = None
 
@@ -41,9 +40,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.daoEvent = eventdao
         self.daoRound = RoundDAO()
         self.event = None
+        self.rpigpio = rpi_gpio(rpi)
         self.chronodata = chronodata
-        self.chronoHard = ChronoArduino(self.signal_btnnext)
-        self.rpigpio = rpi_gpio(rpi, self.btn_next_action, None, None)
+        self.chronoHard = ChronoArduino(self.rpigpio.signal_btn_next)
         self.base_test = -10
 
         if ConfigReader.config.conf['language'] != "English":
@@ -58,7 +57,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
         self.initUI()
 
-        self.signal_btnnext.connect(self.btn_next_action)
+        self.rpigpio.signal_btn_next.connect(self.next_action)
 
         self.chronoHard.rssi_signal.connect(self.slot_rssi)
         self.chronoHard.accu_signal.connect(self.slot_accu)
@@ -435,9 +434,6 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.controllers['training'].btn_reset()
 
         self.rpigpio.signal_buzzer_next.emit(1)
-
-    def btn_next_action(self, port):
-        self.next_action()
 
     def handle_time_elapsed(self):
         print("time elapsed")
