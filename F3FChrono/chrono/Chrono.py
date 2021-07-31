@@ -19,16 +19,11 @@ import os
 from datetime import datetime
 import collections
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
-from F3FChrono.chrono.UDPBeep import *
+from F3FChrono.chrono.UDPSend import *
 from F3FChrono.chrono.UDPReceive import *
 from F3FChrono.chrono import ConfigReader
 from F3FChrono.chrono.rs232_arduino import rs232_arduino
 from F3FChrono.chrono.weather import Weather
-
-
-IPUDPBEEP = '255.255.255.255'
-UDPPORT = 4445
-
 
 class chronoType():
     wire = 0
@@ -77,7 +72,6 @@ class ChronoHard(QObject):
         self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.weather.windspeed_signal,
                                      self.weather.winddir_signal, self.weather.rain_signal, self.accu_signal,
                                      self.rssi_signal)
-        self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
         self.valid = True
         self.refly = False
         self.__debug = False
@@ -262,109 +256,6 @@ class ChronoArduino(ChronoHard, QTimer):
 
     def set_mode(self, training=True):
         self.arduino.set_mode(training)
-
-
-'''
-class ChronoRpi(ChronoHard):
-    def __init__(self, signal_btnnext):
-        super().__init__(signal_btnnext)
-        self.lastBase = -2
-        self.lastBaseChangeTime = 0.0
-        self.lastDetectionTime = 0.0
-        self.status = chronoStatus.InWait
-        self.startAltitude = 0.0
-        self.chrono_signal.connect(self.handle_chrono_event)
-        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.wind_signal, self.accu_signal, self.rssi_signal)
-        self.udpBeep = udpbeep(IPUDPBEEP, UDPPORT)
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.timerEvent)
-
-    def __del__(self):
-        self.udpBeep.terminate()
-        del self.udpBeep
-        del self.udpReceive
-
-    def handle_chrono_event(self, caller, data, address):
-        if not caller.lower() == "btnnext" and not self.status == chronoStatus.InProgressA \
-                and not self.status == chronoStatus.InProgressB:
-            self.buzzer_validated.emit()
-        if ((self.status == chronoStatus.Launched or self.status == chronoStatus.InStart or
-             self.status == chronoStatus.InProgressA or self.status == chronoStatus.InProgressB)
-            and caller.lower() == "udpreceive" or caller.lower() == "btnnext") \
-                and data.lower() == "event":
-            self.__declareBase(address)
-
-
-    def timerEvent(self):
-        self.__declareBase("Altitude")
-
-    def __declareBase (self, base):
-        print (base, self.status)
-        now = time.time()
-        if self.status == chronoStatus.InWait or self.status == chronoStatus.WaitLaunch:
-            self.set_status(self.status+1)
-            return True
-
-        if self.status == chronoStatus.WaitAltitude and now>=(self.startAltitude + 5.0):
-            self.altitude_finished.emit()
-            self.set_status(self.status+1)
-            self.timer.stop()
-            return True
-
-        if self.status == chronoStatus.Finished:
-            self.run_validated.emit()
-            return True
-
-        if self.status == chronoStatus.Launched and (base == "btnnext" or base == "baseA"):
-            self.lastBase=base
-            self.set_status(self.status+1)
-            return True
-
-        if self.status == chronoStatus.InStart and (base == "btnnext" or base == "baseA"):
-            self.lastBaseChangeTime = now
-            self.startTime = datetime.now()
-            self.chronoLap.clear()
-            self.timelost.clear()
-            self.set_status(self.status+1)
-            self.lastBase = base
-            self.run_started.emit()
-            return True
-
-        if self.status==chronoStatus.InProgressA and (base == "baseA" or base == "btnnext"):
-            elapsedTime = (now - self.lastBaseChangeTime)
-            self.lastBaseChangeTime = now
-            self.lastDetectionTime = now
-            self.lastBase = base
-
-            self.status = chronoStatus.InProgressB
-            self.chronoLap.append(elapsedTime)
-            self.timelost.append(0.0)
-            self.lap_finished.emit(self.getLapCount(), elapsedTime)
-
-            if self.getLapCount()==10:
-                self.endTime=datetime.now()
-                self.set_status(chronoStatus.WaitAltitude)
-                self.startAltitude = now
-                self.run_finished.emit(self.get_time())
-                self.timer.start(100)
-            return True
-        elif self.status==chronoStatus.InProgressB and (base=="baseB" or base=="btnnext"):
-            elapsedTime = ((now- self.lastBaseChangeTime))
-            self.lastBaseChangeTime = now
-            self.lastDetectionTime = now
-            self.lastBase = base
-
-            self.status = chronoStatus.InProgressA
-            self.chronoLap.append(elapsedTime)
-            self.timelost.append(0.0)
-            self.lap_finished.emit(self.getLapCount(), elapsedTime)
-            return True
-        elif self.getLapCount() > 1:    #Base declaration is the same
-                elapsedTime = now - self.lastDetectionTime
-                self.lastDetectionTime = now
-                self.timelost[self.getLapCount() - 1] = self.timelost[self.getLapCount() - 1] + elapsedTime
-                return False
-'''
 
 
 def main():

@@ -29,4 +29,4 @@ class Pilot:
         return self.f3x_vault_id
 
     def to_string(self):
-        return self.name + '\t' + self.first_name
+        return self.name + ' ' + self.first_name
