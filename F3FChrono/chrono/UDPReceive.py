@@ -165,7 +165,7 @@ class udpreceive(QThread):
         if find and (base == "baseA" or base == "baseB"):
             self.event_chrono.emit("udpreceive", "event", base)
         elif find and base == "btn_next":
-            self.event_btn_next.emit(0)
+            self.event_btn_next.emit()
         elif find and base == "switch_mode":
             self.switchMode_sig.emit()
         elif find and base == "penalty":
