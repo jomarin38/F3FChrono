@@ -160,10 +160,10 @@ class rpi_gpio(QObject):
 
     def btn_next_action(self, port):
         if port==ConfigReader.config.conf['btn_next']:
-            GPIO.remove_event_detect(port)
             self.signal_btn_next.emit()
 
     def btn_next_event(self):
+        GPIO.remove_event_detect(ConfigReader.config.conf['btn_next'])
         self.btnNext_Timer.start(200)
         
     def btn_next_check(self):
