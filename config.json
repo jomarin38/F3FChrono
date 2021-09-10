@@ -16,7 +16,7 @@
  "inStartBlackOut_second": 0.5,
  "language": "French",
  "lowvoltage_sound": true,
- "noisesound": true,
+ "noisesound": false,
  "noisevolume": 0.07,
  "rebound_btn_time": 500,
  "run_webserver": true,

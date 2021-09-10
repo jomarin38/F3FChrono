@@ -416,6 +416,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.show_chrono()
             print(current_round.get_summary_as_json())
             self.udpsend.sendOrderData(current_round.get_summary_as_json())
+
         else:
             self.chronoHard.set_mode(training=True)
             self.controllers['training'].wChronoCtrl.reset()
