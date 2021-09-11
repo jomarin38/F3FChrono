@@ -90,6 +90,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsbase'] = WSettingsBase("panel SettingsBase", self.ui.centralwidget)
         self.controllers['settingswBtn'] = WSettingswBtn("panel Settings_wBtn", self.ui.centralwidget)
         self.controllers['settingssound'] = WSettingsSound("panel SettingsSound", self.ui.centralwidget)
+        self.controllers['settingQrCode'] = WSettingsQrCode("panel QrCode", self.ui.centralwidget)
         self.controllers['wind'] = WWindCtrl("panel Wind", self.ui.centralwidget)
 
         for key, ctrl in self.controllers.items():
@@ -127,6 +128,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settings'].btn_settingsbase_sig.connect(self.show_settingsbase)
         self.controllers['settings'].btn_settingswBtn_sig.connect(self.show_settingswBtn)
         self.controllers['settings'].btn_settingssound_sig.connect(self.show_settingssound)
+        self.controllers['settings'].qrcode_sig.connect(self.show_settingsQrCode)
 
         self.controllers['settingsbase'].set_udp_sig(self.chronoHard.udpReceive.simulate_base_sig,
                                                      self.chronoHard.udpReceive.ipbase_set_sig,
@@ -147,6 +149,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingssound'].btn_settings_sig.connect(self.show_settings)
         self.controllers['settingssound'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settingssound'].btn_valid_sig.connect(self.settings_valid)
+        self.controllers['settingQrCode'].btn_back_sig.connect(self.show_settings)
         self.controllers['training'].btn_reset_sig.connect(self.chronoHard.arduino.reset_training)
         self.controllers['training'].btn_home_sig.connect(self.home_training)
         self.controllers['training'].btn_next_sig.connect(self.next_action)
@@ -168,6 +171,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsbase'].hide()
         self.controllers['settingswBtn'].hide()
         self.controllers['settingssound'].hide()
+        self.controllers['settingQrCode'].hide()
         self.controllers['config'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
@@ -180,6 +184,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsbase'].hide()
         self.controllers['settingswBtn'].hide()
         self.controllers['settingssound'].hide()
+        self.controllers['settingQrCode'].hide()
         self.controllers['round'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
@@ -192,6 +197,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsbase'].hide()
         self.controllers['settingswBtn'].hide()
         self.controllers['settingssound'].hide()
+        self.controllers['settingQrCode'].hide()
         self.controllers['settings'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
@@ -205,6 +211,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsbase'].hide()
         self.controllers['settingswBtn'].hide()
         self.controllers['settingssound'].hide()
+        self.controllers['settingQrCode'].hide()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
@@ -217,6 +224,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsbase'].show()
         self.controllers['settingswBtn'].hide()
         self.controllers['settingssound'].hide()
+        self.controllers['settingQrCode'].hide()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
@@ -229,6 +237,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsbase'].hide()
         self.controllers['settingswBtn'].show()
         self.controllers['settingssound'].hide()
+        self.controllers['settingQrCode'].hide()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
@@ -241,6 +250,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsbase'].hide()
         self.controllers['settingswBtn'].hide()
         self.controllers['settingssound'].show()
+        self.controllers['settingQrCode'].hide()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
@@ -253,6 +263,21 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswBtn'].hide()
         self.controllers['settingsbase'].hide()
         self.controllers['settingssound'].hide()
+        self.controllers['settingQrCode'].hide()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
+
+    def show_settingsQrCode(self, url):
+        self.controllers['settingQrCode'].displayF3FRankingQrCode()
+        self.controllers['training'].hide()
+        self.controllers['config'].hide()
+        self.controllers['settings'].hide()
+        self.controllers['round'].hide()
+        self.controllers['settingsadvanced'].hide()
+        self.controllers['settingswBtn'].hide()
+        self.controllers['settingsbase'].hide()
+        self.controllers['settingssound'].hide()
+        self.controllers['settingQrCode'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 

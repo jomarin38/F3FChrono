@@ -9,6 +9,7 @@ python3 -m PyQt5.uic.pyuic -x WChronoTraining.ui -o WChronoTraining_ui.py
 python3 -m PyQt5.uic.pyuic -x WChronoBtn.ui -o WChronoBtn_ui.py
 python3 -m PyQt5.uic.pyuic -x WChronoBtn_cancel.ui -o WChronoBtn_cancel_ui.py
 python3 -m PyQt5.uic.pyuic -x WTrainingBtn.ui -o WTrainingBtn_ui.py
+python3 -m PyQt5.uic.pyuic -x WSettingsQrCode.ui -o WSettingsQrCode_ui.py
 
 python3 -m PyQt5.uic.pyuic -x WSettings.ui -o WSettings_ui.py
 python3 -m PyQt5.uic.pyuic -x WSettingsSound.ui -o WSettingsSound_ui.py

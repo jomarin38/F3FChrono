@@ -61,6 +61,10 @@ class Utils:
         return Utils._protocol + Utils.get_ip() + ':' + str(Utils.get_port_number()) + '/administrator/logout_f3f_admin'
 
     @staticmethod
+    def get_administrator_url():
+        return Utils._protocol + Utils.get_ip() + ':' + str(Utils.get_port_number()) + '/administrator'
+
+    @staticmethod
     def server_alive():
         try:
             request_url = Utils.get_base_url()+'/is_alive'

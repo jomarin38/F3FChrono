@@ -37,6 +37,7 @@ from F3FChrono.gui.WSettingsBase_item_ui import Ui_WSettingBase_item
 from F3FChrono.gui.WSettingswBtn_ui import Ui_WSettingswBtn
 from F3FChrono.gui.WSettingswBtn_item_ui import Ui_WSettingwBtn_item
 from F3FChrono.gui.WSettingsSound_ui import Ui_WSettingsSound
+from F3FChrono.gui.WSettingsQrCode_ui import Ui_WSettingsQrCode
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.web.Utils import Utils
 
@@ -757,6 +758,86 @@ class WSettingsAdvanced(QObject):
         ConfigReader.config.conf['voltage_min_Accu2'] = self.view.voltagemin_2.value()
         ConfigReader.config.conf['voltage_coef_Accu2'] = self.view.voltagecoef_2.value()
 
+class WSettingsQrCode(QObject):
+    btn_back_sig = pyqtSignal()
+    widgetList = []
+
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WSettingsQrCode()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.btn_back.clicked.connect(self.btn_back_sig.emit)
+        self.view.btn_AdminQRCode.clicked.connect(self.displayAdminQrCode)
+        self._translate = QtCore.QCoreApplication.translate
+
+    def get_widget(self):
+        return (self.widgetList)
+
+    def show(self):
+        self.widget.show()
+
+    def is_show(self):
+        return self.widget.isVisible()
+
+    def hide(self):
+        self.widget.hide()
+
+    def displayF3FRankingQrCode(self):
+        import pyqrcode
+        import qrcode
+        import png
+        from PyQt5 import QtCore
+        from PyQt5.QtGui import QPixmap, QImage
+        import io
+        from pyqrcode import QRCode
+        from PIL.ImageQt import ImageQt
+
+        # Generate QR code
+        url = pyqrcode.create(Utils.get_base_url())
+        buffer = io.BytesIO()
+        url.png(buffer, scale=5)
+
+        image = QImage()
+        image.loadFromData(buffer.getvalue())
+
+        # Create and save the png file naming "saved_qr.png"
+        #url.png('saved_qr.png', scale=5)
+        pixmap01 = QPixmap(image)
+        self.view.label_2.setPixmap(pixmap01)
+        self.view.label_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.view.label_2.setScaledContents(False)
+        self.view.label_2.setMinimumSize(1, 1)
+
+    def displayAdminQrCode(self):
+        import pyqrcode
+        import qrcode
+        import png
+        from PyQt5 import QtCore
+        from PyQt5.QtGui import QPixmap, QImage
+        import io
+        from pyqrcode import QRCode
+        from PIL.ImageQt import ImageQt
+
+        self.view.label.setText(self._translate("Admin QR Code", "Admin QR Code"))
+        # Generate QR code
+        url = pyqrcode.create(Utils.get_administrator_url())
+        buffer = io.BytesIO()
+        url.png(buffer, scale=5, module_color=[255, 0, 0])
+
+        image = QImage()
+        image.loadFromData(buffer.getvalue())
+
+        # Create and save the png file naming "saved_qr.png"
+        #url.png('saved_qr.png', scale=5)
+        pixmap01 = QPixmap(image)
+        self.view.label_2.setPixmap(pixmap01)
+        self.view.label_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.view.label_2.setScaledContents(False)
+        self.view.label_2.setMinimumSize(1, 1)
 
 class WSettingsBase(QObject):
     btn_settings_sig = pyqtSignal()
@@ -1242,6 +1323,7 @@ class WSettings(QObject):
     btn_settingssound_sig = pyqtSignal()
     btn_cancel_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
+    qrcode_sig = pyqtSignal(str)
     widgetList = []
 
     def __init__(self, name, parent):
@@ -1257,6 +1339,7 @@ class WSettings(QObject):
         self.view.btn_base_settings.clicked.connect(self.btn_settingsbase_sig.emit)
         self.view.wbtn_settings.clicked.connect(self.btn_settingswBtn_sig.emit)
         self.view.btn_sound_settings.clicked.connect(self.btn_settingssound_sig.emit)
+        self.view.webserverUrl.clicked.connect(self.qrCode)
 
         self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
         self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
@@ -1300,3 +1383,6 @@ class WSettings(QObject):
         ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
         ConfigReader.config.conf['competition_mode'] = self.view.mode.currentIndex()
         ConfigReader.config.conf['language']=self.languages_available[self.view.language.currentIndex()]
+
+    def qrCode(self):
+        self.qrcode_sig.emit(self.view.webserverUrl.text())
