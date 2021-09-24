@@ -26,6 +26,7 @@ from F3FChrono.data.Chrono import Chrono
 from F3FChrono.chrono.Sound import *
 from F3FChrono.chrono.GPIOPort import rpi_gpio
 from F3FChrono.chrono.UDPSend import *
+from F3FChrono.data.web.Utils import Utils
 import os
 
 
@@ -68,7 +69,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.signal_race = None
         self.signal_training = None
         self.low_voltage_ask = False
-        self.udpsend = udpsend(IPUDPSEND, UDPPORT)
+        ip = Utils.get_ip().split(".")
+        self.udpsend = udpsend(ip[0] + "." + ip[1] + "." + ip[2] + ".255" , UDPPORT)
 
     def initUI(self, ):
         self.MainWindow = QtWidgets.QMainWindow()
