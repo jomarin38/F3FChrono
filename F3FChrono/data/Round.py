@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
+import json
 import os
 from F3FChrono.data.Run import Run
 from F3FChrono.data.RoundGroup import RoundGroup
@@ -429,3 +429,21 @@ class Round:
                         row.append(str(valid_run.chrono.get_lap_time(i)))
                 csv_writer.writerow(row)
 
+    def get_summary_as_json(self):
+        result_dict = {}
+        groups = []
+        for group in self.groups:
+            if group.get_best_run() is not None:
+                group_dict = {'group_number': group.group_number,
+                              'best_run': group.get_best_run().to_string()}
+            else:
+                group_dict = {'group_number': group.group_number}
+            groups.append(group_dict)
+        result_dict['best_runs'] = groups
+        remaining_pilots = []
+        for bib_number in self.get_remaining_bibs_to_fly():
+            pilot_dict = {'bib_number': bib_number,
+                          'pilot_name': self.event.competitors[bib_number].display_name()}
+            remaining_pilots.append(pilot_dict)
+        result_dict['remaining_pilots'] = remaining_pilots
+        return json.dumps(result_dict)

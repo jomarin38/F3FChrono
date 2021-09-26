@@ -27,8 +27,13 @@ from PyQt5.QtCore import QObject
 
 INITMSG = "Init"
 EVENTMSG = "Event"
+RACEORDERMSG = "Order"
 
-class udpbeep(QObject):
+IPUDPSEND = '255.255.255.255'
+UDPPORT = 4445
+
+
+class udpsend(QObject):
     def __init__(self, udpip, udpport):
         super(QObject, self).__init__()
         self.udpip = udpip
@@ -45,6 +50,9 @@ class udpbeep(QObject):
 
     def sendData(self, data):
         self.sock.sendto(bytes(data, 'utf-8'), (self.udpip, self.port))
+
+    def sendOrderData(self, data):
+        self.sock.sendto(bytes((RACEORDERMSG+ ' '+ data), 'utf-8'), (self.udpip, self.port))
 
     def terminate(self):
         print('terminated event')

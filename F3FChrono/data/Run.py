@@ -28,7 +28,7 @@ class Run:
         self.score = None
 
     def to_string(self):
-        return self.competitor.display_name() + '\t:\t' + self.value_as_string()
+        return self.competitor.display_name() + ' : ' + self.value_as_string()
 
     def value_as_string(self):
         res = self.chrono.run_time_as_string()

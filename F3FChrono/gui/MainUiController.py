@@ -25,6 +25,8 @@ from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.chrono.Sound import *
 from F3FChrono.chrono.GPIOPort import rpi_gpio
+from F3FChrono.chrono.UDPSend import *
+from F3FChrono.data.web.Utils import Utils
 import os
 
 
@@ -67,6 +69,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.signal_race = None
         self.signal_training = None
         self.low_voltage_ask = False
+        ip = Utils.get_ip().split(".")
+        self.udpsend = udpsend(ip[0] + "." + ip[1] + "." + ip[2] + ".255" , UDPPORT)
 
     def initUI(self, ):
         self.MainWindow = QtWidgets.QMainWindow()
@@ -371,6 +375,10 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.controllers['round'].handle_group_scoring_enabled(True)
         else:
             self.controllers['round'].handle_group_scoring_enabled(False)
+        # Send this string using UDP ... using udpbeep ?
+        print(current_round.get_summary_as_json())
+        self.udpsend.sendOrderData(current_round.get_summary_as_json())
+
 
     def context_valuechanged(self):
         self.getcontextparameters(False)
@@ -433,6 +441,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.chronoHard.weather.enable_rules(self.controllers['round'].isalarm_enable())
             self.set_signal_mode(training=False)
             self.show_chrono()
+            print(current_round.get_summary_as_json())
+            self.udpsend.sendOrderData(current_round.get_summary_as_json())
+
         else:
             self.chronoHard.set_mode(training=True)
             self.controllers['training'].wChronoCtrl.reset()

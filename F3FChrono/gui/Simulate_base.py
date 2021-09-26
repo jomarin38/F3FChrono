@@ -22,7 +22,7 @@ from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.gui.simulate_base_ui import Ui_MainWindow
 from F3FChrono.gui.simulate_base_widget_ui import Ui_base_widget
 from F3FChrono.gui.simulate_wBtn_widget_ui import Ui_wBtn_widget
-from F3FChrono.chrono.UDPBeep import udpbeep
+from F3FChrono.chrono.UDPSend import udpsend
 
 
 class SimulateBase(QtWidgets.QMainWindow, QTimer):
@@ -45,7 +45,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         self.ui.btn_gpio_A.clicked.connect(self.send_gpio_A)
         self.ui.btn_gpio_B.clicked.connect(self.send_gpio_B)
         self.ui.btn_send_Info.clicked.connect(self.send_info)
-        self.udpbeep = udpbeep("255.255.255.255", 4445)
+        self.udpsend = udpsend("255.255.255.255", 4445)
 
         self.timerEvent = QTimer()
         self.timerEvent.timeout.connect(self.run)
@@ -57,36 +57,36 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
 
 
     def send_base_A(self):
-        self.__sendbase(self.udpbeep,
+        self.__sendbase(self.udpsend,
                         self.__getWidgetinQlistWidget(self.baseAList, self.ui.listBaseA, self.sender().parent().pos()))
 
     def send_base_B(self):
-        self.__sendbase(self.udpbeep,
+        self.__sendbase(self.udpsend,
                         self.__getWidgetinQlistWidget(self.baseBList, self.ui.listBaseB, self.sender().parent().pos()))
 
     def send_wbtnClicked(self):
-        self.__sendwBtn(self.udpbeep,
+        self.__sendwBtn(self.udpsend,
                         self.__getWidgetinQlistWidget(self.wBtnList, self.ui.listWBtn, self.sender().parent().pos()),
                         '2')
 
     def send_wbtnSP(self):
-        self.__sendwBtn(self.udpbeep,
+        self.__sendwBtn(self.udpsend,
                         self.__getWidgetinQlistWidget(self.wBtnList, self.ui.listWBtn, self.sender().parent().pos()),
                         '1')
 
     def send_wbtnLP(self):
-        self.__sendwBtn(self.udpbeep,
+        self.__sendwBtn(self.udpsend,
                         self.__getWidgetinQlistWidget(self.wBtnList, self.ui.listWBtn, self.sender().parent().pos()),
                         '0')
 
     def send_gpio_A(self):
-        self.udpbeep.sendData("simulate GPIO baseA")
+        self.udpsend.sendData("simulate GPIO baseA")
 
     def send_gpio_B(self):
-        self.udpbeep.sendData("simulate GPIO baseB")
+        self.udpsend.sendData("simulate GPIO baseB")
 
     def send_gpio_next(self):
-        self.udpbeep.sendData("simulate GPIO btnnext")
+        self.udpsend.sendData("simulate GPIO btnnext")
 
     def send_info(self):
         if self.timerEvent.isActive() == False:
@@ -97,10 +97,10 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
             self.timerEvent.stop()
 
     def run(self):
-        self.udpbeep.sendData("wind_speed " + str(self.ui.wind_speed.value()) + " m/s")
-        self.udpbeep.sendData("wind_dir " + str(self.ui.wind_dir.value()))
-        self.udpbeep.sendData("rain " + str(self.ui.rain.isChecked()))
-        self.udpbeep.sendData("simulate info " + str(self.ui.AccuVoltage.value()) + " " + \
+        self.udpsend.sendData("wind_speed " + str(self.ui.wind_speed.value()) + " m/s")
+        self.udpsend.sendData("wind_dir " + str(self.ui.wind_dir.value()))
+        self.udpsend.sendData("rain " + str(self.ui.rain.isChecked()))
+        self.udpsend.sendData("simulate info " + str(self.ui.AccuVoltage.value()) + " " + \
                               str(self.ui.rssi_picam1.value()) + " " + str(self.ui.rssi_picam2.value()))
 
     def closeEvent(self, event):
