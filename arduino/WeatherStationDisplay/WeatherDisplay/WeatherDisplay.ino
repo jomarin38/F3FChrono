@@ -34,6 +34,13 @@ boolean newData = false;
 float wind_dir = 0.0;
 float wind_speed = 0.0;
 
+unsigned long last_data_time = 0.0;
+unsigned long data_timeout = 10000;
+
+int btn1Pin = 3;
+int btn2Pin = 4;
+int btn3Pin = 5;
+
 
 /*
  * For the display
@@ -64,12 +71,13 @@ char dir_str[6];
 float current_speed = 0.0;
 float current_dir = 0.0;
 
-
-
 void setup() {
 
   SPI_MasterInit();
   
+  pinMode(btn1Pin, INPUT);
+  pinMode(btn2Pin, INPUT);
+  pinMode(btn3Pin, INPUT);
 
   delay(300);
   SPI_MasterTransfer(0xFE);
@@ -94,6 +102,7 @@ void setup() {
 void loop() { // run over and over
   recvWithEndMarker();
   parseData();
+  readButtonsState();
 }
 
 void recvWithEndMarker() {
@@ -101,7 +110,7 @@ void recvWithEndMarker() {
     char endMarker = '\n';
     char rc;
     
-    while (Serial.available() > 0 && newData == false) {
+    while (Serial.available() > 0 && !(newData)) {
         rc = Serial.read();
 
         if (rc != endMarker) {
@@ -115,6 +124,7 @@ void recvWithEndMarker() {
             receivedChars[ndx] = '\0'; // terminate the string
             ndx = 0;
             newData = true;
+            last_data_time = millis();
         }
     }
 }
@@ -145,8 +155,31 @@ void parseData() {
         newData=false;
     }
     else {
+      if ((millis()-last_data_time)>data_timeout) {
+        sprintf(screen_buffer, "Waiting for data ...");
+        Display_2x16(ON, screen_buffer);
+      }
       newData=false;
     }
+}
+
+void readButtonsState() {
+  int val1 = digitalRead(btn1Pin);
+  int val2 = digitalRead(btn2Pin);
+  int val3 = digitalRead(btn3Pin);
+
+  if (val1 == HIGH) {
+    Serial.println("WIFIBTN1");
+  }
+
+  if (val2 == HIGH) {
+    Serial.println("WIFIBTN2");
+  }
+
+  if (val3 == HIGH) {
+    Serial.println("WIFIBTN3");
+  }
+  
 }
 
 float getReceivedValue() {
