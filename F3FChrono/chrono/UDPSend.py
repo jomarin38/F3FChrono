@@ -52,7 +52,11 @@ class udpsend(QObject):
         self.sock.sendto(bytes(data, 'utf-8'), (self.udpip, self.port))
 
     def sendOrderData(self, data):
-        self.sock.sendto(bytes((RACEORDERMSG+ ' '+ data), 'utf-8'), (self.udpip, self.port))
+        local_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        local_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        local_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        local_socket.sendto(bytes((RACEORDERMSG+ ' '+ data), 'utf-8'), (self.udpip, self.port))
+        local_socket.close()
 
     def terminate(self):
         print('terminated event')
