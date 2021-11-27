@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+import copy
 import json
 import os
 from F3FChrono.data.Run import Run
@@ -73,7 +74,7 @@ class Round:
             else:
                 groups[current_group_index].set_flight_order(flight_order)
                 flight_order = [bib]
-                counter = 0
+                counter = 1
                 groups.append(RoundGroup(self, len(groups) + 1))
                 current_group_index += 1
         for bib in [bib_number for bib_number in sorted(self.event.competitors)
@@ -84,7 +85,7 @@ class Round:
             else:
                 groups[current_group_index].set_flight_order(flight_order)
                 flight_order = [bib]
-                counter = 0
+                counter = 1
                 groups.append(RoundGroup(self, len(groups) + 1))
                 current_group_index += 1
         groups[current_group_index].set_flight_order(flight_order)
@@ -101,8 +102,30 @@ class Round:
             group = self.groups[0]
 
             new_groups = self.get_groups_from_scratch(self.event.groups_number)
+            #Temporary groups to find valid groups
+            new_groups2 = self.get_groups_from_scratch(self.event.groups_number)
+
+            #Get runs from base group
+            for new_group in new_groups2:
+                for bib_number in new_group.get_flight_order():
+                    competitor = self.event.get_competitor(bib_number)
+                    valid_run = group.get_valid_run(competitor)
+                    if valid_run is not None:
+                        valid_run = copy.deepcopy(valid_run)
+                        if new_group.group_number>1:
+                            valid_run.round_group=new_group
+                        new_group.add_run(valid_run, insert_database=False)
+                        new_group.set_current_competitor(competitor)
 
             #Cancel flights of competitors that need to refly
+            counter = 0
+            while counter<len(new_groups2):
+                new_group = new_groups2[counter]
+                if len(new_group.get_remaining_bibs_to_fly())==0:
+                    new_group.validate_group()
+                    new_groups[counter] = new_group
+                counter += 1
+
             for bib_number in group.get_flight_order():
                 competitor = self.event.get_competitor(bib_number)
                 if not new_groups[0].has_competitor(competitor):
@@ -123,11 +146,11 @@ class Round:
             self.groups += new_groups[1:]
             #Add new groups in database
             for group in new_groups[1:]:
-                Round.round_dao.add_group(group)
+                Round.round_dao.add_group(group, populate_runs=True)
                 group.group_id = Round.round_dao.get_not_cancelled_group_id(self.event.id, self.round_number,
                                                                             group.group_number)
 
-            if first_group_maybe_finished:
+            while (self.groups[self._current_group_index].valid):
                 self._current_group_index += 1
 
             Round.round_dao.update(self)

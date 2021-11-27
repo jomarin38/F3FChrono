@@ -118,7 +118,7 @@ class RoundDAO(Dao):
                 for run in runs:
                     RoundDAO.run_dao.insert(run)
 
-    def add_group(self, group):
+    def add_group(self, group, populate_runs=False):
         sql = 'INSERT INTO roundgroup ' \
               '(event_id, round_number, group_number, start_date, end_date, flight_order, valid, cancelled) ' \
               'VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
@@ -133,6 +133,14 @@ class RoundDAO(Dao):
         self._execute_insert(sql, group.round.event.id, group.round.round_number, group.group_number,
                              start_time, end_time, group.get_serialized_flight_order(), group.valid,
                              group.cancelled)
+
+        if populate_runs:
+            for bib_number in group.get_flight_order():
+                competitor = group.round.event.get_competitor(bib_number)
+                valid_run = group.get_valid_run(competitor)
+                if valid_run is not None:
+                    from F3FChrono.data.RoundGroup import RoundGroup
+                    RoundGroup.rundao.insert(valid_run)
 
     def get_not_cancelled_group_id(self, event_id, round_number, group_number):
         from F3FChrono.data.Round import Round

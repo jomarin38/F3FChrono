@@ -330,6 +330,8 @@ def manage_event(request):
     header = Header(name=Cell('Round number'))
     header.add_cell(Cell(''))
     header.add_cell(Cell(''))
+    header.add_cell(Cell(''))
+    header.add_cell(Cell(''))
     table.set_header(header)
 
     for f3f_round in event.rounds:
@@ -339,9 +341,10 @@ def manage_event(request):
                           '&round_number='+str(f3f_round.round_number)))
         row.add_cell(Link('Export to F3XVault', 'login_to_export_round_f3x_vault?event_id=' + str(event.id) +
                           '&round_number='+str(f3f_round.round_number)))
+        row.add_cell(Link('Cancel Round', 'cancel_round?event_id=' + str(event.id) +
+                          '&round_number=' + str(f3f_round.round_number)))
         if f3f_round.valid:
-            row.add_cell(Link('Cancel Round', 'cancel_round?event_id=' + str(event.id) +
-                              '&round_number='+str(f3f_round.round_number)))
+            row.add_cell(Cell(''))
         else:
             row.add_cell(Link('Validate Round', 'validate_round?event_id=' + str(event.id) +
                               '&round_number='+str(f3f_round.round_number)))
