@@ -32,6 +32,11 @@
 #define sleepDelay 100
 #define sendDelay 1000
 
+#define batProtectionVoltage 9.6
+
+#define R3 3900.0
+#define R4 1000.0
+
 //UDP
 WiFiUDP udp;
 char remoteIP[] = "255.255.255.255";
@@ -89,6 +94,19 @@ void setup() {
 }
 
 void loop() {
+
+  // read the input on analog pin 0:
+  int sensorValue = analogRead(A0);
+  // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 3.2V):
+  float voltage = sensorValue * (3.2 / 1023.0);
+
+  float batVoltage = (R3+R4)/R4 * voltage;
+
+  if (batVoltage<batProtectionVoltage) {
+    sendVoltageAlarm();
+  }
+
+
   boolean btnPressed = !digitalRead(buttonPin);
   if (btnPressed) {
     Serial.println("Button pressed !");
@@ -134,6 +152,16 @@ int getAngleSmooth() {
 
 void sendUDP(int angle) {
   sprintf(message,"wind_dir %d\r\n",angle);
+  
+  udp.beginPacket(remoteIP, remotePort);
+  udp.write(message);
+  udp.endPacket();
+  
+  //Serial.println(message);
+}
+
+void sendVoltageAlarm() {
+  sprintf(message,"wind_dir_low_voltage\r\n");
   
   udp.beginPacket(remoteIP, remotePort);
   udp.write(message);
