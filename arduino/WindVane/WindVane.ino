@@ -34,7 +34,7 @@
 
 #define batProtectionVoltage 9.6
 
-#define R3 3900.0
+#define R3 3640.0
 #define R4 1000.0
 
 //UDP
@@ -101,6 +101,9 @@ void loop() {
   float voltage = sensorValue * (3.2 / 1023.0);
 
   float batVoltage = (R3+R4)/R4 * voltage;
+
+  //Uncomment to calibrate using serial monitor
+  //Serial.print("Battery voltage : ");Serial.println(batVoltage);
 
   if (batVoltage<batProtectionVoltage) {
     sendVoltageAlarm();
