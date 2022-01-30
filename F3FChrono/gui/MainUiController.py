@@ -90,6 +90,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['training'] = WTrainingCtrl("panel Training", self.ui.centralwidget,
                                                      ConfigReader.config.conf['training_speech_interval'])
         self.controllers['settings'] = WSettings("panel Settings", self.ui.centralwidget)
+        self.controllers['settingswDevices'] = WSettingsWirelessDevices("panel SettingswDevices", self.ui.centralwidget)
         self.controllers['settingsadvanced'] = WSettingsAdvanced("panel SettingsAdvanced", self.ui.centralwidget)
         self.controllers['settingsbase'] = WSettingsBase("panel SettingsBase", self.ui.centralwidget)
         self.controllers['settingswBtn'] = WSettingswBtn("panel Settings_wBtn", self.ui.centralwidget)
@@ -129,10 +130,14 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
         self.controllers['settings'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
-        self.controllers['settings'].btn_settingsbase_sig.connect(self.show_settingsbase)
-        self.controllers['settings'].btn_settingswBtn_sig.connect(self.show_settingswBtn)
         self.controllers['settings'].btn_settingssound_sig.connect(self.show_settingssound)
         self.controllers['settings'].qrcode_sig.connect(self.show_settingsQrCode)
+
+        self.controllers['settingswDevices'].btn_settings_sig.connect(self.show_settings)
+        self.controllers['settingswDevices'].btn_cancel_sig.connect(self.settings_cancel)
+        self.controllers['settingswDevices'].btn_valid_sig.connect(self.settings_valid)
+        self.controllers['settingswDevices'].btn_settingsbase_sig.connect(self.show_settingsbase)
+        self.controllers['settingswDevices'].btn_settingswBtn_sig.connect(self.show_settingswBtn)
 
         self.controllers['settingsbase'].set_udp_sig(self.chronoHard.udpReceive.simulate_base_sig,
                                                      self.chronoHard.udpReceive.ipbase_set_sig,
