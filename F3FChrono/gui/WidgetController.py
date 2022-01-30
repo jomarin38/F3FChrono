@@ -31,6 +31,7 @@ from F3FChrono.gui.WChronoBtn_cancel_ui import Ui_WChronoBtn_Cancel
 from F3FChrono.gui.WTrainingBtn_ui import Ui_WTrainingBtn
 from F3FChrono.gui.WConfig_ui import Ui_WConfig
 from F3FChrono.gui.WSettings_ui import Ui_WSettings
+from F3FChrono.gui.WSettingsConnectedDevices_ui import Ui_WSettingsConnectedDevices
 from F3FChrono.gui.WSettingsAdvanced_ui import Ui_WSettingsAdvanced
 from F3FChrono.gui.WSettingsBase_ui import Ui_WSettingsBase
 from F3FChrono.gui.WSettingsBase_item_ui import Ui_WSettingBase_item
@@ -1316,10 +1317,50 @@ class WSettingsSound(QObject):
         ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
         ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()/100
 
-class WSettings(QObject):
-    btn_settingsadvanced_sig = pyqtSignal()
+class WSettingsWirelessDevices(QObject):
     btn_settingsbase_sig = pyqtSignal()
     btn_settingswBtn_sig = pyqtSignal()
+    btn_cancel_sig = pyqtSignal()
+    btn_valid_sig = pyqtSignal()
+    widgetList = []
+
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WSettings()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self._translate = QtCore.QCoreApplication.translate
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.view.btn_base_settings.clicked.connect(self.btn_settingsbase_sig.emit)
+        self.view.wbtn_settings.clicked.connect(self.btn_settingswBtn_sig.emit)
+
+        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
+        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+
+    def get_widget(self):
+        return (self.widgetList)
+
+    def show(self):
+        self.widget.show()
+
+    def is_show(self):
+        return self.widget.isVisible()
+
+    def hide(self):
+        self.widget.hide()
+
+    def set_data(self):
+        print("setData")
+
+    def get_data(self):
+        print("getData")
+
+
+class WSettings(QObject):
+    btn_settingsadvanced_sig = pyqtSignal()
+    btn_settingswDevices_sig = pyqtSignal()
     btn_settingssound_sig = pyqtSignal()
     btn_cancel_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
@@ -1336,8 +1377,7 @@ class WSettings(QObject):
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
         self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
-        self.view.btn_base_settings.clicked.connect(self.btn_settingsbase_sig.emit)
-        self.view.wbtn_settings.clicked.connect(self.btn_settingswBtn_sig.emit)
+        self.view.wDevices_settings.clicked.connect(self.btn_settingswDevices_sig.emit)
         self.view.btn_sound_settings.clicked.connect(self.btn_settingssound_sig.emit)
         self.view.webserverUrl.clicked.connect(self.qrCode)
 

@@ -13,6 +13,7 @@ python3 -m PyQt5.uic.pyuic -x WSettingsQrCode.ui -o WSettingsQrCode_ui.py
 
 python3 -m PyQt5.uic.pyuic -x WSettings.ui -o WSettings_ui.py
 python3 -m PyQt5.uic.pyuic -x WSettingsSound.ui -o WSettingsSound_ui.py
+python3 -m PyQt5.uic.pyuic -x WSettingsConnectedDevices.ui -o WSettingsConnectedDevices_ui.py
 python3 -m PyQt5.uic.pyuic -x WSettingsBase.ui -o WSettingsBase_ui.py
 python3 -m PyQt5.uic.pyuic -x WSettingsBase_item.ui -o WSettingsBase_item_ui.py
 python3 -m PyQt5.uic.pyuic -x WSettingswBtn.ui -o WSettingswBtn_ui.py
