@@ -91,7 +91,7 @@ class chronoQSound(QThread):
         self.seconds_twenty = 109
         self.seconds_fifteen = 110
         self.seconds_ten = 111
-        self.to_launch = 112
+        self.launch = 112
         self.loadwav(volume)
         self.__debug = False
 
@@ -180,9 +180,10 @@ class chronoQSound(QThread):
                 if cmd == 30:
                     if not self.sound_isplaying[self.seconds_thirty]:
                         self.stop_all()
-                        self.sound_list.append(self.seconds_thirty)
-                        #if to_launch:
-                        #    self.sound_list.append(self.to_launch)
+                        if to_launch:
+                            self.sound_list.append(self.seconds_thirty)
+                        else:
+                            self.sound_list.append(self.launch)
                         if len(self.sound_list) > 0:
 
                             self.__start_play()
