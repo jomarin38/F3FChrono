@@ -28,6 +28,7 @@ from F3FChrono.gui.WChrono_ui import Ui_WChrono
 from F3FChrono.gui.WChronoTraining_ui import Ui_WTraining
 from F3FChrono.gui.WChronoBtn_ui import Ui_WChronoBtn
 from F3FChrono.gui.WChronoBtn_cancel_ui import Ui_WChronoBtn_Cancel
+from F3FChrono.gui.WChronoBtn_GS_Validate_ui import Ui_WChronoGSEnable
 from F3FChrono.gui.WTrainingBtn_ui import Ui_WTrainingBtn
 from F3FChrono.gui.WConfig_ui import Ui_WConfig
 from F3FChrono.gui.WSettings_ui import Ui_WSettings
@@ -60,25 +61,32 @@ class WRoundCtrl(QObject):
         self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent, vocal_elapsedTime_sig)
         self.wBtnCtrl = Ui_WChronoBtn()
         self.wBtnCancel = Ui_WChronoBtn_Cancel()
+        self.wBtnGS = Ui_WChronoGSEnable()
         self.name = name
         self.parent = parent
         self.widgetBtn = QtWidgets.QWidget(parent)
         self.widgetBtnCancel = QtWidgets.QWidget(parent)
+        self.widgetBtnGS = QtWidgets.QWidget(parent)
         self.wBtnCtrl.setupUi(self.widgetBtn)
         self.wBtnCancel.setupUi(self.widgetBtnCancel)
+        self.wBtnGS.setupUi(self.widgetBtnGS)
         self.widgetList.append(self.wPilotCtrl.get_widget())
         self.widgetList.append(self.wChronoCtrl.get_widget())
         self.widgetList.append(self.widgetBtn)
         self.widgetList.append(self.widgetBtnCancel)
+        self.widgetList.append(self.widgetBtnGS)
         self.set_cancelmode(False)
+        self.widgetBtnGS.hide()
         for widget in self.widgetList:
             widget.setStyleSheet("QPushButton{border: 1px solid black;border-radius: 10px;}")
         # Event connect
         self.wBtnCtrl.Btn_Home.clicked.connect(self.btn_home_sig.emit)
         self.wBtnCtrl.Btn_Next.clicked.connect(self.btn_next_sig.emit)
-        self.wBtnCtrl.Btn_gscoring.clicked.connect(self.btn_gscoring_sig.emit)
+        self.wBtnCtrl.Btn_gscoring.clicked.connect(self.gs_continue)
         self.wBtnCancel.Btn_Next.clicked.connect(self.cancel_next)
         self.wBtnCancel.Btn_Home.clicked.connect(self.cancel_home)
+        self.wBtnGS.Btn_Next.clicked.connect(self.gs_next)
+        self.wBtnGS.Btn_Home.clicked.connect(self.gs_cancel)
 
     def get_widget(self):
         return (self.widgetList)
@@ -110,6 +118,19 @@ class WRoundCtrl(QObject):
 
     def cancel_home(self):
         self.set_cancelmode(False)
+
+    def gs_continue(self):
+        self.widgetBtn.hide()
+        self.widgetBtnGS.show()
+
+    def gs_next(self):
+        self.widgetBtnGS.hide()
+        self.widgetBtn.show()
+        self.btn_gscoring_sig.emit()
+
+    def gs_cancel(self):
+        self.widgetBtnGS.hide()
+        self.widgetBtn.show()
 
     def isalarm_enable(self):
         return self.wPilotCtrl.isalarm_enable()
