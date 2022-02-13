@@ -1341,24 +1341,30 @@ class WSettingsSound(QObject):
 class WSettingsWirelessDevices(QObject):
     btn_settingsbase_sig = pyqtSignal()
     btn_settingswBtn_sig = pyqtSignal()
+    btn_AnemometerGetList_sig = pyqtSignal()
+    btn_AnemometerConnect_sig = pyqtSignal(str)
+    btn_settingsback_sig = pyqtSignal()
     btn_cancel_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
         super().__init__()
-        self.view = Ui_WSettings()
+        self.view = Ui_WSettingsConnectedDevices()
         self.name = name
         self.parent = parent
         self.widget = QtWidgets.QWidget(parent)
         self._translate = QtCore.QCoreApplication.translate
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
+        self.view.btn_AnemometerConnect.clicked.connect(self.anemometerconnect)
+        self.view.btn_AnemometerGetList.clicked.connect(self.btn_AnemometerGetList_sig.emit)
         self.view.btn_base_settings.clicked.connect(self.btn_settingsbase_sig.emit)
         self.view.wbtn_settings.clicked.connect(self.btn_settingswBtn_sig.emit)
-
+        self.view.btn_back.clicked.connect(self.btn_settingsback_sig.emit)
         self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
         self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self.view.AnemometerComboBox.clear()
 
     def get_widget(self):
         return (self.widgetList)
@@ -1378,6 +1384,13 @@ class WSettingsWirelessDevices(QObject):
     def get_data(self):
         print("getData")
 
+    def anemometerSetData(self, datalist):
+        self.view.AnemometerComboBox.clear()
+        for i in datalist:
+            self.view.AnemometerComboBox.addItem(i)
+
+    def anemometerconnect(self):
+        self.btn_AnemometerConnect_sig.emit(self.view.AnemometerComboBox.currentText())
 
 class WSettings(QObject):
     btn_settingsadvanced_sig = pyqtSignal()
@@ -1398,7 +1411,7 @@ class WSettings(QObject):
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
         self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
-        self.view.wDevices_settings.clicked.connect(self.btn_settingswDevices_sig.emit)
+        self.view.btn_wDevices_settings.clicked.connect(self.btn_settingswDevices_sig.emit)
         self.view.btn_sound_settings.clicked.connect(self.btn_settingssound_sig.emit)
         self.view.webserverUrl.clicked.connect(self.qrCode)
 

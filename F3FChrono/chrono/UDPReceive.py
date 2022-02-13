@@ -42,7 +42,8 @@ class udpreceive(QThread):
     switchMode_sig = pyqtSignal()
     penalty_sig = pyqtSignal()
 
-    def __init__(self, udpport, signal_chrono, signal_btnnext, signal_windspeed, signal_winddir, signal_rain, signal_accu, signal_rssi):
+    def __init__(self, udpport, signal_chrono, signal_btnnext, signal_windspeed, signal_winddir, signal_rain, \
+                 signal_accu, signal_rssi, weatherList_sig, weatherStatus_sig):
         super().__init__()
         self.__debug = False
         self.port = udpport
@@ -53,6 +54,8 @@ class udpreceive(QThread):
         self.event_rain = signal_rain
         self.event_accu = signal_accu
         self.event_rssi = signal_rssi
+        self.event_weatherlist_sig = weatherList_sig
+        self.event_weatherStatus_sig = weatherStatus_sig
         self.clear_ipbase()
         self.clear_ipwBtn()
 
@@ -144,6 +147,13 @@ class udpreceive(QThread):
                     self.event_rssi.emit(int(m[2]), int(m[3]))
                 elif m[0] == 'wBtn':
                     self._wbtn_function(address[0], int(m[1]))
+                elif m[0] == "anemometerList":
+                    temp = list()
+                    for i in range(0, int(m[1])):
+                        temp.append(m[2+i])
+                    self.event_weatherlist_sig.emit(temp)
+                elif m[0] == "anemometerStatus":
+                    self.event_weatherStatus_sig.emit(m[1])
                 else:
                     self._base_function(m[0].lower(), address[0])
             except socket.error as msg:
