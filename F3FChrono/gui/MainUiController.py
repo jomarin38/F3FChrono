@@ -127,17 +127,25 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.btn_refly_sig.connect(self.refly)
         self.controllers['round'].wPilotCtrl.btn_cancel_flight_sig.connect(self.display_cancel_round)
         self.controllers['round'].btn_gscoring_sig.connect(self.enable_group_scoring)
-        self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
         self.controllers['settings'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
+        self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
         self.controllers['settings'].btn_settingssound_sig.connect(self.show_settingssound)
         self.controllers['settings'].qrcode_sig.connect(self.show_settingsQrCode)
+        self.controllers['settings'].btn_settingswDevices_sig.connect(self.show_settingswDevices)
 
-        self.controllers['settingswDevices'].btn_settings_sig.connect(self.show_settings)
+        self.controllers['settingswDevices'].btn_settingsbase_sig.connect(self.show_settingsbase)
+        self.controllers['settingswDevices'].btn_settingswBtn_sig.connect(self.show_settingswBtn)
+        self.controllers['settingswDevices'].btn_settingsback_sig.connect(self.show_settings)
         self.controllers['settingswDevices'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settingswDevices'].btn_valid_sig.connect(self.settings_valid)
         self.controllers['settingswDevices'].btn_settingsbase_sig.connect(self.show_settingsbase)
         self.controllers['settingswDevices'].btn_settingswBtn_sig.connect(self.show_settingswBtn)
+        self.controllers['settingswDevices'].btn_AnemometerGetList_sig.connect(self.chronoHard.weather.anemometer.GetList)
+        self.controllers['settingswDevices'].btn_AnemometerConnect_sig.connect(self.chronoHard.weather.anemometer.Connect)
+        
+        self.chronoHard.weather.anemometer.list_sig.connect(self.controllers['settingswDevices'].anemometerSetData)
+        self.chronoHard.weather.anemometer.status_sig.connect(self.controllers['settingswDevices'].view.AnemometerStatus.setText)
 
         self.controllers['settingsbase'].set_udp_sig(self.chronoHard.udpReceive.simulate_base_sig,
                                                      self.chronoHard.udpReceive.ipbase_set_sig,
@@ -149,10 +157,10 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsadvanced'].btn_settings_sig.connect(self.show_settings)
         self.controllers['settingsadvanced'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settingsadvanced'].btn_valid_sig.connect(self.settings_valid)
-        self.controllers['settingsbase'].btn_settings_sig.connect(self.show_settings)
+        self.controllers['settingsbase'].btn_settings_sig.connect(self.show_settingswDevices)
         self.controllers['settingsbase'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settingsbase'].btn_valid_sig.connect(self.settings_valid)
-        self.controllers['settingswBtn'].btn_settings_sig.connect(self.show_settings)
+        self.controllers['settingswBtn'].btn_settings_sig.connect(self.show_settingswDevices)
         self.controllers['settingswBtn'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settingswBtn'].btn_valid_sig.connect(self.settings_valid)
         self.controllers['settingssound'].btn_settings_sig.connect(self.show_settings)
@@ -181,6 +189,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswBtn'].hide()
         self.controllers['settingssound'].hide()
         self.controllers['settingQrCode'].hide()
+        self.controllers['settingswDevices'].hide()
         self.controllers['config'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
@@ -194,6 +203,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswBtn'].hide()
         self.controllers['settingssound'].hide()
         self.controllers['settingQrCode'].hide()
+        self.controllers['settingswDevices'].hide()
         self.controllers['round'].show()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
@@ -207,7 +217,22 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswBtn'].hide()
         self.controllers['settingssound'].hide()
         self.controllers['settingQrCode'].hide()
+        self.controllers['settingswDevices'].hide()
         self.controllers['settings'].show()
+        self.controllers['wind'].show()
+        print(self.MainWindow.size())
+
+    def show_settingswDevices(self):
+        self.controllers['training'].hide()
+        self.controllers['config'].hide()
+        self.controllers['settingsadvanced'].hide()
+        self.controllers['round'].hide()
+        self.controllers['settingsbase'].hide()
+        self.controllers['settingswBtn'].hide()
+        self.controllers['settingssound'].hide()
+        self.controllers['settingQrCode'].hide()
+        self.controllers['settingswDevices'].show()
+        self.controllers['settings'].hide()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
@@ -221,6 +246,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswBtn'].hide()
         self.controllers['settingssound'].hide()
         self.controllers['settingQrCode'].hide()
+        self.controllers['settingswDevices'].hide()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
@@ -234,6 +260,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswBtn'].hide()
         self.controllers['settingssound'].hide()
         self.controllers['settingQrCode'].hide()
+        self.controllers['settingswDevices'].hide()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
@@ -247,6 +274,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswBtn'].show()
         self.controllers['settingssound'].hide()
         self.controllers['settingQrCode'].hide()
+        self.controllers['settingswDevices'].hide()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
@@ -260,6 +288,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswBtn'].hide()
         self.controllers['settingssound'].show()
         self.controllers['settingQrCode'].hide()
+        self.controllers['settingswDevices'].hide()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
@@ -273,6 +302,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsbase'].hide()
         self.controllers['settingssound'].hide()
         self.controllers['settingQrCode'].hide()
+        self.controllers['settingswDevices'].hide()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 
@@ -287,6 +317,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsbase'].hide()
         self.controllers['settingssound'].hide()
         self.controllers['settingQrCode'].show()
+        self.controllers['settingswDevices'].hide()
         self.controllers['wind'].show()
         print(self.MainWindow.size())
 

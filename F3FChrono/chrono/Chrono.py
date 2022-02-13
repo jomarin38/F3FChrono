@@ -71,7 +71,8 @@ class ChronoHard(QObject):
         self.weather = Weather()
         self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.weather.windspeed_signal,
                                      self.weather.winddir_signal, self.weather.rain_signal, self.accu_signal,
-                                     self.rssi_signal)
+                                     self.rssi_signal, self.weather.anemometer.list_sig,
+                                     self.weather.anemometer.status_sig)
         self.valid = True
         self.refly = False
         self.__debug = False

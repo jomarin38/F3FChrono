@@ -50,6 +50,7 @@ class udpsend(QObject):
 
     def sendData(self, data):
         self.sock.sendto(bytes(data, 'utf-8'), (self.udpip, self.port))
+        print("udpsendData : " + data)
 
     def sendOrderData(self, data):
         self.sock.sendto(bytes((RACEORDERMSG+ ' '+ data), 'utf-8'), (self.udpip, self.port))
