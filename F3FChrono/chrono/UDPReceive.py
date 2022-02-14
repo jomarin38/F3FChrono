@@ -139,11 +139,12 @@ class udpreceive(QThread):
                 if m[0] == 'wind_speed':
                     self.event_wind_speed.emit(float(m[1]), str(m[2]))
                 elif m[0] == 'wind_dir':
-                    self.event_wind_dir.emit(float(m[1]))
+                    self.event_wind_dir.emit(float(m[1]), float(m[2]))
                 elif m[0] == 'rain':
                     self.event_rain.emit(bool(m[1] == 'True'))
                 elif m[0] == 'info':
-                    self.event_accu.emit(float(m[1]), float(m[1]))
+                    if self.event_accu is not None:
+                        self.event_accu.emit(float(m[1]), float(m[1]))
                     self.event_rssi.emit(int(m[2]), int(m[3]))
                 elif m[0] == 'wBtn':
                     self._wbtn_function(address[0], int(m[1]))

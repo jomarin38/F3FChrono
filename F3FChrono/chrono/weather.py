@@ -35,11 +35,16 @@ class anemometer(QObject):
         self.udpSend.sendData("anemometerConnect " + index)
 
 class Weather(QTimer):
+    #parameters : value, unity
     windspeed_signal = pyqtSignal(float, str)
-    winddir_signal = pyqtSignal(float)
+    #parameters : direction, accu voltage
+    winddir_signal = pyqtSignal(float, float)
     rain_signal = pyqtSignal(bool)
     # gui_weather_signal parameters wind_speed, wind_speed_unit,  wind_dir, rain, alarm
     gui_weather_signal = pyqtSignal(float, str, float, bool, bool)
+    #parameters : wind_speed, wind_speed_unit, wind_speed_ispresent, wind_dir, wind_dir_voltage, wind_dir_voltage_alarme,
+    #wind_dir_ispresent
+    gui_wind_speed_dir_signal = pyqtSignal(float, str, bool, float, float, bool, bool)
     beep_signal = pyqtSignal(str, int, int)
 
     def __init__(self):
@@ -52,6 +57,9 @@ class Weather(QTimer):
         self.rules = collections.OrderedDict()
         self.reset_wind()
         self.__debug = False
+        self.windDirVoltage = 0.0
+        self.windDir_isPresent = False
+        self.windSpeed_isPresent = False
         self.rules['starttime'] = time.time()
         self.rules['endtime'] = time.time()
         self.rules['detected'] = False
@@ -61,9 +69,15 @@ class Weather(QTimer):
         self.rules['speed_limit_min'] = -1.0
         self.rules['speed_limit_max'] = -1.0
         self.rules['dir_limit'] = -1.0
+        self.rules['wind_dir_voltage_min'] = 0.0
+        self.rules['wind_dir_voltage_alarm'] = False
         self.__rules_enable = False
         self.timeout.connect(self.refresh_gui)
         self.start(1000)
+        self.timerDir = QTimer()
+        self.timerSpeed = QTimer()
+        self.timerDir.timeout.connect(self.timeoutDir)
+        self.timerSpeed.timeout.connect(self.timeoutSpeed)
 
     def __checkrules(self):
         if self.__rules_enable and self.rules['speed_limit_min'] != -1.0 and \
@@ -124,10 +138,17 @@ class Weather(QTimer):
     def refresh_gui(self):
         self.gui_weather_signal.emit(self.wind['speed'], self.wind['unit'], self.wind['orientation'],
                                      self.rain, self.rules['alarm'])
+        self.gui_wind_speed_dir_signal.emit(self.wind['speed'], self.wind['unit'], self.windSpeed_isPresent,
+                                            self.wind['orientation'], self.windDirVoltage,
+                                            self.rules['wind_dir_voltage_alarm'], self.windDir_isPresent)
 
     def slot_wind_speed(self, speed, unit):
         self.wind['speed'] = speed
         self.wind['unit'] = unit
+        self.windSpeed_isPresent = True
+        self.timerSpeed.stop()
+        self.timerSpeed.start(2000)
+
         if self.inRun:
             self.wind['speed_nb'] += 1
             self.wind['speed_sum'] += speed
@@ -139,8 +160,14 @@ class Weather(QTimer):
 
         self.__checkrules()
 
-    def slot_wind_dir(self, orientation):
+    def slot_wind_dir(self, orientation, voltage):
         self.wind['orientation'] = orientation
+        self.windDirVoltage = voltage
+        self.rules['wind_dir_voltage_alarm'] = (self.windDirVoltage < self.rules['wind_dir_voltage_min'])
+        self.windDir_isPresent = True
+        self.timerDir.stop()
+        self.timerDir.start(2000)
+
         if self.inRun:
             self.wind['orientation_sum'] += orientation
             self.wind['orientation_nb'] += 1
@@ -204,5 +231,8 @@ class Weather(QTimer):
         self.rain = False
         self.inRun = False
 
+    def timeoutDir(self):
+        self.windDir_isPresent=False
 
-
+    def timeoutSpeed(self):
+        self.windSpeed_isPresent=False

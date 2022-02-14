@@ -98,7 +98,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
 
     def run(self):
         self.udpsend.sendData("wind_speed " + str(self.ui.wind_speed.value()) + " m/s")
-        self.udpsend.sendData("wind_dir " + str(self.ui.wind_dir.value()))
+        self.udpsend.sendData("wind_dir " + str(self.ui.wind_dir.value()) + " " + str(self.ui.wind_dirVoltage.value()))
         self.udpsend.sendData("rain " + str(self.ui.rain.isChecked()))
         self.udpsend.sendData("simulate info " + str(self.ui.AccuVoltage.value()) + " " + \
                               str(self.ui.rssi_picam1.value()) + " " + str(self.ui.rssi_picam2.value()))

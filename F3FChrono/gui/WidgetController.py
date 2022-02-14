@@ -1371,6 +1371,25 @@ class WSettingsWirelessDevices(QObject):
     def anemometerconnect(self):
         self.btn_AnemometerConnect_sig.emit(self.view.AnemometerComboBox.currentText())
 
+    def weatherStation_display(self, wind_speed, wind_speed_unit, wind_speed_ispresent,
+                               wind_dir, wind_dir_voltage, wind_dir_voltage_alarm, wind_dir_ispresent):
+        if wind_speed_ispresent:
+            self.view.WeatherStation_Speed.setText("WindSpeed : "+str(wind_speed) + wind_speed_unit)
+            self.view.WeatherStation_Speed.setStyleSheet("background-color:rgba( 255, 255, 255, 0% );")
+        else:
+            self.view.WeatherStation_Speed.setText("WindSpeed : --")
+            self.view.WeatherStation_Speed.setStyleSheet("background-color:red;")
+        if wind_dir_ispresent:
+            self.view.WeatherStation_Dir.setText("Dir : " + str(wind_dir)+ ", "+ str(wind_dir_voltage)+"V")
+            if wind_dir_voltage_alarm:
+                self.view.WeatherStation_Dir.setStyleSheet("background-color:red;")
+            else:
+                self.view.WeatherStation_Dir.setStyleSheet("background-color:rgba( 255, 255, 255, 0% );")
+        else:
+            self.view.WeatherStation_Dir.setText("Dir : --")
+            self.view.WeatherStation_Dir.setStyleSheet("background-color:red;")
+
+
 class WSettings(QObject):
     btn_settingsadvanced_sig = pyqtSignal()
     btn_settingswDevices_sig = pyqtSignal()
