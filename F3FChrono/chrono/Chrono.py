@@ -56,7 +56,7 @@ class ChronoHard(QObject):
     buzzer_validated = pyqtSignal()
     chrono_signal = pyqtSignal(str, str, str)
     accu_signal = pyqtSignal(float, float)
-    rssi_signal = pyqtSignal(int, int)
+    picam_signal = pyqtSignal(float, int)
     altitude_finished = pyqtSignal(float)
 
     def __init__(self, signal_btnnext):
@@ -70,8 +70,8 @@ class ChronoHard(QObject):
         self.timelost = []
         self.weather = Weather()
         self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.weather.windspeed_signal,
-                                     self.weather.winddir_signal, self.weather.rain_signal, None,
-                                     self.rssi_signal, self.weather.anemometer.list_sig,
+                                     self.weather.winddir_signal, self.weather.rain_signal,
+                                     self.picam_signal, self.weather.anemometer.list_sig,
                                      self.weather.anemometer.status_sig)
         self.valid = True
         self.refly = False

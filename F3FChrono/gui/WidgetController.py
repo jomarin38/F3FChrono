@@ -253,8 +253,8 @@ class WWindCtrl():
             self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
 
-    def set_rssi(self, rssi1, rssi2):
-        self.view.rssi.setText(str(rssi1) + "%, " + str(rssi2) + "%")
+    def set_picam(self, accu, rssi):
+        self.view.rssi.setText(str(accu) + "V, " + str(rssi) + "%")
 
 
 class WPilotCtrl(QObject):
@@ -1345,6 +1345,7 @@ class WSettingsWirelessDevices(QObject):
         self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
         self.view.AnemometerComboBox.clear()
 
+
     def get_widget(self):
         return (self.widgetList)
 
@@ -1358,10 +1359,10 @@ class WSettingsWirelessDevices(QObject):
         self.widget.hide()
 
     def set_data(self):
-        print("setData")
+        self.view.display.setChecked(ConfigReader.config.conf['F3FDisplay'])
 
     def get_data(self):
-        print("getData")
+        ConfigReader.config.conf['F3FDisplay'] = self.view.display.isChecked()
 
     def anemometerSetData(self, datalist):
         self.view.AnemometerComboBox.clear()
@@ -1372,7 +1373,8 @@ class WSettingsWirelessDevices(QObject):
         self.btn_AnemometerConnect_sig.emit(self.view.AnemometerComboBox.currentText())
 
     def weatherStation_display(self, wind_speed, wind_speed_unit, wind_speed_ispresent,
-                               wind_dir, wind_dir_voltage, wind_dir_voltage_alarm, wind_dir_ispresent):
+                               wind_dir, wind_dir_voltage, wind_dir_voltage_alarm, wind_dir_ispresent,
+                               rain, rain_ispresent):
         if wind_speed_ispresent:
             self.view.WeatherStation_Speed.setText("WindSpeed : "+str(wind_speed) + wind_speed_unit)
             self.view.WeatherStation_Speed.setStyleSheet("background-color:rgba( 255, 255, 255, 0% );")
@@ -1388,7 +1390,15 @@ class WSettingsWirelessDevices(QObject):
         else:
             self.view.WeatherStation_Dir.setText("Dir : --")
             self.view.WeatherStation_Dir.setStyleSheet("background-color:red;")
-
+        if rain_ispresent:
+            if rain:
+                self.view.WeatherStation_Rain.setText("rain : Yes")
+            else:
+                self.view.WeatherStation_Rain.setText("rain : No")
+            self.view.WeatherStation_Rain.setStyleSheet("background-color:rgba( 255, 255, 255, 0% );")
+        else:
+            self.view.WeatherStation_Rain.setText("rain : --")
+            self.view.WeatherStation_Rain.setStyleSheet("background-color:red;")
 
 class WSettings(QObject):
     btn_settingsadvanced_sig = pyqtSignal()

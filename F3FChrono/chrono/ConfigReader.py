@@ -75,7 +75,9 @@ default_config = \
     "noisevolume": 0.005,
     'lowvoltage_sound': False,
     'inStartBlackOut': False,
-    'inStartBlackOut_second': 0.5
+    'inStartBlackOut_second': 0.5,
+    'voltage_min_windDir' : 10.0,
+    'F3FDisplay' : True
 }
 
 def init():

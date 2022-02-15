@@ -1,4 +1,5 @@
 {
+ "F3FDisplay": false,
  "Launch_time": 30000,
  "Launched_time": 30000,
  "btn_baseA": 5,
@@ -31,5 +32,6 @@
  "voltage_coef_Accu2": 0.357,
  "voltage_min_Accu1": 9.9,
  "voltage_min_Accu2": 9.9,
+ "voltage_min_windDir": 10.0,
  "webserver_port": 8000
 }

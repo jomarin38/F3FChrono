@@ -97,11 +97,18 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
             self.timerEvent.stop()
 
     def run(self):
-        self.udpsend.sendData("wind_speed " + str(self.ui.wind_speed.value()) + " m/s")
-        self.udpsend.sendData("wind_dir " + str(self.ui.wind_dir.value()) + " " + str(self.ui.wind_dirVoltage.value()))
-        self.udpsend.sendData("rain " + str(self.ui.rain.isChecked()))
-        self.udpsend.sendData("simulate info " + str(self.ui.AccuVoltage.value()) + " " + \
-                              str(self.ui.rssi_picam1.value()) + " " + str(self.ui.rssi_picam2.value()))
+        if self.ui.speedProcessing.isChecked():
+            self.udpsend.sendData("wind_speed " + str(self.ui.wind_speed.value()) + " m/s")
+        if self.ui.dirProcessing.isChecked():
+            self.udpsend.sendData("wind_dir " + str(self.ui.wind_dir.value()) + " " + str(self.ui.wind_dirVoltage.value()))
+        if self.ui.rainProcessing.isChecked():
+            self.udpsend.sendData("rain " + str(self.ui.rain.isChecked()))
+        if self.ui.picam1Processing.isChecked():
+            self.udpsend.sendData("simulate info " + str(self.ui.AccuPicam1.value()) + " " + \
+                            str(self.ui.rssi_picam1.value()))
+        if self.ui.picam2Processing.isChecked():
+            self.udpsend.sendData("simulate info " + str(self.ui.AccuPicam2.value()) + " " + \
+                            str(self.ui.rssi_picam2.value()))
 
     def closeEvent(self, event):
         self.close_signal.emit()

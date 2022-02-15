@@ -43,9 +43,12 @@ class Weather(QTimer):
     # gui_weather_signal parameters wind_speed, wind_speed_unit,  wind_dir, rain, alarm
     gui_weather_signal = pyqtSignal(float, str, float, bool, bool)
     #parameters : wind_speed, wind_speed_unit, wind_speed_ispresent, wind_dir, wind_dir_voltage, wind_dir_voltage_alarme,
-    #wind_dir_ispresent
-    gui_wind_speed_dir_signal = pyqtSignal(float, str, bool, float, float, bool, bool)
+    #wind_dir_ispresent, rain, rain_ispresent
+    gui_wind_speed_dir_signal = pyqtSignal(float, str, bool, float, float, bool, bool, bool, bool)
     beep_signal = pyqtSignal(str, int, int)
+    windSpeedLost_signal = pyqtSignal()
+    windDirLost_signal = pyqtSignal()
+    rainLost_signal = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -60,6 +63,7 @@ class Weather(QTimer):
         self.windDirVoltage = 0.0
         self.windDir_isPresent = False
         self.windSpeed_isPresent = False
+        self.rain_isPresent = False
         self.rules['starttime'] = time.time()
         self.rules['endtime'] = time.time()
         self.rules['detected'] = False
@@ -76,8 +80,10 @@ class Weather(QTimer):
         self.start(1000)
         self.timerDir = QTimer()
         self.timerSpeed = QTimer()
+        self.timerRain = QTimer()
         self.timerDir.timeout.connect(self.timeoutDir)
         self.timerSpeed.timeout.connect(self.timeoutSpeed)
+        self.timerRain.timeout.connect(self.timeoutRain)
 
     def __checkrules(self):
         if self.__rules_enable and self.rules['speed_limit_min'] != -1.0 and \
@@ -140,7 +146,8 @@ class Weather(QTimer):
                                      self.rain, self.rules['alarm'])
         self.gui_wind_speed_dir_signal.emit(self.wind['speed'], self.wind['unit'], self.windSpeed_isPresent,
                                             self.wind['orientation'], self.windDirVoltage,
-                                            self.rules['wind_dir_voltage_alarm'], self.windDir_isPresent)
+                                            self.rules['wind_dir_voltage_alarm'], self.windDir_isPresent,
+                                            self.rain, self.rain_isPresent)
 
     def slot_wind_speed(self, speed, unit):
         self.wind['speed'] = speed
@@ -209,6 +216,9 @@ class Weather(QTimer):
 
     def rain_info(self, rain):
         self.rain = (rain == True)
+        self.timerRain.stop()
+        self.timerRain.start(2000)
+        self.rain_isPresent = True
 
     def getRain(self):
         return self.rain
@@ -217,6 +227,9 @@ class Weather(QTimer):
         self.rules['speed_limit_min'] = speed_min
         self.rules['speed_limit_max'] = speed_max
         self.rules['dir_limit'] = dir
+
+    def set_minVoltageWindDir(self, min):
+        self.rules['wind_dir_voltage_min'] = min
 
     def reset_wind(self):
         self.wind['speed'] = -1.0
@@ -233,6 +246,12 @@ class Weather(QTimer):
 
     def timeoutDir(self):
         self.windDir_isPresent=False
+        self.windDirLost_signal.emit()
 
     def timeoutSpeed(self):
         self.windSpeed_isPresent=False
+        self.windSpeedLost_signal.emit()
+
+    def timeoutRain(self):
+        self.rain_isPresent = False
+        self.rainLost_signal.emit()
