@@ -38,6 +38,40 @@
    <property name="verticalSpacing">
     <number>1</number>
    </property>
+   <item row="16" column="1">
+    <widget class="QPushButton" name="btn_valid">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Valid</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="AnemometerStatus">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="inputMethodHints">
+      <set>Qt::ImhNone</set>
+     </property>
+     <property name="text">
+      <string>Not connected</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
    <item row="2" column="0">
     <widget class="QComboBox" name="AnemometerComboBox">
      <property name="font">
@@ -64,22 +98,15 @@
      </item>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="btn_AnemometerConnect">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Connect</string>
+   <item row="7" column="0" colspan="2">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="10" column="0">
-    <widget class="QCheckBox" name="webserver">
+   <item row="1" column="0">
+    <widget class="QPushButton" name="btn_AnemometerGetList">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -88,49 +115,7 @@
       </font>
      </property>
      <property name="text">
-      <string>F3F Display</string>
-     </property>
-    </widget>
-   </item>
-   <item row="13" column="0">
-    <widget class="QPushButton" name="btn_base_settings">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Base Settings</string>
-     </property>
-    </widget>
-   </item>
-   <item row="15" column="1">
-    <widget class="QPushButton" name="btn_valid">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Valid</string>
-     </property>
-    </widget>
-   </item>
-   <item row="15" column="0">
-    <widget class="QPushButton" name="btn_cancel">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Cancel</string>
+      <string>Get Anemometer List</string>
      </property>
     </widget>
    </item>
@@ -151,8 +136,8 @@
      </property>
     </widget>
    </item>
-   <item row="13" column="1">
-    <widget class="QPushButton" name="wbtn_settings">
+   <item row="16" column="0">
+    <widget class="QPushButton" name="btn_cancel">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -161,18 +146,11 @@
       </font>
      </property>
      <property name="text">
-      <string>WBtn Settings</string>
+      <string>Cancel</string>
      </property>
     </widget>
    </item>
-   <item row="11" column="0" colspan="2">
-    <widget class="Line" name="line_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="14" column="0" colspan="2">
+   <item row="15" column="0" colspan="2">
     <widget class="QPushButton" name="btn_back">
      <property name="font">
       <font>
@@ -183,40 +161,6 @@
      </property>
      <property name="text">
       <string>Back to Settings</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="AnemometerStatus">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="inputMethodHints">
-      <set>Qt::ImhNone</set>
-     </property>
-     <property name="text">
-      <string>Not connected</string>
-     </property>
-     <property name="checkable">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="btn_AnemometerGetList">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Get Anemometer List</string>
      </property>
     </widget>
    </item>
@@ -241,8 +185,50 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0" colspan="2">
-    <widget class="Line" name="line">
+   <item row="14" column="0">
+    <widget class="QPushButton" name="btn_base_settings">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Base Settings</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="1">
+    <widget class="QPushButton" name="wbtn_settings">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>WBtn Settings</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="btn_AnemometerConnect">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Connect</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0" colspan="2">
+    <widget class="Line" name="line_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -259,6 +245,34 @@
      </property>
      <property name="text">
       <string>Dir : Nan, 5V</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="QCheckBox" name="display">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>F3F Display</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="WeatherStation_Rain">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>rain</string>
      </property>
     </widget>
    </item>

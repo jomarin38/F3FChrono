@@ -61,7 +61,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
         self.rpigpio.signal_btn_next.connect(self.next_action)
 
-        self.chronoHard.rssi_signal.connect(self.slot_rssi)
+        self.chronoHard.picam_signal.connect(self.slot_picam)
         self.chronoHard.accu_signal.connect(self.slot_accu)
         self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
         self.chronoHard.event_voltage()
@@ -147,6 +147,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.chronoHard.weather.anemometer.list_sig.connect(self.controllers['settingswDevices'].anemometerSetData)
         self.chronoHard.weather.anemometer.status_sig.connect(self.controllers['settingswDevices'].view.AnemometerStatus.setText)
         self.chronoHard.weather.gui_wind_speed_dir_signal.connect(self.controllers['settingswDevices'].weatherStation_display)
+        self.chronoHard.weather.set_minVoltageWindDir(ConfigReader.config.conf['voltage_min_windDir'])
 
         self.controllers['settingsbase'].set_udp_sig(self.chronoHard.udpReceive.simulate_base_sig,
                                                      self.chronoHard.udpReceive.ipbase_set_sig,
@@ -328,6 +329,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsadvanced'].set_data()
         self.controllers['settingsbase'].set_data()
         self.controllers['settingswBtn'].set_data()
+        self.controllers['settingswDevices'].set_data()
         self.show_settings()
 
     def set_signal_mode(self, training=False):
@@ -371,6 +373,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settings'].get_data()
         self.controllers['settingssound'].get_data()
         self.controllers['settingsadvanced'].get_data()
+        self.controllers['settingswDevices'].get_data()
         self.controllers['settingsbase'].get_data()
         self.controllers['settingsbase'].btn_valid()
         self.controllers['settingswBtn'].get_data()
@@ -680,8 +683,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
                 ',' + str(voltage1) + ',' + str(voltage2) + '\n')
         f.close()
 
-    def slot_rssi(self, rssi1, rssi2):
-        self.controllers['wind'].set_rssi(rssi1, rssi2)
+    def slot_picam(self, accu, rssi):
+        self.controllers['wind'].set_picam(accu, rssi)
 
     def slot_low_voltage_ask(self):
         if not self.controllers['round'].is_show():
