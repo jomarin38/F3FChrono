@@ -1376,13 +1376,14 @@ class WSettingsWirelessDevices(QObject):
                                wind_dir, wind_dir_voltage, wind_dir_voltage_alarm, wind_dir_ispresent,
                                rain, rain_ispresent):
         if wind_speed_ispresent:
-            self.view.WeatherStation_Speed.setText("WindSpeed : "+str(wind_speed) + wind_speed_unit)
+            self.view.WeatherStation_Speed.setText("WindSpeed : "+"{:0>.1f}".format(wind_speed) + wind_speed_unit)
             self.view.WeatherStation_Speed.setStyleSheet("background-color:rgba( 255, 255, 255, 0% );")
         else:
             self.view.WeatherStation_Speed.setText("WindSpeed : --")
             self.view.WeatherStation_Speed.setStyleSheet("background-color:red;")
         if wind_dir_ispresent:
-            self.view.WeatherStation_Dir.setText("Dir : " + str(wind_dir)+ ", "+ str(wind_dir_voltage)+"V")
+            self.view.WeatherStation_Dir.setText("Dir : " + "{:0>.1f}".format(wind_dir)+ ", " +
+                                                 "{:0>.1f}".format(wind_dir_voltage)+"V")
             if wind_dir_voltage_alarm:
                 self.view.WeatherStation_Dir.setStyleSheet("background-color:red;")
             else:
