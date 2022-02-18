@@ -56,7 +56,6 @@ class ChronoHard(QObject):
     buzzer_validated = pyqtSignal()
     chrono_signal = pyqtSignal(str, str, str)
     accu_signal = pyqtSignal(float, float)
-    picam_signal = pyqtSignal(float, int)
     altitude_finished = pyqtSignal(float)
 
     def __init__(self, signal_btnnext):
@@ -71,8 +70,7 @@ class ChronoHard(QObject):
         self.weather = Weather()
         self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.weather.windspeed_signal,
                                      self.weather.winddir_signal, self.weather.rain_signal,
-                                     self.picam_signal, self.weather.anemometer.list_sig,
-                                     self.weather.anemometer.status_sig)
+                                     self.weather.anemometer.list_sig, self.weather.anemometer.status_sig)
         self.valid = True
         self.refly = False
         self.__debug = False
@@ -177,7 +175,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.timer.start(30000)
         self.reset()
         self.in_start_blackout_enabled = ConfigReader.config.conf['inStartBlackOut']
-        self.in_start_blackout_second = ConfigReader.config.conf['inStartBlackOut_second']
+        self.in_start_blackout_second = ConfigReader.config.conf['inStartBlackOut_msecond']/1000
         self.competition_mode = ConfigReader.config.conf['competition_mode']
 
     def slot_status(self, status):

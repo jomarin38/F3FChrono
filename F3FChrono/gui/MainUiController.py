@@ -61,7 +61,6 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
         self.rpigpio.signal_btn_next.connect(self.next_action)
 
-        self.chronoHard.picam_signal.connect(self.slot_picam)
         self.chronoHard.accu_signal.connect(self.slot_accu)
         self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
         self.chronoHard.event_voltage()
@@ -143,6 +142,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswDevices'].btn_settingswBtn_sig.connect(self.show_settingswBtn)
         self.controllers['settingswDevices'].btn_AnemometerGetList_sig.connect(self.chronoHard.weather.anemometer.GetList)
         self.controllers['settingswDevices'].btn_AnemometerConnect_sig.connect(self.chronoHard.weather.anemometer.Connect)
+        self.controllers['settingswDevices'].wirelessDevicesSelected_sig.connect(self.chronoHard.weather.setConfig)
         
         self.chronoHard.weather.anemometer.list_sig.connect(self.controllers['settingswDevices'].anemometerSetData)
         self.chronoHard.weather.anemometer.status_sig.connect(self.controllers['settingswDevices'].view.AnemometerStatus.setText)
@@ -373,7 +373,6 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settings'].get_data()
         self.controllers['settingssound'].get_data()
         self.controllers['settingsadvanced'].get_data()
-        self.controllers['settingswDevices'].get_data()
         self.controllers['settingsbase'].get_data()
         self.controllers['settingsbase'].btn_valid()
         self.controllers['settingswBtn'].get_data()
@@ -659,6 +658,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.next_pilot(insert_database=True)
         self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False)
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
+        self.controllers['wind'].setLastRoundTime()
 
     @staticmethod
     def chronoHard_to_chrono(chronoHard, chrono):
@@ -683,8 +683,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
                 ',' + str(voltage1) + ',' + str(voltage2) + '\n')
         f.close()
 
-    def slot_picam(self, accu, rssi):
-        self.controllers['wind'].set_picam(accu, rssi)
+
 
     def slot_low_voltage_ask(self):
         if not self.controllers['round'].is_show():

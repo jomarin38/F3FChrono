@@ -17,8 +17,9 @@
 
 import time
 import collections
-from F3FChrono.chrono.UDPSend import *
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
+from F3FChrono.chrono.UDPSend import *
+from F3FChrono.chrono import ConfigReader
 
 class anemometer(QObject):
     list_sig = pyqtSignal(list)
@@ -53,9 +54,10 @@ class Weather(QTimer):
     def __init__(self):
         super().__init__()
         self.anemometer = anemometer()
-        self.windspeed_signal.connect(self.slot_wind_speed)
-        self.winddir_signal.connect(self.slot_wind_dir)
-        self.rain_signal.connect(self.rain_info)
+        self.handleSpeed = None
+        self.handleDir = None
+        self.handleRain = None
+        self.setConfig()
         self.wind = collections.OrderedDict()
         self.rules = collections.OrderedDict()
         self.reset_wind()
@@ -78,12 +80,35 @@ class Weather(QTimer):
         self.__rules_enable = False
         self.timeout.connect(self.refresh_gui)
         self.start(1000)
+        self.sensorAlarmTimeOut = ConfigReader.config.conf['SensorAlarmTimeout']
         self.timerDir = QTimer()
         self.timerSpeed = QTimer()
         self.timerRain = QTimer()
         self.timerDir.timeout.connect(self.timeoutDir)
         self.timerSpeed.timeout.connect(self.timeoutSpeed)
         self.timerRain.timeout.connect(self.timeoutRain)
+
+    def setConfig(self):
+        if ConfigReader.config.conf['enableSensorSpeed']:
+            self.handleSpeed = self.windspeed_signal.connect(self.slot_wind_speed)
+        else:
+            if self.handleSpeed is not None:
+                self.windspeed_signal.disconnect()
+                self.handleSpeed = None
+
+        if ConfigReader.config.conf['enableSensorDir']:
+            self.handleDir = self.winddir_signal.connect(self.slot_wind_dir)
+        else:
+            if self.handleDir is not None:
+                self.winddir_signal.disconnect()
+                self.handleDir = None
+        if ConfigReader.config.conf['enableSensorRain']:
+            self.handleRain = self.rain_signal.connect(self.rain_info)
+        else:
+            if self.handleRain is not None:
+                self.rain_signal.disconnect()
+                self.handleRain = None
+
 
     def __checkrules(self):
         if self.__rules_enable and self.rules['speed_limit_min'] != -1.0 and \
@@ -154,7 +179,7 @@ class Weather(QTimer):
         self.wind['unit'] = unit
         self.windSpeed_isPresent = True
         self.timerSpeed.stop()
-        self.timerSpeed.start(2000)
+        self.timerSpeed.start(self.sensorAlarmTimeOut)
 
         if self.inRun:
             self.wind['speed_nb'] += 1
@@ -173,7 +198,7 @@ class Weather(QTimer):
         self.rules['wind_dir_voltage_alarm'] = (self.windDirVoltage < self.rules['wind_dir_voltage_min'])
         self.windDir_isPresent = True
         self.timerDir.stop()
-        self.timerDir.start(2000)
+        self.timerDir.start(self.sensorAlarmTimeOut)
 
         if self.inRun:
             self.wind['orientation_sum'] += orientation
@@ -217,7 +242,7 @@ class Weather(QTimer):
     def rain_info(self, rain):
         self.rain = (rain == True)
         self.timerRain.stop()
-        self.timerRain.start(2000)
+        self.timerRain.start(self.sensorAlarmTimeOut)
         self.rain_isPresent = True
 
     def getRain(self):
