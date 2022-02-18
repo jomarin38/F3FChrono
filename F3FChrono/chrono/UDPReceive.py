@@ -43,7 +43,7 @@ class udpreceive(QThread):
     penalty_sig = pyqtSignal()
 
     def __init__(self, udpport, signal_chrono, signal_btnnext, signal_windspeed, signal_winddir, signal_rain, \
-                 signal_picam, weatherList_sig, weatherStatus_sig):
+                 weatherList_sig, weatherStatus_sig):
         super().__init__()
         self.__debug = False
         self.port = udpport
@@ -52,7 +52,6 @@ class udpreceive(QThread):
         self.event_wind_speed = signal_windspeed
         self.event_wind_dir = signal_winddir
         self.event_rain = signal_rain
-        self.event_picam = signal_picam
         self.event_weatherlist_sig = weatherList_sig
         self.event_weatherStatus_sig = weatherStatus_sig
         self.clear_ipbase()
@@ -141,8 +140,6 @@ class udpreceive(QThread):
                     self.event_wind_dir.emit(float(m[1]), float(m[2]))
                 elif m[0] == 'rain':
                     self.event_rain.emit(bool(m[1] == 'True'))
-                elif m[0] == 'info':
-                    self.event_picam.emit(float(m[1]), float(m[2]))
                 elif m[0] == 'wBtn':
                     self._wbtn_function(address[0], int(m[1]))
                 elif m[0] == "anemometerList":

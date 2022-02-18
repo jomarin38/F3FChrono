@@ -274,9 +274,8 @@ class WWindCtrl():
             self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
 
-    def set_picam(self, accu, rssi):
-        self.view.rssi.setText(str(accu) + "V, " + str(rssi) + "%")
-
+    def setLastRoundTime(self):
+        self.view.lastRun.setText(datetime.now().strftime("%H:%M"))
 
 class WPilotCtrl(QObject):
     btn_cancel_flight_sig = pyqtSignal()
@@ -912,11 +911,11 @@ class WSettingsBase(QObject):
 
     def set_data(self):
         self.view.inStartBlackOut.setChecked(ConfigReader.config.conf['inStartBlackOut'])
-        self.view.inStartBlackOut_second.setValue(ConfigReader.config.conf['inStartBlackOut_second'])
+        self.view.inStartBlackOut_second.setValue(ConfigReader.config.conf['inStartBlackOut_msecond']/1000)
 
     def get_data(self):
         ConfigReader.config.conf['inStartBlackOut'] = self.view.inStartBlackOut.isChecked()
-        ConfigReader.config.conf['inStartBlackOut_second'] = self.view.inStartBlackOut_second.value()
+        ConfigReader.config.conf['inStartBlackOut_msecond'] = self.view.inStartBlackOut_second.value()*1000
 
     def set_udp_sig(self, udp, set, clear, invert):
         self.udp_sig = udp
@@ -1346,6 +1345,7 @@ class WSettingsWirelessDevices(QObject):
     btn_settingsback_sig = pyqtSignal()
     btn_cancel_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
+    wirelessDevicesSelected_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -1364,6 +1364,11 @@ class WSettingsWirelessDevices(QObject):
         self.view.btn_back.clicked.connect(self.btn_settingsback_sig.emit)
         self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
         self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self.view.checkBox_Display.stateChanged.connect(self.get_data)
+        self.view.checkBox_Dir.stateChanged.connect(self.get_data)
+        self.view.checkBox_Speed.stateChanged.connect(self.get_data)
+        self.view.checkBox_Rain.stateChanged.connect(self.get_data)
+
         self.view.AnemometerComboBox.clear()
 
 
@@ -1380,10 +1385,17 @@ class WSettingsWirelessDevices(QObject):
         self.widget.hide()
 
     def set_data(self):
-        self.view.display.setChecked(ConfigReader.config.conf['F3FDisplay'])
+        self.view.checkBox_Display.setChecked(ConfigReader.config.conf['enableDisplay'])
+        self.view.checkBox_Speed.setChecked(ConfigReader.config.conf['enableSensorSpeed'])
+        self.view.checkBox_Dir.setChecked(ConfigReader.config.conf['enableSensorDir'])
+        self.view.checkBox_Rain.setChecked(ConfigReader.config.conf['enableSensorRain'])
 
     def get_data(self):
-        ConfigReader.config.conf['F3FDisplay'] = self.view.display.isChecked()
+        ConfigReader.config.conf['enableDisplay'] = self.view.checkBox_Display.isChecked()
+        ConfigReader.config.conf['enableSensorSpeed'] = self.view.checkBox_Speed.isChecked()
+        ConfigReader.config.conf['enableSensorDir'] = self.view.checkBox_Dir.isChecked()
+        ConfigReader.config.conf['enableSensorRain'] = self.view.checkBox_Rain.isChecked()
+        self.wirelessDevicesSelected_sig.emit()
 
     def anemometerSetData(self, datalist):
         self.view.AnemometerComboBox.clear()
@@ -1397,10 +1409,10 @@ class WSettingsWirelessDevices(QObject):
                                wind_dir, wind_dir_voltage, wind_dir_voltage_alarm, wind_dir_ispresent,
                                rain, rain_ispresent):
         if wind_speed_ispresent:
-            self.view.WeatherStation_Speed.setText("WindSpeed : "+"{:0>.1f}".format(wind_speed) + wind_speed_unit)
+            self.view.WeatherStation_Speed.setText("Speed : "+"{:0>.1f}".format(wind_speed) + wind_speed_unit)
             self.view.WeatherStation_Speed.setStyleSheet("background-color:rgba( 255, 255, 255, 0% );")
         else:
-            self.view.WeatherStation_Speed.setText("WindSpeed : --")
+            self.view.WeatherStation_Speed.setText("Speed : --")
             self.view.WeatherStation_Speed.setStyleSheet("background-color:red;")
         if wind_dir_ispresent:
             self.view.WeatherStation_Dir.setText("Dir : " + "{:0>.1f}".format(wind_dir)+ ", " +
