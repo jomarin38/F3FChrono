@@ -209,10 +209,12 @@ class WWindCtrl():
         self.widget.hide()
 
     def display_wind_info(self, wind_speed, wind_speed_unit,  wind_dir, rain, alarm):
-        if rain:
+        if rain>0.0:
             strrain = self._translate("Rain", "Rain")
-        else:
+        elif rain==0.0:
             strrain = self._translate("No Rain", "No Rain")
+        else:
+            strrain = self._translate("Rain", "Rain") + " : --"
         self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + '{:.1f}'.format(wind_speed) +
                                    wind_speed_unit + self._translate(", Angle : ", ", Angle : ") +
                                    str(wind_dir) + '°' + ', ' + strrain)
@@ -1336,6 +1338,7 @@ class WSettingsWirelessDevices(QObject):
         self._translate = QtCore.QCoreApplication.translate
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
+        self.set_data()
         self.view.btn_AnemometerConnect.clicked.connect(self.anemometerconnect)
         self.view.btn_AnemometerGetList.clicked.connect(self.btn_AnemometerGetList_sig.emit)
         self.view.btn_base_settings.clicked.connect(self.btn_settingsbase_sig.emit)
@@ -1404,7 +1407,7 @@ class WSettingsWirelessDevices(QObject):
             self.view.WeatherStation_Dir.setText("Dir : --")
             self.view.WeatherStation_Dir.setStyleSheet("background-color:red;")
         if rain_ispresent:
-            if rain:
+            if rain > 0.0:
                 self.view.WeatherStation_Rain.setText("rain : Yes")
             else:
                 self.view.WeatherStation_Rain.setText("rain : No")
