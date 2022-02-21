@@ -148,7 +148,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.chronoHard.weather.anemometer.status_sig.connect(self.controllers['settingswDevices'].view.AnemometerStatus.setText)
         self.chronoHard.weather.gui_wind_speed_dir_signal.connect(self.controllers['settingswDevices'].weatherStation_display)
         self.chronoHard.weather.set_minVoltageWindDir(ConfigReader.config.conf['voltage_min_windDir'])
-
+        self.chronoHard.weather.weather_sound_signal.connect(self.vocal.slot_windAlarm)
+        self.chronoHard.weather.weather_lowVoltage_signal.connect(self.vocal.slot_weatherStationLowVoltage)
+        self.chronoHard.weather.weather_sensor_lost.connect(self.vocal.slot_weatherStationSensorsLost)
         self.controllers['settingsbase'].set_udp_sig(self.chronoHard.udpReceive.simulate_base_sig,
                                                      self.chronoHard.udpReceive.ipbase_set_sig,
                                                      self.chronoHard.udpReceive.ipbase_clear_sig,

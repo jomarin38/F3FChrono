@@ -82,7 +82,9 @@ default_config = \
     'lowvoltage_sound': False,
     'inStartBlackOut': False,
     'inStartBlackOut_msecond': 500,
-    'voltage_min_windDir' : 10.0
+    'voltage_min_windDir' : 10.0,
+    'weather_beep_okDC': 250,
+    'weather_beep_nok': 100
 }
 
 def init():

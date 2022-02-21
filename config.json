@@ -13,9 +13,9 @@
  "buzzer_valid": true,
  "competition_mode": 1,
  "enableDisplay": false,
- "enableSensorDir": false,
- "enableSensorRain": false,
- "enableSensorSpeed": false,
+ "enableSensorDir": true,
+ "enableSensorRain": true,
+ "enableSensorSpeed": true,
  "fullscreen": true,
  "inStartBlackOut": true,
  "inStartBlackOut_msecond": 500.0,
@@ -37,5 +37,7 @@
  "voltage_min_Accu1": 9.9,
  "voltage_min_Accu2": 9.9,
  "voltage_min_windDir": 10.0,
+ "weather_beep_nok": 100,
+ "weather_beep_okDC": 250,
  "webserver_port": 8000
 }

@@ -78,6 +78,8 @@ class chronoQSound(QThread):
         self.signal_penalty.connect(self.sound_penalty)
         self.signal_pilotname.connect(self.sound_pilot)
         self.signal_lowVoltage.connect(self.lowVoltage)
+        self.marginalConditionFlag = False
+        self.training = False
 
         #define constant index
         self.index_dot = 101
@@ -91,14 +93,19 @@ class chronoQSound(QThread):
         self.seconds_twenty = 109
         self.seconds_fifteen = 110
         self.seconds_ten = 111
-        self.launch = 112
+        self.to_launch = 112
+        self.windok = 113
+        self.windAlert = 114
+        self.marginalCondition=115
+        self.weatherstationlowvoltage=116
+        self.weatherstationsensorslost=117
         self.loadwav(volume)
         self.__debug = False
 
     def loadwav(self, volume):
         try:
             self.time = []
-            for i in range(0, 113):
+            for i in range(0, 118):
                 self.time.append(QSoundEffect())
                 self.time[i].setSource(QUrl.fromLocalFile(
                     os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav')))
@@ -111,6 +118,7 @@ class chronoQSound(QThread):
 
     def sound_time(self, run_time, training=False):
         self.run_time = run_time
+        self.training = training
         if not training:
             self.finaltime_timer.start(2000)
         else:
@@ -120,27 +128,32 @@ class chronoQSound(QThread):
         self.stop_all()
         self.finaltime_timer.stop()
         if self.play_sound:
-            # decompose numeric time to find cent, diz, 1/100
-            var_time = Decimal("{:0.2f}".format(self.run_time))
-            cent, diz = divmod(var_time, 100)
-            x = int(var_time % 1 * 100)
-
-            # create sequence sound
-            if int(cent) > 0:
-                self.sound_list.append(int(cent * 100))
-                if int(diz) > 0:
-                    self.sound_list.append(int(diz))
+            if not self.training and self.marginalConditionFlag:
+                self.sound_list.append(self.marginalCondition)
+                self.__start_play()
+                self.marginalConditionFlag = False
             else:
-                self.sound_list.append(int(diz))
+                # decompose numeric time to find cent, diz, 1/100
+                var_time = Decimal("{:0.2f}".format(self.run_time))
+                cent, diz = divmod(var_time, 100)
+                x = int(var_time % 1 * 100)
 
-            if x < 100:
-                self.sound_list.append(self.index_dot)  # add dot wav
-                if x > 0 and x < 10:
-                    self.sound_list.append(0)
-                    self.sound_list.append(x)
+                # create sequence sound
+                if int(cent) > 0:
+                    self.sound_list.append(int(cent * 100))
+                    if int(diz) > 0:
+                        self.sound_list.append(int(diz))
                 else:
-                    self.sound_list.append(x)
-            self.__start_play()
+                    self.sound_list.append(int(diz))
+
+                if x < 100:
+                    self.sound_list.append(self.index_dot)  # add dot wav
+                    if x > 0 and x < 10:
+                        self.sound_list.append(0)
+                        self.sound_list.append(x)
+                    else:
+                        self.sound_list.append(x)
+                self.__start_play()
 
     def sound_pilot(self, bib):
         self.stop_all()
@@ -151,10 +164,34 @@ class chronoQSound(QThread):
             self.__start_play()
 
     def lowVoltage(self):
-        self.stop_all()
         if self.play_sound:
             self.sound_list.append(self.index_lowvoltage)
             self.__start_play()
+
+    def slot_windAlarm(self, type):
+        if self.play_sound:
+            if type=="windok":
+                self.sound_list.append(self.windok)
+                if len(self.sound_list) == 1:
+                    self.__start_play()
+            elif type=="windalert":
+                self.sound_list.append(self.windAlert)
+                if len(self.sound_list) == 1:
+                    self.__start_play()
+            elif type=="windmarginal":
+                self.marginalConditionFlag = True
+
+    def slot_weatherStationLowVoltage(self):
+        if self.play_sound:
+            self.sound_list.append(self.weatherstationlowvoltage)
+            if len(self.sound_list) == 1:
+                self.__start_play()
+
+    def slot_weatherStationSensorsLost(self):
+        if self.play_sound:
+            self.sound_list.append(self.weatherstationsensorslost)
+            if len(self.sound_list) == 1:
+                self.__start_play()
 
     def sound_base(self, index):
         self.stop_all()
@@ -180,12 +217,10 @@ class chronoQSound(QThread):
                 if cmd == 30:
                     if not self.sound_isplaying[self.seconds_thirty]:
                         self.stop_all()
-                        if to_launch:
-                            self.sound_list.append(self.seconds_thirty)
-                        else:
-                            self.sound_list.append(self.launch)
+                        self.sound_list.append(self.seconds_thirty)
+                        #if to_launch:
+                        #    self.sound_list.append(self.to_launch)
                         if len(self.sound_list) > 0:
-
                             self.__start_play()
                 elif cmd == 25:
                     if not self.sound_isplaying[self.seconds_twentyfive]:

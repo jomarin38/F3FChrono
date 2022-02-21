@@ -242,7 +242,7 @@ class ChronoArduino(ChronoHard, QTimer):
     def reset(self):
         self.arduino.reset()
         self.chronoLap.clear()
-        self.weather.reset_wind()
+        self.weather.reset_weather()
         self.clearPenalty()
         self.valid = True
         self.refly = False
