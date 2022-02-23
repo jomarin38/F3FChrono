@@ -32,7 +32,6 @@ import os
 
 class MainUiCtrl(QtWidgets.QMainWindow):
     close_signal = pyqtSignal()
-    signal_lowvoltage_ask = pyqtSignal()
     startup_time = None
 
     def __init__(self, eventdao, chronodata, rpi, webserver_process):
@@ -65,6 +64,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.chronoHard.buzzer_validated.connect(self.slot_buzzer)
         self.chronoHard.event_voltage()
         self.chronoHard.udpReceive.switchMode_sig.connect(self.slot_switch_mode)
+        self.chronoHard.status_changed.connect(self.vocal.slot_status_changed)
         self.signal_race = None
         self.signal_training = None
         self.low_voltage_ask = False
@@ -181,8 +181,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['wind'].display_wind_info(-1.0, "m/s", -1.0, False, False)
         self.chronoHard.weather.gui_weather_signal.connect(self.controllers['wind'].display_wind_info)
         self.chronoHard.weather.gui_weather_signal.connect(self.controllers['round'].wChronoCtrl.display_wind_info)
-        self.controllers['wind'].set_signal(self.signal_lowvoltage_ask)
-        self.signal_lowvoltage_ask.connect(self.slot_low_voltage_ask)
+        self.controllers['wind'].lowVoltage_sig.connect(self.vocal.slot_lowVoltage)
 
     def show_config(self):
         self.controllers['round'].hide()
@@ -613,10 +612,6 @@ class MainUiCtrl(QtWidgets.QMainWindow):
     def slot_status_changed(self, status):
         # print ("slot status", status)
         self.controllers['round'].wChronoCtrl.set_status(status)
-        if (status == chronoStatus.InWait):
-            if self.low_voltage_ask:
-                self.vocal.signal_lowVoltage.emit()
-                self.low_voltage_ask = False
         if (status == chronoStatus.WaitLaunch):
             self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False,
                                                           to_launch=True)
@@ -684,14 +679,6 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         f.write(str(self.startup_time) + ',' + str((time.time() - self.startup_time) / 60.0) +
                 ',' + str(voltage1) + ',' + str(voltage2) + '\n')
         f.close()
-
-
-
-    def slot_low_voltage_ask(self):
-        if not self.controllers['round'].is_show():
-            self.vocal.signal_lowVoltage.emit()
-        else:
-            self.low_voltage_ask = True
 
     def closeEvent(self, event):
         self.close_signal.emit()

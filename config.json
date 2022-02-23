@@ -14,7 +14,7 @@
  "competition_mode": 1,
  "enableDisplay": false,
  "enableSensorDir": true,
- "enableSensorRain": true,
+ "enableSensorRain": false,
  "enableSensorSpeed": true,
  "fullscreen": true,
  "inStartBlackOut": true,
