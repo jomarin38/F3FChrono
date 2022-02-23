@@ -199,10 +199,12 @@ class WTrainingCtrl(QObject):
         self.btn_reset_sig.emit()
 
 
-class WWindCtrl():
+class WWindCtrl(QObject):
     widgetList = []
+    lowVoltage_sig = pyqtSignal()
 
     def __init__(self, name, parent):
+        super().__init__()
         self.view = Ui_WWind()
         self.name = name
         self.parent = parent
@@ -212,7 +214,6 @@ class WWindCtrl():
         self.widgetList.append(self.widget)
         self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
         self.windstylesheet = "background-color:rgba( 255, 255, 255, 0% );"
-        self.lowVoltage_sig = None
         self._translate = QtCore.QCoreApplication.translate
 
     def get_widget(self):
@@ -268,8 +269,7 @@ class WWindCtrl():
                 self.voltagestylesheet == "background-color:rgba( 255, 255, 255, 0% );":
             self.voltagestylesheet = "background-color:red;"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
-            if self.lowVoltage_sig is not None:
-                self.lowVoltage_sig.emit()
+            self.lowVoltage_sig.emit()
         elif (voltage1 > ConfigReader.config.conf['voltage_min_Accu1'] or
               voltage2 > ConfigReader.config.conf['voltage_min_Accu2']) and \
                 self.voltagestylesheet == "background-color:red;":

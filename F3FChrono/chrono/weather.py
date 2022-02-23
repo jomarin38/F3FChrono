@@ -65,8 +65,6 @@ class Weather(QTimer):
     weather_sound_signal = pyqtSignal(str)
     weather_lowVoltage_signal = pyqtSignal()
     weather_sensor_lost = pyqtSignal()
-    weather_condition_signal = pyqtSignal()
-    weather_notcondition_signal = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -74,11 +72,10 @@ class Weather(QTimer):
         self.handleSpeed = None
         self.handleDir = None
         self.handleRain = None
-        self.setConfig()
         self.weather = collections.OrderedDict()
         self.rules = collections.OrderedDict()
         self.reset_weather()
-        self.__debug = True
+        self.__debug = False
         self.windDirVoltage = 20.0
         self.windDir_isPresent = True
         self.windSpeed_isPresent = True
@@ -105,32 +102,34 @@ class Weather(QTimer):
         self.timerDir.timeout.connect(self.timeoutDir)
         self.timerSpeed.timeout.connect(self.timeoutSpeed)
         self.timerRain.timeout.connect(self.timeoutRain)
-        self.timerDir.start(self.sensorAlarmTimeOut)
-        self.timerSpeed.start(self.sensorAlarmTimeOut)
-        self.timerRain.start(self.sensorAlarmTimeOut)
-        self.weather_condition_signal.connect(self.slot_weatherCondition)
-        self.weather_notcondition_signal.connect(self.slot_weatherNotCondition)
+        self.setConfig()
 
     def setConfig(self):
         if ConfigReader.config.conf['enableSensorSpeed']:
             self.handleSpeed = self.windspeed_signal.connect(self.slot_wind_speed)
+            self.timerSpeed.start(self.sensorAlarmTimeOut)
         else:
             if self.handleSpeed is not None:
                 self.windspeed_signal.disconnect()
                 self.handleSpeed = None
+                self.timerSpeed.stop()
 
         if ConfigReader.config.conf['enableSensorDir']:
             self.handleDir = self.winddir_signal.connect(self.slot_wind_dir)
+            self.timerDir.start(self.sensorAlarmTimeOut)
         else:
             if self.handleDir is not None:
                 self.winddir_signal.disconnect()
                 self.handleDir = None
+                self.timerDir.stop()
         if ConfigReader.config.conf['enableSensorRain']:
             self.handleRain = self.rain_signal.connect(self.rain_info)
+            self.timerRain.start(self.sensorAlarmTimeOut)
         else:
             if self.handleRain is not None:
                 self.rain_signal.disconnect()
                 self.handleRain = None
+                self.timerRain.stop()
 
 
     def __checkrules(self):
@@ -150,10 +149,9 @@ class Weather(QTimer):
                 ((self.weather['speed'] < self.rules['speed_limit_min'] or \
                 self.weather['speed'] > self.rules['speed_limit_max']) and self.windSpeed_isPresent) \
                 or self.weather['rain'] > 0.0 and self.rain_isPresent):
-                self.weather_notcondition_signal.emit()
+                self.slot_weatherNotCondition()
             else:
-                self.weather_condition_signal.emit()
-
+                self.slot_weatherCondition()
 
     def enable_rules(self, enable=False):
         self.__rules_enable = enable
@@ -258,13 +256,16 @@ class Weather(QTimer):
         self.rules['wind_dir_voltage_min'] = min
 
     def reset_weather(self):
+        self.weather['speed'] = 3.0
         self.weather['unit'] = "m/s"
         self.weather['speed_sum'] = 0.0
         self.weather['speed_nb'] = 0.0
         self.weather['speed_min'] = -1.0
         self.weather['speed_max'] = -1.0
+        self.weather['orientation'] = 0.0
         self.weather['orientation_sum'] = 0.0
         self.weather['orientation_nb'] = 0.0
+        self.weather['rain'] = 0.0
         self.inRun = False
 
     def timeoutDir(self):
