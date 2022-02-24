@@ -50,40 +50,34 @@ class noiseGenerator(QThread):
         self.sound.stop()
 
 class chronoSound(QSoundEffect):
-    def __init__(self, source, slot, volume):
+    def __init__(self, num, source, slot, volume):
         super().__init__()
         self.__debug = False
         try:
-
+            self.number = num
             self.setSource(QUrl.fromLocalFile(source))
             if self.__debug:
                 print(self.source(), "Status : ", self.status())
             self.handleSlot = self.playingChanged.connect(slot)
             self.setVolume(volume)
-            self.InProgress = False
-
-
         except TypeError as e:
             print("QSoundError : ", e, " status : ", self.status())
 
     def playSound(self):
         try:
             self.play()
-            self.InProgress = True
         except TypeError as e:
             print("QSoundError : ", e)
 
     def stopSound(self):
         try:
             self.stop()
-            self.InProgress = False
         except TypeError as e:
             print("QSoundError : ", e)
 
 class chronoQSound(QThread):
     signal_penalty = pyqtSignal()
     signal_base = pyqtSignal(int)
-    signal_entry = pyqtSignal()
     signal_time = pyqtSignal(float, bool)
     signal_elapsedTime = pyqtSignal(int, bool)
     signal_start = pyqtSignal(int)
@@ -101,7 +95,6 @@ class chronoQSound(QThread):
         self.sound_list = []
         self.sound_lowPriority = []
         self.signal_elapsedTime.connect(self.sound_elapsedTime)
-        self.signal_entry.connect(self.sound_entry)
         self.signal_base.connect(self.sound_base)
         self.signal_time.connect(self.sound_time)
         self.signal_penalty.connect(self.sound_penalty)
@@ -111,32 +104,37 @@ class chronoQSound(QThread):
         self.chronoStatus = chronoStatus.InWait
 
         #define constant index
-        self.index_dot = 101
-        self.index_pilot = 102
-        self.index_entry = 103
-        self.index_penalty = 104
-        self.index_lowvoltage = 105
-        self.index_seconds = 106
-        self.seconds_thirty = 107
-        self.seconds_twentyfive = 108
-        self.seconds_twenty = 109
-        self.seconds_fifteen = 110
-        self.seconds_ten = 111
-        self.to_launch = 112
-        self.windok = 113
-        self.windAlert = 114
-        self.marginalCondition=115
-        self.weatherstationlowvoltage=116
-        self.weatherstationsensorslost=117
+        self.specialsound = collections.OrderedDict()
+        self.specialsound['index_dot'] = 101
+        self.specialsound['index_pilot'] = 102
+        self.specialsound['index_entry'] = 103
+        self.specialsound['index_penalty'] = 104
+        self.specialsound['index_lowvoltage'] = 105
+        self.specialsound['index_seconds'] = 106
+        self.specialsound['seconds_thirty'] = 107
+        self.specialsound['seconds_twentyfive'] = 108
+        self.specialsound['seconds_twenty'] = 109
+        self.specialsound['seconds_fifteen'] = 110
+        self.specialsound['seconds_ten'] = 111
+        self.specialsound['to_launch'] = 112
+        self.specialsound['windok'] = 113
+        self.specialsound['windAlert'] = 114
+        self.specialsound['marginalCondition'] = 115
+        self.specialsound['weatherstationlowvoltage'] = 116
+        self.specialsound['weatherstationsensorslost'] = 117
+        self.specialsound['to_late'] = 118
         self.loadwav(volume)
+        self.volume = volume
+        self.entry_sound = False
+        self.entry_soundToLate = False
+        self.toLateSound = False
         self.__debug = True
 
     def loadwav(self, volume):
         self.time = []
-        for i in range(0, 118):
-            self.time.append(chronoSound(os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav'),\
+        for i in range(0, 119):
+            self.time.append(chronoSound(i, os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav'),\
                                          self.slot_sound_playing_changed, volume))
-
 
     def sound_time(self, run_time, training=False):
         self.run_time = run_time
@@ -167,7 +165,7 @@ class chronoQSound(QThread):
                     self.__addSound(int(diz))
 
                 if x < 100:
-                    self.__addSound(self.index_dot)  # add dot wav
+                    self.__addSound(self.specialsound['index_dot'])  # add dot wav
                     if x > 0 and x < 10:
                         self.__addSound(0)
                         self.__addSound(x)
@@ -176,55 +174,74 @@ class chronoQSound(QThread):
 
 
     def sound_pilot(self, bib):
-        self.__addSound(self.index_pilot)
+        self.__addSound(self.specialsound['index_pilot'])
         self.__addSound(int(bib))
 
     def slot_lowVoltage(self):
         if self.__debug:
             print("sound low voltage")
-        self.__addSound(self.index_lowvoltage, lowpriority=True)
+        self.__addSound(self.specialsound['index_lowvoltage'], lowpriority=True)
 
     def slot_windAlarm(self, type):
         if type=="windok":
-            self.__addSound(self.windok)
+            self.__addSound(self.specialsound['windok'])
         elif type=="windalert":
-            self.__addSound(self.windAlert)
+            self.__addSound(self.specialsound['windAlert'])
         elif type=="windmarginal":
             self.marginalConditionFlag = True
 
     def slot_weatherStationLowVoltage(self):
-        self.__addSound(self.weatherstationlowvoltage, lowpriority=True)
+        self.__addSound(self.specialsound['weatherstationlowvoltage'], lowpriority=True)
 
     def slot_weatherStationSensorsLost(self):
-        self.__addSound(self.weatherstationsensorslost)
+        self.__addSound(self.specialsound['weatherstationsensorslost'])
 
     def sound_base(self, index):
         if index < 10:
             self.__addSound(index)
 
     def sound_entry(self):
-        self.__addSound(self.index_entry)
+        if self.time[self.specialsound['seconds_ten']].isPlaying():
+            if self.__debug:
+                print("sound seconds_ten play and set volume to 0")
+            self.time[self.specialsound['seconds_ten']].setVolume(0)
+        self.entry_sound = True
+        self.entry_soundToLate = True
+        self.time[self.specialsound['index_entry']].playSound()
 
     def sound_penalty(self):
-        self.__addSound(self.index_penalty)
+        self.__addSound(self.specialsound['index_penalty'])
 
     def sound_elapsedTime(self, cmd, to_launch):
         if self.__debug:
             print("sound elapsed time : " + str(cmd) + ", to launch" + str(to_launch))
         if 10 <= cmd <= 30:
             if cmd == 30 and to_launch:
-                self.__addSound(self.seconds_thirty)
+                self.__addSound(self.specialsound['seconds_thirty'])
+            elif cmd == 30 and not to_launch:
+                if self.time[self.specialsound['seconds_ten']].isPlaying():
+                    if self.__debug:
+                        print("sound seconds_ten play and stop it")
+                    self.time[self.specialsound['seconds_ten']].stop()
             elif cmd == 25:
-                self.__addSound(self.seconds_twentyfive)
+                self.__addSound(self.specialsound['seconds_twentyfive'])
             elif cmd == 20:
-                self.__addSound(self.seconds_twenty)
+                self.__addSound(self.specialsound['seconds_twenty'])
             elif cmd == 15:
-                self.__addSound(self.seconds_fifteen)
+                self.__addSound(self.specialsound['seconds_fifteen'])
             elif cmd == 10:
-                self.__addSound(self.seconds_ten)
+                self.__addSound(self.specialsound['seconds_ten'])
+
+    def sound_toLate(self):
+        self.__addSound(self.specialsound['to_late'])
+        self.toLateSound = True
+
+    def stop_Timing(self):
+        if self.time[self.specialsound['seconds_ten']].isPlaying():
+            self.time[self.specialsound['seconds_ten']].stop()
 
     def stop_all(self):
-        #print("stop_all")
+        print("stop_all")
         if len(self.sound_list) > 0:
             for i in range(len(self.sound_list)-1, -1, -1):
                 self.sound_list[i].stop()
@@ -257,22 +274,46 @@ class chronoQSound(QThread):
     def slot_status_changed(self, status):
         self.chronoStatus = status
         self.checklowPrioritySound()
+        if self.__debug:
+            print("sound slot status changed : ", str(status))
+        if (status == chronoStatus.Late or status == chronoStatus.InStartLate) and not self.toLateSound:
+            print("sound self.to_late")
+            self.sound_toLate()
+        if status == chronoStatus.InWait or status == chronoStatus.Finished:
+            self.toLateSound = False
+            self.entry_soundToLate = False
+        if (status == chronoStatus.InStart or status == chronoStatus.InStartLate) and not self.entry_soundToLate:
+            self.sound_entry()
 
     def slot_sound_playing_changed(self):
         if self.__debug:
-            print("slot sound")
-        if len(self.sound_list) > 0:
-            if not self.sound_list[0].isPlaying():
-                self.sound_list[0].stop()
-                del self.sound_list[0]
-                if len(self.sound_list) > 0:
-                    self.sound_list[0].playSound()
+            #print("slot sound, entry sound : ", str(self.entry_sound), ", Entry sound playing : ",
+            #      self.time[self.specialsound['index_entry']].isPlaying())
+            soundPlaying = [p.number for p in self.time if p.isPlaying()]
+            if len(soundPlaying)>0:
+                print("slot sound is playing", soundPlaying)
+        if self.entry_sound :
+            if self.__debug:
+                print("slot sound entry and check ten seconds is playing to setVolume")
+            if not self.time[self.specialsound['index_entry']].isPlaying():
+                self.entry_sound = False
+                if self.time[self.specialsound['seconds_ten']].isPlaying():
+                    self.time[self.specialsound['seconds_ten']].setVolume(self.volume)
+
+        else:
+            if len(self.sound_list) > 0:
+                if not self.sound_list[0].isPlaying():
+                    self.sound_list[0].stop()
+                    del self.sound_list[0]
+                    if len(self.sound_list) > 0:
+                        self.sound_list[0].playSound()
 
 
 if __name__ == '__main__':
     app = QCoreApplication(sys.argv)
 
     Vocal = chronoQSound(os.path.dirname(os.path.dirname(os.getcwd())), "French", 1, 100)
+    Vocal.sound_toLate()
     Vocal.signal_elapsedTime.emit(30, False)
     time.sleep(5)
     Vocal.sound_time(100)
