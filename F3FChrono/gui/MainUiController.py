@@ -415,9 +415,10 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.controllers['round'].handle_group_scoring_enabled(True)
         else:
             self.controllers['round'].handle_group_scoring_enabled(False)
-        # Send this string using UDP ... using udpbeep ?
-        print(current_round.get_summary_as_json())
-        self.udpsend.sendOrderData(current_round.get_summary_as_json())
+        # Send this string using UDP ... using udpbeep
+        if ConfigReader.config.conf['enableDisplay']:
+            print(current_round.get_summary_as_json())
+            self.udpsend.sendOrderData(current_round.get_summary_as_json())
 
 
     def context_valuechanged(self):
@@ -481,8 +482,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.chronoHard.weather.enable_rules(self.controllers['round'].isalarm_enable())
             self.set_signal_mode(training=False)
             self.show_chrono()
-            print(current_round.get_summary_as_json())
-            self.udpsend.sendOrderData(current_round.get_summary_as_json())
+            if ConfigReader.config.conf['enableDisplay']:
+                print(current_round.get_summary_as_json())
+                self.udpsend.sendOrderData(current_round.get_summary_as_json())
 
         else:
             self.chronoHard.set_mode(training=True)
