@@ -28,6 +28,8 @@
  "simulatemode": false,
  "sound": true,
  "soundvolume": 0.96,
+ "weather_TimeOut_MarginalCond": 20000,
+ "weather_TimeOut_OkDC": 20000,
  "training_speech_interval": 2,
  "udpport": 4445,
  "voice": true,
