@@ -84,7 +84,9 @@ default_config = \
     'inStartBlackOut_msecond': 500,
     'voltage_min_windDir' : 10.0,
     'weather_beep_okDC': 250,
-    'weather_beep_nok': 100
+    'weather_beep_nok': 100,
+    "weather_TimeOut_MarginalCond": 20000,
+    "weather_TimeOut_OkDC": 20000
 }
 
 def init():

@@ -316,7 +316,7 @@ class Weather(QTimer):
         elif self.rules['state'] == weatherState.condNok or \
             self.rules['state'] == weatherState.condMarginal:
             self.timerMarginal.stop()
-            self.timerOkDC.start(20000)
+            self.timerOkDC.start(ConfigReader.config.conf['weather_TimeOut_OkDC'])
             self.rules['state'] = weatherState.condWaiting
 
     def slot_weatherNotCondition(self):
@@ -329,5 +329,5 @@ class Weather(QTimer):
         if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.Nominal or \
                 self.rules['state'] == weatherState.condWaiting:
             self.timerOkDC.stop()
-            self.timerMarginal.start(20000)
+            self.timerMarginal.start(ConfigReader.config.conf['weather_TimeOut_MarginalCond'])
             self.rules['state'] = weatherState.condNok
