@@ -74,7 +74,7 @@ class Weather(QTimer):
         self.handleRain = None
         self.weather = collections.OrderedDict()
         self.rules = collections.OrderedDict()
-        self.reset_weather()
+        self.reset_weather(first=True)
         self.__debug = False
         self.windDirVoltage = 20.0
         self.windDir_isPresent = True
@@ -255,14 +255,16 @@ class Weather(QTimer):
     def set_minVoltageWindDir(self, min):
         self.rules['wind_dir_voltage_min'] = min
 
-    def reset_weather(self):
-        self.weather['speed'] = 3.0
-        self.weather['unit'] = "m/s"
+    def reset_weather(self, first=False):
+        if first:
+            self.weather['speed'] = -1.0
+            self.weather['unit'] = "m/s"
+            self.weather['orientation'] = -1.0
+
         self.weather['speed_sum'] = 0.0
         self.weather['speed_nb'] = 0.0
         self.weather['speed_min'] = -1.0
         self.weather['speed_max'] = -1.0
-        self.weather['orientation'] = 0.0
         self.weather['orientation_sum'] = 0.0
         self.weather['orientation_nb'] = 0.0
         self.weather['rain'] = 0.0
