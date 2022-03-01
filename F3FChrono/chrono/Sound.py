@@ -36,10 +36,12 @@ class noiseGenerator(QThread):
 
     def __init__(self, playnoise, volume):
         super().__init__()
+        self.__debug = True
         pathname = os.path.dirname(os.path.realpath('whitenoise.wav'))
         self.sound = QSoundEffect()
         self.sound.setSource(QUrl.fromLocalFile(pathname + '/whitenoise.wav'))
-
+        if self.__debug:
+            print("source : ", self.sound.source(), "Status : ", self.sound.status())
         self.sound.setLoopCount(QSoundEffect.Infinite)
         self.settings(playnoise, volume)
 
@@ -57,7 +59,7 @@ class noiseGenerator(QThread):
 class chronoSound(QSoundEffect):
     def __init__(self, num, source, slot, volume):
         super().__init__()
-        self.__debug = True
+        self.__debug = False
         try:
             self.number = num
             self.setSource(QUrl.fromLocalFile(source))
