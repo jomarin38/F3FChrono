@@ -48,6 +48,7 @@ refly_btn_stylesheet = 'background-color:#66ccff;border-radius: 10px;'
 penalty100_btn_stylesheet = 'background-color:#ffd633;border-radius: 10px;'
 penalty1000_btn_stylesheet = 'background-color:#db4dff;border-radius: 10px;'
 clear_penalty_btn_stylesheet = 'background-color:#aaff80;border-radius: 10px;'
+debug = False
 
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
@@ -427,7 +428,8 @@ class WChronoCtrl(QTimer):
             self.view.Status.setText(self.statusText[self.current_status]+"  {:d}".format(self.current_lap))
 
     def set_finaltime(self, data_time):
-        print("Widget chrono set final time : ", time.time())
+        if debug:
+            print("Widget chrono set final time : ", time.time())
         self.view.Time_label.setText("{:0.2f}".format(data_time))
 
     def reset_ui(self):
@@ -948,7 +950,8 @@ class WSettingsBase(QObject):
             self.__baseB_release()
 
     def slot_udp(self, address):
-        print(address)
+        if debug:
+            print(address)
         if self.baseInProgress == 'A' and self.__ipNotPresent(self.baseAList, address) \
                 and self.__ipNotPresent(self.baseBList, address):
             self.__addbase_List(self.baseAList, self.view.listWidget_baseA, address, self.deleteItemBaseA,
@@ -1130,10 +1133,12 @@ class WSettingswBtn(QObject):
         self.widget.hide()
 
     def set_data(self):
-        print("Settings wBtn set_data")
+        if debug:
+            print("Settings wBtn set_data")
 
     def get_data(self):
-        print("Settings wBtn get_data")
+        if debug:
+            print("Settings wBtn get_data")
 
     def set_udp_sig(self, udp, set, clear):
         self.udp_sig = udp

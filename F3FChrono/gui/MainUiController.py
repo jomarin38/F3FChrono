@@ -36,7 +36,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def __init__(self, eventdao, chronodata, rpi, webserver_process):
         super().__init__()
-
+        self.__debug=False
         self.webserver_process = webserver_process
         self.daoEvent = eventdao
         self.daoRound = RoundDAO()
@@ -195,7 +195,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswDevices'].hide()
         self.controllers['config'].show()
         self.controllers['wind'].show()
-        print(self.MainWindow.size())
+        if self.__debug:
+            print(self.MainWindow.size())
 
     def show_chrono(self):
         self.controllers['training'].hide()
@@ -209,7 +210,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswDevices'].hide()
         self.controllers['round'].show()
         self.controllers['wind'].show()
-        print(self.MainWindow.size())
+        if self.__debug:
+            print(self.MainWindow.size())
 
     def show_settings(self):
         self.controllers['training'].hide()
@@ -223,7 +225,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswDevices'].hide()
         self.controllers['settings'].show()
         self.controllers['wind'].show()
-        print(self.MainWindow.size())
+        if self.__debug:
+            print(self.MainWindow.size())
 
     def show_settingswDevices(self):
         self.controllers['training'].hide()
@@ -237,7 +240,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settings'].hide()
         self.controllers['settingswDevices'].show()
         self.controllers['wind'].show()
-        print(self.MainWindow.size())
+        if self.__debug:
+            print(self.MainWindow.size())
 
     def show_settingsadvanced(self):
         self.controllers['training'].hide()
@@ -251,7 +255,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswDevices'].hide()
         self.controllers['settingsadvanced'].show()
         self.controllers['wind'].show()
-        print(self.MainWindow.size())
+        if self.__debug:
+            print(self.MainWindow.size())
 
     def show_settingsbase(self):
         self.controllers['training'].hide()
@@ -265,7 +270,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswDevices'].hide()
         self.controllers['settingsbase'].show()
         self.controllers['wind'].show()
-        print(self.MainWindow.size())
+        if self.__debug:
+            print(self.MainWindow.size())
 
     def show_settingswBtn(self):
         self.controllers['training'].hide()
@@ -279,7 +285,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswDevices'].hide()
         self.controllers['settingswBtn'].show()
         self.controllers['wind'].show()
-        print(self.MainWindow.size())
+        if self.__debug:
+            print(self.MainWindow.size())
 
     def show_settingssound(self):
         self.controllers['training'].hide()
@@ -293,7 +300,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswDevices'].hide()
         self.controllers['settingssound'].show()
         self.controllers['wind'].show()
-        print(self.MainWindow.size())
+        if self.__debug:
+            print(self.MainWindow.size())
 
     def show_training(self):
         self.controllers['config'].hide()
@@ -307,7 +315,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswDevices'].hide()
         self.controllers['training'].show()
         self.controllers['wind'].show()
-        print(self.MainWindow.size())
+        if self.__debug:
+            print(self.MainWindow.size())
 
     def show_settingsQrCode(self, url):
         self.controllers['settingQrCode'].displayF3FRankingQrCode()
@@ -322,7 +331,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswDevices'].hide()
         self.controllers['settingQrCode'].show()
         self.controllers['wind'].show()
-        print(self.MainWindow.size())
+        if self.__debug:
+            print(self.MainWindow.size())
 
     def set_show_settings(self):
         self.controllers['settings'].set_data()
@@ -417,7 +427,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.controllers['round'].handle_group_scoring_enabled(False)
         # Send this string using UDP ... using udpbeep
         if ConfigReader.config.conf['enableDisplay']:
-            print(current_round.get_summary_as_json())
+            if self.__debug:
+                print(current_round.get_summary_as_json())
             self.udpsend.sendOrderData(current_round.get_summary_as_json())
 
 
@@ -483,7 +494,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.set_signal_mode(training=False)
             self.show_chrono()
             if ConfigReader.config.conf['enableDisplay']:
-                print(current_round.get_summary_as_json())
+                if self.__debug:
+                    print(current_round.get_summary_as_json())
                 self.udpsend.sendOrderData(current_round.get_summary_as_json())
 
         else:
@@ -514,7 +526,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.rpigpio.signal_buzzer_next.emit(1)
 
     def handle_time_elapsed(self):
-        print("time elapsed")
+        if self.__debug:
+            print("time elapsed")
         if self.chronoHard.get_status() == chronoStatus.WaitLaunch:
             self.vocal.signal_penalty.emit()
             self.controllers['round'].wChronoCtrl.stoptime()
@@ -587,24 +600,28 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def slot_weather_alarm(self):
         self.chronoHard.weather.enable_rules(self.controllers['round'].isalarm_enable())
-        print("alarm enable : ", self.controllers['round'].isalarm_enable())
+        if self.__debug:
+            print("alarm enable : ", self.controllers['round'].isalarm_enable())
 
     def slot_switch_mode(self):
         if self.controllers['config'].is_show():
-            print('config')
+            if self.__debug:
+                print('config')
             contest = self.controllers['config'].view.ContestList.count()
             self.controllers['config'].view.ContestList.setCurrentIndex(contest - 1)
             self.controllers['config'].contest_sig.emit()
             self.start()
         elif self.controllers['round'].is_show():
-            print("mode round")
+            if self.__debug:
+                print("mode round")
             self.controllers['round'].btn_home_sig.emit()
             self.controllers['config'].view.ContestList.setCurrentIndex(0)
             self.controllers['config'].contest_sig.emit()
             self.start()
 
         elif self.controllers['training'].is_show():
-            print("mode training")
+            if self.__debug:
+                print("mode training")
             self.controllers['training'].btn_home_sig.emit()
             contest = self.controllers['config'].view.ContestList.count()
             self.controllers['config'].view.ContestList.setCurrentIndex(contest - 1)
@@ -638,7 +655,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.vocal.signal_time.emit(run_time, False)
 
     def slot_altitude_finished(self, run_time):
-        print("slot altitude")
+        if self.__debug:
+            print("slot altitude finished")
 
     def slot_run_validated(self):
         # print("run validated")
@@ -669,11 +687,12 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         chrono.wind_direction = chronoHard.weather.getWindDir()
         for lap in chronoHard.getLaps():
             chrono.add_lap_time(lap)
-        print(chrono.to_string())
+            #print(chrono.to_string())
 
     def slot_accu(self, voltage1, voltage2):
         self.controllers['wind'].set_voltage(voltage1, voltage2)
-        print(voltage1, voltage2)
+        if self.__debug:
+            print(voltage1, voltage2)
         # adding for log voltage
         f = open("voltage_log.txt", "a+")
         f.write(str(self.startup_time) + ',' + str((time.time() - self.startup_time) / 60.0) +
@@ -689,7 +708,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.rpigpio.buzzer_next.slot_blink("stop", 0)
         self.chronoHard.stop()
         if self.webserver_process is not None:
-            print('Kill process ' + str(self.webserver_process.pid))
+            if self.__debug:
+                print('Kill process ' + str(self.webserver_process.pid))
             time.sleep(1)  # Wait for the process to be killed
             self.webserver_process.kill()
         exit()
