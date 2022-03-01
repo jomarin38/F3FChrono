@@ -75,7 +75,7 @@ class Weather(QTimer):
         self.weather = collections.OrderedDict()
         self.rules = collections.OrderedDict()
         self.reset_weather(first=True)
-        self.__debug = False
+        self.__debug = true
         self.windDirVoltage = 20.0
         self.windDir_isPresent = True
         self.windSpeed_isPresent = True
