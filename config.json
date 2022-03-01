@@ -1,7 +1,7 @@
 {
  "Launch_time": 30000,
  "Launched_time": 30000,
- "SensorAlarmTimeout": 2000,
+ "SensorAlarmTimeout": 4000,
  "btn_baseA": 5,
  "btn_baseB": 6,
  "btn_next": 12,
