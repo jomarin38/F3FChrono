@@ -36,7 +36,7 @@ class noiseGenerator(QThread):
 
     def __init__(self, playnoise, volume):
         super().__init__()
-        self.__debug = True
+        self.__debug = False
         pathname = os.path.dirname(os.path.realpath('whitenoise.wav'))
         self.sound = QSoundEffect()
         self.sound.setSource(QUrl.fromLocalFile(pathname + '/whitenoise.wav'))
@@ -136,12 +136,16 @@ class chronoQSound(QThread):
         self.entry_sound = False
         self.entry_soundToLate = False
         self.toLateSound = False
-        self.__debug = True
+        self.__debug = False
 
     def loadwav(self, volume):
         self.time = []
         for i in range(0, 119):
-            self.time.append(chronoSound(i, os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav'),\
+            if i==self.specialsound['index_entry']:
+                self.time.append(chronoSound(i, os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav'), \
+                                             self.slot_sound_entry, volume))
+            else:
+                self.time.append(chronoSound(i, os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav'),\
                                          self.slot_sound_playing_changed, volume))
 
     def sound_time(self, run_time, training=False):
@@ -328,21 +332,21 @@ class chronoQSound(QThread):
             soundPlaying = [p.number for p in self.time if p.isPlaying()]
             if len(soundPlaying)>0:
                 print("slot sound is playing", soundPlaying)
-        if self.specialsound['index_entry'].alreadyPlay :
-            if self.__debug:
-                print("slot sound entry and check ten seconds is playing to setVolume")
-            if not self.time[self.specialsound['index_entry'].num].isPlaying():
-                self.specialsound['index_entry'].alreadyPlay = False
-                if self.time[self.specialsound['seconds_ten'].num].isPlaying():
-                    self.time[self.specialsound['seconds_ten'].num].setVolume(self.volume)
-
-        else:
             if len(self.sound_list) > 0:
                 if not self.sound_list[0].isPlaying():
                     self.sound_list[0].stop()
                     del self.sound_list[0]
                     if len(self.sound_list) > 0:
                         self.sound_list[0].playSound()
+
+    def slot_sound_entry(self):
+        if self.specialsound['index_entry'].alreadyPlay:
+            if self.__debug:
+                print("slot sound entry and check ten seconds is playing to setVolume")
+            if not self.time[self.specialsound['index_entry'].num].isPlaying():
+                self.specialsound['index_entry'].alreadyPlay = False
+                if self.time[self.specialsound['seconds_ten'].num].isPlaying():
+                    self.time[self.specialsound['seconds_ten'].num].setVolume(self.volume)
 
 
 if __name__ == '__main__':

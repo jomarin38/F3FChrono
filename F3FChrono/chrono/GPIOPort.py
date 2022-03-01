@@ -63,7 +63,7 @@ class gpioPort(QTimer):
         self.state = False
         self.nbevent = 0
         self.timeout.connect(self.run)
-
+        self.__debug = False
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.port, GPIO.OUT)
 
@@ -108,12 +108,14 @@ class gpioPort(QTimer):
     def __activate(self):
         GPIO.output(self.port, self.activate)
         self.state = True
-        print("gpio__activate")
+        if self.__debug:
+            print("gpio__activate")
         
     def __deactivate(self):
         GPIO.output(self.port, self.deactivate)
         self.state = False
-        print("gpio__deactivate")
+        if self.__debug:
+            print("gpio__deactivate")
 
 
 def event_detected(port):
@@ -136,6 +138,7 @@ class rpi_gpio(QObject):
         self.signal_buzzer_next.connect(self.buzzer_next_fct)
         self.buzzer = None
         self.buzzer_next = None
+        self.__debug = False
         if rpi:
             self.buzzer = gpioPort(ConfigReader.config.conf['buzzer'],
                                    duration=ConfigReader.config.conf['buzzer_duration'], start_blinks=2)
@@ -149,12 +152,14 @@ class rpi_gpio(QObject):
 
 
     def buzzer_fct(self, nb):
-        print("buzzer base")
+        if self.__debug:
+            print("buzzer base")
         if self.buzzer is not None:
             self.buzzer.slot_blink("blink", nb)
 
     def buzzer_next_fct(self, nb):
-        print("buzzer next : ", nb)
+        if self.__debug:
+            print("buzzer next : ", nb)
         if self.buzzer_next is not None:
             self.buzzer_next.slot_blink("blink", nb)
 
