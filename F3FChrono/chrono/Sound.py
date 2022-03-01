@@ -66,7 +66,7 @@ class chronoSound(QSoundEffect):
             self.handleSlot = self.playingChanged.connect(slot)
             self.setVolume(volume)
         except TypeError as e:
-            print("QSoundError : ", e, " status : ", self.status())
+            print("QSoundError : ", e, " status : ", self.status(), " number : ", str(num))
 
     def playSound(self):
         try:
