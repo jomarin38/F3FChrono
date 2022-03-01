@@ -141,7 +141,7 @@ class chronoQSound(QThread):
     def loadwav(self, volume):
         self.time = []
         for i in range(0, 119):
-            if i==self.specialsound['index_entry']:
+            if i==self.specialsound['index_entry'].num:
                 self.time.append(chronoSound(i, os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav'), \
                                              self.slot_sound_entry, volume))
             else:
@@ -267,7 +267,8 @@ class chronoQSound(QThread):
             self.time[self.specialsound['seconds_ten'].num].stop()
 
     def stop_all(self):
-        print("stop_all")
+        if self.__debug:
+            print("stop_all")
         if len(self.sound_list) > 0:
             for i in range(len(self.sound_list)-1, -1, -1):
                 self.sound_list[i].stop()
@@ -327,17 +328,17 @@ class chronoQSound(QThread):
 
     def slot_sound_playing_changed(self):
         if self.__debug:
-            #print("slot sound, entry sound : ", str(self.entry_sound), ", Entry sound playing : ",
-            #      self.time[self.specialsound['index_entry']].isPlaying())
-            soundPlaying = [p.number for p in self.time if p.isPlaying()]
-            if len(soundPlaying)>0:
-                print("slot sound is playing", soundPlaying)
-            if len(self.sound_list) > 0:
-                if not self.sound_list[0].isPlaying():
-                    self.sound_list[0].stop()
-                    del self.sound_list[0]
-                    if len(self.sound_list) > 0:
-                        self.sound_list[0].playSound()
+            print("slot sound, entry sound : ", str(self.entry_sound), ", Entry sound playing : ",
+                  self.time[self.specialsound['index_entry']].isPlaying())
+        soundPlaying = [p.number for p in self.time if p.isPlaying()]
+        if len(soundPlaying)>0:
+            print("slot sound is playing", soundPlaying)
+        if len(self.sound_list) > 0:
+            if not self.sound_list[0].isPlaying():
+                self.sound_list[0].stop()
+                del self.sound_list[0]
+                if len(self.sound_list) > 0:
+                    self.sound_list[0].playSound()
 
     def slot_sound_entry(self):
         if self.specialsound['index_entry'].alreadyPlay:
