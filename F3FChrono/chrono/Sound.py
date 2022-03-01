@@ -57,12 +57,12 @@ class noiseGenerator(QThread):
 class chronoSound(QSoundEffect):
     def __init__(self, num, source, slot, volume):
         super().__init__()
-        self.__debug = False
+        self.__debug = True
         try:
             self.number = num
             self.setSource(QUrl.fromLocalFile(source))
             if self.__debug:
-                print(self.source(), "Status : ", self.status())
+                print("Num : ", num, ", source : ", self.source(), "Status : ", self.status())
             self.handleSlot = self.playingChanged.connect(slot)
             self.setVolume(volume)
         except TypeError as e:
