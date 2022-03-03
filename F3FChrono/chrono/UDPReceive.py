@@ -46,6 +46,7 @@ class udpreceive(QThread):
                  weatherList_sig, weatherStatus_sig):
         super().__init__()
         self.__debug = False
+        self.__debugBtnNext = True
         self.port = udpport
         self.event_chrono = signal_chrono
         self.event_btn_next = signal_btnnext
@@ -122,6 +123,8 @@ class udpreceive(QThread):
                     if m[1] == 'GPIO':
                         if m[2].lower() == "btnnext":
                             self.event_btn_next.emit(0)
+                            if self.__debugBtnNext:
+                                print(__class__, __name__, "signal Btn Next")
                         break
                     if m[1] == 'base':
                         address[0] = m[2]
@@ -171,6 +174,8 @@ class udpreceive(QThread):
             self.event_chrono.emit("udpreceive", "event", base)
         elif find and base == "btn_next":
             self.event_btn_next.emit()
+            if self.__debugBtnNext:
+                    print(__class__, __name__, "signal Btn Next")
         elif find and base == "switch_mode":
             self.switchMode_sig.emit()
         elif find and base == "penalty":
@@ -191,7 +196,7 @@ class udpreceive(QThread):
                     print("baseB")
                 return True, "baseB"
             elif ip in self.ipwBtn_btnNext[shortpush]:
-                if self.__debug:
+                if self.__debugBtnNext:
                     print("btn_next")
                 return True, "btn_next"
             elif ip in self.ipwBtn_SwitchMode[shortpush]:

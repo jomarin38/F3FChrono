@@ -196,12 +196,16 @@ class ChronoArduino(ChronoHard, QTimer):
         ChronoArduino._lock.acquire()
         if caller.lower() == "btnnext" and \
                 (self.status == chronoStatus.WaitLaunch or self.status == chronoStatus.InWait):
+            if self.__debug:
+                    print(__class__, __name__, "Btn Next Set Status +1")
             self.arduino.set_status(self.status + 1)
         elif caller.lower() == "btnnext" and self.status == chronoStatus.InStart:
             if not self.competition_mode:
                 self.arduino.event_Base('n')
         elif caller.lower() == "btnnext" and self.status == chronoStatus.Finished:
             self.run_validated.emit()
+            if self.__debug:
+                    print(__class__, __name__, "Btn Next run validated")
         elif caller.lower() == "btnnext":
             if not self.competition_mode:
                 if self.__debug:

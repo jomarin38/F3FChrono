@@ -332,7 +332,8 @@ class chronoQSound(QThread):
                   self.time[self.specialsound['index_entry']].isPlaying())
         soundPlaying = [p.number for p in self.time if p.isPlaying()]
         if len(soundPlaying)>0:
-            print("slot sound is playing", soundPlaying)
+            if self.__debug:
+                print("slot sound is playing", soundPlaying)
         if len(self.sound_list) > 0:
             if not self.sound_list[0].isPlaying():
                 self.sound_list[0].stop()

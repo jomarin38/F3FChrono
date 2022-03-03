@@ -520,6 +520,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
     def next_action(self):
         if self.controllers['round'].is_show():
             self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
+            if self.__debug:
+                    print(__class__, __name__, "chrono signal Btn Next")
         elif self.controllers['training'].is_show():
             self.controllers['training'].btn_reset()
 
