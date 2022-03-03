@@ -144,14 +144,13 @@ class Weather(QTimer):
                 print("Weather voltage alarm release")
             self.rules['sensor_voltage_alarm'] = alarm.Release
         #check rules speed, orientation, rain
-        if self.__rules_enable:
-            if (abs(self.weather['orientation']) > self.rules['dir_limit'] and self.windDir_isPresent or \
-                ((self.weather['speed'] < self.rules['speed_limit_min'] or \
-                self.weather['speed'] > self.rules['speed_limit_max']) and self.windSpeed_isPresent) \
-                or self.weather['rain'] > 0.0 and self.rain_isPresent):
-                self.slot_weatherNotCondition()
-            else:
-                self.slot_weatherCondition()
+        if (abs(self.weather['orientation']) > self.rules['dir_limit'] and self.windDir_isPresent or \
+            ((self.weather['speed'] < self.rules['speed_limit_min'] or \
+            self.weather['speed'] > self.rules['speed_limit_max']) and self.windSpeed_isPresent) \
+            or self.weather['rain'] > 0.0 and self.rain_isPresent):
+            self.slot_weatherNotCondition()
+        else:
+            self.slot_weatherCondition()
 
     def enable_rules(self, enable=False):
         self.__rules_enable = enable
@@ -299,15 +298,17 @@ class Weather(QTimer):
             print("slot_okDC")
         self.timerOkDC.stop()
         self.rules['state'] = weatherState.Nominal
-        self.beep_signal.emit("blink", 5, ConfigReader.config.conf['weather_beep_okDC'])
-        self.weather_sound_signal.emit("windok")
+        if self.__rules_enable:
+            self.beep_signal.emit("blink", 5, ConfigReader.config.conf['weather_beep_okDC'])
+            self.weather_sound_signal.emit("windok")
 
     def slot_Marginal(self):
         if self.__debug:
             print("slot_marginal")
         self.timerMarginal.stop()
         self.rules['state'] = weatherState.condMarginal
-        self.beep_signal.emit("permanent", -1, 1000)
+        if self.__rules_enable:
+            self.beep_signal.emit("permanent", -1, 1000)
         self.weather_sound_signal.emit("windmarginal")
 
     def slot_weatherCondition(self):
@@ -325,8 +326,9 @@ class Weather(QTimer):
         if self.__debug:
             print("slot weather Not Condition, state : " + str(self.rules['state']))
         if self.rules['state'] != weatherState.condNok and self.rules['state'] != weatherState.condMarginal:
-            self.beep_signal.emit("blink", 2, ConfigReader.config.conf['weather_beep_nok'])
-            self.weather_sound_signal.emit("windalert")
+            if self.__rules_enable:
+                self.beep_signal.emit("blink", 2, ConfigReader.config.conf['weather_beep_nok'])
+                self.weather_sound_signal.emit("windalert")
 
         if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.Nominal or \
                 self.rules['state'] == weatherState.condWaiting:
