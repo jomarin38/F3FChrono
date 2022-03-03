@@ -2231,7 +2231,7 @@
 										"$ref": "AAAAAAF/TqAtYKJmCfs="
 									},
 									"edgePosition": 1,
-									"text": "+Condition Nok"
+									"text": "+Condition Ok"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -2457,9 +2457,9 @@
 										"$ref": "AAAAAAF/TqOBp7T1DMk="
 									},
 									"font": "Arial;13;0",
-									"left": 544,
+									"left": 434,
 									"top": 448,
-									"width": 79.85986328125,
+									"width": 298.82861328125,
 									"height": 13,
 									"alpha": 1.6230896607874876,
 									"distance": 57.3149195236284,
@@ -2467,7 +2467,7 @@
 										"$ref": "AAAAAAF/TqOBp7T5gl8="
 									},
 									"edgePosition": 1,
-									"text": "+Condition ok"
+									"text": "+Condition_ok and (fin_run or not_run_in_progress)"
 								},
 								{
 									"_type": "EdgeLabelView",
@@ -2946,7 +2946,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFxie5+BMWancs="
 							},
-							"name": "Condition Nok",
+							"name": "Condition Ok",
 							"end1": {
 								"_type": "UMLLinkEnd",
 								"_id": "AAAAAAF/TqAtX6Jj664=",
@@ -3126,7 +3126,7 @@
 							"_parent": {
 								"$ref": "AAAAAAF/TpmEb4jFzHs="
 							},
-							"name": "Condition ok",
+							"name": "Condition_ok and (fin_run or not_run_in_progress)",
 							"end1": {
 								"_type": "UMLLinkEnd",
 								"_id": "AAAAAAF/TqOBp7T2PSY=",
