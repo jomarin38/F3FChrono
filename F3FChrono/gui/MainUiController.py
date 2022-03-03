@@ -36,7 +36,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def __init__(self, eventdao, chronodata, rpi, webserver_process):
         super().__init__()
-        self.__debug=False
+        self.__debug = False
+        self.__debugBtnNext = True
         self.webserver_process = webserver_process
         self.daoEvent = eventdao
         self.daoRound = RoundDAO()
@@ -520,7 +521,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
     def next_action(self):
         if self.controllers['round'].is_show():
             self.chronoHard.chrono_signal.emit("btnnext", "event", "btnnext")
-            if self.__debug:
+            if self.__debugBtnNext:
                     print(__class__, __name__, "chrono signal Btn Next")
         elif self.controllers['training'].is_show():
             self.controllers['training'].btn_reset()
