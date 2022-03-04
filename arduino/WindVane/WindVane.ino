@@ -42,6 +42,7 @@ WiFiUDP udp;
 char remoteIP[] = "255.255.255.255";
 int remotePort = 4445;
 char  message[45] = "";       // a string to send
+char  voltage[8];
 
 volatile int encoder0Pos = 0;
 
@@ -105,11 +106,6 @@ void loop() {
   //Uncomment to calibrate using serial monitor
   //Serial.print("Battery voltage : ");Serial.println(batVoltage);
 
-  if (batVoltage<batProtectionVoltage) {
-    sendVoltageAlarm();
-  }
-
-
   boolean btnPressed = !digitalRead(buttonPin);
   if (btnPressed) {
     Serial.println("Button pressed !");
@@ -118,7 +114,7 @@ void loop() {
   currentAngle = getAngleSmooth();
   counter++;
   if (counter*sleepDelay>sendDelay) {
-    sendUDP(currentAngle);
+    sendUDP(currentAngle, batVoltage);
     counter=0;
   }
   delay(sleepDelay);
@@ -153,18 +149,10 @@ int getAngleSmooth() {
   return int(float(sum)/float(nSamples));
 }
 
-void sendUDP(int angle) {
-  sprintf(message,"wind_dir %d\r\n",angle);
+void sendUDP(int angle, float batVoltage) {
+  dtostrf(batVoltage,5,2,voltage);
   
-  udp.beginPacket(remoteIP, remotePort);
-  udp.write(message);
-  udp.endPacket();
-  
-  //Serial.println(message);
-}
-
-void sendVoltageAlarm() {
-  sprintf(message,"wind_dir_low_voltage\r\n");
+  sprintf(message,"wind_dir %d %s\r\n",angle,voltage);
   
   udp.beginPacket(remoteIP, remotePort);
   udp.write(message);
