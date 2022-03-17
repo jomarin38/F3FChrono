@@ -70,6 +70,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.low_voltage_ask = False
         ip = Utils.get_ip().split(".")
         self.udpsend = udpsend(ip[0] + "." + ip[1] + "." + ip[2] + ".255" , UDPPORT)
+        self.enableConnectedDisplay = ConfigReader.config.conf['enableDisplay']
+        self.launch_time = ConfigReader.config.conf['Launch_time']
+        self.configSound = ConfigReader.config.conf["sound"]
 
     def initUI(self, ):
         self.MainWindow = QtWidgets.QMainWindow()
@@ -394,6 +397,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.noise.settings(ConfigReader.config.conf['noisesound'],
                             ConfigReader.config.conf['noisevolume'])
         self.chronoHard.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
+        self.enableConnectedDisplay = ConfigReader.config.conf['enableDisplay']
+        self.launch_time = ConfigReader.config.conf['Launch_time']
+        self.configSound = ConfigReader.config.conf["sound"]
 
     def settings_cancel(self):
         self.controllers['settingsbase'].btn_cancel()
@@ -426,7 +432,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         else:
             self.controllers['round'].handle_group_scoring_enabled(False)
         # Send this string using UDP ... using udpbeep
-        if ConfigReader.config.conf['enableDisplay']:
+        if self.enableConnectedDisplay:
             if self.__debug:
                 print(current_round.get_summary_as_json())
             self.udpsend.sendOrderData(current_round.get_summary_as_json())
@@ -480,7 +486,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.vocal.signal_pilotname.emit(int(current_competitor.get_bib_number()))
             self.chronoHard.set_mode(training=False)
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
-            self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False,
+            self.controllers['round'].wChronoCtrl.settime(self.launch_time, False, False,
                                                           to_launch=True)
             self.controllers['round'].wChronoCtrl.reset_ui()
             if current_round.group_scoring_enabled():
@@ -493,7 +499,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.chronoHard.weather.enable_rules(self.controllers['round'].isalarm_enable())
             self.set_signal_mode(training=False)
             self.show_chrono()
-            if ConfigReader.config.conf['enableDisplay']:
+            if self.enableConnectedDisplay:
                 if self.__debug:
                     print(current_round.get_summary_as_json())
                 self.udpsend.sendOrderData(current_round.get_summary_as_json())
@@ -632,10 +638,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         # print ("slot status", status)
         self.controllers['round'].wChronoCtrl.set_status(status)
         if (status == chronoStatus.WaitLaunch):
-            self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False,
-                                                          to_launch=True)
+            self.controllers['round'].wChronoCtrl.settime(self.launch_time, False, to_launch=True)
         if (status == chronoStatus.Launched):
-            self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launched_time'], False)
+            self.controllers['round'].wChronoCtrl.settime(self.launch_time, False)
 
     def slot_run_started(self):
         self.controllers['round'].wChronoCtrl.settime(0, True)
@@ -651,7 +656,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         # print ('final time : ' + str(run_time))
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         self.controllers['round'].widgetBtn.update()
-        if ConfigReader.config.conf["sound"]:
+        if self.configSound:
             self.vocal.signal_time.emit(run_time, False)
 
     def slot_altitude_finished(self, run_time):
@@ -671,7 +676,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.chronoHard.reset()
         self.chronodata = Chrono()
         self.next_pilot(insert_database=True)
-        self.controllers['round'].wChronoCtrl.settime(ConfigReader.config.conf['Launch_time'], False, False)
+        self.controllers['round'].wChronoCtrl.settime(self.launch_time, False, False)
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['wind'].setLastRoundTime()
 

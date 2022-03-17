@@ -195,6 +195,8 @@ class WWindCtrl(QObject):
         self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
         self.windstylesheet = "background-color:rgba( 255, 255, 255, 0% );"
         self._translate = QtCore.QCoreApplication.translate
+        self.voltageMinAccu1 = ConfigReader.config.conf['voltage_min_Accu1']
+        self.voltageMinAccu2 = ConfigReader.config.conf['voltage_min_Accu2']
 
     def get_widget(self):
         return (self.widgetList)
@@ -244,14 +246,13 @@ class WWindCtrl(QObject):
 
     def set_voltage(self, voltage1, voltage2):
         self.view.voltage.setText("{:0>3.1f}V, {:0>3.1f}V".format(voltage1, voltage2))
-        if voltage1 <= ConfigReader.config.conf['voltage_min_Accu1'] and \
-                voltage2 <= ConfigReader.config.conf['voltage_min_Accu2'] and \
+        if voltage1 <= self.voltageMinAccu1 and \
+                voltage2 <= self.voltageMinAccu2 and \
                 self.voltagestylesheet == "background-color:rgba( 255, 255, 255, 0% );":
             self.voltagestylesheet = "background-color:red;"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
             self.lowVoltage_sig.emit()
-        elif (voltage1 > ConfigReader.config.conf['voltage_min_Accu1'] or
-              voltage2 > ConfigReader.config.conf['voltage_min_Accu2']) and \
+        elif (voltage1 > self.voltageMinAccu1 or voltage2 > self.voltageMinAccu2) and\
                 self.voltagestylesheet == "background-color:red;":
             self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)

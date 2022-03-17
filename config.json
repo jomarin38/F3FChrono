@@ -1,7 +1,7 @@
 {
  "Launch_time": 30000,
  "Launched_time": 30000,
- "SensorAlarmTimeout": 4000,
+ "SensorAlarmTimeout": 5000,
  "btn_baseA": 5,
  "btn_baseB": 6,
  "btn_next": 12,
@@ -37,6 +37,8 @@
  "voltage_min_Accu1": 9.9,
  "voltage_min_Accu2": 9.9,
  "voltage_min_windDir": 10.0,
+ "weather_Beep": false,
+ "weather_Sound": true,
  "weather_TimeOut_MarginalCond": 20000,
  "weather_TimeOut_OkDC": 20000,
  "weather_beep_nok": 100,

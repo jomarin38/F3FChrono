@@ -86,7 +86,9 @@ default_config = \
     'weather_beep_okDC': 250,
     'weather_beep_nok': 100,
     "weather_TimeOut_MarginalCond": 20000,
-    "weather_TimeOut_OkDC": 20000
+    "weather_TimeOut_OkDC": 20000,
+    "weather_Sound": False,
+    "weather_Beep": False
 }
 
 def init():
