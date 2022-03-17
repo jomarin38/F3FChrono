@@ -335,18 +335,19 @@ class Weather(QTimer):
     def slot_weatherCondition(self):
         if self.__debug:
             print("slot weather Condition, state : " + str(self.rules['state']))
+        self.timerMarginal.stop()
         if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.condNok:
             self.rules['state'] = weatherState.Nominal
             if self.__rules_enable and self.weatherSound:
                 self.weather_sound_signal.emit("windok")
         elif self.rules['state'] == weatherState.condMarginal:
-            self.timerMarginal.stop()
             self.timerOkDC.start(self.weatherTimeOutOkDc)
             self.rules['state'] = weatherState.condWaiting
 
     def slot_weatherNotCondition(self):
         if self.__debug:
             print("slot weather Not Condition, state : " + str(self.rules['state']))
+        self.timerOkDC.stop()
         if self.rules['state'] != weatherState.condNok and self.rules['state'] != weatherState.condMarginal:
             if self.__rules_enable:
                 if self.weatherBeep:
@@ -354,8 +355,9 @@ class Weather(QTimer):
                 if self.weatherSound:
                     self.weather_sound_signal.emit("windalert")
 
-        if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.Nominal or \
-                self.rules['state'] == weatherState.condWaiting:
-            self.timerOkDC.stop()
+        if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.Nominal:
             self.timerMarginal.start(self.weatherTimeOutMarginalcond)
             self.rules['state'] = weatherState.condNok
+
+        if self.rules['state'] == weatherState.condWaiting:
+            self.rules['state'] = weatherState.condMarginal

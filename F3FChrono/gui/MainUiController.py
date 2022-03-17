@@ -73,6 +73,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.enableConnectedDisplay = ConfigReader.config.conf['enableDisplay']
         self.launch_time = ConfigReader.config.conf['Launch_time']
         self.configSound = ConfigReader.config.conf["sound"]
+        self.chronoHard.weather.set_rules_limit(self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,
+                                                self.event.max_wind_dir_dev)
 
     def initUI(self, ):
         self.MainWindow = QtWidgets.QMainWindow()
