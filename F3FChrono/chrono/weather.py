@@ -31,7 +31,7 @@ class weatherState():
     Nominal = 1,
     condNok = 2,
     condMarginal = 3,
-    condWaiting = 4
+    Stabilizing = 4
 
 
 
@@ -55,8 +55,8 @@ class Weather(QTimer):
     #parameters : direction, accu voltage
     winddir_signal = pyqtSignal(float, float)
     rain_signal = pyqtSignal(bool)
-    # gui_weather_signal parameters wind_speed, wind_speed_unit,  wind_dir, rain, alarm
-    gui_weather_signal = pyqtSignal(float, str, float, float, bool)
+    # gui_weather_signal parameters wind_speed, wind_speed_unit,  wind_dir, rain, alarm, status
+    gui_weather_signal = pyqtSignal(float, str, float, float, bool, str)
     #parameters : wind_speed, wind_speed_unit, wind_speed_ispresent, wind_dir, wind_dir_voltage, wind_dir_voltage_alarme,
     #wind_dir_ispresent, rain, rain_ispresent
     gui_wind_speed_dir_signal = pyqtSignal(float, str, bool, float, float, bool, bool, bool, bool)
@@ -75,7 +75,7 @@ class Weather(QTimer):
         self.weather = collections.OrderedDict()
         self.rules = collections.OrderedDict()
         self.reset_weather(first=True)
-        self.__debug = True
+        self.__debug = False
         self.windDirVoltage = 20.0
         self.windDir_isPresent = True
         self.windSpeed_isPresent = True
@@ -90,7 +90,7 @@ class Weather(QTimer):
         self.rules['state'] = weatherState.init
         self.__rules_enable = False
         self.timeout.connect(self.refresh_gui)
-        self.start(1000)
+        self.start(2000)
         self.weatherBeep = ConfigReader.config.conf['weather_Beep']
         self.weatherSound = ConfigReader.config.conf['weather_Sound']
         self.sensorAlarmTimeOut = ConfigReader.config.conf['SensorAlarmTimeout']
@@ -109,6 +109,7 @@ class Weather(QTimer):
         self.timerSpeed.timeout.connect(self.timeoutSpeed)
         self.timerRain.timeout.connect(self.timeoutRain)
         self.setConfig()
+        self.status = ""
 
     def setConfig(self):
         if ConfigReader.config.conf['enableSensorSpeed']:
@@ -179,7 +180,7 @@ class Weather(QTimer):
     def refresh_gui(self):
         self.gui_weather_signal.emit(self.weather['speed'], self.weather['unit'], self.weather['orientation'],
                                      self.weather['rain'], self.rules['state']==weatherState.condNok or \
-                                     self.rules['state'] == weatherState.condMarginal)
+                                     self.rules['state'] == weatherState.condMarginal, self.status)
         self.gui_wind_speed_dir_signal.emit(self.weather['speed'], self.weather['unit'], self.windSpeed_isPresent,
                                             self.weather['orientation'], self.windDirVoltage,
                                             self.rules['wind_dir_voltage_alarm']==alarm.Alarm,
@@ -282,6 +283,7 @@ class Weather(QTimer):
         self.weather['orientation_nb'] = 0.0
         self.weather['rain'] = 0.0
         self.inRun = False
+        self.status = "Init"
 
     def timeoutDir(self):
         if self.__debug:
@@ -315,6 +317,7 @@ class Weather(QTimer):
             print("slot_okDC")
         self.timerOkDC.stop()
         self.rules['state'] = weatherState.Nominal
+        self.status = "OKDC"
         if self.__rules_enable:
             if self.weatherBeep:
                 self.beep_signal.emit("blink", 5, self.weatherBeepOkDc)
@@ -326,6 +329,7 @@ class Weather(QTimer):
             print("slot_marginal")
         self.timerMarginal.stop()
         self.rules['state'] = weatherState.condMarginal
+        self.status = "MC"
         if self.__rules_enable:
             if self.weatherBeep:
                 self.beep_signal.emit("permanent", -1, 1000)
@@ -336,19 +340,24 @@ class Weather(QTimer):
         if self.__debug:
             print("slot weather Condition, state : " + str(self.rules['state']))
         self.timerMarginal.stop()
+
         if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.condNok:
             self.rules['state'] = weatherState.Nominal
+            self.status = "OKDC"
             if self.__rules_enable and self.weatherSound:
                 self.weather_sound_signal.emit("windok")
         elif self.rules['state'] == weatherState.condMarginal:
             self.timerOkDC.start(self.weatherTimeOutOkDc)
-            self.rules['state'] = weatherState.condWaiting
+            self.rules['state'] = weatherState.Stabilizing
+            self.status = "STAB"
 
     def slot_weatherNotCondition(self):
         if self.__debug:
             print("slot weather Not Condition, state : " + str(self.rules['state']))
         self.timerOkDC.stop()
-        if self.rules['state'] != weatherState.condNok and self.rules['state'] != weatherState.condMarginal:
+        self.status = "NOK"
+        if self.rules['state'] != weatherState.condNok and self.rules['state'] != weatherState.condMarginal and\
+                self.rules['state'] != weatherState.Stabilizing:
             if self.__rules_enable:
                 if self.weatherBeep:
                     self.beep_signal.emit("blink", 2, self.weatherBeepNok)
@@ -358,6 +367,7 @@ class Weather(QTimer):
         if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.Nominal:
             self.timerMarginal.start(self.weatherTimeOutMarginalcond)
             self.rules['state'] = weatherState.condNok
+        elif self.rules['state'] == weatherState.Stabilizing:
+            self.slot_Marginal()
 
-        if self.rules['state'] == weatherState.condWaiting:
-            self.rules['state'] = weatherState.condMarginal
+

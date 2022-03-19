@@ -605,6 +605,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.controllers['config'].contest_valuechanged_sig.disconnect()
             self.controllers['config'].set_data(self.event)
             self.controllers['config'].contest_valuechanged_sig.connect(self.context_valuechanged)
+            self.chronoHard.weather.set_rules_limit(self.event.min_allowed_wind_speed,
+                                                    self.event.max_allowed_wind_speed,
+                                                    self.event.max_wind_dir_dev)
 
     def slot_weather_alarm(self):
         self.chronoHard.weather.enable_rules(self.controllers['round'].isalarm_enable())

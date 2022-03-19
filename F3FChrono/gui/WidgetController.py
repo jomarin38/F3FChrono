@@ -522,8 +522,8 @@ class WChronoCtrl(QTimer):
         else:
             self.view.nullFlightLabel.setText("")
 
-    def display_wind_info(self, wind_speed, wind_speed_unit,  wind_dir, rain, alarm):
-        self.view.WindInfo.setText('{:.1f}'.format(wind_speed) + wind_speed_unit + ', '+ str(wind_dir) + '°')
+    def display_wind_info(self, wind_speed, wind_speed_unit,  wind_dir, rain, alarm, status):
+        self.view.WindInfo.setText(status + ' ' + '{:.1f}'.format(wind_speed) + wind_speed_unit + ' '+ str(wind_dir) + '°')
 
         if alarm:
             self.view.WindInfo.setStyleSheet('background-color:red;')
