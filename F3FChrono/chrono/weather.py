@@ -173,7 +173,7 @@ class Weather(QTimer):
             self.rules['wind_dir_voltage_alarm'] = alarm.Release
             self.rules['sensor_voltage_alarm'] = alarm.Release
             self.rules['sensor_lost_alarm'] = alarm.Release
-            self.rules['state'] = weatherState.init
+            #self.rules['state'] = weatherState.init
         else:
             self.beep_signal.emit("stop", -1, 1000)
         
@@ -274,6 +274,7 @@ class Weather(QTimer):
             self.weather['speed'] = -1.0
             self.weather['unit'] = "m/s"
             self.weather['orientation'] = -1.0
+            self.status = "Init"
 
         self.weather['speed_sum'] = 0.0
         self.weather['speed_nb'] = 0.0
@@ -283,7 +284,7 @@ class Weather(QTimer):
         self.weather['orientation_nb'] = 0.0
         self.weather['rain'] = 0.0
         self.inRun = False
-        self.status = "Init"
+
 
     def timeoutDir(self):
         if self.__debug:
