@@ -109,7 +109,7 @@ class Weather(QTimer):
         self.timerSpeed.timeout.connect(self.timeoutSpeed)
         self.timerRain.timeout.connect(self.timeoutRain)
         self.setConfig()
-        self.status = ""
+        self.status = "Init"
 
     def setConfig(self):
         if ConfigReader.config.conf['enableSensorSpeed']:
@@ -356,9 +356,10 @@ class Weather(QTimer):
         if self.__debug:
             print("slot weather Not Condition, state : " + str(self.rules['state']))
         self.timerOkDC.stop()
-        self.status = "NOK"
+
         if self.rules['state'] != weatherState.condNok and self.rules['state'] != weatherState.condMarginal and\
                 self.rules['state'] != weatherState.Stabilizing:
+            self.status = "NOK"
             if self.__rules_enable:
                 if self.weatherBeep:
                     self.beep_signal.emit("blink", 2, self.weatherBeepNok)
