@@ -58,7 +58,7 @@ class rs232_arduino (QObject):
         self.inRun = False
         self.kill_aduino()
         self.training = False
-        self.__debug = False
+        self.__debug = True
         self.finaltime = 0.0
 
     @staticmethod
