@@ -36,7 +36,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def __init__(self, eventdao, chronodata, rpi, webserver_process):
         super().__init__()
-        self.__debug=False
+        self.__debug=True
         self.webserver_process = webserver_process
         self.daoEvent = eventdao
         self.daoRound = RoundDAO()
