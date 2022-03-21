@@ -166,6 +166,8 @@ class rpi_gpio(QObject):
 
     def btn_next_action(self, port):
         if port==self.configBtnNext:
+            if self.__debug:
+                print("btn_next_action")
             self.signal_btn_next.emit()
 
     def btn_next_event(self):
