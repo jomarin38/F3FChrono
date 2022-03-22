@@ -239,7 +239,7 @@ class chronoQSound(QThread):
                 if self.time[self.specialsound['seconds_ten'].num].isPlaying():
                     if self.__debug:
                         print("sound seconds_ten play and stop it")
-                    self.time[self.specialsound['seconds_ten'].num].stop()
+                    self.time[self.specialsound['seconds_ten'].num].stopSound()
                     self.specialsound['seconds_ten'].alreadyPlay = False
             elif cmd == 25 and not self.specialsound['seconds_twentyfive'].alreadyPlay:
                 self.__addSound(self.specialsound['seconds_twentyfive'].num)
@@ -264,7 +264,8 @@ class chronoQSound(QThread):
 
     def stop_Timing(self):
         if self.time[self.specialsound['seconds_ten'].num].isPlaying():
-            self.time[self.specialsound['seconds_ten'].num].stop()
+            self.time[self.specialsound['seconds_ten'].num].stopSound()
+            self.specialsound['seconds_ten'].alreadyPlay = False
 
     def stop_all(self):
         if self.__debug:
