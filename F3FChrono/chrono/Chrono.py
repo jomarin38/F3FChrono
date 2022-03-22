@@ -58,19 +58,15 @@ class ChronoHard(QObject):
     accu_signal = pyqtSignal(float, float)
     altitude_finished = pyqtSignal(float)
 
-    def __init__(self, signal_btnnext):
+    def __init__(self):
         super().__init__()
         self.penalty = 0.0
         self.startTime = None
         self.endTime = None
         self.climbout_time = 0
-        self.signal_btnnext = signal_btnnext
         self.chronoLap = []
         self.timelost = []
         self.weather = Weather()
-        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, self.signal_btnnext, self.weather.windspeed_signal,
-                                     self.weather.winddir_signal, self.weather.rain_signal,
-                                     self.weather.anemometer.list_sig, self.weather.anemometer.status_sig)
         self.valid = True
         self.refly = False
         self.__debug = False
@@ -152,13 +148,16 @@ class ChronoArduino(ChronoHard, QTimer):
     _last_event_time = 0
 
     def __init__(self, signal_btnnext):
-        super().__init__(signal_btnnext)
+        super().__init__()
         self.__debug = True
         self.status = chronoStatus.InWait
         self.chrono_signal.connect(self.handle_chrono_event)
         self.lap_finished.connect(self.handle_lap_finished)
         self.run_started.connect(self.handle_run_started)
         self.run_finished.connect(self.handle_run_finished)
+        self.udpReceive = udpreceive(UDPPORT, self.chrono_signal, signal_btnnext, self.weather.windspeed_signal,
+                                     self.weather.winddir_signal, self.weather.rain_signal,
+                                     self.weather.anemometer.list_sig, self.weather.anemometer.status_sig)
 
         self.arduino = rs232_arduino(ConfigReader.config.conf['voltage_coef_Accu1'],
                                      ConfigReader.config.conf['voltage_coef_Accu2'],
