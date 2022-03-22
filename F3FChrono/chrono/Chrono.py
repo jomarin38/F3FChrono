@@ -152,7 +152,7 @@ class ChronoArduino(ChronoHard, QTimer):
     _last_event_time = 0
 
     def __init__(self, signal_btnnext):
-        super().__init__()
+        super().__init__(signal_btnnext)
         self.__debug = True
         self.status = chronoStatus.InWait
         self.chrono_signal.connect(self.handle_chrono_event)
