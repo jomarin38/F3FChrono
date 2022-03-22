@@ -532,6 +532,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.controllers['training'].btn_reset()
 
         self.rpigpio.signal_buzzer_next.emit(1)
+        print("MainUIController btn_next_action")
 
     def handle_time_elapsed(self):
         if self.__debug:
