@@ -80,6 +80,9 @@ class Weather(QTimer):
         self.windDir_isPresent = True
         self.windSpeed_isPresent = True
         self.rain_isPresent = True
+        self.windDir_enable = ConfigReader.config.conf['enableSensorDir']
+        self.windSpeed_enable = ConfigReader.config.conf['enableSensorSpeed']
+        self.rain_enable = ConfigReader.config.conf['enableSensorRain']
         self.rules['speed_limit_min'] = -1.0
         self.rules['speed_limit_max'] = -1.0
         self.rules['dir_limit'] = -1.0
@@ -112,7 +115,11 @@ class Weather(QTimer):
         self.status = "Init"
 
     def setConfig(self):
-        if ConfigReader.config.conf['enableSensorSpeed']:
+        self.windDir_enable = ConfigReader.config.conf['enableSensorDir']
+        self.windSpeed_enable = ConfigReader.config.conf['enableSensorSpeed']
+        self.rain_enable = ConfigReader.config.conf['enableSensorRain']
+
+        if self.windSpeed_enable:
             self.handleSpeed = self.windspeed_signal.connect(self.slot_wind_speed)
             self.timerSpeed.start(self.sensorAlarmTimeOut)
         else:
@@ -121,7 +128,7 @@ class Weather(QTimer):
                 self.handleSpeed = None
                 self.timerSpeed.stop()
 
-        if ConfigReader.config.conf['enableSensorDir']:
+        if self.windDir_enable:
             self.handleDir = self.winddir_signal.connect(self.slot_wind_dir)
             self.timerDir.start(self.sensorAlarmTimeOut)
         else:
@@ -129,7 +136,7 @@ class Weather(QTimer):
                 self.winddir_signal.disconnect()
                 self.handleDir = None
                 self.timerDir.stop()
-        if ConfigReader.config.conf['enableSensorRain']:
+        if self.rain_enable:
             self.handleRain = self.rain_signal.connect(self.rain_info)
             self.timerRain.start(self.sensorAlarmTimeOut)
         else:
@@ -290,34 +297,37 @@ class Weather(QTimer):
         if self.__debug:
             print("weather timeout orientation")
         self.weather['orientation'] = -1.0
-        self.windDir_isPresent=False
-        self.timerSpeed.stop()
         self.timerDir.stop()
-        self.timerRain.stop()
-        if self.__rules_enable:
+        if self.__rules_enable and (
+                self.windDir_isPresent and self.windDir_enable or not self.windDir_enable) and \
+                (self.rain_isPresent and self.rain_enable or not self.rain_enable) and \
+                (self.windSpeed_isPresent and self.windSpeed_enable or not self.windSpeed_enable):
             self.weather_sensor_lost.emit()
+        self.windDir_isPresent=False
 
     def timeoutSpeed(self):
         if self.__debug:
             print("weather timeout speed")
         self.weather['speed'] = -1.0
-        self.windSpeed_isPresent=False
         self.timerSpeed.stop()
-        self.timerDir.stop()
-        self.timerRain.stop()
-        if self.__rules_enable:
+        if self.__rules_enable and (
+                self.windDir_isPresent and self.windDir_enable or not self.windDir_enable) and \
+                (self.rain_isPresent and self.rain_enable or not self.rain_enable) and \
+                (self.windSpeed_isPresent and self.windSpeed_enable or not self.windSpeed_enable):
             self.weather_sensor_lost.emit()
+        self.windSpeed_isPresent=False
 
     def timeoutRain(self):
         if self.__debug:
             print("weather timeout rain")
         self.weather['rain'] = -1.0
-        self.rain_isPresent = False
-        self.timerSpeed.stop()
-        self.timerDir.stop()
         self.timerRain.stop()
-        if self.__rules_enable:
+        if self.__rules_enable and (
+                self.windDir_isPresent and self.windDir_enable or not self.windDir_enable) and \
+                (self.rain_isPresent and self.rain_enable or not self.rain_enable) and \
+                (self.windSpeed_isPresent and self.windSpeed_enable or not self.windSpeed_enable):
             self.weather_sensor_lost.emit()
+        self.rain_isPresent = False
 
     def slot_okDC(self):
         if self.__debug:
