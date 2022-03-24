@@ -291,7 +291,9 @@ class Weather(QTimer):
             print("weather timeout orientation")
         self.weather['orientation'] = -1.0
         self.windDir_isPresent=False
+        self.timerSpeed.stop()
         self.timerDir.stop()
+        self.timerRain.stop()
         if self.__rules_enable:
             self.weather_sensor_lost.emit()
 
@@ -301,6 +303,8 @@ class Weather(QTimer):
         self.weather['speed'] = -1.0
         self.windSpeed_isPresent=False
         self.timerSpeed.stop()
+        self.timerDir.stop()
+        self.timerRain.stop()
         if self.__rules_enable:
             self.weather_sensor_lost.emit()
 
@@ -309,6 +313,8 @@ class Weather(QTimer):
             print("weather timeout rain")
         self.weather['rain'] = -1.0
         self.rain_isPresent = False
+        self.timerSpeed.stop()
+        self.timerDir.stop()
         self.timerRain.stop()
         if self.__rules_enable:
             self.weather_sensor_lost.emit()
