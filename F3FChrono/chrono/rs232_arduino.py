@@ -82,7 +82,7 @@ class rs232_arduino (QObject):
                 if self.bus.inWaiting() > 0:
                     data = self.bus.readline().decode().split(',')
                     if (self.__debug):
-                        print(data)
+                        print("rs232 receive : ",data)
                     if data[0] == "status":
                         self.status = int(data[1])
                         self.status_changed_sig.emit(self.status)
@@ -121,7 +121,7 @@ class rs232_arduino (QObject):
                                 self.finaltime = round(int(data[12])/1000,2)
                                 self.run_finished_sig.emit(self.finaltime)
                                 if self.__debug:
-                                    print("finaltime : ", self.finaltime, " finaltime with laps : ", tmp)
+                                    print("RS232 Receive - finaltime : ", self.finaltime, " finaltime with laps : ", tmp)
                     if data[0] == "climbout_time":
                         self.climbout_time_sig.emit(int(data[1])/1000)
                     if data[0] == "voltage":
@@ -130,11 +130,11 @@ class rs232_arduino (QObject):
                         self.reset_arduino_sig.emit()
             except serial.SerialException as e:
                 if self.__debug:
-                    print("serial exception")
+                    print("RS232 Receive serial exception : ", e)
                 return None
             except TypeError as e:
                 if self.__debug:
-                    print("bus close : ", e)
+                    print("RS232 Receive error : ", e)
                 self.bus.close()
                 self.bus = None
                 return None
@@ -143,7 +143,7 @@ class rs232_arduino (QObject):
     def set_mode(self, training=True):
         self.check_request_time()
         chaine = "m1\n" if training else "m0\n"
-        self.bus.write(chaine.encode())
+        self.__send(chaine)
         self.training = training
         return 0
 
@@ -153,40 +153,40 @@ class rs232_arduino (QObject):
 
     def debug(self):
         self.check_request_time()
-        self.bus.write("d\n".encode())
+        self.__send("d\n")
         self.__debug = True
         return 0
 
     def set_status(self, status):
         self.check_request_time()
-        self.bus.write(("s"+str(status)+"\n").encode())
+        self.__send("s"+str(status)+"\n")
         return 0
 
     def set_buzzerTime(self, time):
         self.check_request_time()
-        self.bus.write(("t"+str(time)+"\n").encode())
+        self.__send("t"+str(time)+"\n")
         return 0
 
     def set_RebundBtn(self, time):
         self.check_request_time()
-        self.bus.write(("b"+str(time)+"\n").encode())
+        self.__send("b"+str(time)+"\n")
         return 0
 
     def event_Base(self, base='a'):
         if self.__debug:
             print("force base : ", base)
         self.check_request_time()
-        self.bus.write(("e"+base+"\n").encode())
+        self.__send("e"+base+"\n")
         return 0
 
     def kill_aduino(self):
         self.check_request_time()
-        self.bus.write(("k\n").encode())
+        self.__send("k\n")
         self.__debug = False
 
     def reset(self):
         self.check_request_time()
-        self.bus.write(("r\n").encode())
+        self.__send("r\n")
         return 0
 
     def reset_training(self):
@@ -195,7 +195,7 @@ class rs232_arduino (QObject):
 
     def get_voltage(self):
         self.check_request_time()
-        self.bus.write(("v\n").encode())
+        self.__send("v\n")
         return 0
 
     def get_status(self):
@@ -209,6 +209,26 @@ class rs232_arduino (QObject):
         if (time.time() - self.lastrequest) < 0.1:
             time.sleep(0.1)
         self.lastrequest = time.time()
+
+    def __send(self, data):
+        try:
+            if self.bus is not None:
+                print("rs232_send : ", (data).encode())
+                result = self.bus.write((data).encode())
+                return result
+            else:
+                print("rs232_send : bus None")
+                return -1
+        except serial.SerialException as e:
+            if self.__debug:
+                print("RS232_Send serial exception : ", e)
+            return None
+        except TypeError as e:
+            if self.__debug:
+                print("RS232_Send error : ", e)
+            self.bus.close()
+            self.bus = None
+            return None
 
 if __name__ == '__main__':
 

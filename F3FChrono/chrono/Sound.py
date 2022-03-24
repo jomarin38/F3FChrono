@@ -136,7 +136,7 @@ class chronoQSound(QThread):
         self.entry_sound = False
         self.entry_soundToLate = False
         self.toLateSound = False
-        self.__debug = True
+        self.__debug = False
 
     def loadwav(self, volume):
         self.time = []
