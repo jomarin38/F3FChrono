@@ -42,11 +42,13 @@ urlpatterns = [
     path('give_penalty', views.give_penalty, name='give_penalty'),
     path('give_zero', views.give_zero, name='give_zero'),
     path('download_csv', views.download_csv, name='download_csv'),
+    path('download_pilots_as_csv', views.download_pilots_as_csv, name='download_pilots_as_csv'),
     path('export_round_f3x_vault', views.export_round_f3x_vault, name='export_round_f3x_vault'),
     path('login_to_export_round_f3x_vault', views.login_to_export_round_f3x_vault,
          name='login_to_export_round_f3x_vault'),
     path('export_event_f3x_vault', views.export_event_f3x_vault, name='export_event_f3x_vault'),
     path('login_to_export_event_f3x_vault', views.login_to_export_event_f3x_vault,
          name='login_to_export_event_f3x_vault'),
-    path('sign_in', views.sign_in, name='sign_in')
+    path('define_bibs', views.define_bibs, name='define_bibs'),
+    path('do_define_bibs', views.do_define_bibs, name='define_bibs')
 ]

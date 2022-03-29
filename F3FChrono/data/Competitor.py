@@ -48,6 +48,9 @@ class Competitor:
     def get_bib_number(self):
         return self.bib_number
 
+    def set_bib_number(self, number):
+        self.bib_number = number
+
     def to_string(self):
         return str(self.bib_number) + '\t' + self.pilot.to_string()
 

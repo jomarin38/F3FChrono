@@ -290,6 +290,20 @@ def manage_event(request):
 
     table = ResultTable(title='', css_id='ranking')
 
+    header = Header(name=Link('Export bib numbers', 'download_pilots_as_csv?event_id=' + event_id))
+    table.set_header(header)
+
+    page.add_table(table)
+
+    table = ResultTable(title='', css_id='ranking')
+
+    header = Header(name=Link('Define bib numbers', 'define_bibs?event_id='+event_id))
+    table.set_header(header)
+
+    page.add_table(table)
+
+    table = ResultTable(title='', css_id='ranking')
+
     header = Header(name=Link('Export to F3X Vault', 'login_to_export_event_f3x_vault?event_id='+event_id))
     table.set_header(header)
 
@@ -353,6 +367,54 @@ def manage_event(request):
 
     return HttpResponse(page.to_html())
 
+
+def define_bibs(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    return render(request, 'define_bibs_template.html', {'event_id': request.GET.get('event_id')})
+
+def do_define_bibs(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+
+    csv_file = request.FILES["csv_file"]
+
+    event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=False, fetch_runs=False)
+
+    event.import_bibs(csv_file)
+
+    for bib, competitor in event.get_competitors().items():
+        CompetitorDAO().update(competitor)
+
+    if ('username' in request.POST) and ('password' in request.POST) and ('F3X_vault_id' in request.POST):
+
+        f3x_username = request.POST["username"]
+        f3x_password = request.POST["password"]
+
+        f3x_event_id = request.POST["F3X_vault_id"]
+
+        event = Event.from_f3x_vault(f3x_username, f3x_password, f3x_event_id)
+
+        event.id = EventDAO().insert(event)
+
+        for bib, competitor in event.get_competitors().items():
+            CompetitorDAO().insert(competitor)
+
+        for f3f_round in event.rounds:
+            RoundDAO().insert(f3f_round)
+
+        return redirect('index')
+
+    else:
+
+        return HttpResponse('<p>Invalid parameters !')
 
 def login_to_export_round_f3x_vault(request):
     if not request.user.is_authenticated:
@@ -607,6 +669,31 @@ def download_csv(request):
         return response
     else:
         return HttpResponse('Round not found')
+
+
+def download_pilots_as_csv(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+
+    event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=False, fetch_runs=False)
+
+    if event is not None:
+        # Create the HttpResponse object with the appropriate CSV header.
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="'+\
+                                          str(event.name)+'.csv"'
+
+        csv_writer = csv.writer(response)
+
+        event.export_bibs_as_csv(csv_writer)
+
+        return response
+    else:
+        return HttpResponse('Event not found')
 
 
 def set_competitor_presence(request):

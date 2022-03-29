@@ -28,5 +28,8 @@ class Pilot:
     def get_f3x_vault_id(self):
         return self.f3x_vault_id
 
+    def get_id(self):
+        return self.id
+
     def to_string(self):
         return self.name + ' ' + self.first_name
