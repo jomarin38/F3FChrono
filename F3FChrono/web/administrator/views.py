@@ -393,28 +393,15 @@ def do_define_bibs(request):
     for bib, competitor in event.get_competitors().items():
         CompetitorDAO().update(competitor)
 
-    if ('username' in request.POST) and ('password' in request.POST) and ('F3X_vault_id' in request.POST):
+    if ('username' in request.POST) and ('password' in request.POST):
 
         f3x_username = request.POST["username"]
         f3x_password = request.POST["password"]
 
-        f3x_event_id = request.POST["F3X_vault_id"]
+        if len(f3x_username)>0 and len(f3x_password)>0:
+            event.export_bibs_to_f3xvault(f3x_username, f3x_password)
 
-        event = Event.from_f3x_vault(f3x_username, f3x_password, f3x_event_id)
-
-        event.id = EventDAO().insert(event)
-
-        for bib, competitor in event.get_competitors().items():
-            CompetitorDAO().insert(competitor)
-
-        for f3f_round in event.rounds:
-            RoundDAO().insert(f3f_round)
-
-        return redirect('index')
-
-    else:
-
-        return HttpResponse('<p>Invalid parameters !')
+    return HttpResponseRedirect('manage_event?event_id=' + event_id)
 
 def login_to_export_round_f3x_vault(request):
     if not request.user.is_authenticated:

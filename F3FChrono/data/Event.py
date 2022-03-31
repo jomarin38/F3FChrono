@@ -104,6 +104,22 @@ class Event:
 
         return event
 
+    def export_bibs_to_f3xvault(self, f3x_username, f3x_password):
+        """
+        TODO: f3x_vault related stuff should be moved in specific class later
+        :param f3x_username:
+        :param f3x_password:
+        :return:
+        """
+
+        for competitor in self.competitors.values():
+            request_url = 'https://www.f3xvault.com/api.php?login=' + f3x_username + \
+                          '&password=' + f3x_password + \
+                          '&function=updateEventPilot&event_id=' + str(self.f3x_vault_id) + \
+                          '&pilot_id=' + str(competitor.get_pilot().get_f3x_vault_id())  + \
+                          '&event_pilot_bib=' + str(competitor.get_bib_number())
+            requests.post(request_url)
+
     @staticmethod
     def from_f3x_vault(login, password, contest_id, max_rounds=None):
         """
