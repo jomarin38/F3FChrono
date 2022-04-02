@@ -27,6 +27,7 @@ from F3FChrono.chrono.Sound import *
 from F3FChrono.chrono.GPIOPort import rpi_gpio
 from F3FChrono.chrono.UDPSend import *
 from F3FChrono.data.web.Utils import Utils
+from F3FChrono.Utils import get_ip
 import os
 
 
@@ -68,8 +69,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.signal_race = None
         self.signal_training = None
         self.low_voltage_ask = False
-        ip = Utils.get_ip().split(".")
-        self.udpsend = udpsend(ip[0] + "." + ip[1] + "." + ip[2] + ".255" , UDPPORT)
+        ip, broadcast = get_ip()
+        self.udpsend = udpsend(broadcast, ConfigReader.config.conf['udp_port'])
         self.enableConnectedDisplay = ConfigReader.config.conf['enableDisplay']
         self.launch_time = ConfigReader.config.conf['Launch_time']
         self.configSound = ConfigReader.config.conf["sound"]
