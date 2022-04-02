@@ -189,7 +189,7 @@ class Ui_WSettingsConnectedDevices(object):
         _translate = QtCore.QCoreApplication.translate
         WSettingsConnectedDevices.setWindowTitle(_translate("WSettingsConnectedDevices", "Form"))
         self.btn_AnemometerConnect.setText(_translate("WSettingsConnectedDevices", "Connect"))
-        self.WeatherStation_Speed.setText(_translate("WSettingsConnectedDevices", "Speed : -1 m/s"))
+        self.WeatherStation_Speed.setText(_translate("WSettingsConnectedDevices", "Wind : -1 m/s"))
         self.label.setText(_translate("WSettingsConnectedDevices", "Connected Devices Settings"))
         self.AnemometerStatus.setText(_translate("WSettingsConnectedDevices", "Not connected"))
         self.WeatherStation_Rain.setText(_translate("WSettingsConnectedDevices", "Rain : Yes"))
@@ -202,11 +202,11 @@ class Ui_WSettingsConnectedDevices(object):
         self.AnemometerComboBox.setItemText(1, _translate("WSettingsConnectedDevices", "PRO"))
         self.AnemometerComboBox.setItemText(2, _translate("WSettingsConnectedDevices", "JMA"))
         self.btn_AnemometerGetList.setText(_translate("WSettingsConnectedDevices", "Get Anemometer List"))
-        self.WeatherStation_Dir.setText(_translate("WSettingsConnectedDevices", "Dir : Nan, 5V"))
-        self.checkBox_Speed.setText(_translate("WSettingsConnectedDevices", "Speed"))
+        self.WeatherStation_Dir.setText(_translate("WSettingsConnectedDevices", "Angle : Nan, 5V"))
+        self.checkBox_Speed.setText(_translate("WSettingsConnectedDevices", "Wind"))
         self.checkBox_Rain.setText(_translate("WSettingsConnectedDevices", "Rain"))
         self.checkBox_Display.setText(_translate("WSettingsConnectedDevices", "Display"))
-        self.checkBox_Dir.setText(_translate("WSettingsConnectedDevices", "Dir"))
+        self.checkBox_Dir.setText(_translate("WSettingsConnectedDevices", "Angle"))
 
 
 if __name__ == "__main__":

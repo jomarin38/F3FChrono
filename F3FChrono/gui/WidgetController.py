@@ -757,28 +757,20 @@ class WSettingsAdvanced(QObject):
         self.widget.hide()
 
     def set_data(self):
-        self.view.port_btn_baseA.setValue(ConfigReader.config.conf['btn_baseA'])
-        self.view.port_btn_baseB.setValue(ConfigReader.config.conf['btn_baseB'])
-        self.view.port_btn_next.setValue(ConfigReader.config.conf['btn_next'])
-        self.view.port_buzzer.setValue(ConfigReader.config.conf['buzzer'])
-        self.view.buzzer_duration.setValue(ConfigReader.config.conf['buzzer_duration'])
-        self.view.port_buzzer_next.setValue(ConfigReader.config.conf['buzzer_next'])
-        self.view.buzzer_next_duration.setValue(ConfigReader.config.conf['buzzer_next_duration'])
-        self.view.udp_port.setValue(ConfigReader.config.conf['udpport'])
+        self.view.WeatherSensorLostTimeOut.setValue(ConfigReader.config.conf['SensorAlarmTimeout'] / 1000)
+        self.view.WeatherMC.setValue(ConfigReader.config.conf['weather_TimeOut_MarginalCond'] / 1000)
+        self.view.WeatherOKDC.setValue(ConfigReader.config.conf['weather_TimeOut_OkDC'] / 1000)
+        self.view.WeatherMinVoltage.setValue(ConfigReader.config.conf['voltage_min_windDir'])
         self.view.voltagemin_1.setValue(ConfigReader.config.conf['voltage_min_Accu1'])
         self.view.voltagecoef_1.setValue(ConfigReader.config.conf['voltage_coef_Accu1'])
         self.view.voltagemin_2.setValue(ConfigReader.config.conf['voltage_min_Accu2'])
         self.view.voltagecoef_2.setValue(ConfigReader.config.conf['voltage_coef_Accu2'])
 
     def get_data(self):
-        ConfigReader.config.conf['btn_baseA'] = self.view.port_btn_baseA.value()
-        ConfigReader.config.conf['btn_baseB'] = self.view.port_btn_baseB.value()
-        ConfigReader.config.conf['btn_next'] = self.view.port_btn_next.value()
-        ConfigReader.config.conf['buzzer'] = self.view.port_buzzer.value()
-        ConfigReader.config.conf['buzzer_duration'] = self.view.buzzer_duration.value()
-        ConfigReader.config.conf['buzzer_next'] = self.view.port_buzzer_next.value()
-        ConfigReader.config.conf['buzzer_next_duration'] = self.view.buzzer_next_duration.value()
-        ConfigReader.config.conf['udpport'] = self.view.udp_port.value()
+        ConfigReader.config.conf['SensorAlarmTimeout'] = self.view.WeatherSensorLostTimeOut.value() * 1000
+        ConfigReader.config.conf['weather_TimeOut_MarginalCond'] = self.view.WeatherMC.value() * 1000
+        ConfigReader.config.conf['weather_TimeOut_OkDC'] = self.view.WeatherOKDC.value() * 1000
+        ConfigReader.config.conf['voltage_min_windDir'] = self.view.WeatherMinVoltage.value()
         ConfigReader.config.conf['voltage_min_Accu1'] = self.view.voltagemin_1.value()
         ConfigReader.config.conf['voltage_coef_Accu1'] = self.view.voltagecoef_1.value()
         ConfigReader.config.conf['voltage_min_Accu2'] = self.view.voltagemin_2.value()
@@ -1329,21 +1321,21 @@ class WSettingsSound(QObject):
     def set_data(self):
         self.view.sound.setChecked(ConfigReader.config.conf['sound'])
         self.view.soundvolume.setValue(ConfigReader.config.conf['soundvolume']*100)
-        self.view.buzzer.setChecked(ConfigReader.config.conf['buzzer_valid'])
         self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
-        self.view.lowVoltage.setChecked(ConfigReader.config.conf['lowvoltage_sound'])
         self.view.noiseSound.setChecked(ConfigReader.config.conf['noisesound'])
         self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume']*100)
+        self.view.WeatherStationAlarmBuzzer.setChecked(ConfigReader.config.conf['weather_Beep'])
+        self.view.WeatherStationAlarmSound.setChecked(ConfigReader.config.conf['weather_Sound'])
 
 
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
         ConfigReader.config.conf['soundvolume'] = self.view.soundvolume.value() / 100
-        ConfigReader.config.conf['buzzer_valid'] = self.view.buzzer.isChecked()
         ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
-        ConfigReader.config.conf['lowvoltage_sound'] = self.view.lowVoltage.isChecked()
         ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
-        ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()/100
+        ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value() / 100
+        ConfigReader.config.conf['weather_Beep'] = self.view.WeatherStationAlarmBuzzer.isChecked()
+        ConfigReader.config.conf['weather_Sound'] = self.view.WeatherStationAlarmSound.isChecked()
 
 class WSettingsWirelessDevices(QObject):
     btn_settingsbase_sig = pyqtSignal()
@@ -1377,7 +1369,10 @@ class WSettingsWirelessDevices(QObject):
         self.view.checkBox_Dir.stateChanged.connect(self.get_data)
         self.view.checkBox_Speed.stateChanged.connect(self.get_data)
         self.view.checkBox_Rain.stateChanged.connect(self.get_data)
-
+        self.TextSpeed = self._translate("WSettingsConnectedDevices", "Wind")
+        self.TextRainYes = self._translate("WSettingsConnectedDevices", "Rain : Yes")
+        self.TextRainNo = self._translate("WSettingsConnectedDevices", "Rain : No")
+        self.TextDir = self._translate("WSettingsConnectedDevices", "Angle")
         self.view.AnemometerComboBox.clear()
 
 
@@ -1418,26 +1413,26 @@ class WSettingsWirelessDevices(QObject):
                                wind_dir, wind_dir_voltage, wind_dir_voltage_alarm, wind_dir_ispresent,
                                rain, rain_ispresent):
         if wind_speed_ispresent:
-            self.view.WeatherStation_Speed.setText("Speed : "+"{:0>.1f}".format(wind_speed) + wind_speed_unit)
+            self.view.WeatherStation_Speed.setText(self.TextSpeed + " : "+"{:0>.1f}".format(wind_speed) + wind_speed_unit)
             self.view.WeatherStation_Speed.setStyleSheet("background-color:rgba( 255, 255, 255, 0% );")
         else:
-            self.view.WeatherStation_Speed.setText("Speed : --")
+            self.view.WeatherStation_Speed.setText(self.TextSpeed + " : --")
             self.view.WeatherStation_Speed.setStyleSheet("background-color:red;")
         if wind_dir_ispresent:
-            self.view.WeatherStation_Dir.setText("Dir : " + "{:0>.1f}".format(wind_dir)+ ", " +
+            self.view.WeatherStation_Dir.setText(self.TextDir + " : " + "{:0>.1f}".format(wind_dir)+ ", " +
                                                  "{:0>.1f}".format(wind_dir_voltage)+"V")
             if wind_dir_voltage_alarm:
                 self.view.WeatherStation_Dir.setStyleSheet("background-color:red;")
             else:
                 self.view.WeatherStation_Dir.setStyleSheet("background-color:rgba( 255, 255, 255, 0% );")
         else:
-            self.view.WeatherStation_Dir.setText("Dir : --")
+            self.view.WeatherStation_Dir.setText(self.TextDir + " : --")
             self.view.WeatherStation_Dir.setStyleSheet("background-color:red;")
         if rain_ispresent:
             if rain > 0.0:
-                self.view.WeatherStation_Rain.setText("rain : Yes")
+                self.view.WeatherStation_Rain.setText(self.TextRainYes)
             else:
-                self.view.WeatherStation_Rain.setText("rain : No")
+                self.view.WeatherStation_Rain.setText(self.TextRainNo)
             self.view.WeatherStation_Rain.setStyleSheet("background-color:rgba( 255, 255, 255, 0% );")
         else:
             self.view.WeatherStation_Rain.setText("rain : --")

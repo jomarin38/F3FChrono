@@ -62,7 +62,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Speed : -1 m/s</string>
+      <string>Wind : -1 m/s</string>
      </property>
     </widget>
    </item>
@@ -258,7 +258,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Dir : Nan, 5V</string>
+      <string>Angle : Nan, 5V</string>
      </property>
     </widget>
    </item>
@@ -272,7 +272,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Speed</string>
+      <string>Wind</string>
      </property>
     </widget>
    </item>
@@ -314,7 +314,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Dir</string>
+      <string>Angle</string>
      </property>
     </widget>
    </item>
