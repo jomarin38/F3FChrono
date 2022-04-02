@@ -88,7 +88,8 @@ default_config = \
     "weather_TimeOut_MarginalCond": 20000,
     "weather_TimeOut_OkDC": 20000,
     "weather_Sound": False,
-    "weather_Beep": False
+    "weather_Beep": False,
+    "udp_port" : 4445
 }
 
 def init():

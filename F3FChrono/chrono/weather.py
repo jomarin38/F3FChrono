@@ -20,6 +20,7 @@ import collections
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.chrono.UDPSend import *
 from F3FChrono.chrono import ConfigReader
+from F3FChrono.Utils import get_ip
 
 class alarm():
     Release = 0,
@@ -41,7 +42,8 @@ class anemometer(QObject):
 
     def __init__(self):
         super().__init__()
-        self.udpSend = udpsend(IPUDPSEND, UDPPORT)
+        ip, broadcast = get_ip()
+        self.udpSend = udpsend(broadcast, ConfigReader.config.conf['udp_port'])
 
     def GetList(self):
         self.udpSend.sendData("anemometerGetList")
