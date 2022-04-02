@@ -907,12 +907,12 @@
 <context>
     <name>WSettingsConnectedDevices</name>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="190"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="188"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="191"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="189"/>
         <source>Connect</source>
         <translation>Connecter</translation>
     </message>
@@ -922,84 +922,84 @@
         <translation type="obsolete">Vitesse : -1 m/s</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="193"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="191"/>
         <source>Connected Devices Settings</source>
         <translation>Config Capteurs connectés</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="194"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="207"/>
         <source>Not connected</source>
-        <translation>Non connecté</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="195"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="192"/>
         <source>Rain : Yes</source>
         <translation>Pluie : Oui</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="196"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="193"/>
         <source>Base Settings</source>
         <translation>Configuration Bases</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="197"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="194"/>
         <source>WBtn Settings</source>
         <translation>Configuration wifi Btn</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="198"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="195"/>
         <source>Back to Settings</source>
         <translation>retour configuration</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="199"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="196"/>
         <source>Valid</source>
         <translation>Valider</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="200"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="197"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="201"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="198"/>
         <source>SDA</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="202"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="199"/>
         <source>PRO</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="203"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="200"/>
         <source>JMA</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="204"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="201"/>
         <source>Get Anemometer List</source>
         <translation>Liste anémomètre</translation>
     </message>
     <message>
         <location filename="../F3FChrono/gui/WidgetController.py" line="1372"/>
         <source>Speed</source>
-        <translation>Vitesse</translation>
+        <translation type="obsolete">Vitesse</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="207"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="204"/>
         <source>Rain</source>
         <translation>Pluie</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="208"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="205"/>
         <source>Display</source>
         <translation>Afficheur</translation>
     </message>
     <message>
         <location filename="../F3FChrono/gui/WidgetController.py" line="1375"/>
         <source>Dir</source>
-        <translation>Dir</translation>
+        <translation type="obsolete">Dir</translation>
     </message>
     <message>
         <location filename="../F3FChrono/gui/WidgetController.py" line="1374"/>
@@ -1007,22 +1007,22 @@
         <translation>Pluie : Non</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="192"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="190"/>
         <source>Wind : -1 m/s</source>
         <translation>Vent : -1m/s</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="205"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="202"/>
         <source>Angle : Nan, 5V</source>
         <translation>Angle : Nan, 5V</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="206"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="203"/>
         <source>Wind</source>
         <translation>Vent</translation>
     </message>
     <message>
-        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="209"/>
+        <location filename="../F3FChrono/gui/WSettingsConnectedDevices_ui.py" line="206"/>
         <source>Angle</source>
         <translation>Angle</translation>
     </message>

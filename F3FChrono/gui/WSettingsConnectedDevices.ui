@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>390</width>
+    <width>397</width>
     <height>247</height>
    </rect>
   </property>
@@ -80,26 +80,6 @@
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3" colspan="3">
-    <widget class="QPushButton" name="AnemometerStatus">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="inputMethodHints">
-      <set>Qt::ImhNone</set>
-     </property>
-     <property name="text">
-      <string>Not connected</string>
-     </property>
-     <property name="checkable">
-      <bool>false</bool>
      </property>
     </widget>
    </item>
@@ -315,6 +295,20 @@
      </property>
      <property name="text">
       <string>Angle</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3" colspan="3">
+    <widget class="QLabel" name="AnemometerStatus">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Not connected</string>
      </property>
     </widget>
    </item>

@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_WSettingsConnectedDevices(object):
     def setupUi(self, WSettingsConnectedDevices):
         WSettingsConnectedDevices.setObjectName("WSettingsConnectedDevices")
-        WSettingsConnectedDevices.resize(390, 247)
+        WSettingsConnectedDevices.resize(397, 247)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -49,16 +49,6 @@ class Ui_WSettingsConnectedDevices(object):
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
         self.gridLayout.addWidget(self.label, 0, 0, 1, 6)
-        self.AnemometerStatus = QtWidgets.QPushButton(WSettingsConnectedDevices)
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        font.setBold(True)
-        font.setWeight(75)
-        self.AnemometerStatus.setFont(font)
-        self.AnemometerStatus.setInputMethodHints(QtCore.Qt.ImhNone)
-        self.AnemometerStatus.setCheckable(False)
-        self.AnemometerStatus.setObjectName("AnemometerStatus")
-        self.gridLayout.addWidget(self.AnemometerStatus, 2, 3, 1, 3)
         self.WeatherStation_Rain = QtWidgets.QLabel(WSettingsConnectedDevices)
         font = QtGui.QFont()
         font.setPointSize(14)
@@ -181,6 +171,14 @@ class Ui_WSettingsConnectedDevices(object):
         self.checkBox_Dir.setFont(font)
         self.checkBox_Dir.setObjectName("checkBox_Dir")
         self.gridLayout.addWidget(self.checkBox_Dir, 10, 1, 1, 1)
+        self.AnemometerStatus = QtWidgets.QLabel(WSettingsConnectedDevices)
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(75)
+        self.AnemometerStatus.setFont(font)
+        self.AnemometerStatus.setObjectName("AnemometerStatus")
+        self.gridLayout.addWidget(self.AnemometerStatus, 2, 3, 1, 3)
 
         self.retranslateUi(WSettingsConnectedDevices)
         QtCore.QMetaObject.connectSlotsByName(WSettingsConnectedDevices)
@@ -191,7 +189,6 @@ class Ui_WSettingsConnectedDevices(object):
         self.btn_AnemometerConnect.setText(_translate("WSettingsConnectedDevices", "Connect"))
         self.WeatherStation_Speed.setText(_translate("WSettingsConnectedDevices", "Wind : -1 m/s"))
         self.label.setText(_translate("WSettingsConnectedDevices", "Connected Devices Settings"))
-        self.AnemometerStatus.setText(_translate("WSettingsConnectedDevices", "Not connected"))
         self.WeatherStation_Rain.setText(_translate("WSettingsConnectedDevices", "Rain : Yes"))
         self.btn_base_settings.setText(_translate("WSettingsConnectedDevices", "Base Settings"))
         self.wbtn_settings.setText(_translate("WSettingsConnectedDevices", "WBtn Settings"))
@@ -207,6 +204,7 @@ class Ui_WSettingsConnectedDevices(object):
         self.checkBox_Rain.setText(_translate("WSettingsConnectedDevices", "Rain"))
         self.checkBox_Display.setText(_translate("WSettingsConnectedDevices", "Display"))
         self.checkBox_Dir.setText(_translate("WSettingsConnectedDevices", "Angle"))
+        self.AnemometerStatus.setText(_translate("WSettingsConnectedDevices", "Not connected"))
 
 
 if __name__ == "__main__":
