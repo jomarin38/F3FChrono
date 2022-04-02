@@ -394,7 +394,7 @@ class Round:
                     if valid_run is not None:
                         if valid_run.chrono is not None:
                             request_url += '&wind_avg=' + str(valid_run.chrono.mean_wind_speed)
-                            request_url += '&dir_avg=' + str(valid_run.chrono.mean_wind_speed)
+                            request_url += '&dir_avg=' + str(valid_run.chrono.wind_direction)
                         if order is not None:
                             request_url +='&order=' + str(order)
                         response = requests.post(request_url)
