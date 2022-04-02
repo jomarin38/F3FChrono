@@ -29,30 +29,44 @@ INITMSG = "Init"
 EVENTMSG = "Event"
 RACEORDERMSG = "Order"
 
-IPUDPSEND = '255.255.255.255'
+#IPUDPSEND = '255.255.255.255'
 UDPPORT = 4445
 
 
 class udpsend(QObject):
     def __init__(self, udpip, udpport):
         super(QObject, self).__init__()
+        print(udpip, udpport)
         self.udpip = udpip
         self.port = udpport
-        self.sock=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        try:
+            self.sock=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        except e as error:
+            print("udpsend init error : ", e)
 
     def __del__(self):
         del self.sock
 
-    def send(self):
-        self.sock.sendto(bytes('event', 'utf-8'), (self.udpip, self.port))
+    def sendEvent(self):
+        try:
+            self.sock.sendto(bytes('event', 'utf-8'), (self.udpip, self.port))
+        except e as error:
+            print("udpsendEvent error : ", e)
+
 
     def sendData(self, data):
-        self.sock.sendto(bytes(data, 'utf-8'), (self.udpip, self.port))
+        try:
+            self.sock.sendto(bytes(data, 'utf-8'), (self.udpip, self.port))
+        except e as error:
+            print("udpsendData error : ", e)
 
     def sendOrderData(self, data):
-        self.sock.sendto(bytes((RACEORDERMSG+ ' '+ data), 'utf-8'), (self.udpip, self.port))
+        try:
+            self.sock.sendto(bytes((RACEORDERMSG+ ' '+ data), 'utf-8'), (self.udpip, self.port))
+        except e as error:
+            print("udpsendOrderData error : ", e)
 
     def terminate(self):
         print('terminated event')

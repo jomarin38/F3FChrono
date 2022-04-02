@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WSettings</class>
- <widget class="QWidget" name="WSettings">
+ <class>WSettingsConnectedDevices</class>
+ <widget class="QWidget" name="WSettingsConnectedDevices">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>469</width>
-    <height>253</height>
+    <width>390</width>
+    <height>247</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -38,8 +38,8 @@
    <property name="verticalSpacing">
     <number>1</number>
    </property>
-   <item row="8" column="0">
-    <widget class="QPushButton" name="btn_cancel">
+   <item row="1" column="3" colspan="3">
+    <widget class="QPushButton" name="btn_AnemometerConnect">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -48,11 +48,25 @@
       </font>
      </property>
      <property name="text">
-      <string>Cancel</string>
+      <string>Connect</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2">
+   <item row="8" column="0" colspan="2">
+    <widget class="QLabel" name="WeatherStation_Speed">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Speed : -1 m/s</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="6">
     <widget class="QLabel" name="label">
      <property name="font">
       <font>
@@ -62,15 +76,35 @@
       </font>
      </property>
      <property name="text">
-      <string>Race Management Settings</string>
+      <string>Connected Devices Settings</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QCheckBox" name="fullscreen">
+   <item row="2" column="3" colspan="3">
+    <widget class="QPushButton" name="AnemometerStatus">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="inputMethodHints">
+      <set>Qt::ImhNone</set>
+     </property>
+     <property name="text">
+      <string>Not connected</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="4" colspan="2">
+    <widget class="QLabel" name="WeatherStation_Rain">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -79,12 +113,12 @@
       </font>
      </property>
      <property name="text">
-      <string>FullScreen</string>
+      <string>Rain : Yes</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_2">
+   <item row="14" column="0" colspan="3">
+    <widget class="QPushButton" name="btn_base_settings">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -93,12 +127,12 @@
       </font>
      </property>
      <property name="text">
-      <string>Mode</string>
+      <string>Base Settings</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
-    <widget class="QPushButton" name="btn_advanced_settings">
+   <item row="14" column="3" colspan="3">
+    <widget class="QPushButton" name="wbtn_settings">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -107,12 +141,12 @@
       </font>
      </property>
      <property name="text">
-      <string>Advanced Settings</string>
+      <string>WBtn Settings</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
-    <widget class="QPushButton" name="btn_sound_settings">
+   <item row="15" column="0" colspan="6">
+    <widget class="QPushButton" name="btn_back">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -121,39 +155,11 @@
       </font>
      </property>
      <property name="text">
-      <string>Sound &amp;&amp; Voice Settings</string>
+      <string>Back to Settings</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QCheckBox" name="simulate_mode">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Simulate Mode</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QPushButton" name="btn_wDevices_settings">
-     <property name="font">
-      <font>
-       <pointsize>14</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Wireless Devices Settings</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="1">
+   <item row="16" column="3" colspan="3">
     <widget class="QPushButton" name="btn_valid">
      <property name="font">
       <font>
@@ -167,8 +173,8 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
-    <widget class="QCheckBox" name="webserver">
+   <item row="16" column="0" colspan="3">
+    <widget class="QPushButton" name="btn_cancel">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -177,12 +183,33 @@
       </font>
      </property>
      <property name="text">
-      <string>WebServer</string>
+      <string>Cancel</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QComboBox" name="language">
+   <item row="9" column="0" colspan="6">
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="6">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0" colspan="6">
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QComboBox" name="AnemometerComboBox">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -192,18 +219,23 @@
      </property>
      <item>
       <property name="text">
-       <string>French</string>
+       <string>SDA</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>English</string>
+       <string>PRO</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>JMA</string>
       </property>
      </item>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_3">
+   <item row="1" column="0" colspan="3">
+    <widget class="QPushButton" name="btn_AnemometerGetList">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -212,12 +244,12 @@
       </font>
      </property>
      <property name="text">
-      <string>Langage</string>
+      <string>Get Anemometer List</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QComboBox" name="mode">
+   <item row="8" column="2" colspan="2">
+    <widget class="QLabel" name="WeatherStation_Dir">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -225,38 +257,64 @@
        <bold>true</bold>
       </font>
      </property>
-     <property name="currentIndex">
-      <number>1</number>
+     <property name="text">
+      <string>Dir : Nan, 5V</string>
      </property>
-     <item>
-      <property name="text">
-       <string>Training</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Competition</string>
-      </property>
-     </item>
     </widget>
    </item>
-   <item row="4" column="1">
-    <widget class="QPushButton" name="webserverUrl">
+   <item row="10" column="0">
+    <widget class="QCheckBox" name="checkBox_Speed">
      <property name="font">
       <font>
-       <pointsize>10</pointsize>
+       <pointsize>14</pointsize>
        <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
-     <property name="inputMethodHints">
-      <set>Qt::ImhNone</set>
+     <property name="text">
+      <string>Speed</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="3">
+    <widget class="QCheckBox" name="checkBox_Rain">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
-      <string>Not started</string>
+      <string>Rain</string>
      </property>
-     <property name="checkable">
-      <bool>false</bool>
+    </widget>
+   </item>
+   <item row="10" column="4" colspan="2">
+    <widget class="QCheckBox" name="checkBox_Display">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Display</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="QCheckBox" name="checkBox_Dir">
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Dir</string>
      </property>
     </widget>
    </item>

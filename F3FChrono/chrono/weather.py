@@ -18,128 +18,219 @@
 import time
 import collections
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
+from F3FChrono.chrono.UDPSend import *
+from F3FChrono.chrono import ConfigReader
+from F3FChrono.Utils import get_ip
+
+class alarm():
+    Release = 0,
+    Alarm=1,
+    Waiting=2
+
+class weatherState():
+    init = 0,
+    Nominal = 1,
+    condNok = 2,
+    condMarginal = 3,
+    Stabilizing = 4
 
 
 
-class Weather(QTimer):
-    windspeed_signal = pyqtSignal(float, str)
-    winddir_signal = pyqtSignal(float)
-    rain_signal = pyqtSignal(bool)
-    # gui_weather_signal parameters wind_speed, wind_speed_unit,  wind_dir, rain, alarm
-    gui_weather_signal = pyqtSignal(float, str, float, bool, bool)
-    beep_signal = pyqtSignal(str, int, int)
+class anemometer(QObject):
+    list_sig = pyqtSignal(list)
+    status_sig = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
-        self.windspeed_signal.connect(self.slot_wind_speed)
-        self.winddir_signal.connect(self.slot_wind_dir)
-        self.rain_signal.connect(self.rain_info)
-        self.wind = collections.OrderedDict()
+        ip, broadcast = get_ip()
+        self.udpSend = udpsend(broadcast, ConfigReader.config.conf['udp_port'])
+
+    def GetList(self):
+        self.udpSend.sendData("anemometerGetList")
+
+    def Connect(self, index):
+        self.udpSend.sendData("anemometerConnect " + index)
+
+class Weather(QTimer):
+    #parameters : value, unity
+    windspeed_signal = pyqtSignal(float, str)
+    #parameters : direction, accu voltage
+    winddir_signal = pyqtSignal(float, float)
+    rain_signal = pyqtSignal(bool)
+    # gui_weather_signal parameters wind_speed, wind_speed_unit,  wind_dir, rain, alarm, status
+    gui_weather_signal = pyqtSignal(float, str, float, float, bool, str)
+    #parameters : wind_speed, wind_speed_unit, wind_speed_ispresent, wind_dir, wind_dir_voltage, wind_dir_voltage_alarme,
+    #wind_dir_ispresent, rain, rain_ispresent
+    gui_wind_speed_dir_signal = pyqtSignal(float, str, bool, float, float, bool, bool, bool, bool)
+    beep_signal = pyqtSignal(str, int, int)
+
+    weather_sound_signal = pyqtSignal(str)
+    weather_lowVoltage_signal = pyqtSignal()
+    weather_sensor_lost = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.anemometer = anemometer()
+        self.handleSpeed = None
+        self.handleDir = None
+        self.handleRain = None
+        self.weather = collections.OrderedDict()
         self.rules = collections.OrderedDict()
-        self.reset_wind()
+        self.reset_weather(first=True)
         self.__debug = False
-        self.rules['starttime'] = time.time()
-        self.rules['endtime'] = time.time()
-        self.rules['detected'] = False
-        self.rules['alarm'] = False
-        self.rules['ok_dc'] = False
-        self.rules['beep_state'] = ""
+        self.windDirVoltage = 20.0
+        self.windDir_isPresent = True
+        self.windSpeed_isPresent = True
+        self.rain_isPresent = True
+        self.windDir_enable = ConfigReader.config.conf['enableSensorDir']
+        self.windSpeed_enable = ConfigReader.config.conf['enableSensorSpeed']
+        self.rain_enable = ConfigReader.config.conf['enableSensorRain']
         self.rules['speed_limit_min'] = -1.0
         self.rules['speed_limit_max'] = -1.0
         self.rules['dir_limit'] = -1.0
+        self.rules['wind_dir_voltage_min'] = ConfigReader.config.conf['voltage_min_windDir']
+        self.rules['wind_dir_voltage_alarm'] = alarm.Release
+        self.rules['sensor_voltage_alarm'] = alarm.Release
+        self.rules['sensor_lost_alarm'] = alarm.Release
+        self.rules['state'] = weatherState.init
         self.__rules_enable = False
         self.timeout.connect(self.refresh_gui)
-        self.start(1000)
+        self.start(2000)
+        self.weatherBeep = ConfigReader.config.conf['weather_Beep']
+        self.weatherSound = ConfigReader.config.conf['weather_Sound']
+        self.sensorAlarmTimeOut = ConfigReader.config.conf['SensorAlarmTimeout']
+        self.weatherTimeOutOkDc = ConfigReader.config.conf['weather_TimeOut_OkDC']
+        self.weatherTimeOutMarginalcond = ConfigReader.config.conf['weather_TimeOut_MarginalCond']
+        self.weatherBeepNok = ConfigReader.config.conf['weather_beep_nok']
+        self.weatherBeepOkDc = ConfigReader.config.conf['weather_beep_okDC']
+        self.timerOkDC = QTimer()
+        self.timerMarginal = QTimer()
+        self.timerDir = QTimer()
+        self.timerSpeed = QTimer()
+        self.timerRain = QTimer()
+        self.timerOkDC.timeout.connect(self.slot_okDC)
+        self.timerMarginal.timeout.connect(self.slot_Marginal)
+        self.timerDir.timeout.connect(self.timeoutDir)
+        self.timerSpeed.timeout.connect(self.timeoutSpeed)
+        self.timerRain.timeout.connect(self.timeoutRain)
+        self.setConfig()
+        self.status = "Init"
+
+    def setConfig(self):
+        self.windDir_enable = ConfigReader.config.conf['enableSensorDir']
+        self.windSpeed_enable = ConfigReader.config.conf['enableSensorSpeed']
+        self.rain_enable = ConfigReader.config.conf['enableSensorRain']
+
+        if self.windSpeed_enable:
+            self.handleSpeed = self.windspeed_signal.connect(self.slot_wind_speed)
+            self.timerSpeed.start(self.sensorAlarmTimeOut)
+        else:
+            if self.handleSpeed is not None:
+                self.windspeed_signal.disconnect()
+                self.handleSpeed = None
+                self.timerSpeed.stop()
+
+        if self.windDir_enable:
+            self.handleDir = self.winddir_signal.connect(self.slot_wind_dir)
+            self.timerDir.start(self.sensorAlarmTimeOut)
+        else:
+            if self.handleDir is not None:
+                self.winddir_signal.disconnect()
+                self.handleDir = None
+                self.timerDir.stop()
+        if self.rain_enable:
+            self.handleRain = self.rain_signal.connect(self.rain_info)
+            self.timerRain.start(self.sensorAlarmTimeOut)
+        else:
+            if self.handleRain is not None:
+                self.rain_signal.disconnect()
+                self.handleRain = None
+                self.timerRain.stop()
+        self.rules['wind_dir_voltage_min'] = ConfigReader.config.conf['voltage_min_windDir']
+        self.weatherBeep = ConfigReader.config.conf['weather_Beep']
+        self.weatherSound = ConfigReader.config.conf['weather_Sound']
+        self.sensorAlarmTimeOut = ConfigReader.config.conf['SensorAlarmTimeout']
+        self.weatherTimeOutOkDc = ConfigReader.config.conf['weather_TimeOut_OkDC']
+        self.weatherTimeOutMarginalcond = ConfigReader.config.conf['weather_TimeOut_MarginalCond']
+        self.weatherBeepNok = ConfigReader.config.conf['weather_beep_nok']
+        self.weatherBeepOkDc = ConfigReader.config.conf['weather_beep_okDC']
+
 
     def __checkrules(self):
-        if self.__rules_enable and self.rules['speed_limit_min'] is not -1.0 and \
-                self.rules['speed_limit_max'] is not -1.0 and \
-                self.rules['dir_limit'] is not -1.0:
+        #check voltage alarm
+        if self.rules['sensor_voltage_alarm'] == alarm.Release and self.windDirVoltage <  self.rules['wind_dir_voltage_min']:
+            self.rules['sensor_voltage_alarm'] = alarm.Alarm
+            self.weather_lowVoltage_signal.emit()
             if self.__debug:
-                print("checkrules")
-            if abs(self.wind['orientation']) > self.rules['dir_limit'] or \
-                    self.wind['speed'] < self.rules['speed_limit_min'] or \
-                    self.wind['speed'] > self.rules['speed_limit_max'] or self.rain:
-                if not self.rules['detected']:
-                    self.rules['starttime'] = time.time()
-                    self.rules['detected'] = True
-                    self.rules['alarm'] = False
-                    self.rules['ok_dc'] = False
-                else:
-                    self.rules['endtime'] = time.time()
-                    if (time.time() - self.rules['starttime']) > 20:
-                        self.rules['alarm'] = True
-                        if self.rules['beep_state'] is not "alarm":
-                            self.beep_signal.emit("permanent", -1, 1000)
-                            self.rules['beep_state'] = "alarm_wait"
-                            if self.__debug:
-                                print("weather alarm")
-                    else:
-                        self.beep_signal.emit("blink", 1, 500)
-                        if self.__debug:
-                            print("weather not condition")
-            else:
-                if (time.time() - self.rules['endtime']) > 20 and not self.rules['ok_dc'] and not self.inRun:
-                    if self.rules['beep_state'] is not "ok_dc":
-                        self.beep_signal.emit("blink", 5, 250)
-                        self.rules['beep_state'] = "ok_dc"
-                        self.rules['ok_dc'] = True
-                        if self.__debug:
-                            print("weather ok for DC")
-                else:
-                    self.rules['detected'] = False
-                    self.rules['alarm'] = False
-                    if self.rules['beep_state'] is not "stop":
-                        self.beep_signal.emit("stop", -1, 1000)
-                        self.rules['beep_state'] = "stop"
-                        if self.__debug:
-                            print("stop beep")
-                            
+                print("Weather Sensor voltage alarm")
+        if self.rules['sensor_voltage_alarm'] == alarm.Alarm and self.windDirVoltage > self.rules['wind_dir_voltage_min']+0.2:
+            if self.__debug:
+                print("Weather voltage alarm release")
+            self.rules['sensor_voltage_alarm'] = alarm.Release
+        #check rules speed, orientation, rain
+        if (abs(self.weather['orientation']) > self.rules['dir_limit'] and self.windDir_isPresent or \
+            ((self.weather['speed'] < self.rules['speed_limit_min'] or \
+            self.weather['speed'] > self.rules['speed_limit_max']) and self.windSpeed_isPresent) \
+            or self.weather['rain'] > 0.0 and self.rain_isPresent):
+            self.slot_weatherNotCondition()
+        else:
+            self.slot_weatherCondition()
+
     def enable_rules(self, enable=False):
         self.__rules_enable = enable
-        self.rules['starttime'] = time.time()
-        self.rules['endtime'] = time.time()
-        self.rules['detected'] = False
-        self.rules['alarm'] = False
-        self.rules['ok_dc'] = False
-        self.rules['beep_state'] = ""
-        if not self.__rules_enable:
+        if self.__rules_enable:
+            self.rules['wind_dir_voltage_alarm'] = alarm.Release
+            self.rules['sensor_voltage_alarm'] = alarm.Release
+            self.rules['sensor_lost_alarm'] = alarm.Release
+            #self.rules['state'] = weatherState.init
+        else:
             self.beep_signal.emit("stop", -1, 1000)
-            self.rules['beep_state'] = "stop"
         
     def refresh_gui(self):
-        self.gui_weather_signal.emit(self.wind['speed'], self.wind['unit'], self.wind['orientation'],
-                                     self.rain, self.rules['alarm'])
+        self.gui_weather_signal.emit(self.weather['speed'], self.weather['unit'], self.weather['orientation'],
+                                     self.weather['rain'], self.rules['state']==weatherState.condNok or \
+                                     self.rules['state'] == weatherState.condMarginal, self.status)
+        self.gui_wind_speed_dir_signal.emit(self.weather['speed'], self.weather['unit'], self.windSpeed_isPresent,
+                                            self.weather['orientation'], self.windDirVoltage,
+                                            self.rules['wind_dir_voltage_alarm']==alarm.Alarm,
+                                            self.windDir_isPresent, self.weather['rain'], self.rain_isPresent)
 
     def slot_wind_speed(self, speed, unit):
-        self.wind['speed'] = speed
-        self.wind['unit'] = unit
-        if self.inRun:
-            self.wind['speed_nb'] += 1
-            self.wind['speed_sum'] += speed
-
-            if speed < self.wind['speed_min'] or self.wind['speed_min'] == -1:
-                self.wind['speed_min'] = speed
-            if speed > self.wind['speed_max'] or self.wind['speed_max'] == -1:
-                self.wind['speed_max'] = speed
-
+        self.weather['speed'] = speed
+        self.weather['unit'] = unit
+        self.windSpeed_isPresent = True
+        self.timerSpeed.stop()
+        self.timerSpeed.start(self.sensorAlarmTimeOut)
         self.__checkrules()
-
-    def slot_wind_dir(self, orientation):
-        self.wind['orientation'] = orientation
         if self.inRun:
-            self.wind['orientation_sum'] += orientation
-            self.wind['orientation_nb'] += 1
+            self.weather['speed_nb'] += 1
+            self.weather['speed_sum'] += speed
+
+            if speed < self.weather['speed_min'] or self.weather['speed_min'] == -1:
+                self.weather['speed_min'] = speed
+            if speed > self.weather['speed_max'] or self.weather['speed_max'] == -1:
+                self.weather['speed_max'] = speed
+
+    def slot_wind_dir(self, orientation, voltage):
+        self.weather['orientation'] = orientation
+        self.windDirVoltage = voltage
+        self.windDir_isPresent = True
+        self.timerDir.stop()
+        self.__checkrules()
+        if self.inRun:
+            self.weather['orientation_sum'] += orientation
+            self.weather['orientation_nb'] += 1
+        self.timerDir.start(self.sensorAlarmTimeOut)
 
     def setInRun(self, inRun):
         if inRun:
             self.inRun = True
-            self.wind['speed_sum'] = 0.0
-            self.wind['speed_nb'] = 0.0
-            self.wind['speed_min'] = -1.0
-            self.wind['speed_max'] = -1.0
-            self.wind['orientation_sum'] = 0.0
-            self.wind['orientation_nb'] = 0.0
+            self.weather['speed_sum'] = 0.0
+            self.weather['speed_nb'] = 0.0
+            self.weather['speed_min'] = -1.0
+            self.weather['speed_max'] = -1.0
+            self.weather['orientation_sum'] = 0.0
+            self.weather['orientation_nb'] = 0.0
             self.enable_rules(self.__rules_enable)
             if self.__debug:
                 print("Wind InRun")
@@ -149,25 +240,32 @@ class Weather(QTimer):
                 print("Wind not InRun")
 
     def getMaxWindSpeed(self):
-        return self.wind['speed_max']
+        return self.weather['speed_max']
 
     def getMinWindSpeed(self):
-        return self.wind['speed_min']
+        return self.weather['speed_min']
 
     def getMeanWindSpeed(self):
-        if (self.wind['speed_nb'] != 0):
-            return self.wind['speed_sum'] / self.wind['speed_nb']
+        if (self.weather['speed_nb'] != 0):
+            return self.weather['speed_sum'] / self.weather['speed_nb']
         else:
             return 0
 
     def getWindDir(self):
-        if (self.wind['orientation_nb'] != 0):
-            return self.wind['orientation_sum'] / self.wind['orientation_nb']
+        if (self.weather['orientation_nb'] != 0):
+            return self.weather['orientation_sum'] / self.weather['orientation_nb']
         else:
             return 0
 
     def rain_info(self, rain):
-        self.rain = (rain == True)
+        if rain:
+            self.weather['rain'] = 1.0
+        else:
+            self.weather['rain'] = 0.0
+        self.__checkrules()
+        self.timerRain.stop()
+        self.timerRain.start(self.sensorAlarmTimeOut)
+        self.rain_isPresent = True
 
     def getRain(self):
         return self.rain
@@ -177,16 +275,119 @@ class Weather(QTimer):
         self.rules['speed_limit_max'] = speed_max
         self.rules['dir_limit'] = dir
 
-    def reset_wind(self):
-        self.wind['speed'] = -1.0
-        self.wind['unit'] = "m/s"
-        self.wind['speed_sum'] = 0.0
-        self.wind['speed_nb'] = 0.0
-        self.wind['speed_min'] = -1.0
-        self.wind['speed_max'] = -1.0
-        self.wind['orientation'] = -1.0
-        self.wind['orientation_sum'] = 0.0
-        self.wind['orientation_nb'] = 0.0
-        self.rain = False
+    def set_minVoltageWindDir(self, min):
+        self.rules['wind_dir_voltage_min'] = min
+
+    def reset_weather(self, first=False):
+        if first:
+            self.weather['speed'] = -1.0
+            self.weather['unit'] = "m/s"
+            self.weather['orientation'] = -1.0
+            self.status = "Init"
+
+        self.weather['speed_sum'] = 0.0
+        self.weather['speed_nb'] = 0.0
+        self.weather['speed_min'] = -1.0
+        self.weather['speed_max'] = -1.0
+        self.weather['orientation_sum'] = 0.0
+        self.weather['orientation_nb'] = 0.0
+        self.weather['rain'] = 0.0
         self.inRun = False
+
+
+    def timeoutDir(self):
+        if self.__debug:
+            print("weather timeout orientation")
+        self.weather['orientation'] = -1.0
+        self.timerDir.stop()
+        if self.__rules_enable and (
+                self.windDir_isPresent and self.windDir_enable or not self.windDir_enable) and \
+                (self.rain_isPresent and self.rain_enable or not self.rain_enable) and \
+                (self.windSpeed_isPresent and self.windSpeed_enable or not self.windSpeed_enable):
+            self.weather_sensor_lost.emit()
+        self.windDir_isPresent=False
+
+    def timeoutSpeed(self):
+        if self.__debug:
+            print("weather timeout speed")
+        self.weather['speed'] = -1.0
+        self.timerSpeed.stop()
+        if self.__rules_enable and (
+                self.windDir_isPresent and self.windDir_enable or not self.windDir_enable) and \
+                (self.rain_isPresent and self.rain_enable or not self.rain_enable) and \
+                (self.windSpeed_isPresent and self.windSpeed_enable or not self.windSpeed_enable):
+            self.weather_sensor_lost.emit()
+        self.windSpeed_isPresent=False
+
+    def timeoutRain(self):
+        if self.__debug:
+            print("weather timeout rain")
+        self.weather['rain'] = -1.0
+        self.timerRain.stop()
+        if self.__rules_enable and (
+                self.windDir_isPresent and self.windDir_enable or not self.windDir_enable) and \
+                (self.rain_isPresent and self.rain_enable or not self.rain_enable) and \
+                (self.windSpeed_isPresent and self.windSpeed_enable or not self.windSpeed_enable):
+            self.weather_sensor_lost.emit()
+        self.rain_isPresent = False
+
+    def slot_okDC(self):
+        if self.__debug:
+            print("slot_okDC")
+        self.timerOkDC.stop()
+        self.rules['state'] = weatherState.Nominal
+        self.status = "OKDC"
+        if self.__rules_enable:
+            if self.weatherBeep:
+                self.beep_signal.emit("blink", 5, self.weatherBeepOkDc)
+            if self.weatherSound:
+                self.weather_sound_signal.emit("windok")
+
+    def slot_Marginal(self):
+        if self.__debug:
+            print("slot_marginal")
+        self.timerMarginal.stop()
+        self.rules['state'] = weatherState.condMarginal
+        self.status = "MC"
+        if self.__rules_enable:
+            if self.weatherBeep:
+                self.beep_signal.emit("permanent", -1, 1000)
+            if self.weatherSound:
+                self.weather_sound_signal.emit("windmarginal")
+
+    def slot_weatherCondition(self):
+        if self.__debug:
+            print("slot weather Condition, state : " + str(self.rules['state']))
+        self.timerMarginal.stop()
+
+        if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.condNok:
+            self.rules['state'] = weatherState.Nominal
+            self.status = "OKDC"
+            if self.__rules_enable and self.weatherSound:
+                self.weather_sound_signal.emit("windok")
+        elif self.rules['state'] == weatherState.condMarginal:
+            self.timerOkDC.start(self.weatherTimeOutOkDc)
+            self.rules['state'] = weatherState.Stabilizing
+            self.status = "STAB"
+
+    def slot_weatherNotCondition(self):
+        if self.__debug:
+            print("slot weather Not Condition, state : " + str(self.rules['state']))
+        self.timerOkDC.stop()
+
+        if self.rules['state'] != weatherState.condNok and self.rules['state'] != weatherState.condMarginal and\
+                self.rules['state'] != weatherState.Stabilizing:
+            self.status = "NOK"
+            if self.__rules_enable:
+                if self.weatherBeep:
+                    self.beep_signal.emit("blink", 2, self.weatherBeepNok)
+                if self.weatherSound:
+                    self.weather_sound_signal.emit("windalert")
+
+        if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.Nominal:
+            self.timerMarginal.start(self.weatherTimeOutMarginalcond)
+            self.rules['state'] = weatherState.condNok
+        elif self.rules['state'] == weatherState.Stabilizing:
+            self.slot_Marginal()
+
 

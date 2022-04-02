@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>678</width>
-    <height>250</height>
+    <width>916</width>
+    <height>332</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -21,7 +21,276 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="7" column="4">
+     <widget class="QDoubleSpinBox" name="AccuPicam1">
+      <property name="decimals">
+       <number>1</number>
+      </property>
+      <property name="minimum">
+       <double>9.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>12.600000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.100000000000000</double>
+      </property>
+      <property name="value">
+       <double>11.800000000000001</double>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="3">
+     <widget class="QLabel" name="label_28">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>15</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Accu</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" rowspan="11">
+     <widget class="QListWidget" name="listBaseA">
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="3" colspan="3">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QSpinBox" name="wind_speed">
+      <property name="maximum">
+       <number>30</number>
+      </property>
+      <property name="value">
+       <number>3</number>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="5">
+     <widget class="QCheckBox" name="speedProcessing">
+      <property name="text">
+       <string>Speed</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="3" colspan="3">
+     <widget class="Line" name="line_4">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="4">
+     <widget class="QCheckBox" name="rain">
+      <property name="text">
+       <string>Rain</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="3" colspan="3">
+     <widget class="Line" name="line_3">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="5" rowspan="2">
+     <widget class="QCheckBox" name="picam2Processing">
+      <property name="text">
+       <string>Picam2</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="3">
+     <widget class="QLabel" name="label_26">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>15</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>RSSI</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="3">
+     <widget class="QLabel" name="label_25">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>15</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Accu</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="4">
+     <widget class="QDoubleSpinBox" name="AccuPicam2">
+      <property name="decimals">
+       <number>1</number>
+      </property>
+      <property name="minimum">
+       <double>9.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>12.600000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.100000000000000</double>
+      </property>
+      <property name="value">
+       <double>11.800000000000001</double>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="0">
+     <widget class="QPushButton" name="btn_gpio_A">
+      <property name="text">
+       <string>GPIO Btn</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_3">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Base A</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="4">
+     <widget class="QSpinBox" name="wind_dir">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="minimum">
+       <number>-90</number>
+      </property>
+      <property name="maximum">
+       <number>90</number>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QLabel" name="label_13">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>15</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Dir (°)</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2" rowspan="11">
+     <widget class="QListWidget" name="listWBtn">
+      <property name="minimumSize">
+       <size>
+        <width>300</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QLabel" name="label_5">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Wireless btn</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="5">
+     <widget class="QCheckBox" name="rainProcessing">
+      <property name="text">
+       <string>Rain</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="4">
      <widget class="QSpinBox" name="rssi_picam1">
       <property name="enabled">
        <bool>true</bool>
@@ -37,19 +306,22 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QLabel" name="label_4">
-      <property name="font">
-       <font>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
+    <item row="3" column="4">
+     <widget class="QDoubleSpinBox" name="wind_dirVoltage">
+      <property name="decimals">
+       <number>1</number>
       </property>
-      <property name="text">
-       <string>Base B</string>
+      <property name="minimum">
+       <double>9.000000000000000</double>
       </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+      <property name="maximum">
+       <double>12.600000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.100000000000000</double>
+      </property>
+      <property name="value">
+       <double>11.800000000000001</double>
       </property>
      </widget>
     </item>
@@ -82,8 +354,15 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_3">
+    <item row="7" column="5" rowspan="2">
+     <widget class="QCheckBox" name="picam1Processing">
+      <property name="text">
+       <string>Picam1</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="label_4">
       <property name="font">
        <font>
         <weight>75</weight>
@@ -91,86 +370,14 @@
        </font>
       </property>
       <property name="text">
-       <string>Base A</string>
+       <string>Base B</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
-    <item row="9" column="1">
-     <widget class="QPushButton" name="btn_gpio_B">
-      <property name="text">
-       <string>GPIO Btn</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="3">
-     <widget class="QLabel" name="label_13">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>15</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Dir (°)</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="3">
-     <widget class="QCheckBox" name="rain">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="9" column="0">
-     <widget class="QPushButton" name="btn_gpio_A">
-      <property name="text">
-       <string>GPIO Btn</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="4">
-     <widget class="QLabel" name="label_26">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>15</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>PiCAM1 RSSI</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="9" column="3" colspan="2">
-     <widget class="QPushButton" name="btn_send_Info">
-      <property name="text">
-       <string>Send info</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="4">
+    <item row="11" column="3">
      <widget class="QLabel" name="label_27">
       <property name="font">
        <font>
@@ -179,59 +386,28 @@
        </font>
       </property>
       <property name="text">
-       <string>PICAM2 RSSI</string>
+       <string>RSSI</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
-    <item row="4" column="3">
-     <widget class="QSpinBox" name="wind_dir">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="minimum">
-       <number>-90</number>
-      </property>
-      <property name="maximum">
-       <number>90</number>
+    <item row="4" column="3" colspan="3">
+     <widget class="Line" name="line_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
      </widget>
     </item>
-    <item row="0" column="2">
-     <widget class="QLabel" name="label_5">
-      <property name="font">
-       <font>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
+    <item row="14" column="1">
+     <widget class="QPushButton" name="btn_gpio_B">
       <property name="text">
-       <string>Wireless btn</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <string>GPIO Btn</string>
       </property>
      </widget>
     </item>
-    <item row="5" column="3">
-     <widget class="QLabel" name="label_14">
-      <property name="font">
-       <font>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Rain</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="4">
+    <item row="11" column="4">
      <widget class="QSpinBox" name="rssi_picam2">
       <property name="enabled">
        <bool>true</bool>
@@ -247,37 +423,12 @@
       </property>
      </widget>
     </item>
-    <item row="8" column="3">
-     <widget class="QDoubleSpinBox" name="AccuVoltage">
-      <property name="decimals">
-       <number>1</number>
-      </property>
-      <property name="minimum">
-       <double>9.000000000000000</double>
-      </property>
-      <property name="maximum">
-       <double>12.600000000000000</double>
-      </property>
-      <property name="singleStep">
-       <double>0.100000000000000</double>
-      </property>
-      <property name="value">
-       <double>11.800000000000001</double>
-      </property>
-     </widget>
-    </item>
-    <item row="7" column="3">
-     <widget class="QLabel" name="label_25">
+    <item row="3" column="3">
+     <widget class="QLabel" name="label_15">
       <property name="minimumSize">
        <size>
         <width>0</width>
         <height>15</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>16777215</height>
        </size>
       </property>
       <property name="font">
@@ -287,31 +438,36 @@
        </font>
       </property>
       <property name="text">
-       <string>Accu</string>
+       <string>Dir Accu</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
-    <item row="2" column="3">
-     <widget class="QSpinBox" name="wind_speed">
-      <property name="maximum">
-       <number>30</number>
-      </property>
-      <property name="value">
-       <number>3</number>
+    <item row="2" column="1" rowspan="11">
+     <widget class="QListWidget" name="listBaseB">
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
       </property>
      </widget>
     </item>
-    <item row="2" column="2" rowspan="7">
-     <widget class="QListWidget" name="listWBtn"/>
+    <item row="2" column="5" rowspan="2">
+     <widget class="QCheckBox" name="dirProcessing">
+      <property name="text">
+       <string>Dir</string>
+      </property>
+     </widget>
     </item>
-    <item row="2" column="1" rowspan="7">
-     <widget class="QListWidget" name="listBaseB"/>
-    </item>
-    <item row="2" column="0" rowspan="7">
-     <widget class="QListWidget" name="listBaseA"/>
+    <item row="14" column="3" colspan="3">
+     <widget class="QPushButton" name="btn_send_Info">
+      <property name="text">
+       <string>Send info</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

@@ -32,6 +32,7 @@ from F3FChrono.gui.WChronoBtn_GS_Validate_ui import Ui_WChronoGSEnable
 from F3FChrono.gui.WTrainingBtn_ui import Ui_WTrainingBtn
 from F3FChrono.gui.WConfig_ui import Ui_WConfig
 from F3FChrono.gui.WSettings_ui import Ui_WSettings
+from F3FChrono.gui.WSettingsConnectedDevices_ui import Ui_WSettingsConnectedDevices
 from F3FChrono.gui.WSettingsAdvanced_ui import Ui_WSettingsAdvanced
 from F3FChrono.gui.WSettingsBase_ui import Ui_WSettingsBase
 from F3FChrono.gui.WSettingsBase_item_ui import Ui_WSettingBase_item
@@ -47,6 +48,7 @@ refly_btn_stylesheet = 'background-color:#66ccff;border-radius: 10px;'
 penalty100_btn_stylesheet = 'background-color:#ffd633;border-radius: 10px;'
 penalty1000_btn_stylesheet = 'background-color:#db4dff;border-radius: 10px;'
 clear_penalty_btn_stylesheet = 'background-color:#aaff80;border-radius: 10px;'
+debug = False
 
 class WRoundCtrl(QObject):
     btn_next_sig = pyqtSignal()
@@ -198,10 +200,12 @@ class WTrainingCtrl(QObject):
         self.btn_reset_sig.emit()
 
 
-class WWindCtrl():
+class WWindCtrl(QObject):
     widgetList = []
+    lowVoltage_sig = pyqtSignal()
 
     def __init__(self, name, parent):
+        super().__init__()
         self.view = Ui_WWind()
         self.name = name
         self.parent = parent
@@ -211,8 +215,9 @@ class WWindCtrl():
         self.widgetList.append(self.widget)
         self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
         self.windstylesheet = "background-color:rgba( 255, 255, 255, 0% );"
-        self.lowVoltage_sig = None
         self._translate = QtCore.QCoreApplication.translate
+        self.voltageMinAccu1 = ConfigReader.config.conf['voltage_min_Accu1']
+        self.voltageMinAccu2 = ConfigReader.config.conf['voltage_min_Accu2']
 
     def get_widget(self):
         return (self.widgetList)
@@ -229,10 +234,12 @@ class WWindCtrl():
         self.widget.hide()
 
     def display_wind_info(self, wind_speed, wind_speed_unit,  wind_dir, rain, alarm):
-        if rain:
+        if rain>0.0:
             strrain = self._translate("Rain", "Rain")
-        else:
+        elif rain==0.0:
             strrain = self._translate("No Rain", "No Rain")
+        else:
+            strrain = self._translate("Rain", "Rain") + " : --"
         self.view.WindInfo.setText(self._translate("Wind : ", "Wind : ") + '{:.1f}'.format(wind_speed) +
                                    wind_speed_unit + self._translate(", Angle : ", ", Angle : ") +
                                    str(wind_dir) + '°' + ', ' + strrain)
@@ -260,22 +267,19 @@ class WWindCtrl():
 
     def set_voltage(self, voltage1, voltage2):
         self.view.voltage.setText("{:0>3.1f}V, {:0>3.1f}V".format(voltage1, voltage2))
-        if voltage1 <= ConfigReader.config.conf['voltage_min_Accu1'] and \
-                voltage2 <= ConfigReader.config.conf['voltage_min_Accu2'] and \
+        if voltage1 <= self.voltageMinAccu1 and \
+                voltage2 <= self.voltageMinAccu2 and \
                 self.voltagestylesheet == "background-color:rgba( 255, 255, 255, 0% );":
             self.voltagestylesheet = "background-color:red;"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
-            if self.lowVoltage_sig is not None:
-                self.lowVoltage_sig.emit()
-        elif (voltage1 > ConfigReader.config.conf['voltage_min_Accu1'] or
-              voltage2 > ConfigReader.config.conf['voltage_min_Accu2']) and \
+            self.lowVoltage_sig.emit()
+        elif (voltage1 > self.voltageMinAccu1 or voltage2 > self.voltageMinAccu2) and\
                 self.voltagestylesheet == "background-color:red;":
             self.voltagestylesheet = "background-color:rgba( 255, 255, 255, 0% );"
             self.view.voltage.setStyleSheet(self.voltagestylesheet)
 
-    def set_rssi(self, rssi1, rssi2):
-        self.view.rssi.setText(str(rssi1) + "%, " + str(rssi2) + "%")
-
+    def setLastRoundTime(self):
+        self.view.lastRun.setText(datetime.now().strftime("%H:%M"))
 
 class WPilotCtrl(QObject):
     btn_cancel_flight_sig = pyqtSignal()
@@ -425,7 +429,8 @@ class WChronoCtrl(QTimer):
             self.view.Status.setText(self.statusText[self.current_status]+"  {:d}".format(self.current_lap))
 
     def set_finaltime(self, data_time):
-        print("Widget chrono set final time : ", time.time())
+        if debug:
+            print("Widget chrono set final time : ", time.time())
         self.view.Time_label.setText("{:0.2f}".format(data_time))
 
     def reset_ui(self):
@@ -517,8 +522,8 @@ class WChronoCtrl(QTimer):
         else:
             self.view.nullFlightLabel.setText("")
 
-    def display_wind_info(self, wind_speed, wind_speed_unit,  wind_dir, rain, alarm):
-        self.view.WindInfo.setText('{:.1f}'.format(wind_speed) + wind_speed_unit + ', '+ str(wind_dir) + '°')
+    def display_wind_info(self, wind_speed, wind_speed_unit,  wind_dir, rain, alarm, status):
+        self.view.WindInfo.setText(status + ' ' + '{:.1f}'.format(wind_speed) + wind_speed_unit + ' '+ str(wind_dir) + '°')
 
         if alarm:
             self.view.WindInfo.setStyleSheet('background-color:red;')
@@ -911,11 +916,11 @@ class WSettingsBase(QObject):
 
     def set_data(self):
         self.view.inStartBlackOut.setChecked(ConfigReader.config.conf['inStartBlackOut'])
-        self.view.inStartBlackOut_second.setValue(ConfigReader.config.conf['inStartBlackOut_second'])
+        self.view.inStartBlackOut_second.setValue(ConfigReader.config.conf['inStartBlackOut_msecond']/1000)
 
     def get_data(self):
         ConfigReader.config.conf['inStartBlackOut'] = self.view.inStartBlackOut.isChecked()
-        ConfigReader.config.conf['inStartBlackOut_second'] = self.view.inStartBlackOut_second.value()
+        ConfigReader.config.conf['inStartBlackOut_msecond'] = self.view.inStartBlackOut_second.value()*1000
 
     def set_udp_sig(self, udp, set, clear, invert):
         self.udp_sig = udp
@@ -946,7 +951,8 @@ class WSettingsBase(QObject):
             self.__baseB_release()
 
     def slot_udp(self, address):
-        print(address)
+        if debug:
+            print(address)
         if self.baseInProgress == 'A' and self.__ipNotPresent(self.baseAList, address) \
                 and self.__ipNotPresent(self.baseBList, address):
             self.__addbase_List(self.baseAList, self.view.listWidget_baseA, address, self.deleteItemBaseA,
@@ -1128,10 +1134,12 @@ class WSettingswBtn(QObject):
         self.widget.hide()
 
     def set_data(self):
-        print("Settings wBtn set_data")
+        if debug:
+            print("Settings wBtn set_data")
 
     def get_data(self):
-        print("Settings wBtn get_data")
+        if debug:
+            print("Settings wBtn get_data")
 
     def set_udp_sig(self, udp, set, clear):
         self.udp_sig = udp
@@ -1337,10 +1345,107 @@ class WSettingsSound(QObject):
         ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
         ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value()/100
 
-class WSettings(QObject):
-    btn_settingsadvanced_sig = pyqtSignal()
+class WSettingsWirelessDevices(QObject):
     btn_settingsbase_sig = pyqtSignal()
     btn_settingswBtn_sig = pyqtSignal()
+    btn_AnemometerGetList_sig = pyqtSignal()
+    btn_AnemometerConnect_sig = pyqtSignal(str)
+    btn_settingsback_sig = pyqtSignal()
+    btn_cancel_sig = pyqtSignal()
+    btn_valid_sig = pyqtSignal()
+    wirelessDevicesSelected_sig = pyqtSignal()
+    widgetList = []
+
+    def __init__(self, name, parent):
+        super().__init__()
+        self.view = Ui_WSettingsConnectedDevices()
+        self.name = name
+        self.parent = parent
+        self.widget = QtWidgets.QWidget(parent)
+        self._translate = QtCore.QCoreApplication.translate
+        self.view.setupUi(self.widget)
+        self.widgetList.append(self.widget)
+        self.set_data()
+        self.view.btn_AnemometerConnect.clicked.connect(self.anemometerconnect)
+        self.view.btn_AnemometerGetList.clicked.connect(self.btn_AnemometerGetList_sig.emit)
+        self.view.btn_base_settings.clicked.connect(self.btn_settingsbase_sig.emit)
+        self.view.wbtn_settings.clicked.connect(self.btn_settingswBtn_sig.emit)
+        self.view.btn_back.clicked.connect(self.btn_settingsback_sig.emit)
+        self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
+        self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
+        self.view.checkBox_Display.stateChanged.connect(self.get_data)
+        self.view.checkBox_Dir.stateChanged.connect(self.get_data)
+        self.view.checkBox_Speed.stateChanged.connect(self.get_data)
+        self.view.checkBox_Rain.stateChanged.connect(self.get_data)
+
+        self.view.AnemometerComboBox.clear()
+
+
+    def get_widget(self):
+        return (self.widgetList)
+
+    def show(self):
+        self.widget.show()
+
+    def is_show(self):
+        return self.widget.isVisible()
+
+    def hide(self):
+        self.widget.hide()
+
+    def set_data(self):
+        self.view.checkBox_Display.setChecked(ConfigReader.config.conf['enableDisplay'])
+        self.view.checkBox_Speed.setChecked(ConfigReader.config.conf['enableSensorSpeed'])
+        self.view.checkBox_Dir.setChecked(ConfigReader.config.conf['enableSensorDir'])
+        self.view.checkBox_Rain.setChecked(ConfigReader.config.conf['enableSensorRain'])
+
+    def get_data(self):
+        ConfigReader.config.conf['enableDisplay'] = self.view.checkBox_Display.isChecked()
+        ConfigReader.config.conf['enableSensorSpeed'] = self.view.checkBox_Speed.isChecked()
+        ConfigReader.config.conf['enableSensorDir'] = self.view.checkBox_Dir.isChecked()
+        ConfigReader.config.conf['enableSensorRain'] = self.view.checkBox_Rain.isChecked()
+        self.wirelessDevicesSelected_sig.emit()
+
+    def anemometerSetData(self, datalist):
+        self.view.AnemometerComboBox.clear()
+        for i in datalist:
+            self.view.AnemometerComboBox.addItem(i)
+
+    def anemometerconnect(self):
+        self.btn_AnemometerConnect_sig.emit(self.view.AnemometerComboBox.currentText())
+
+    def weatherStation_display(self, wind_speed, wind_speed_unit, wind_speed_ispresent,
+                               wind_dir, wind_dir_voltage, wind_dir_voltage_alarm, wind_dir_ispresent,
+                               rain, rain_ispresent):
+        if wind_speed_ispresent:
+            self.view.WeatherStation_Speed.setText("Speed : "+"{:0>.1f}".format(wind_speed) + wind_speed_unit)
+            self.view.WeatherStation_Speed.setStyleSheet("background-color:rgba( 255, 255, 255, 0% );")
+        else:
+            self.view.WeatherStation_Speed.setText("Speed : --")
+            self.view.WeatherStation_Speed.setStyleSheet("background-color:red;")
+        if wind_dir_ispresent:
+            self.view.WeatherStation_Dir.setText("Dir : " + "{:0>.1f}".format(wind_dir)+ ", " +
+                                                 "{:0>.1f}".format(wind_dir_voltage)+"V")
+            if wind_dir_voltage_alarm:
+                self.view.WeatherStation_Dir.setStyleSheet("background-color:red;")
+            else:
+                self.view.WeatherStation_Dir.setStyleSheet("background-color:rgba( 255, 255, 255, 0% );")
+        else:
+            self.view.WeatherStation_Dir.setText("Dir : --")
+            self.view.WeatherStation_Dir.setStyleSheet("background-color:red;")
+        if rain_ispresent:
+            if rain > 0.0:
+                self.view.WeatherStation_Rain.setText("rain : Yes")
+            else:
+                self.view.WeatherStation_Rain.setText("rain : No")
+            self.view.WeatherStation_Rain.setStyleSheet("background-color:rgba( 255, 255, 255, 0% );")
+        else:
+            self.view.WeatherStation_Rain.setText("rain : --")
+            self.view.WeatherStation_Rain.setStyleSheet("background-color:red;")
+
+class WSettings(QObject):
+    btn_settingsadvanced_sig = pyqtSignal()
+    btn_settingswDevices_sig = pyqtSignal()
     btn_settingssound_sig = pyqtSignal()
     btn_cancel_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
@@ -1357,8 +1462,7 @@ class WSettings(QObject):
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
         self.view.btn_advanced_settings.clicked.connect(self.btn_settingsadvanced_sig.emit)
-        self.view.btn_base_settings.clicked.connect(self.btn_settingsbase_sig.emit)
-        self.view.wbtn_settings.clicked.connect(self.btn_settingswBtn_sig.emit)
+        self.view.btn_wDevices_settings.clicked.connect(self.btn_settingswDevices_sig.emit)
         self.view.btn_sound_settings.clicked.connect(self.btn_settingssound_sig.emit)
         self.view.webserverUrl.clicked.connect(self.qrCode)
 

@@ -40,3 +40,41 @@ def get_raspi_revision():
 def is_running_on_pi():
     pi = get_raspi_revision()
     return pi['pi'] != ''
+
+def get_ip():
+    import itertools
+    import os
+    import re
+
+
+    ip = []
+    broadcast = []
+    f = os.popen('ifconfig')
+    for iface in [' '.join(i) for i in
+                  iter(lambda: list(itertools.takewhile(lambda l: not l.isspace(), f)), [])]:
+        int = re.findall('^(eth?|wlan?|enp?|wlps?)[0-9]', iface)
+        if int and re.findall('RUNNING', iface):
+            ip.append(re.findall(r'(?<=inet\s)[\d.-]+', iface)[0])
+            broadcast.append(re.findall(r'(?<=broadcast\s)[\d.-]+', iface)[0])
+    return ip, broadcast
+
+def get_ip():
+    import itertools
+    import os
+    import re
+
+
+    ip = []
+    broadcast = []
+    f = os.popen('ifconfig')
+    for iface in [' '.join(i) for i in
+                  iter(lambda: list(itertools.takewhile(lambda l: not l.isspace(), f)), [])]:
+        int = re.findall('^(eth?|wlan?|enp?|wlps?)[0-9]', iface)
+        if int and re.findall('RUNNING', iface):
+            ip.append(re.findall(r'(?<=inet\s)[\d.-]+', iface)[0])
+            broadcast.append(re.findall(r'(?<=broadcast\s)[\d.-]+', iface)[0])
+    index = 0
+    if len(broadcast)>0:
+        if "192.168.1.251" in ip:
+            index = ip.index("192.168.1.251")
+    return ip[index], broadcast[index]

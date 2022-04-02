@@ -44,6 +44,11 @@ default_config = \
     "competition_mode" : False,
     "simulatemode": False,
     "sound": False,
+    "enableDisplay": False,
+    "enableSensorSpeed":False,
+    "enableSensorDir":False,
+    "enableSensorRain":False,
+    "SensorAlarmTimeout":2000,#ms
     "soundvolume" : 1.0,
     "voltage_min_Accu1": 9.9,
     "voltage_min_Accu2": 9.9,
@@ -64,7 +69,8 @@ default_config = \
     "webserver_port": 8000,
     "voltage_coef_Accu1": 0.354,
     "voltage_coef_Accu2": 0.354,
-    "rebound_btn_time": 500, #time in ms
+    "rebound_btnbase_time": 500, #time in ms
+    "rebound_btnnext_time": 200, #time in ms
     "Launch_time": 12000,
     "Launched_time": 12000,
     "language": "English",
@@ -75,7 +81,15 @@ default_config = \
     "noisevolume": 0.005,
     'lowvoltage_sound': False,
     'inStartBlackOut': False,
-    'inStartBlackOut_second': 0.5
+    'inStartBlackOut_msecond': 500,
+    'voltage_min_windDir' : 10.0,
+    'weather_beep_okDC': 250,
+    'weather_beep_nok': 100,
+    "weather_TimeOut_MarginalCond": 20000,
+    "weather_TimeOut_OkDC": 20000,
+    "weather_Sound": False,
+    "weather_Beep": False,
+    "udp_port" : 4445
 }
 
 def init():

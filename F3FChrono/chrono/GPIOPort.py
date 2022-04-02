@@ -63,7 +63,7 @@ class gpioPort(QTimer):
         self.state = False
         self.nbevent = 0
         self.timeout.connect(self.run)
-
+        self.__debug = False
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.port, GPIO.OUT)
 
@@ -108,12 +108,14 @@ class gpioPort(QTimer):
     def __activate(self):
         GPIO.output(self.port, self.activate)
         self.state = True
-        print("gpio__activate")
+        if self.__debug:
+            print("gpio__activate")
         
     def __deactivate(self):
         GPIO.output(self.port, self.deactivate)
         self.state = False
-        print("gpio__deactivate")
+        if self.__debug:
+            print("gpio__deactivate")
 
 
 def event_detected(port):
@@ -136,40 +138,50 @@ class rpi_gpio(QObject):
         self.signal_buzzer_next.connect(self.buzzer_next_fct)
         self.buzzer = None
         self.buzzer_next = None
+        self.configBtnNext = ConfigReader.config.conf['btn_next']
+        self.__debug = True
         if rpi:
             self.buzzer = gpioPort(ConfigReader.config.conf['buzzer'],
                                    duration=ConfigReader.config.conf['buzzer_duration'], start_blinks=2)
             self.buzzer_next = gpioPort(ConfigReader.config.conf['buzzer_next'],
                                         duration=ConfigReader.config.conf['buzzer_next_duration'], start_blinks=2)
             # btn_next callback
-            addCallback(ConfigReader.config.conf['btn_next'], self.btn_next_action, True)
+            addCallback(self.configBtnNext, self.btn_next_action, True)
             self.btnNext_Timer.timeout.connect(self.btn_next_check)
             self.signal_btn_next.connect(self.btn_next_event)
             
 
 
     def buzzer_fct(self, nb):
-        print("buzzer base")
+        if self.__debug:
+            print("buzzer base")
         if self.buzzer is not None:
             self.buzzer.slot_blink("blink", nb)
 
     def buzzer_next_fct(self, nb):
-        print("buzzer next : ", nb)
+        if self.__debug:
+            print("buzzer next : ", nb)
         if self.buzzer_next is not None:
             self.buzzer_next.slot_blink("blink", nb)
 
     def btn_next_action(self, port):
-        if port==ConfigReader.config.conf['btn_next']:
+        if port==self.configBtnNext:
+            if self.__debug:
+                print("gpio btn_next_action")
             self.signal_btn_next.emit()
 
     def btn_next_event(self):
-        GPIO.remove_event_detect(ConfigReader.config.conf['btn_next'])
+        GPIO.remove_event_detect(self.configBtnNext)
         self.btnNext_Timer.start(200)
+        if self.__debug:
+            print("gpio signal btn_next_event")
         
     def btn_next_check(self):
-        if GPIO.input(ConfigReader.config.conf['btn_next']):
-            addCallback(ConfigReader.config.conf['btn_next'], self.btn_next_action, True)
+        if GPIO.input(self.configBtnNext):
+            addCallback(self.configBtnNext, self.btn_next_action, True)
             self.btnNext_Timer.stop()
+            if self.__debug:
+                print("gpio btn_next_check")
 
 if __name__ == '__main__':
     led = gpioPort(19, duration=1000, start_blinks=2)
