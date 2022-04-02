@@ -504,8 +504,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.show_chrono()
             if self.enableConnectedDisplay:
                 if self.__debug:
-                    print(current_round.get_summary_as_json())
-                self.udpsend.sendOrderData(current_round.get_summary_as_json())
+                    print(current_round.get_summary_as_json(self.event.get_current_round()))
+                self.udpsend.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
 
         else:
             self.chronoHard.set_mode(training=True)

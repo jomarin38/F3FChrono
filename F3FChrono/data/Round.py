@@ -452,9 +452,10 @@ class Round:
                         row.append(str(valid_run.chrono.get_lap_time(i)))
                 csv_writer.writerow(row)
 
-    def get_summary_as_json(self):
+    def get_summary_as_json(self, current_round):
         result_dict = {}
         groups = []
+        result_dict['round'] = str(len(current_round.event.valid_rounds) + 1)
         for group in self.groups:
             if group.get_best_run() is not None:
                 group_dict = {'group_number': group.group_number,
