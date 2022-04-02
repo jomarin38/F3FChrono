@@ -56,6 +56,28 @@ class Event:
         self.second_joker_round_number = 15
         self.groups_number = 1
 
+    def export_bibs_as_csv(self, csv_writer):
+        csv_writer.writerow(['id', 'pilot_name', 'bib_number'])
+
+        for competitor in self.competitors.values():
+            row = [str(competitor.get_pilot().get_id()),
+                   competitor.get_pilot().to_string(),
+                   competitor.get_bib_number()]
+            csv_writer.writerow(row)
+
+    def import_bibs(self, csv_file):
+        file_data = csv_file.read().decode("utf-8")
+
+        lines = file_data.split("\n")
+
+        for line in lines[1:]:
+            splitted_line = line.split(',')
+            if len(splitted_line)>=3:
+                pilot_id = int(splitted_line[0].strip('\"'))
+                pilot_bib = int(splitted_line[2].strip('\"'))
+                competitor = self.competitor_from_id(pilot_id)
+                if competitor is not None:
+                    competitor.set_bib_number(pilot_bib)
 
     @staticmethod
     def from_csv(event_name, event_location, begin_date, end_date, csv_file):
@@ -81,6 +103,22 @@ class Event:
                 next_bib_number += 1
 
         return event
+
+    def export_bibs_to_f3xvault(self, f3x_username, f3x_password):
+        """
+        TODO: f3x_vault related stuff should be moved in specific class later
+        :param f3x_username:
+        :param f3x_password:
+        :return:
+        """
+
+        for competitor in self.competitors.values():
+            request_url = 'https://www.f3xvault.com/api.php?login=' + f3x_username + \
+                          '&password=' + f3x_password + \
+                          '&function=updateEventPilot&event_id=' + str(self.f3x_vault_id) + \
+                          '&pilot_id=' + str(competitor.get_pilot().get_f3x_vault_id())  + \
+                          '&event_pilot_bib=' + str(competitor.get_bib_number())
+            requests.post(request_url)
 
     @staticmethod
     def from_f3x_vault(login, password, contest_id, max_rounds=None):
@@ -189,6 +227,12 @@ class Event:
     def competitor_from_f3x_vault_id(self, f3x_vault_id):
         for key, competitor in self.competitors.items():
             if competitor.get_pilot().get_f3x_vault_id() == f3x_vault_id:
+                return competitor
+        return None
+
+    def competitor_from_id(self, id):
+        for key, competitor in self.competitors.items():
+            if competitor.get_pilot().get_id() == id:
                 return competitor
         return None
 

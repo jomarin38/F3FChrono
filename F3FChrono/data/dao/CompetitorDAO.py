@@ -23,7 +23,8 @@ from F3FChrono.data.Pilot import Pilot
 class CompetitorDAO(Dao):
 
     def get_list(self, event):
-        sql = 'SELECT c.pilot_id, c.bib_number, c.team, p.name, p.first_name, c.present ' \
+        sql = 'SELECT c.pilot_id, c.bib_number, c.team, p.name, p.first_name, c.present, ' \
+              'p.f3x_vault_id ,p.fai_id ,p.national_id ' \
               'FROM competitor c ' \
               'LEFT JOIN pilot p ON c.pilot_id=p.pilot_id ' \
               'WHERE event_id=%s'
@@ -32,7 +33,8 @@ class CompetitorDAO(Dao):
         for row in query_result:
             bib_number = row[1]
             team = row[2]
-            pilot = Pilot(row[3], row[4], pilot_id=row[0])
+            pilot = Pilot(row[3], row[4], pilot_id=row[0],
+                          f3x_vault_id=row[6], fai_id=row[7], national_id=row[8])
             present = bool(row[5])
             result[bib_number] = Competitor.register_pilot(event, bib_number, pilot, team, present)
         return result
