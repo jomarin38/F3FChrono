@@ -43,7 +43,7 @@ class anemometer(QObject):
     def __init__(self):
         super().__init__()
         ip, broadcast = get_ip()
-        self.udpSend = udpsend(broadcast, ConfigReader.config.conf['udp_port'])
+        self.udpSend = udpsend(broadcast, ConfigReader.config.conf['udpport'])
 
     def GetList(self):
         self.udpSend.sendData("anemometerGetList")

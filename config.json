@@ -29,7 +29,6 @@
  "sound": true,
  "soundvolume": 0.96,
  "training_speech_interval": 2,
- "udp_port": 4445,
  "udpport": 4445,
  "voice": true,
  "voice_rate": 150,
