@@ -70,7 +70,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.signal_training = None
         self.low_voltage_ask = False
         ip, broadcast = get_ip()
-        self.udpsend = udpsend(broadcast, ConfigReader.config.conf['udp_port'])
+        self.udpsend = udpsend(broadcast, ConfigReader.config.conf['udpport'])
         self.enableConnectedDisplay = ConfigReader.config.conf['enableDisplay']
         self.launch_time = ConfigReader.config.conf['Launch_time']
         self.configSound = ConfigReader.config.conf["sound"]

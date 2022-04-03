@@ -63,6 +63,10 @@ class gpioPort(QTimer):
         self.state = False
         self.nbevent = 0
         self.timeout.connect(self.run)
+        self.buzzer = ConfigReader.config.conf['buzzer']
+        self.buzzerValid = ConfigReader.config.conf['buzzer_valid']
+        self.buzzerNext = ConfigReader.config.conf['buzzer_next']
+        self.buzzerNextValid = ConfigReader.config.conf['buzzer_next_valid']
         self.__debug = False
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.port, GPIO.OUT)
@@ -92,9 +96,8 @@ class gpioPort(QTimer):
                     self.start(duration)
 
     def run(self):
-        if (self.port == ConfigReader.config.conf['buzzer'] and ConfigReader.config.conf['buzzer_valid'] or
-                self.port == ConfigReader.config.conf['buzzer_next'] and
-                ConfigReader.config.conf['buzzer_next_valid']):
+        if (self.port == self.buzzer and self.buzzerValid or
+                self.port == self.buzzerNext and self.buzzerNextValid):
             if self.nbevent > 0 or self.nbevent == -1:
                 if self.state:
                     self.__deactivate()
