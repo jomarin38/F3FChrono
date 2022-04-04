@@ -43,8 +43,8 @@ class udpsend(QObject):
             self.sock=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        except e as error:
-            print("udpsend init error : ", e)
+        except Exception as error:
+            print("udpsend init error : ", error)
 
     def __del__(self):
         del self.sock
@@ -52,25 +52,28 @@ class udpsend(QObject):
     def sendEvent(self):
         try:
             self.sock.sendto(bytes('event', 'utf-8'), (self.udpip, self.port))
-        except e as error:
-            print("udpsendEvent error : ", e)
+        except Exception as error:
+            print("udpsendEvent error : ", error)
 
 
     def sendData(self, data):
         try:
             self.sock.sendto(bytes(data, 'utf-8'), (self.udpip, self.port))
-        except e as error:
-            print("udpsendData error : ", e)
+        except Exception as error:
+            print("udpsendData error : ", error)
 
     def sendOrderData(self, data):
         try:
             self.sock.sendto(bytes((RACEORDERMSG+ ' '+ data), 'utf-8'), (self.udpip, self.port))
-        except e as error:
-            print("udpsendOrderData error : ", e)
+        except Exception as error:
+            print("udpsendOrderData error : ", error)
 
     def terminate(self):
         print('terminated event')
-        self.sock.sendto(bytes('terminated', 'utf-8'), (self.udpip, self.port)) 
+        try:
+            self.sock.sendto(bytes('terminated', 'utf-8'), (self.udpip, self.port))
+        except Exception as error:
+            print("udpsendTerminate error : ", error)
 
 if __name__ == '__main__':
     print ("UDP Beep Debug")
