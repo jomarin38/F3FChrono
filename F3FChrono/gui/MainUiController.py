@@ -438,7 +438,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         if self.enableConnectedDisplay:
             if self.__debug:
                 print(current_round.get_summary_as_json(self.event.get_current_round()))
-            self.udpsend.sendœData(current_round.get_summary_as_json(self.event.get_current_round()))
+            self.udpsend.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
 
 
     def context_valuechanged(self):
