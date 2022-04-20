@@ -455,6 +455,7 @@ class Round:
     def get_summary_as_json(self, current_round):
         result_dict = {}
         groups = []
+        result_dict['weather'] = {"wind" = 0, "orient" = 0}
         result_dict['round'] = str(len(current_round.event.valid_rounds) + 1)
         for group in self.groups:
             if group.get_best_run() is not None:
