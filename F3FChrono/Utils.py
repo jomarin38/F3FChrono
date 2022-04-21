@@ -69,7 +69,7 @@ def get_ip():
     f = os.popen('ifconfig')
     for iface in [' '.join(i) for i in
                   iter(lambda: list(itertools.takewhile(lambda l: not l.isspace(), f)), [])]:
-        int = re.findall('^(eth?|wlan?|enp?|wlps?)[0-9]', iface)
+        int = re.findall('^(eth?|wlan?|wlx?|enp?|wlps?)[0-9]', iface)
         if int and re.findall('RUNNING', iface):
             ip.append(re.findall(r'(?<=inet\s)[\d.-]+', iface)[0])
             broadcast.append(re.findall(r'(?<=broadcast\s)[\d.-]+', iface)[0])
