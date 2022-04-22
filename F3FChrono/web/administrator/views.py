@@ -39,6 +39,8 @@ from F3FChrono.data.Event import Event
 from F3FChrono.data.Pilot import Pilot
 from F3FChrono.data.Round import Round
 
+from F3FChrono.web.administrator.tasks import f3x_vault_export_task
+
 import csv
 
 
@@ -427,18 +429,10 @@ def export_round_f3x_vault(request):
         f3x_username = request.POST["username"]
         f3x_password = request.POST["password"]
 
-        #We must fetch full event to get correct valid round number
-        event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
-        requested_f3f_round = None
-        for f3f_round in event.rounds:
-            if f3f_round.round_number == int(round_number):
-                requested_f3f_round = f3f_round
+        task_id = f3x_vault_export_task.delay(event_id, round_number, f3x_username, f3x_password)
 
-        if requested_f3f_round is not None:
-            requested_f3f_round.export_to_f3x_vault(f3x_username, f3x_password)
-
-    return HttpResponseRedirect('manage_event?event_id=' + event_id)
-
+    return render(request, 'display_progress.html',
+                  {'key': task_id})
 
 def login_to_export_event_f3x_vault(request):
     if not request.user.is_authenticated:

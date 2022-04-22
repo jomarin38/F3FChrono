@@ -22,6 +22,8 @@ from F3FChrono.data.RoundGroup import RoundGroup
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
 from F3FChrono.data.dao.RoundDAO import RoundDAO
+from celery_progress.backend import ProgressRecorder
+
 import requests
 
 
@@ -370,10 +372,15 @@ class Round:
         else:
             f3f_run.penalty += penalty
 
-    def export_to_f3x_vault(self, login, password):
+    def export_to_f3x_vault(self, login, password, progress_recorder=None):
         visited_competitors = []
+        total_operations = len(self.event.competitors)
+        task_counter = 0
+        print('Total operations : ' + str(total_operations))
         for group in self.groups:
             for bib_number, competitor in self.event.competitors.items():
+                import time
+                time.sleep(5)
                 fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
                 valid_run = group.get_valid_run(fetched_competitor)
                 #TODO : compute global penalty for this round
@@ -399,6 +406,9 @@ class Round:
                             request_url +='&order=' + str(order)
                         response = requests.post(request_url)
                     visited_competitors.append(competitor)
+                    if progress_recorder is not None:
+                        progress_recorder.set_progress(task_counter, total_operations)
+                        task_counter += 1
                 else:
                     if competitor not in visited_competitors:
                         #Competitor did not finish its run (or even did not start it !)
@@ -430,6 +440,9 @@ class Round:
                       '&round_number=' + str(self.valid_round_number) + \
                       '&event_round_score_status=' + str(valid_integer_code)
         response = requests.post(request_url)
+
+        if progress_recorder is not None:
+            progress_recorder.set_progress(total_operations, total_operations)
 
     def export_to_csv(self, csv_writer):
         csv_writer.writerow(['bib_number', 'pilot_name', 'pilot_firstname', 'round', 'seconds', 'penalty',
