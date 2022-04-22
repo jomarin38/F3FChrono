@@ -379,8 +379,6 @@ class Round:
         print('Total operations : ' + str(total_operations))
         for group in self.groups:
             for bib_number, competitor in self.event.competitors.items():
-                import time
-                time.sleep(5)
                 fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
                 valid_run = group.get_valid_run(fetched_competitor)
                 #TODO : compute global penalty for this round
