@@ -53,9 +53,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             _translator.load(_path)
             QtWidgets.QApplication.instance().installTranslator(_translator)
 
-        self.vocal = chronoQSound(os.getcwd(), ConfigReader.config.conf['language'],
-                                  ConfigReader.config.conf['sound'], ConfigReader.config.conf['soundvolume'])
-        self.noise = noiseGenerator(ConfigReader.config.conf['noisesound'], ConfigReader.config.conf['noisevolume'])
+        self.vocal = chronoQSound()
 
         self.initUI()
 
@@ -397,8 +395,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         ConfigReader.config.write('config.json')
         self.show_config()
         # self.vocal.settings(ConfigReader.config.conf['sound'])
-        self.noise.settings(ConfigReader.config.conf['noisesound'],
-                            ConfigReader.config.conf['noisevolume'])
+        self.vocal.noise.settings(ConfigReader.config.conf['noisesound'],
+                            ConfigReader.config.conf['noisevolume'],
+                            ConfigReader.config.conf['noisetempo_msecond'])
         self.chronoHard.set_buzzer_time(ConfigReader.config.conf['buzzer_duration'])
         self.enableConnectedDisplay = ConfigReader.config.conf['enableDisplay']
         self.launch_time = ConfigReader.config.conf['Launch_time']
@@ -416,12 +415,10 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.show_config()
         self.set_signal_mode(training=None)
         self.chronoHard.weather.enable_rules(enable=False)
-        self.noise.stop()
 
     def home_training(self):
         self.show_config()
         self.set_signal_mode(training=None)
-        self.noise.stop()
 
     def next_pilot(self, insert_database=False):
         current_round = self.event.get_current_round()
@@ -469,7 +466,6 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
         self.chronoHard.reset()
         self.chronodata.reset()
-        self.noise.start()
 
         eventData = self.controllers['config'].view.ContestList.currentData()
         if eventData is not None:

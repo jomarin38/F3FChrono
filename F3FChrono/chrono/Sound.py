@@ -32,28 +32,50 @@ class specialSound():
         self.num = num
         self.alreadyPlay = already_play
 
-class noiseGenerator(QThread):
+class noiseGenerator():
 
-    def __init__(self, playnoise, volume):
+    def __init__(self):
         super().__init__()
         self.__debug = False
-        pathname = os.path.dirname(os.path.realpath('whitenoise.wav'))
-        self.sound = QSoundEffect()
-        self.sound.setSource(QUrl.fromLocalFile(pathname + '/whitenoise.wav'))
-        if self.__debug:
-            print("source : ", self.sound.source(), "Status : ", self.sound.status())
-        self.sound.setLoopCount(QSoundEffect.Infinite)
-        self.settings(playnoise, volume)
+        try:
+            pathname = os.path.dirname(os.path.realpath('whitenoise.wav'))
+            self.sound = QSoundEffect()
+            self.sound.setSource(QUrl.fromLocalFile(pathname + '/whitenoise.wav'))
+            if self.__debug:
+                print("source : ", self.sound.source(), "Status : ", self.sound.status())
 
-    def settings(self, playnoise, volume):
+            self.startsound = QSoundEffect()
+            self.startsound.setSource(QUrl.fromLocalFile(pathname + '/start.wav'))
+            if self.__debug:
+                print("source : ", self.startsound.source(), "Status : ", self.startsound.status())
+
+            #self.sound.setLoopCount(QSoundEffect.Infinite)
+        except TypeError as e:
+            print("QSoundError : ", e, " status : ", self.status(), " number : ", str(num))
+
+        self.settings(ConfigReader.config.conf['noisesound'], ConfigReader.config.conf['noisevolume'],
+                      ConfigReader.config.conf['noisetempo_msecond'])
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.play)
+        if self.playnoise:
+            self.startsound.play()
+        self.start()
+
+    def settings(self, playnoise, volume, tempo):
         self.playnoise = playnoise
         self.sound.setVolume(volume)
+        self.tempo = tempo
 
-    def run(self):
+
+    def start(self):
+        self.timer.start(self.tempo)
+
+    def play(self):
         if self.playnoise:
             self.sound.play()
 
     def stop(self):
+        self.timer.stop()
         self.sound.stop()
 
 class chronoSound(QSoundEffect):
@@ -91,14 +113,14 @@ class chronoQSound(QThread):
     signal_pilotname = pyqtSignal(int)
 
 
-    def __init__(self, pathname, langage, playsound, volume):
+    def __init__(self):
         super().__init__()
         self._translate = QtCore.QCoreApplication.translate
-        self.pathname = pathname
-        self.langage = langage
+        self.pathname = os.getcwd()
+        self.langage = ConfigReader.config.conf['language']
         self.finaltime_timer = QtCore.QTimer()
         self.finaltime_timer.timeout.connect(self.__final_time)
-        self.play_sound = playsound
+        self.play_sound = ConfigReader.config.conf['sound']
         self.sound_list = []
         self.sound_lowPriority = []
         self.signal_elapsedTime.connect(self.sound_elapsedTime)
@@ -131,11 +153,13 @@ class chronoQSound(QThread):
         self.specialsound['weatherstationsensorslost'] = specialSound(117)
         self.specialsound['tolate'] = specialSound(118)
         self.specialsound['tolate_Entry'] = specialSound(118)
-        self.loadwav(volume)
-        self.volume = volume
+        self.volume = ConfigReader.config.conf['soundvolume']
+        self.loadwav(self.volume)
         self.entry_sound = False
         self.entry_soundToLate = False
         self.toLateSound = False
+
+        self.noise = noiseGenerator()
         self.__debug = False
 
     def loadwav(self, volume):
@@ -292,6 +316,7 @@ class chronoQSound(QThread):
                     self.sound_list.append(self.time[num])
                     if play and len (self.sound_list) == 1:
                         self.sound_list[0].playSound()
+                        self.noise.stop()
 
     def checklowPrioritySound(self):
         if self.chronoStatus == chronoStatus.InWait or self.chronoStatus == chronoStatus.Finished:
@@ -341,6 +366,8 @@ class chronoQSound(QThread):
                 del self.sound_list[0]
                 if len(self.sound_list) > 0:
                     self.sound_list[0].playSound()
+                else:
+                    self.noise.start()
 
     def slot_sound_entry(self):
         if self.specialsound['index_entry'].alreadyPlay:

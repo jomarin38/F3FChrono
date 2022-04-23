@@ -79,6 +79,7 @@ default_config = \
     "training_speech_interval": 2,
     "noisesound": False,
     "noisevolume": 0.005,
+    "noisetempo_msecond": 5000,
     'inStartBlackOut': False,
     'inStartBlackOut_msecond': 500,
     'voltage_min_windDir' : 10.0,
