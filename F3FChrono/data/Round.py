@@ -457,10 +457,12 @@ class Round:
         groups = []
         result_dict['weather'] = {}
         if len(self.groups)>0:
-            result_dict['weather']['wind'] = self.groups[-1].runs[list(self.groups[-1].runs)[-1]][
-                0].chrono.mean_wind_speed
-            result_dict['weather']['orient'] = self.groups[-1].runs[list(self.groups[-1].runs)[-1]][
-                0].chrono.wind_direction
+            runs_list = list(self.groups[-1].runs)
+            if len(runs_list)>0:
+                result_dict['weather']['wind'] = self.groups[-1].runs[runs_list[-1]][
+                    0].chrono.mean_wind_speed
+                result_dict['weather']['orient'] = self.groups[-1].runs[runs_list[-1]][
+                    0].chrono.wind_direction
 
         result_dict['round'] = str(len(current_round.event.valid_rounds) + 1)
         for group in self.groups:
