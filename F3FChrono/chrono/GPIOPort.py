@@ -182,9 +182,8 @@ class rpi_gpio(QObject):
             if self.__debug:
                 print("gpio btn_next_check")
 
-def event_signal():
-    global nb_event
-    print ("test event signal : ", str(nb_event))
+    def event_signal(self):
+        print ("test event signal : ", str(self.nb_event))
 
 
 if __name__ == '__main__':
