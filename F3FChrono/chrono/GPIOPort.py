@@ -120,14 +120,8 @@ class gpioPort(QTimer):
         if self.__debug:
             print("gpio__deactivate")
 
-
 def event_detected(port):
     print("callback " + str(port))
-
-
-def event_detected(port):
-    print("callback " + str(port))
-
 
 class rpi_gpio(QObject):
     signal_buzzer = pyqtSignal(int)
@@ -186,38 +180,20 @@ class rpi_gpio(QObject):
             if self.__debug:
                 print("gpio btn_next_check")
 
+def event_signal():
+    global nb_event
+    print ("test event signal : ", str(nb_event))
+
+
 if __name__ == '__main__':
-    led = gpioPort(19, duration=1000, start_blinks=2)
-    addCallback(12, event_detected, False)
-    addCallback(5, event_detected, False)
-    addCallback(6, event_detected, False)
+    from F3FChrono.Utils import is_running_on_pi
 
-    sleep(10)
+    ConfigReader.init()
+    ConfigReader.config = ConfigReader.Configuration('../../config.json')
+    rpi = rpi_gpio(rpi = is_running_on_pi())
 
-    led.terminated = True
-    led.join()
+    rpi.signal_btn_next.connect(event_signal)
+    while True:
+        sleep(5)
 
-'''    def pressed(value):
-        print("pressed %d" % value)
-
-    #addCallback(2,pressed)
-    statusLED(23,on=True)
-
-    p1=19
-    p2=27
-
-    port1 = gpioPort(p1)
-    port2 = gpioPort(p2, duration=3000)
-    port1.event.set()
-    port2.event.set()
-    sleep(2)
-    port1.event.set()
-    sleep(2)
-    port1.terminated = True
-    port2.terminated = True
-    port1.join()
-    port2.join()
-
-    statusLED(23, on=False)
-    GPIO.cleanup()
-'''
+    del (rpi)
