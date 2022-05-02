@@ -137,6 +137,7 @@ class rpi_gpio(QObject):
         self.buzzer_next = None
         self.configBtnNext = ConfigReader.config.conf['btn_next']
         self.__debug = True
+        self.nb_event = 0
         if rpi:
             self.buzzer = gpioPort(ConfigReader.config.conf['buzzer'],
                                    duration=ConfigReader.config.conf['buzzer_duration'], start_blinks=2)
@@ -164,7 +165,8 @@ class rpi_gpio(QObject):
     def btn_next_action(self, port):
         if port==self.configBtnNext:
             if self.__debug:
-                print("gpio btn_next_action")
+                self.nb_event += 1
+                print("gpio btn_next_action ", str(self.nb_event))
             self.signal_btn_next.emit()
 
     def btn_next_event(self):
