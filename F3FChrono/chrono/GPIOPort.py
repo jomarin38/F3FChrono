@@ -194,7 +194,8 @@ if __name__ == '__main__':
     rpi = rpi_gpio(rpi = is_running_on_pi())
 
     rpi.signal_btn_next.connect(event_signal)
-    while True:
-        sleep(5)
+    app = QCoreApplication(sys.argv)
+    
+    sys.exit(app.exec())
 
     del (rpi)
