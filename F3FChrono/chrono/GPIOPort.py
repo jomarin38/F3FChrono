@@ -187,6 +187,7 @@ class rpi_gpio(QObject):
 
 
 if __name__ == '__main__':
+    import sys
     from F3FChrono.Utils import is_running_on_pi
     from PyQt5.QtCore import pyqtSignal, QObject, QTimer, QThread, QCoreApplication
     
