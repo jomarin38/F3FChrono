@@ -188,7 +188,8 @@ class rpi_gpio(QObject):
 
 if __name__ == '__main__':
     from F3FChrono.Utils import is_running_on_pi
-
+    from PyQt5.QtCore import pyqtSignal, QObject, QTimer, QThread, QCoreApplication
+    
     ConfigReader.init()
     ConfigReader.config = ConfigReader.Configuration('../../config.json')
     rpi = rpi_gpio(rpi = is_running_on_pi())
