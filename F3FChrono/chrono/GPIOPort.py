@@ -147,6 +147,9 @@ class rpi_gpio(QObject):
             # btn_next callback
             addCallback(self.configBtnNext, self.btn_next_action, True)
             self.btnNext_Timer.timeout.connect(self.btn_next_check)
+            self.signal_btn_next.connect(self.btn_next_event)
+
+
 
     def buzzer_fct(self, nb):
         if self.__debug:
@@ -166,9 +169,12 @@ class rpi_gpio(QObject):
                 self.nb_event += 1
                 print("gpio btn_next_action ", str(self.nb_event))
             self.signal_btn_next.emit()
-            self.btnnext_enableEvent = False
-            self.btnNext_Timer.start(200)
 
+    def btn_next_event(self):
+        self.btnnext_enableEvent = False
+        self.btnNext_Timer.start(200)
+        if self.__debug:
+            print("gpio signal btn_next_event")
 
     def btn_next_check(self):
         if GPIO.input(self.configBtnNext):
