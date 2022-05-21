@@ -136,18 +136,20 @@ class rpi_gpio(QObject):
         self.buzzer = None
         self.buzzer_next = None
         self.configBtnNext = ConfigReader.config.conf['btn_next']
+        GPIO.setup(self.configBtnNext, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         self.__debug = True
         self.nb_event = 0
         self.btnnext_enableEvent = True
+        self.btnNext_lastValue = [False, False, False]
         if rpi:
             self.buzzer = gpioPort(ConfigReader.config.conf['buzzer'],
                                    duration=ConfigReader.config.conf['buzzer_duration'], start_blinks=2)
             self.buzzer_next = gpioPort(ConfigReader.config.conf['buzzer_next'],
                                         duration=ConfigReader.config.conf['buzzer_next_duration'], start_blinks=2)
             # btn_next callback
-            addCallback(self.configBtnNext, self.btn_next_action, True)
-            self.btnNext_Timer.timeout.connect(self.btn_next_check)
-            self.signal_btn_next.connect(self.btn_next_event)
+            self.btnNext_Timer.timeout.connect(self.btn_next_action)
+            self.btnNext_Timer.start(400)
+
 
 
 
@@ -163,12 +165,18 @@ class rpi_gpio(QObject):
         if self.buzzer_next is not None:
             self.buzzer_next.slot_blink("blink", nb)
 
-    def btn_next_action(self, port):
-        if port==self.configBtnNext and self.btnnext_enableEvent:
-            if self.__debug:
-                self.nb_event += 1
-                print("gpio btn_next_action ", str(self.nb_event))
-            self.signal_btn_next.emit()
+    def btn_next_action(self):
+        del self.btnNext_lastValue[0]
+        self.btnNext_lastValue[2] = GPIO.input(self.configBtnNext)
+        if self.__debug:
+            print("gpio btn_next_action last value", self.btnNext_lastValue)
+        if self.btnnext_enableEvent:
+            if not self.btnNext_lastValue[0] and not self.btnNext_lastValue[1] and not self.btnNext_lastValue[2]:
+                self.signal_btn_next.emit()
+                self.btnnext_enableEvent = False
+        else:
+            if self.btnNext_lastValue[0] and self.btnNext_lastValue[1] and self.btnNext_lastValue[2]:
+                self.btnnext_enableEvent = True
 
     def btn_next_event(self):
         self.btnnext_enableEvent = False
