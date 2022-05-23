@@ -63,7 +63,7 @@ class rpi_gpio(QObject):
         if self.buzzer_next is not None:
             self.buzzer_next.blink(0.5, 0.5, nb)
             
-    def buzzer_next_slot_blink(self, mode, number, duration=-1):
+    def buzzer_next_slot_blink(self, mode, number, duration=-1):#duration in seconds
         if mode.lower() == "stop":
             self.buzzer_next.off()
         elif mode.lower() == "permanent":
@@ -71,7 +71,7 @@ class rpi_gpio(QObject):
         elif mode.lower() == "blink":
             beeptime = 0.5
             if duration != -1:
-                beeptime = duration
+                beeptime = duration/1000
             self.buzzer_next.blink(beeptime, beeptime, number)
             if (self.__debug):
                 print("buzzer next blink duration:", beeptime)
