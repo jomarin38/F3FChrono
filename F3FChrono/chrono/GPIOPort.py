@@ -73,6 +73,8 @@ class rpi_gpio(QObject):
             if duration != -1:
                 beeptime = duration
             self.buzzer_next.blink(beeptime, beeptime, number)
+            if (self.__debug):
+                print("buzzer next blink duration:", beeptime)
 
     def btnNext_pressed(self):
         if self.__debug:
