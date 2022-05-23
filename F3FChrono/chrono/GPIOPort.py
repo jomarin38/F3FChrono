@@ -20,7 +20,6 @@
 import threading
 from time import sleep
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
-#import RPi.GPIO as GPIO 
 from gpiozero import Button, LED
 from PyQt5.QtCore import QObject, pyqtSignal
 from F3FChrono.chrono import ConfigReader
@@ -32,7 +31,6 @@ class rpi_gpio(QObject):
     signal_buzzer = pyqtSignal(int)
     signal_buzzer_next = pyqtSignal(int)
     signal_btn_next = pyqtSignal()
-    btnNext_Timer = QTimer()
 
     def __init__(self, rpi):
         super().__init__()
@@ -46,8 +44,6 @@ class rpi_gpio(QObject):
             self.btnNext = Button(ConfigReader.config.conf['btn_next'])
             self.buzzer_next = LED(ConfigReader.config.conf['buzzer_next'])
             self.buzzer_next_fct (2)
-            # btn_next callback
-            #self.btnNext_Timer.timeout.connect(self.btn_next_action)
             self.btnNext.when_pressed = self.btnNext_pressed
             self.btnNext.when_released = self.btnNext_released
 
@@ -89,15 +85,6 @@ class rpi_gpio(QObject):
         if self.__debug:
             print("gpio signal btn_next_released")
 
-    def btnNext_check(self):
-        if GPIO.input(self.configBtnNext):
-            self.btnnext_enableEvent = True
-            self.btnNext_Timer.stop()
-            if self.__debug:
-                print("gpio btn_next_check")
-
-    def event_signal(self):
-        print ("test event signal : ", str(self.nb_event))
 
 
 if __name__ == '__main__':
