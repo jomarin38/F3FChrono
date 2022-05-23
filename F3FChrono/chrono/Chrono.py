@@ -166,8 +166,7 @@ class ChronoArduino(ChronoHard, QTimer):
                                      self.climbout,
                                      self.lap_finished, self.run_finished, self.run_training, self.altitude_finished,
                                      self.accu_signal)
-        self.arduino.event_Base('a')
-        self.arduino.event_Base('b')
+        self.arduino.event_Base()
 
         self.status_changed.connect(self.slot_status)
         self.climbout.connect(self.handle_climbout_time)
