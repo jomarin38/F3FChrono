@@ -368,6 +368,7 @@ class Weather(QTimer):
         elif self.rules['state'] == weatherState.condMarginal:
             self.timerOkDC.start(self.weatherTimeOutOkDc)
             self.rules['state'] = weatherState.Stabilizing
+            self.beep_signal.emit("stop", 0)
             self.status = "STAB"
 
     def slot_weatherNotCondition(self):
