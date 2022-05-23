@@ -70,11 +70,6 @@ class rpi_gpio(QObject):
             self.buzzer_next.on()
         elif mode.lower() == "blink":
             self.buzzer_next.blink(0.5, 0.5, number)
-            if self.nbevent > 0:
-                if duration == -1:
-                    self.start(self.duration)
-                elif duration > 0:
-                    self.start(duration)
                     
     def btnNext_pressed(self):
         if self.__debug:
