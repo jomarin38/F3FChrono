@@ -69,8 +69,11 @@ class rpi_gpio(QObject):
         elif mode.lower() == "permanent":
             self.buzzer_next.on()
         elif mode.lower() == "blink":
-            self.buzzer_next.blink(0.5, 0.5, number)
-                    
+            beeptime = 0.5
+            if duration != -1:
+                beeptime = duration
+            self.buzzer_next.blink(beeptime, beeptime, number)
+
     def btnNext_pressed(self):
         if self.__debug:
             print("gpio btnNext_pressed")
