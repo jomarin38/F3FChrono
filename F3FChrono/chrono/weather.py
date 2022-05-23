@@ -152,8 +152,8 @@ class Weather(QTimer):
         self.sensorAlarmTimeOut = ConfigReader.config.conf['SensorAlarmTimeout']
         self.weatherTimeOutOkDc = ConfigReader.config.conf['weather_TimeOut_OkDC']
         self.weatherTimeOutMarginalcond = ConfigReader.config.conf['weather_TimeOut_MarginalCond']
-        self.weatherBeepNok = ConfigReader.config.conf['weather_beep_nok']/100
-        self.weatherBeepOkDc = ConfigReader.config.conf['weather_beep_okDC']/100
+        self.weatherBeepNok = ConfigReader.config.conf['weather_beep_nok']/1000
+        self.weatherBeepOkDc = ConfigReader.config.conf['weather_beep_okDC']/1000
 
 
     def __checkrules(self):
