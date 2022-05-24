@@ -366,7 +366,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.controllers['round'].get_alarm_sig().disconnect(self.slot_weather_alarm)
             if self.rpigpio.buzzer_next is not None:
                 self.chronoHard.weather.beep_signal.emit("stop", 0, 1000)
-                self.chronoHard.weather.beep_signal.disconnect(self.rpigpio.buzzer_next.slot_blink)
+                self.chronoHard.weather.beep_signal.disconnect(self.rpigpio.buzzer_next_slot_blink)
             self.signal_race = None
         if training == True:
             self.chronoHard.run_training.connect(self.controllers['training'].wChronoCtrl.set_time)
@@ -383,7 +383,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.chronoHard.udpReceive.penalty_sig.connect(self.penalty_100)
             self.controllers['round'].get_alarm_sig().connect(self.slot_weather_alarm)
             if self.rpigpio.buzzer_next is not None:
-                self.chronoHard.weather.beep_signal.connect(self.rpigpio.buzzer_next.slot_blink)
+                self.chronoHard.weather.beep_signal.connect(self.rpigpio.buzzer_next_slot_blink)
             self.signal_race = True
 
     def settings_valid(self):
@@ -717,7 +717,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def shutdown_app(self):
         if self.rpigpio.buzzer_next is not None:
-            self.rpigpio.buzzer_next.slot_blink("stop", 0)
+            self.rpigpio.buzzer_next_slot_blink("stop", 0)
         self.chronoHard.stop()
         if self.webserver_process is not None:
             if self.__debug:

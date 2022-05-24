@@ -21,7 +21,8 @@
  "inStartBlackOut_msecond": 500.0,
  "language": "French",
  "noisesound": false,
- "noisevolume": 0.07,
+ "noisetempo_msecond": 3500,
+ "noisevolume": 0.04,
  "rebound_btn_time": 500,
  "run_webserver": true,
  "simulatemode": false,
@@ -40,7 +41,7 @@
  "weather_Sound": true,
  "weather_TimeOut_MarginalCond": 20000,
  "weather_TimeOut_OkDC": 20000,
- "weather_beep_nok": 100,
+ "weather_beep_nok": 150,
  "weather_beep_okDC": 250,
  "webserver_port": 8000
 }
