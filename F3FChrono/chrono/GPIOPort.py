@@ -80,7 +80,7 @@ class rpi_gpio(QObject):
             self.btnnext_enableEvent = False
 
     def btnNext_released(self):
-        self.btnnext_enableEvent = True
+        #self.btnnext_enableEvent = True
         #self.btnNext_Timer.start(200)
         if self.__debug:
             print("gpio signal btn_next_released")
