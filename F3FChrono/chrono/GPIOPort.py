@@ -77,7 +77,7 @@ class rpi_gpio(QObject):
             print("gpio btnNext_pressed")
         if self.btnnext_enableEvent:
             self.signal_btn_next.emit()
-            self.btnnext_enableEvent = False
+            #self.btnnext_enableEvent = False
 
     def btnNext_released(self):
         #self.btnnext_enableEvent = True
