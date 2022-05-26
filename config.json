@@ -20,7 +20,7 @@
  "inStartBlackOut": true,
  "inStartBlackOut_msecond": 500.0,
  "language": "French",
- "noisesound": false,
+ "noisesound": true,
  "noisetempo_msecond": 3500,
  "noisevolume": 0.04,
  "rebound_btn_time": 500,

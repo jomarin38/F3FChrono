@@ -45,7 +45,7 @@ class udpreceive(QThread):
     def __init__(self, udpport, signal_chrono, signal_btnnext, signal_windspeed, signal_winddir, signal_rain, \
                  weatherList_sig, weatherStatus_sig):
         super().__init__()
-        self.__debug = False
+        self.__debug = True
         self.port = udpport
         self.event_chrono = signal_chrono
         self.event_btn_next = signal_btnnext
@@ -137,7 +137,10 @@ class udpreceive(QThread):
                 if m[0] == 'wind_speed':
                     self.event_wind_speed.emit(float(m[1]), str(m[2]))
                 elif m[0] == 'wind_dir':
-                    self.event_wind_dir.emit(float(m[1]), float(m[2]))
+                    try:
+                        self.event_wind_dir.emit(float(m[1]), float(m[3]))
+                    except ValueError:
+                        continue
                 elif m[0] == 'rain':
                     self.event_rain.emit(bool(m[1] == 'True'))
                 elif m[0] == 'wBtn':
