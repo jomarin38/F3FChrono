@@ -41,7 +41,7 @@ class rpi_gpio(QObject):
         self.nb_event = 0
         self.btnnext_enableEvent = True
         if rpi:
-            self.btnNext = Button(ConfigReader.config.conf['btn_next'], bounce_time=0.2)
+            self.btnNext = Button(ConfigReader.config.conf['btn_next'], pull_up = None, bounce_time=0.2)
             self.buzzer_next = LED(ConfigReader.config.conf['buzzer_next'])
             self.buzzer_next_fct (2)
             self.btnNext.when_pressed = self.btnNext_pressed
