@@ -138,7 +138,7 @@ class udpreceive(QThread):
                     self.event_wind_speed.emit(float(m[1]), str(m[2]))
                 elif m[0] == 'wind_dir':
                     try:
-                        self.event_wind_dir.emit(float(m[1]), float(m[3]))
+                        self.event_wind_dir.emit(float(m[1]), float(m[2]))
                     except ValueError:
                         continue
                 elif m[0] == 'rain':

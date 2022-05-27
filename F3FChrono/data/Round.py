@@ -463,8 +463,9 @@ class Round:
                 last_competitor_runs = self.groups[-1].runs[runs_list[-1]]
                 if len(last_competitor_runs)>0:
                     last_run=last_competitor_runs[-1]
-                    result_dict['weather']['wind'] = last_run.chrono.mean_wind_speed
-                    result_dict['weather']['orient'] = last_run.chrono.wind_direction
+                    if last_run.chrono is not None:
+                       result_dict['weather']['wind'] = last_run.chrono.mean_wind_speed
+                       result_dict['weather']['orient'] = last_run.chrono.wind_direction
 
         result_dict['round'] = str(len(current_round.event.valid_rounds) + 1)
         for group in self.groups:
