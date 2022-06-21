@@ -193,7 +193,7 @@ class Weather(QTimer):
         self.gui_wind_speed_dir_signal.emit(self.weather['speed'], self.weather['unit'], self.windSpeed_isPresent,
                                             self.weather['orientation'], self.windDirVoltage,
                                             self.rules['wind_dir_voltage_alarm']==alarm.Alarm,
-                                            self.windDir_isPresent, self.weather['rain'], self.rain_isPresent)
+                                            self.windDir_isPresent, int(self.weather['rain']), self.rain_isPresent)
 
     def slot_wind_speed(self, speed, unit):
         self.weather['speed'] = speed

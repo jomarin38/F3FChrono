@@ -42,9 +42,9 @@ class Event:
         self.competitors = {}
         self.rounds = []
         self.valid_rounds = []
-        self.min_allowed_wind_speed = 3.0
-        self.max_allowed_wind_speed = 25.0
-        self.max_wind_dir_dev = 45.0
+        self.min_allowed_wind_speed = 3
+        self.max_allowed_wind_speed = 25
+        self.max_wind_dir_dev = 45
         self.max_interruption_time = 30 * 60
         self.current_round = None
         self.bib_start = 1
