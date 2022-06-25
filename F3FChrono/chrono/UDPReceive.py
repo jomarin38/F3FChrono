@@ -117,7 +117,7 @@ class udpreceive(QThread):
                 m = data.decode('utf-8').split()
                 if m[0] == 'wind_speed':
                     with open('wind_speed.log', 'a') as f:
-                        f.write(str(address) + ',' + dt + ',' + m[1])
+                        f.write(str(address) + ',' + str(dt) + ',' + m[1])
                 if (m[0] == 'terminated'):
                     self.terminate()
                     break
