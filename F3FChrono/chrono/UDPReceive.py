@@ -114,7 +114,7 @@ class udpreceive(QThread):
                 if self.__debug:
                     print(data, address)
                 dt = time.time()
-                m = re.split(r'\s', data.decode('utf-8'))
+                m = data.decode('utf-8').split()
                 if (m[0] == 'terminated'):
                     self.terminate()
                     break
