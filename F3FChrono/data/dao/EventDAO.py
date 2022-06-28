@@ -48,10 +48,10 @@ class EventDAO(Dao):
             result.end_date = row[2]
             result.location = row[3]
             result.name = row[4]
-            result.min_allowed_wind_speed = row[5]
-            result.max_allowed_wind_speed = row[6]
-            result.max_wind_dir_dev = row[7]
-            result.max_interruption_time = row[8]
+            result.min_allowed_wind_speed = int(row[5])
+            result.max_allowed_wind_speed = int(row[6])
+            result.max_wind_dir_dev = int(row[7])
+            result.max_interruption_time = int(row[8])
             result.bib_start = row[9]
             result.flights_before_refly = row[10]
             result.dayduration = row[11]

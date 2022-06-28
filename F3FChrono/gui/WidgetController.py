@@ -699,7 +699,7 @@ class WConfigCtrl(QObject):
         self.view.RevolValue.setValue(event.flights_before_refly)
         self.view.bib_startslider.setMaximum(event.get_nb_competitors())
         self.view.bib_start.setValue(event.bib_start)
-        self.view.MaxInterruptValue.setValue(event.max_interruption_time / 60)
+        self.view.MaxInterruptValue.setValue(int(event.max_interruption_time / 60))
         self.view.daydurationvalue.setValue(event.dayduration)
         self.view.groups_number_value.setValue(event.groups_number)
 
@@ -757,9 +757,9 @@ class WSettingsAdvanced(QObject):
         self.widget.hide()
 
     def set_data(self):
-        self.view.WeatherSensorLostTimeOut.setValue(ConfigReader.config.conf['SensorAlarmTimeout'] / 1000)
-        self.view.WeatherMC.setValue(ConfigReader.config.conf['weather_TimeOut_MarginalCond'] / 1000)
-        self.view.WeatherOKDC.setValue(ConfigReader.config.conf['weather_TimeOut_OkDC'] / 1000)
+        self.view.WeatherSensorLostTimeOut.setValue(int(ConfigReader.config.conf['SensorAlarmTimeout'] / 1000))
+        self.view.WeatherMC.setValue(int(ConfigReader.config.conf['weather_TimeOut_MarginalCond'] / 1000))
+        self.view.WeatherOKDC.setValue(int(ConfigReader.config.conf['weather_TimeOut_OkDC'] / 1000))
         self.view.WeatherMinVoltage.setValue(ConfigReader.config.conf['voltage_min_windDir'])
         self.view.voltagemin_1.setValue(ConfigReader.config.conf['voltage_min_Accu1'])
         self.view.voltagecoef_1.setValue(ConfigReader.config.conf['voltage_coef_Accu1'])
@@ -1313,27 +1313,27 @@ class WSettingsSound(QObject):
         self.view.soundvolume.setValue(self.view.soundslider.value())
 
     def noisevolume_changed(self):
-        self.view.noiseslider.setValue(self.view.noisevolume.value())
+        self.view.noiseslider.setValue(int(self.view.noisevolume.value()))
 
     def noiseslider_changed(self):
         self.view.noisevolume.setValue(self.view.noiseslider.value())
 
     def set_data(self):
         self.view.sound.setChecked(ConfigReader.config.conf['sound'])
-        self.view.soundvolume.setValue(ConfigReader.config.conf['soundvolume']*100)
+        self.view.soundvolume.setValue(ConfigReader.config.conf['soundvolume'])
         self.view.buzzernext.setChecked(ConfigReader.config.conf['buzzer_next_valid'])
         self.view.noiseSound.setChecked(ConfigReader.config.conf['noisesound'])
-        self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume']*100)
+        self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume'])
         self.view.WeatherStationAlarmBuzzer.setChecked(ConfigReader.config.conf['weather_Beep'])
         self.view.WeatherStationAlarmSound.setChecked(ConfigReader.config.conf['weather_Sound'])
 
 
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
-        ConfigReader.config.conf['soundvolume'] = self.view.soundvolume.value() / 100
+        ConfigReader.config.conf['soundvolume'] = int(self.view.soundvolume.value())
         ConfigReader.config.conf['buzzer_next_valid'] = self.view.buzzernext.isChecked()
         ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
-        ConfigReader.config.conf['noisevolume'] = self.view.noisevolume.value() / 100
+        ConfigReader.config.conf['noisevolume'] = int(self.view.noisevolume.value())
         ConfigReader.config.conf['weather_Beep'] = self.view.WeatherStationAlarmBuzzer.isChecked()
         ConfigReader.config.conf['weather_Sound'] = self.view.WeatherStationAlarmSound.isChecked()
 
