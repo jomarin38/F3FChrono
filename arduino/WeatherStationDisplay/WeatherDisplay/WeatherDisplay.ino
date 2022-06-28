@@ -63,7 +63,9 @@ char dir_str[6];
 
 float current_speed = 0.0;
 float current_dir = 0.0;
+long  last_reception_time = 0;
 
+int timeout_delay = 10000;
 
 
 void setup() {
@@ -115,6 +117,7 @@ void recvWithEndMarker() {
             receivedChars[ndx] = '\0'; // terminate the string
             ndx = 0;
             newData = true;
+            last_reception_time = millis();
         }
     }
 }
@@ -146,6 +149,11 @@ void parseData() {
     }
     else {
       newData=false;
+      if ((millis() - last_reception_time)>timeout_delay) {
+        sprintf(screen_buffer, "Waiting for data ...");
+        Display_2x16(ON, screen_buffer);
+        delay(1500);
+      }
     }
 }
 
@@ -153,20 +161,25 @@ float getReceivedValue() {
     String s = "";
     bool parsing_completed = false;
     bool searching = true;
+    bool waiting_for_data = true;
     int i = 0;
     while(!parsing_completed) {
       char current_char = receivedChars[i];
       if (searching) {
         if (current_char==' ') {
           searching=false;
+          waiting_for_data=true;
         }
       }
       else {
         if (current_char!=' ') {
           s+=current_char;
+          waiting_for_data = false;
         }
         else {
-          parsing_completed = true;
+          if (!(waiting_for_data)) {
+            parsing_completed = true;
+          }
         }
       }
 
