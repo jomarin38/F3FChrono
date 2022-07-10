@@ -37,9 +37,10 @@ class noiseGenerator(QThread):
     def __init__(self, playnoise, volume):
         super().__init__()
         self.__debug = False
-        pathname = os.path.dirname(os.path.realpath('whitenoise.wav'))
+        noiseFile = ConfigReader.config.conf['noisefile']
+        pathname = os.path.dirname(os.path.realpath(noiseFile))
         self.sound = QSoundEffect()
-        self.sound.setSource(QUrl.fromLocalFile(pathname + '/whitenoise.wav'))
+        self.sound.setSource(QUrl.fromLocalFile(pathname + '/' + noiseFile))
         if self.__debug:
             print("source : ", self.sound.source(), "Status : ", self.sound.status())
         self.sound.setLoopCount(QSoundEffect.Infinite)
