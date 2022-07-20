@@ -52,7 +52,7 @@ class anemometer(QObject):
         self.udpSend.sendData("anemometerConnect " + index)
 
 class Weather(QTimer):
-    #parameters : value, unity
+    #parameters : value, unit
     windspeed_signal = pyqtSignal(float, str)
     #parameters : direction, accu voltage
     winddir_signal = pyqtSignal(float, float)
