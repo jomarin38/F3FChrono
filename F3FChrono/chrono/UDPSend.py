@@ -50,30 +50,34 @@ class udpsend(QObject):
         del self.sock
 
     def sendEvent(self):
-        try:
-            self.sock.sendto(bytes('event', 'utf-8'), (self.udpip, self.port))
-        except Exception as error:
-            print("udpsendEvent error : ", error)
+        if self.udpip is not None:
+            try:
+                self.sock.sendto(bytes('event', 'utf-8'), (self.udpip, self.port))
+            except Exception as error:
+                print("udpsendEvent error : ", error)
 
 
     def sendData(self, data):
-        try:
-            self.sock.sendto(bytes(data, 'utf-8'), (self.udpip, self.port))
-        except Exception as error:
-            print("udpsendData error : ", error)
+        if self.udpip is not None:
+            try:
+                self.sock.sendto(bytes(data, 'utf-8'), (self.udpip, self.port))
+            except Exception as error:
+                print("udpsendData error : ", error)
 
     def sendOrderData(self, data):
-        try:
-            self.sock.sendto(bytes((RACEORDERMSG+ ' '+ data), 'utf-8'), (self.udpip, self.port))
-        except Exception as error:
-            print("udpsendOrderData error : ", error)
+        if self.udpip is not None:
+            try:
+                self.sock.sendto(bytes((RACEORDERMSG+ ' '+ data), 'utf-8'), (self.udpip, self.port))
+            except Exception as error:
+                print("udpsendOrderData error : ", error)
 
     def terminate(self):
         print('terminated event')
-        try:
-            self.sock.sendto(bytes('terminated', 'utf-8'), (self.udpip, self.port))
-        except Exception as error:
-            print("udpsendTerminate error : ", error)
+        if self.udpip is not None:
+            try:
+                self.sock.sendto(bytes('terminated', 'utf-8'), (self.udpip, self.port))
+            except Exception as error:
+                print("udpsendTerminate error : ", error)
 
 if __name__ == '__main__':
     print ("UDP Beep Debug")
