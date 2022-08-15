@@ -7,19 +7,25 @@
 #define WIFI_PASS "F3FPassword"
 #define UDP_PORT 4210
 
-int nDetections =0;
-unsigned long lastDetectionTime;
-unsigned long currentTime;
-float period= 0;
-float freq =0;
-bool flag = false;
-int bufferSize = 3;
-float windSpeed = 0.0;
+#define BUFFER_SIZE 5 
 
 #define batProtectionVoltage 9.6
 
 #define R3 3640.0
 #define R4 1000.0
+
+volatile unsigned long nDetections = 0;
+
+unsigned long nDetections_copy= 0;
+unsigned long dt = 0;
+float period;
+float freq =0;
+float windSpeed = 0.0;
+
+const long interval = 1000;
+unsigned long previousMillis = 0;  
+
+
 
 //UDP
 WiFiUDP udp;
@@ -61,39 +67,42 @@ void setup() {
 
 void loop() {
 
-  // read the input on analog pin 0:
-  int sensorValue = analogRead(A0);
-  // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 3.2V):
-  float voltage = sensorValue * (3.2 / 1023.0);
+  unsigned long currentMillis = millis();
+  dt = currentMillis - previousMillis;
 
-  float batVoltage = (R3+R4)/R4 * voltage;
+  if (dt >= interval) {
 
-  // put your main code here, to run repeatedly:
-  if (flag)
-  {
-    freq = 1000.0/period/3.0;
-    flag = false;
-    lastDetectionTime = millis();
-    windSpeed = 2.4 * freq * 0.277778;
+    noInterrupts();
+    nDetections_copy = nDetections;
+    nDetections = 0;
+    interrupts();
+
+    previousMillis = millis();
+
+    // read the input on analog pin 0:
+    int sensorValue = analogRead(A0);
+    // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 3.2V):
+    float voltage = sensorValue * (3.2 / 1023.0);
+  
+    float batVoltage = (R3+R4)/R4 * voltage;
+  
+    // put your main code here, to run repeatedly:
+    if (nDetections_copy>0) {
+      period = float(dt)/float(nDetections_copy);
+      freq = 1000.0/period/3.0;
+      windSpeed = 2.4 * freq * 0.277778;
+    }
+    else {
+      windSpeed = 0.0;
+    }
     sendUDP(windSpeed, batVoltage);
+    
   }
-  else {
-    sendUDP(0.0, batVoltage);
-  }
-  delay(1000);
 }
 
 ICACHE_RAM_ATTR void anemo(void)
 {
  nDetections++;
- if (nDetections>= bufferSize)
- {
- currentTime = millis();
- period = float(currentTime-lastDetectionTime)/float(nDetections);
- lastDetectionTime = currentTime;
- flag = true;
- nDetections=0;
- }
 }
 
 void sendUDP(float wind_speed, float batVoltage) {
