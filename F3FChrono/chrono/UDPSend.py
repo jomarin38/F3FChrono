@@ -72,6 +72,7 @@ class udpsend(QObject):
                 self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
                 self.sock.sendto(bytes((RACEORDERMSG+ ' '+ data), 'utf-8'), (self.udpip, self.port))
+                print(self.udpip + ' , ' + str(self.port))
                 self.sock.close()
             except Exception as error:
                 print("udpsendOrderData error : ", error)
