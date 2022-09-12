@@ -47,7 +47,7 @@ class noiseGenerator(QThread):
 
     def settings(self, playnoise, volume):
         self.playnoise = playnoise
-        self.sound.setVolume(volume)
+        self.sound.setVolume(volume/100)
 
     def run(self):
         if self.playnoise:
