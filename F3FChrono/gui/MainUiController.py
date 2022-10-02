@@ -126,6 +126,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['config'].btn_shutdown_sig.connect(self.shutdown_rpi)
         self.controllers['round'].btn_next_sig.connect(self.next_action)
         self.controllers['round'].btn_home_sig.connect(self.home_action)
+        self.controllers['round'].btn_home_sig.connect(self.slot_contestRunning)
         self.controllers['round'].cancel_round_sig.connect(self.cancel_round)
         self.controllers['round'].wChronoCtrl.btn_penalty_100_sig.connect(self.penalty_100)
         self.controllers['round'].wChronoCtrl.btn_penalty_1000_sig.connect(self.penalty_1000)
@@ -442,7 +443,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             if self.__debug:
                 print(current_round.get_summary_as_json(self.event.get_current_round()))
             #self.udpsend.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
-            self.tcp.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
+            self.tcp.orderDataSig.emit(current_round.get_summary_as_json(self.event.get_current_round()))
 
 
     def context_valuechanged(self):
@@ -510,7 +511,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
                 if self.__debug:
                     print(current_round.get_summary_as_json(self.event.get_current_round()))
                 #self.udpsend.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
-                self.tcp.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
+                self.tcp.orderDataSig.emit(current_round.get_summary_as_json(self.event.get_current_round()))
 
 
         else:
@@ -694,13 +695,13 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['wind'].setLastRoundTime()
 
     def slot_contestRunning(self):
-        print("slot contest Running")
-        self.tcp.contestInRun(self.controllers['round'].is_show())
+        print("slot contest Running : ", str(self.controllers['round'].is_show()))
+        self.tcp.contestInRunSig.emit(self.controllers['round'].is_show())
 
     def slotPilotListRequest(self):
         print("PilotList Request")
         current_round = self.event.get_current_round()
-        self.tcp.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
+        self.tcp.orderDataSig.emit(current_round.get_summary_as_json(self.event.get_current_round()))
 
     @staticmethod
     def chronoHard_to_chrono(chronoHard, chrono):

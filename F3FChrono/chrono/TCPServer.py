@@ -30,7 +30,7 @@ tcpPort = 10000
 F3FDisplayList = list()
 
 
-class tcpF3FDisplayWorker(QObject):
+class tcpF3FDisplayWorker(QThread):
     finished = pyqtSignal()
     status = displayStatus.Init
 
@@ -39,17 +39,26 @@ class tcpF3FDisplayWorker(QObject):
         self.contestRunningSig = None
         self.pilotRequestSig = None
 
-    def setConnectionhandle(self, connection):
+    def setConnectionhandle(self, connection, display):
         self.connection = connection
+        self.displayHandle = display
 
     def setSignal(self, contestRunning, pilotReqSig):
         self.contestRunningSig = contestRunning
         self.pilotRequestSig = pilotReqSig
 
+
+    def slot_contestInRun(self, status):
+        print("tcp F3FDisplay Thread slot_contestInRun")
+        self.connection.sendall(bytes("ContestRunning? " + str(status), "utf-8"))
+
+    def slot_orderData(self, data):
+        self.connection.sendall(bytes("ContestData " + str(data), "utf-8"))
     def run(self):
         print("display worker running")
         while self.status != displayStatus.Close and self.connection is not None:
             if self.status == displayStatus.Init:
+                print("display status init")
                 try:
                     self.connection.sendall(bytes("F3FDisplayServerStarted", "utf-8"))
                 except socket.error as e:
@@ -57,25 +66,41 @@ class tcpF3FDisplayWorker(QObject):
                 self.status = displayStatus.InProgress
             else:
                 try:
-                    data = str(self.connection.recv(1024), "utf-8")
+                    data = self.connection.recv(1024)
                 except socket.error as e:
                     print(str(e))
-                if data == "ContestRunning?":
-                    print("ContestRunning?")
-                    if self.contestRunningSig is not None:
-                        self.contestRunningSig.emit()
-                elif data == "getPilotList":
-                    print("getPilotList Request")
-                    if self.pilotRequestSig is not None:
-                        self.pilotRequestSig.emit()
+                if data == b'':
+                    try:
+                        self.connection.sendall(bytes("Test", "utf-8"))
+                    except socket.error as e:
+                        print(str(e))
+                        self.connection.close()
+                        self.status = displayStatus.Close
+                        F3FDisplayList.remove((self.connection, self.displayHandle))
+                else:
+                    self.datareceived(data)
 
         self.finished.emit()
-
+        del self.displayHandle
+    def datareceived(self, data):
+        m = data.decode("utf-8").split()
+        if m[0] == "ContestRunning?":
+            print("ContestRunning?")
+            if self.contestRunningSig is not None:
+                self.contestRunningSig.emit()
+        elif m[0] == "getPilotList":
+            print("getPilotList Request")
+            if self.pilotRequestSig is not None:
+                self.pilotRequestSig.emit()
+        else:
+            print(data)
 
 
 class tcpServer(QThread):
     contestRunning = pyqtSignal()
+    contestInRunSig = pyqtSignal(bool)
     pilotRequestSig = pyqtSignal()
+    orderDataSig = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -83,6 +108,8 @@ class tcpServer(QThread):
         self.connection = None
         self.client_address = None
         self.port = tcpPort
+        self.contestInRunSig.connect(self.slot_contestInRun)
+        self.orderDataSig.connect(self.slot_orderData)
         self.ServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.ServerSocket.bind((str(socket.INADDR_ANY), self.port))
@@ -92,13 +119,13 @@ class tcpServer(QThread):
             print(f'Server is listing on the port {self.port}...')
         self.start()
 
-    def contestInRun(self, status):
-        if len(F3FDisplayList)>0:
-            F3FDisplayList[-1][0].sendall(bytes("ContestRunning? "+str(status),"utf-8"))
+    def slot_contestInRun(self, status):
+        for i in F3FDisplayList:
+            i[1].slot_contestInRun(status)
 
-    def sendOrderData(self, data):
-        if len(F3FDisplayList)>0:
-            F3FDisplayList[-1][0].sendall(bytes("ContestData " + str(data), "utf-8"))
+    def slot_orderData(self, data):
+        for i in F3FDisplayList:
+            i[1].slot_orderData(data)
 
     def run(self):
         while not self.isFinished():
@@ -114,20 +141,20 @@ class tcpServer(QThread):
                     print(f'{self.client_address}-data received : {data}')
 
                 if data == "F3FDisplay":
-                    threadHandle = QThread()
                     displayHandle = tcpF3FDisplayWorker()
                     displayHandle.init()
-                    F3FDisplayList.append((self.connection, threadHandle, displayHandle))
-                    displayHandle.moveToThread(threadHandle)
-                    threadHandle.started.connect(displayHandle.run)
-                    displayHandle.finished.connect(threadHandle.quit)
+                    F3FDisplayList.append((self.connection, displayHandle))
+
+
+                    displayHandle.finished.connect(displayHandle.quit)
                     displayHandle.finished.connect(displayHandle.deleteLater)
-                    threadHandle.finished.connect(threadHandle.deleteLater)
-                    displayHandle.setConnectionhandle(self.connection)
+                    displayHandle.setConnectionhandle(self.connection, displayHandle)
                     displayHandle.setSignal(self.contestRunning, self.pilotRequestSig)
-                    threadHandle.start()
+                    displayHandle.start()
+                    print("F3FDisplay tcp client thread start")
             except socket.error as e:
-                print(str(e))
-            if self.__debug:
-                print(f'Connection address {self.client_address}')
+                print("tcp server run error:" + str(e))
+
         self.ServerSocket.close()
+
+
