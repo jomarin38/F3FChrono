@@ -28,6 +28,7 @@ from F3FChrono.chrono.GPIOPort import rpi_gpio
 from F3FChrono.chrono.UDPSend import *
 from F3FChrono.data.web.Utils import Utils
 from F3FChrono.Utils import get_ip
+from F3FChrono.chrono.TCPServer import tcpServer
 import os
 
 
@@ -76,7 +77,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.configSound = ConfigReader.config.conf["sound"]
         self.chronoHard.weather.set_rules_limit(self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,
                                                 self.event.max_wind_dir_dev)
-
+        self.tcp = tcpServer()
+        self.tcp.contestRunning.connect(self.slot_contestRunning)
+        self.tcp.pilotRequestSig.connect(self.slotPilotListRequest)
     def initUI(self, ):
         self.MainWindow = QtWidgets.QMainWindow()
         self.MainWindow.closeEvent = self.closeEvent
@@ -438,7 +441,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         if self.enableConnectedDisplay:
             if self.__debug:
                 print(current_round.get_summary_as_json(self.event.get_current_round()))
-            self.udpsend.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
+            #self.udpsend.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
+            self.tcp.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
 
 
     def context_valuechanged(self):
@@ -505,7 +509,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             if self.enableConnectedDisplay:
                 if self.__debug:
                     print(current_round.get_summary_as_json(self.event.get_current_round()))
-                self.udpsend.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
+                #self.udpsend.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
+                self.tcp.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
+
 
         else:
             self.chronoHard.set_mode(training=True)
@@ -686,6 +692,15 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.settime(self.launch_time, False, False)
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['wind'].setLastRoundTime()
+
+    def slot_contestRunning(self):
+        print("slot contest Running")
+        self.tcp.contestInRun(self.controllers['round'].is_show())
+
+    def slotPilotListRequest(self):
+        print("PilotList Request")
+        current_round = self.event.get_current_round()
+        self.tcp.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
 
     @staticmethod
     def chronoHard_to_chrono(chronoHard, chrono):
