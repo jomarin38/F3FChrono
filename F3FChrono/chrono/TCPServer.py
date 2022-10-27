@@ -25,6 +25,9 @@ class displayStatus():
     InProgress = 1
     Close = 4
 
+class serverStatus():
+    Init = 0
+    InProgress = 1
 
 tcpPort = 10000
 F3FDisplayList = list()
@@ -110,13 +113,8 @@ class tcpServer(QThread):
         self.port = tcpPort
         self.contestInRunSig.connect(self.slot_contestInRun)
         self.orderDataSig.connect(self.slot_orderData)
-        self.ServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            self.ServerSocket.bind((str(socket.INADDR_ANY), self.port))
-        except socket.error as e:
-            print(str(e))
-        if self.__debug:
-            print(f'Server is listing on the port {self.port}...')
+        self.ServerSocket = None
+        self.status = serverStatus.Init
         self.start()
 
     def slot_contestInRun(self, status):
@@ -129,31 +127,47 @@ class tcpServer(QThread):
 
     def run(self):
         while not self.isFinished():
-            self.ServerSocket.listen(1)
-            try:
-                self.connection, self.client_address = self.ServerSocket.accept()
-                data = ''
+            if self.status == serverStatus.Init:
                 try:
-                    data = str(self.connection.recv(1024), "utf-8")
+                    self.ServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    self.ServerSocket.bind((str(socket.INADDR_ANY), self.port))
                 except socket.error as e:
                     print(str(e))
-                if self.__debug:
-                    print(f'{self.client_address}-data received : {data}')
+                    del self.ServerSocket
+                    self.ServerSocket = None
+                else:
+                    self.status = serverStatus.InProgress
+                    if self.__debug:
+                        print(f'Server is listing on the port {self.port}...')
+            elif self.status == serverStatus.InProgress:
+                try:
+                    self.ServerSocket.listen(1)
+                    self.connection, self.client_address = self.ServerSocket.accept()
+                    data = ''
+                    try:
+                        data = str(self.connection.recv(1024), "utf-8")
+                    except socket.error as e:
+                        print(str(e))
+                    if self.__debug:
+                        print(f'{self.client_address}-data received : {data}')
 
-                if data == "F3FDisplay":
-                    displayHandle = tcpF3FDisplayWorker()
-                    displayHandle.init()
-                    F3FDisplayList.append((self.connection, displayHandle))
+                    if data == "F3FDisplay":
+                        displayHandle = tcpF3FDisplayWorker()
+                        displayHandle.init()
+                        F3FDisplayList.append((self.connection, displayHandle))
 
 
-                    displayHandle.finished.connect(displayHandle.quit)
-                    displayHandle.finished.connect(displayHandle.deleteLater)
-                    displayHandle.setConnectionhandle(self.connection, displayHandle)
-                    displayHandle.setSignal(self.contestRunning, self.pilotRequestSig)
-                    displayHandle.start()
-                    print("F3FDisplay tcp client thread start")
-            except socket.error as e:
-                print("tcp server run error:" + str(e))
+                        displayHandle.finished.connect(displayHandle.quit)
+                        displayHandle.finished.connect(displayHandle.deleteLater)
+                        displayHandle.setConnectionhandle(self.connection, displayHandle)
+                        displayHandle.setSignal(self.contestRunning, self.pilotRequestSig)
+                        displayHandle.start()
+                        print("F3FDisplay tcp client thread start")
+                except socket.error as e:
+                    del self.ServerSocket
+                    self.ServerSocket = None
+                    self.status = serverStatus.Init
+                    print("tcp server run error:" + str(e))
 
         self.ServerSocket.close()
 
