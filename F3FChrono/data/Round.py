@@ -455,7 +455,7 @@ class Round:
     def get_summary_as_json(self, current_round):
         result_dict = {}
         groups = []
-        result_dict['weather'] = {}
+        result_dict['w'] = {}
         if len(self.groups)>0:
             last_group = self.groups[-1]
             runs_list = list(last_group.runs)
@@ -464,22 +464,22 @@ class Round:
                 if len(last_competitor_runs)>0:
                     last_run=last_competitor_runs[-1]
                     if last_run.chrono is not None:
-                        result_dict['weather']['wind'] = last_run.chrono.mean_wind_speed
-                        result_dict['weather']['orient'] = last_run.chrono.wind_direction
+                        result_dict['w']['s'] = last_run.chrono.mean_wind_speed
+                        result_dict['w']['dir'] = last_run.chrono.wind_direction
 
         result_dict['round'] = str(len(current_round.event.valid_rounds) + 1)
         for group in self.groups:
             if group.get_best_run() is not None:
-                group_dict = {'group_number': group.group_number,
-                              'best_run': group.get_best_run().to_string()}
+                group_dict = {'gp': group.group_number,
+                              'run': group.get_best_run().to_string()}
             else:
-                group_dict = {'group_number': group.group_number}
+                group_dict = {'gp': group.group_number}
             groups.append(group_dict)
-        result_dict['best_runs'] = groups
+        result_dict['best'] = groups
         remaining_pilots = []
         for bib_number in self.get_remaining_bibs_to_fly():
-            pilot_dict = {'bib_number': bib_number,
-                          'pilot_name': self.event.competitors[bib_number].display_name()}
+            pilot_dict = {'bib': bib_number,
+                          'pil': self.event.competitors[bib_number].display_name()}
             remaining_pilots.append(pilot_dict)
-        result_dict['remaining_pilots'] = remaining_pilots
+        result_dict['remain'] = remaining_pilots[:12]
         return json.dumps(result_dict)
