@@ -17,7 +17,7 @@
  "enableSensorRain": false,
  "enableSensorSpeed": true,
  "fullscreen": true,
- "inStartBlackOut": true,
+ "inStartBlackOut": false,
  "inStartBlackOut_msecond": 500.0,
  "language": "French",
  "noisesound": false,
