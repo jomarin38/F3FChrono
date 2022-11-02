@@ -80,6 +80,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.tcp = tcpServer()
         self.tcp.contestRunning.connect(self.slot_contestRunning)
         self.tcp.pilotRequestSig.connect(self.slotPilotListRequest)
+        if ConfigReader.config.conf['inStartBlackOut'] and ConfigReader.config.conf['competition_mode']:
+            ConfigReader.config.conf['inStartBlackOut'] = False
     def initUI(self, ):
         self.MainWindow = QtWidgets.QMainWindow()
         self.MainWindow.closeEvent = self.closeEvent
@@ -398,6 +400,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingsbase'].btn_valid()
         self.controllers['settingswBtn'].get_data()
         self.controllers['settingswBtn'].btn_valid()
+        if ConfigReader.config.conf['inStartBlackOut'] and ConfigReader.config.conf['competition_mode']:
+            ConfigReader.config.conf['inStartBlackOut'] = False
         ConfigReader.config.write('config.json')
         self.show_config()
         # self.vocal.settings(ConfigReader.config.conf['sound'])
