@@ -455,17 +455,6 @@ class Round:
     def get_summary_as_json(self, current_round):
         result_dict = {}
         groups = []
-        result_dict['w'] = {}
-        if len(self.groups)>0:
-            last_group = self.groups[-1]
-            runs_list = list(last_group.runs)
-            if len(runs_list)>0:
-                last_competitor_runs = self.groups[-1].runs[runs_list[-1]]
-                if len(last_competitor_runs)>0:
-                    last_run=last_competitor_runs[-1]
-                    if last_run.chrono is not None:
-                        result_dict['w']['s'] = last_run.chrono.mean_wind_speed
-                        result_dict['w']['dir'] = last_run.chrono.wind_direction
 
         result_dict['round'] = str(len(current_round.event.valid_rounds) + 1)
         for group in self.groups:
@@ -482,4 +471,17 @@ class Round:
                           'pil': self.event.competitors[bib_number].display_name()}
             remaining_pilots.append(pilot_dict)
         result_dict['remain'] = remaining_pilots[:12]
+        result_dict['roundtime'] = []
+        for group in self.groups:
+            for bib_number in sorted(self.event.competitors):
+                competitor = self.event.competitors[bib_number]
+                fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
+                valid_run = group.get_valid_run(fetched_competitor)
+                if valid_run is not None:
+                    row = [str(fetched_competitor.bib_number), fetched_competitor.get_pilot().name]
+                    row.append('{:0.2f}'.format(valid_run.get_flight_time()))
+                    row.append(str(int(group.get_penalty(competitor))))
+                    for i in range(0, 10):
+                        row.append(str(valid_run.chrono.get_lap_time(i)))
+                    result_dict['roundtime'].append(row)
         return json.dumps(result_dict)
