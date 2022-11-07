@@ -69,6 +69,8 @@ def main():
                                   +str(ConfigReader.config.conf['webserver_port'])],
                                  shell=False)
 
+            subprocess.Popen(['celery', '-A', 'administrator',  'worker', '-l', 'info'], cwd=manage_py_path, shell=False)
+
     print("...start")
 
     dao = EventDAO()
