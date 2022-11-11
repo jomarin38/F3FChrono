@@ -306,7 +306,8 @@ def manage_event(request):
 
     table = ResultTable(title='', css_id='ranking')
 
-    header = Header(name=Link('Export to F3X Vault', 'login_to_export_event_f3x_vault?event_id='+event_id))
+    header = Header(name=Link('Export to F3X Vault', 'login_to_export_event_f3x_vault?event_id='+event_id+
+                              '&first_round=1&last_round='+str(len(event.rounds))))
     table.set_header(header)
 
     page.add_table(table)
@@ -441,7 +442,9 @@ def login_to_export_event_f3x_vault(request):
     Utils.set_port_number(request.META['SERVER_PORT'])
 
     return render(request, 'event_f3x_vault_export_template.html',
-                  {'event_id': request.GET.get('event_id')})
+                  {'event_id': request.GET.get('event_id'),
+                   'first_round':request.GET.get('first_round'),
+                   'last_round':request.GET.get('last_round')})
 
 
 def export_event_f3x_vault(request):
@@ -456,9 +459,11 @@ def export_event_f3x_vault(request):
 
         f3x_username = request.POST["username"]
         f3x_password = request.POST["password"]
+        start_round = int(request.POST["start_round"])
+        end_round = int(request.POST["end_round"])
 
         event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
-        event.export_to_f3x_vault(f3x_username, f3x_password)
+        event.export_to_f3x_vault(f3x_username, f3x_password, start_round, end_round)
 
     return HttpResponseRedirect('manage_event?event_id=' + event_id)
 
