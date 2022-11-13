@@ -39,6 +39,9 @@ from F3FChrono.data.Event import Event
 from F3FChrono.data.Pilot import Pilot
 from F3FChrono.data.Round import Round
 
+from F3FChrono.web.administrator.tasks import f3x_vault_export_round_task
+from F3FChrono.web.administrator.tasks import f3x_vault_export_event_task
+
 import csv
 
 
@@ -304,7 +307,8 @@ def manage_event(request):
 
     table = ResultTable(title='', css_id='ranking')
 
-    header = Header(name=Link('Export to F3X Vault', 'login_to_export_event_f3x_vault?event_id='+event_id))
+    header = Header(name=Link('Export to F3X Vault', 'login_to_export_event_f3x_vault?event_id='+event_id+
+                              '&first_round=1&last_round='+str(len(event.rounds)-1), new_tab=True))
     table.set_header(header)
 
     page.add_table(table)
@@ -354,7 +358,7 @@ def manage_event(request):
         row.add_cell(Link('Export to csv', 'download_csv?event_id=' + str(event.id) +
                           '&round_number='+str(f3f_round.round_number)))
         row.add_cell(Link('Export to F3XVault', 'login_to_export_round_f3x_vault?event_id=' + str(event.id) +
-                          '&round_number='+str(f3f_round.round_number)))
+                          '&round_number='+str(f3f_round.round_number), new_tab=True))
         row.add_cell(Link('Cancel Round', 'cancel_round?event_id=' + str(event.id) +
                           '&round_number=' + str(f3f_round.round_number)))
         if f3f_round.valid:
@@ -427,18 +431,10 @@ def export_round_f3x_vault(request):
         f3x_username = request.POST["username"]
         f3x_password = request.POST["password"]
 
-        #We must fetch full event to get correct valid round number
-        event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
-        requested_f3f_round = None
-        for f3f_round in event.rounds:
-            if f3f_round.round_number == int(round_number):
-                requested_f3f_round = f3f_round
+        task_id = f3x_vault_export_round_task.delay(event_id, round_number, f3x_username, f3x_password)
 
-        if requested_f3f_round is not None:
-            requested_f3f_round.export_to_f3x_vault(f3x_username, f3x_password)
-
-    return HttpResponseRedirect('manage_event?event_id=' + event_id)
-
+    return render(request, 'display_progress.html',
+                  {'key': task_id})
 
 def login_to_export_event_f3x_vault(request):
     if not request.user.is_authenticated:
@@ -447,7 +443,9 @@ def login_to_export_event_f3x_vault(request):
     Utils.set_port_number(request.META['SERVER_PORT'])
 
     return render(request, 'event_f3x_vault_export_template.html',
-                  {'event_id': request.GET.get('event_id')})
+                  {'event_id': request.GET.get('event_id'),
+                   'first_round':request.GET.get('first_round'),
+                   'last_round':request.GET.get('last_round')})
 
 
 def export_event_f3x_vault(request):
@@ -462,11 +460,13 @@ def export_event_f3x_vault(request):
 
         f3x_username = request.POST["username"]
         f3x_password = request.POST["password"]
+        start_round = int(request.POST["start_round"])
+        end_round = int(request.POST["end_round"])
 
-        event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
-        event.export_to_f3x_vault(f3x_username, f3x_password)
+        task_id = f3x_vault_export_event_task.delay(event_id, start_round, end_round, f3x_username, f3x_password)
 
-    return HttpResponseRedirect('manage_event?event_id=' + event_id)
+    return render(request, 'display_progress.html',
+                  {'key': task_id})
 
 
 def manage_round(request):

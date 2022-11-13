@@ -22,6 +22,8 @@ from F3FChrono.data.RoundGroup import RoundGroup
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
 from F3FChrono.data.dao.RoundDAO import RoundDAO
+from celery_progress.backend import ProgressRecorder
+
 import requests
 
 
@@ -370,8 +372,9 @@ class Round:
         else:
             f3f_run.penalty += penalty
 
-    def export_to_f3x_vault(self, login, password):
+    def export_to_f3x_vault(self, login, password, progress_recorder=None, total_operations=1, operations_offset=0):
         visited_competitors = []
+        task_counter = operations_offset
         for group in self.groups:
             for bib_number, competitor in self.event.competitors.items():
                 fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
@@ -399,6 +402,9 @@ class Round:
                             request_url +='&order=' + str(order)
                         response = requests.post(request_url)
                     visited_competitors.append(competitor)
+                    if progress_recorder is not None:
+                        progress_recorder.set_progress(task_counter, total_operations)
+                        task_counter += 1
                 else:
                     if competitor not in visited_competitors:
                         #Competitor did not finish its run (or even did not start it !)
@@ -419,6 +425,9 @@ class Round:
                                 request_url += '&wind_avg=' + str(valid_run.chrono.mean_wind_speed)
                                 request_url += '&dir_avg=' + str(valid_run.chrono.mean_wind_speed)
                         response = requests.post(request_url)
+                        if progress_recorder is not None:
+                            progress_recorder.set_progress(task_counter, total_operations)
+                            task_counter += 1
 
         #Update event score status
         valid_integer_code = 0

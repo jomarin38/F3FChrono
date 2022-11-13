@@ -15,7 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.urls import path
+from django.urls import path, re_path, include
 
 from . import views
 
@@ -50,5 +50,6 @@ urlpatterns = [
     path('login_to_export_event_f3x_vault', views.login_to_export_event_f3x_vault,
          name='login_to_export_event_f3x_vault'),
     path('define_bibs', views.define_bibs, name='define_bibs'),
-    path('do_define_bibs', views.do_define_bibs, name='define_bibs')
+    path('do_define_bibs', views.do_define_bibs, name='define_bibs'),
+    re_path(r'^celery-progress/', include('celery_progress.urls', namespace="celery_progress")),
 ]

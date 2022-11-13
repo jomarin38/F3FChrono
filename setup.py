@@ -23,7 +23,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 install_requires = [
-       'pandas', 'requests', 'pymysql', 'Django', 'pyserial', 'scipy', 'pyttsx3', 'netifaces', 'pyqrcode', 'qrcode', 'pypng'
+       'pandas', 'requests', 'pymysql', 'Django', 'pyserial', 'scipy', 'pyttsx3', 'netifaces',
+       'pyqrcode', 'qrcode', 'pypng', 'celery', 'celery-progress', 'python-decouple', 'redis'
     ]
 
 if not is_running_on_pi():
