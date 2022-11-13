@@ -23,7 +23,7 @@
  "noisesound": false,
  "noisetempo_msecond": 3500,
  "noisevolume": 2,
- "rebound_btn_time": 500,
+ "rebound_btn_time": 100,
  "run_webserver": true,
  "simulatemode": false,
  "sound": true,
