@@ -349,6 +349,9 @@ class Event:
                 result += f3f_round.to_string()
         return result
 
-    def export_to_f3x_vault(self, login, password, start_round, end_round):
+    def export_to_f3x_vault(self, login, password, start_round, end_round, progress_recorder=None, total_operations=1):
+        counter = 0
         for i in range(start_round-1, end_round):
-            self.rounds[i].rounds.export_to_f3x_vault(login, password)
+            self.rounds[i].export_to_f3x_vault(login, password, progress_recorder, total_operations,
+                                               counter*len(self.competitors))
+            counter+=1

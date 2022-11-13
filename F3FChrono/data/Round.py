@@ -372,11 +372,9 @@ class Round:
         else:
             f3f_run.penalty += penalty
 
-    def export_to_f3x_vault(self, login, password, progress_recorder=None):
+    def export_to_f3x_vault(self, login, password, progress_recorder=None, total_operations=1, operations_offset=0):
         visited_competitors = []
-        total_operations = len(self.event.competitors)
-        task_counter = 0
-        print('Total operations : ' + str(total_operations))
+        task_counter = operations_offset
         for group in self.groups:
             for bib_number, competitor in self.event.competitors.items():
                 fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
@@ -427,6 +425,9 @@ class Round:
                                 request_url += '&wind_avg=' + str(valid_run.chrono.mean_wind_speed)
                                 request_url += '&dir_avg=' + str(valid_run.chrono.mean_wind_speed)
                         response = requests.post(request_url)
+                        if progress_recorder is not None:
+                            progress_recorder.set_progress(task_counter, total_operations)
+                            task_counter += 1
 
         #Update event score status
         valid_integer_code = 0
@@ -438,9 +439,6 @@ class Round:
                       '&round_number=' + str(self.valid_round_number) + \
                       '&event_round_score_status=' + str(valid_integer_code)
         response = requests.post(request_url)
-
-        if progress_recorder is not None:
-            progress_recorder.set_progress(total_operations, total_operations)
 
     def export_to_csv(self, csv_writer):
         csv_writer.writerow(['bib_number', 'pilot_name', 'pilot_firstname', 'round', 'seconds', 'penalty',
