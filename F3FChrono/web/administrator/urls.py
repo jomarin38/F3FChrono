@@ -46,6 +46,8 @@ urlpatterns = [
     path('export_round_f3x_vault', views.export_round_f3x_vault, name='export_round_f3x_vault'),
     path('login_to_export_round_f3x_vault', views.login_to_export_round_f3x_vault,
          name='login_to_export_round_f3x_vault'),
+    path('auto_export_round_f3x_vault', views.auto_export_round_f3x_vault,
+             name='auto_export_round_f3x_vault'),
     path('export_event_f3x_vault', views.export_event_f3x_vault, name='export_event_f3x_vault'),
     path('login_to_export_event_f3x_vault', views.login_to_export_event_f3x_vault,
          name='login_to_export_event_f3x_vault'),

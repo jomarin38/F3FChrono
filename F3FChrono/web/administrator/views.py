@@ -38,6 +38,8 @@ from F3FChrono.data.web.Utils import Utils
 from F3FChrono.data.Event import Event
 from F3FChrono.data.Pilot import Pilot
 from F3FChrono.data.Round import Round
+from F3FChrono.chrono import ConfigReader
+from F3FChrono.web.administrator.cached_credentials import CachedCredentials
 
 from F3FChrono.web.administrator.tasks import f3x_vault_export_round_task
 from F3FChrono.web.administrator.tasks import f3x_vault_export_event_task
@@ -417,6 +419,25 @@ def login_to_export_round_f3x_vault(request):
                   {'event_id': request.GET.get('event_id'), 'round_number': request.GET.get('round_number')})
 
 
+def auto_export_round_f3x_vault(request):
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+    round_number = request.GET.get('round_number')
+
+    if ConfigReader.config.conf['auto_send_f3xvault'] and \
+            CachedCredentials.f3x_vault_username is not None and \
+            CachedCredentials.f3x_vault_password is not None:
+        f3x_username = CachedCredentials.f3x_vault_username
+        f3x_password = CachedCredentials.f3x_vault_password
+        task_id = do_export_event_f3x_vault(f3x_username, f3x_password, event_id, round_number)
+
+        return HttpResponse("Request submitted")
+    else:
+        return HttpResponse("No credentials cached")
+
+
 def export_round_f3x_vault(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % ('sign_in', request.path))
@@ -431,10 +452,19 @@ def export_round_f3x_vault(request):
         f3x_username = request.POST["username"]
         f3x_password = request.POST["password"]
 
-        task_id = f3x_vault_export_round_task.delay(event_id, round_number, f3x_username, f3x_password)
+        if ConfigReader.config.conf['auto_send_f3xvault']:
+            CachedCredentials.f3x_vault_username = f3x_username
+            CachedCredentials.f3x_vault_password = f3x_password
+
+        task_id = do_export_event_f3x_vault(f3x_username, f3x_password, event_id, round_number)
 
     return render(request, 'display_progress.html',
                   {'key': task_id})
+
+
+def do_export_event_f3x_vault(f3x_username, f3x_password, event_id, round_number):
+    return f3x_vault_export_round_task.delay(event_id, round_number, f3x_username, f3x_password)
+
 
 def login_to_export_event_f3x_vault(request):
     if not request.user.is_authenticated:
@@ -462,6 +492,10 @@ def export_event_f3x_vault(request):
         f3x_password = request.POST["password"]
         start_round = int(request.POST["start_round"])
         end_round = int(request.POST["end_round"])
+
+        if ConfigReader.config.conf['auto_send_f3xvault']:
+            CachedCredentials.f3x_vault_username = f3x_username
+            CachedCredentials.f3x_vault_password = f3x_password
 
         task_id = f3x_vault_export_event_task.delay(event_id, start_round, end_round, f3x_username, f3x_password)
 

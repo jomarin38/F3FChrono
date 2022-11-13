@@ -2,6 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from F3FChrono.chrono import ConfigReader
 
 
 def main():
@@ -18,4 +19,6 @@ def main():
 
 
 if __name__ == '__main__':
+    ConfigReader.init()
+    ConfigReader.config = ConfigReader.Configuration('config.json')
     main()
