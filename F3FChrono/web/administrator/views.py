@@ -308,7 +308,7 @@ def manage_event(request):
     table = ResultTable(title='', css_id='ranking')
 
     header = Header(name=Link('Export to F3X Vault', 'login_to_export_event_f3x_vault?event_id='+event_id+
-                              '&first_round=1&last_round='+str(len(event.rounds)), new_tab=True))
+                              '&first_round=1&last_round='+str(len(event.rounds)-1), new_tab=True))
     table.set_header(header)
 
     page.add_table(table)
