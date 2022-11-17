@@ -1492,6 +1492,7 @@ class WSettings(QObject):
         self.view.fullscreen.setChecked(ConfigReader.config.conf['fullscreen'])
         self.view.webserver.setChecked(ConfigReader.config.conf['run_webserver'])
         self.view.mode.setCurrentIndex(ConfigReader.config.conf['competition_mode'])
+        self.view.f3xvault_autoexport.setChecked(ConfigReader.config.conf['auto_send_f3xvault'])
         index=0
         if ConfigReader.config.conf['language'] in self.languages_available:
             index=self.languages_available.index(ConfigReader.config.conf['language'])
@@ -1503,6 +1504,7 @@ class WSettings(QObject):
         ConfigReader.config.conf['run_webserver'] = self.view.webserver.isChecked()
         ConfigReader.config.conf['competition_mode'] = self.view.mode.currentIndex()
         ConfigReader.config.conf['language']=self.languages_available[self.view.language.currentIndex()]
+        ConfigReader.config.conf['auto_send_f3xvault'] = self.view.f3xvault_autoexport.isChecked()
 
     def qrCode(self):
         self.qrcode_sig.emit(self.view.webserverUrl.text())

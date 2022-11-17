@@ -23,6 +23,9 @@ from F3FChrono.data.Chrono import Chrono
 from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
 from F3FChrono.data.dao.RoundDAO import RoundDAO
 from celery_progress.backend import ProgressRecorder
+from F3FChrono.chrono import ConfigReader
+from F3FChrono.web.administrator.cached_credentials import CachedCredentials
+from F3FChrono.data.web.Utils import Utils
 
 import requests
 
@@ -323,6 +326,11 @@ class Round:
         self.event.valid_rounds.append(self)
         if insert_database:
             Round.round_dao.update(self)
+            if ConfigReader.config.conf['auto_send_f3xvault']:
+                request_url = Utils.get_administrator_url() + \
+                              '/auto_export_round_f3x_vault?event_id=' + str(self.event.id) + \
+                              '&round_number=' + str(self.round_number)
+                response = requests.get(request_url)
 
     def has_run(self):
         res = False

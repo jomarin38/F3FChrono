@@ -2,6 +2,7 @@
  "Launch_time": 30000,
  "Launched_time": 30000,
  "SensorAlarmTimeout": 5000,
+ "auto_send_f3xvault": false,
  "btn_baseA": 5,
  "btn_baseB": 6,
  "btn_next": 12,
