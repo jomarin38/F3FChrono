@@ -17,6 +17,7 @@
 
 import sys
 import collections
+import random
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.gui.simulate_base_ui import Ui_MainWindow
@@ -50,6 +51,10 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         self.timerEvent = QTimer()
         self.timerEvent.timeout.connect(self.run)
         self.duration = 1000
+
+        self.timerEventLimit = QTimer()
+        self.timerEventLimit.timeout.connect(self.EventLimit)
+        self.timerEventLimit.start(20000)
 
         self.__addbase_List(self.baseAList, self.ui.listBaseA, 3, 20, self.send_base_A)
         self.__addbase_List(self.baseBList, self.ui.listBaseB, 5, 50, self.send_base_B)
@@ -98,7 +103,11 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
 
     def run(self):
         if self.ui.speedProcessing.isChecked():
-            self.udpsend.sendData("wind_speed " + str(self.ui.wind_speed.value()) + " m/s")
+            windspeed = self.ui.wind_speed.value()
+            if self.ui.windRandomVar.isChecked():
+                var = self.ui.wind_var_speed.value()
+                windspeed = random.uniform(windspeed-var, windspeed+var)
+            self.udpsend.sendData("wind_speed " + str(windspeed) + " m/s")
         if self.ui.dirProcessing.isChecked():
             self.udpsend.sendData("wind_dir " + str(self.ui.wind_dir.value()) + " " + str(self.ui.wind_dirVoltage.value()))
         if self.ui.rainProcessing.isChecked():
@@ -110,6 +119,20 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
             self.udpsend.sendData("simulate info " + str(self.ui.AccuPicam2.value()) + " " + \
                             str(self.ui.rssi_picam2.value()))
 
+    def EventLimit(self):
+        if self.ui.windRandomLimit.isChecked():
+            windspeed = self.ui.wind_speed.value()
+            var = self.ui.wind_var_limit.value()
+            low = int(windspeed - var/2)
+            if low < 3:
+                low = 15
+            high = int(windspeed + var/2)
+            if high > 25:
+                high = 25
+            windspeed = random.randint(low, high)
+            var = random.randint(1, var)
+            self.ui.wind_speed.setValue(windspeed)
+            self.ui.wind_var_speed.setValue(var)
     def closeEvent(self, event):
         self.close_signal.emit()
         event.accept()
