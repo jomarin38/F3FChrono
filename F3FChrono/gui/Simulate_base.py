@@ -106,7 +106,7 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
             windspeed = self.ui.wind_speed.value()
             if self.ui.windRandomVar.isChecked():
                 var = self.ui.wind_var_speed.value()
-                windspeed = random.uniform(windspeed-var, windspeed+var)
+                windspeed = random.uniform(int(windspeed-var/2), int(windspeed+var/2))
             self.udpsend.sendData("wind_speed " + str(windspeed) + " m/s")
         if self.ui.dirProcessing.isChecked():
             self.udpsend.sendData("wind_dir " + str(self.ui.wind_dir.value()) + " " + str(self.ui.wind_dirVoltage.value()))
@@ -123,12 +123,15 @@ class SimulateBase(QtWidgets.QMainWindow, QTimer):
         if self.ui.windRandomLimit.isChecked():
             windspeed = self.ui.wind_speed.value()
             var = self.ui.wind_var_limit.value()
+            high = int(windspeed + var / 2)
+            if high > 25:
+                high = 25
             low = int(windspeed - var/2)
             if low < 3:
                 low = 15
-            high = int(windspeed + var/2)
-            if high > 25:
-                high = 25
+                if low >= high:
+                    high = low + 5
+
             windspeed = random.randint(low, high)
             var = random.randint(1, var)
             self.ui.wind_speed.setValue(windspeed)
