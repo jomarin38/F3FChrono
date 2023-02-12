@@ -176,7 +176,7 @@ class Event:
 
         for round_id in range(1, n_rounds_to_get+1):
 
-            f3f_round = event.create_new_round()
+            f3f_round = event.create_new_round(insert_database=False)
 
             request_url = 'https://www.f3xvault.com/api.php?login=' + login + \
                           '&password=' + password + \
@@ -241,9 +241,10 @@ class Event:
         f3f_round.set_flight_order_from_scratch()
         if insert_database:
             Round.round_dao.insert(f3f_round)
-
-        #Get round from database to get group ids
-        fully_fetched_round = Round.round_dao.get(f3f_round)
+            #Get round from database to get group ids
+            fully_fetched_round = Round.round_dao.get(f3f_round)
+        else:
+            fully_fetched_round = f3f_round
         self.add_existing_round(fully_fetched_round)
         return fully_fetched_round
 

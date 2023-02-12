@@ -114,6 +114,17 @@ class RoundDAO(Dao):
             self._execute_insert(sql, f3f_round.event.id, f3f_round.round_number, group.group_number,
                                  start_time, end_time, group.get_serialized_flight_order(), group.valid,
                                  group.cancelled)
+
+            auto_increment_sql = 'SELECT LAST_INSERT_ID()'
+
+            query_result = self._execute_query(auto_increment_sql)
+
+            group_id = 0
+            for row in query_result:
+                group_id = row[0]
+
+            group.group_id = group_id
+
             for competitor, runs in group.runs.items():
                 for run in runs:
                     RoundDAO.run_dao.insert(run)
