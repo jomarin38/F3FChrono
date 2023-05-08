@@ -658,11 +658,13 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         if (status == chronoStatus.WaitLaunch):
             self.controllers['round'].wChronoCtrl.settime(self.launch_time, False, to_launch=True)
         if (status == chronoStatus.Launched):
+            self.vocal.stop_Timing()
             self.controllers['round'].wChronoCtrl.settime(self.launch_time, False)
 
     def slot_run_started(self):
         self.controllers['round'].wChronoCtrl.settime(0, True)
         self.vocal.stop_Timing()
+
 
     def slot_lap_finished(self, lap, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)

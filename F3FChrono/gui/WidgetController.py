@@ -399,10 +399,14 @@ class WChronoCtrl(QTimer):
         self.view.btn_clear_penalty.setStyleSheet(clear_penalty_btn_stylesheet)
 
         self.timerEvent = QTimer()
-        self.timerEvent.timeout.connect(self.run)
-        self.duration = 100
+        self.timerEvent.timeout.connect(self.timeCount)
+        self.duration = 1000
+        self.timerSoundEvent = QTimer()
+        self.timerSoundEvent.timeout.connect(self.timeSoundCount)
+        self.durationSound = 5000
         self.startTime = time.time()
         self.time = 0
+        self.timeSound = 30
         self.time_up = True
         self.to_launch = False
 
@@ -442,55 +446,41 @@ class WChronoCtrl(QTimer):
     def settime(self, settime, count_up, starttimer=True, to_launch=False):
         self.to_launch = to_launch
         self.time = settime
+        self.timeSound = settime
         self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000))
         self.time_up = count_up
         self.startTime = time.time()
+        print("settime - time : ", self.time, ", timeSound : ", self.timeSound)
         if starttimer:
             self.timerEvent.start(self.duration)
+            self.timerSoundEvent.start(self.durationSound)
+        if self.time == 0:
+            self.stoptimerSound()
 
     def stoptime(self):
+        print("stopTime")
         self.timerEvent.stop()
+        self.timerSoundEvent.stop()
 
-    def run(self):
+    def stoptimerSound(self):
+        self.timerSoundEvent.stop()
+
+    def timeCount(self):
         if self.time_up:
             self.view.Time_label.setText("{:>6.0f}".format(time.time() - self.startTime))
         else:
             self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000 - (time.time() - self.startTime)))
-            timeval = self.time / 1000 - (time.time() - self.startTime)
-            if timeval >= 29.5:
-                self.vocal_elapsedTime_sig.emit(30, self.to_launch)
-            if 25.5 <= timeval <= 26:
-                self.vocal_elapsedTime_sig.emit(25, self.to_launch)
-            if 20.5 <= timeval <= 21:
-                self.vocal_elapsedTime_sig.emit(20, self.to_launch)
-            if 15.5 <= timeval <= 16:
-                self.vocal_elapsedTime_sig.emit(15, self.to_launch)
-            if 10.5 <= timeval <= 11:
-                self.vocal_elapsedTime_sig.emit(10, self.to_launch)
-            '''
-            if 9 <= timeval <= 10:
-                self.vocal_elapsedTime_sig.emit(9, self.to_launch)
-            if 8.9 <= timeval <= 9:
-                self.vocal_elapsedTime_sig.emit(8, self.to_launch)
-            if 7.9 <= timeval <= 8:
-                self.vocal_elapsedTime_sig.emit(7, self.to_launch)
-            if 6.9 <= timeval <= 7:
-                self.vocal_elapsedTime_sig.emit(6, self.to_launch)
-            if 5.9 <= timeval <= 6:
-                self.vocal_elapsedTime_sig.emit(5, self.to_launch)
-            if 4.9 <= timeval <= 5:
-                self.vocal_elapsedTime_sig.emit(4, self.to_launch)
-            if 3.9 <= timeval <= 4:
-                self.vocal_elapsedTime_sig.emit(3, self.to_launch)
-            if 2.9 <= timeval <= 3:
-                self.vocal_elapsedTime_sig.emit(2, self.to_launch)
-            if 1.9 <= timeval <= 2:
-                self.vocal_elapsedTime_sig.emit(1, self.to_launch)
-            '''
-            if timeval < 0:
-                self.vocal_elapsedTime_sig.emit(0, self.to_launch)
-                self.time_elapsed_sig.emit()
-                self.stoptime()
+
+    def timeSoundCount(self):
+        print("timeSoundCount")
+        timeval = self.timeSound - self.durationSound
+        self.timeSound = timeval
+        if timeval >= 10000:
+            self.vocal_elapsedTime_sig.emit(int(timeval/1000), self.to_launch)
+        elif timeval <= 0:
+            self.vocal_elapsedTime_sig.emit(0, self.to_launch)
+            self.time_elapsed_sig.emit()
+            self.stoptime()
 
     def btn_refly(self, event):
         self.btn_refly_sig.emit()
