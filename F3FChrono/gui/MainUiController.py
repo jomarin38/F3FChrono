@@ -38,7 +38,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def __init__(self, eventdao, chronodata, rpi, webserver_process):
         super().__init__()
-        self.__debug=True
+        self.__debug = True
         self.webserver_process = webserver_process
         self.daoEvent = eventdao
         self.daoRound = RoundDAO()
@@ -82,6 +82,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.tcp.pilotRequestSig.connect(self.slotPilotListRequest)
         if ConfigReader.config.conf['inStartBlackOut'] and ConfigReader.config.conf['competition_mode']:
             ConfigReader.config.conf['inStartBlackOut'] = False
+
     def initUI(self, ):
         self.MainWindow = QtWidgets.QMainWindow()
         self.MainWindow.closeEvent = self.closeEvent
@@ -96,7 +97,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers = collections.OrderedDict()
 
         self.controllers['config'] = WConfigCtrl("panel Config", self.ui.centralwidget)
-        self.controllers['round'] = WRoundCtrl("panel Chrono", self.ui.centralwidget, self.vocal.signal_elapsedTime)
+        self.controllers['round'] = WRoundCtrl("panel Chrono", self.ui.centralwidget)
         self.controllers['training'] = WTrainingCtrl("panel Training", self.ui.centralwidget,
                                                      ConfigReader.config.conf['training_speech_interval'])
         self.controllers['settings'] = WSettings("panel Settings", self.ui.centralwidget)
@@ -134,10 +135,12 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.btn_penalty_1000_sig.connect(self.penalty_1000)
         self.controllers['round'].wChronoCtrl.btn_clear_penalty_sig.connect(self.clear_penalty)
         self.controllers['round'].wChronoCtrl.btn_null_flight_sig.connect(self.null_flight)
-        self.controllers['round'].wChronoCtrl.time_elapsed_sig.connect(self.handle_time_elapsed)
         self.controllers['round'].wChronoCtrl.btn_refly_sig.connect(self.refly)
         self.controllers['round'].wPilotCtrl.btn_cancel_flight_sig.connect(self.display_cancel_round)
         self.controllers['round'].btn_gscoring_sig.connect(self.enable_group_scoring)
+        self.chronoHard.timerF3F.uiTimeRefresh_sig.connect(self.controllers['round'].wChronoCtrl.timeRefresh)
+        self.chronoHard.timerF3F.vocalTimeElapsed_sig.connect(self.vocal.sound_elapsedTime)
+        self.chronoHard.timerF3F.time_elapsed_sig.connect(self.handle_time_elapsed)
         self.controllers['settings'].btn_cancel_sig.connect(self.settings_cancel)
         self.controllers['settings'].btn_valid_sig.connect(self.settings_valid)
         self.controllers['settings'].btn_settingsadvanced_sig.connect(self.show_settingsadvanced)
@@ -152,13 +155,17 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswDevices'].btn_valid_sig.connect(self.settings_valid)
         self.controllers['settingswDevices'].btn_settingsbase_sig.connect(self.show_settingsbase)
         self.controllers['settingswDevices'].btn_settingswBtn_sig.connect(self.show_settingswBtn)
-        self.controllers['settingswDevices'].btn_AnemometerGetList_sig.connect(self.chronoHard.weather.anemometer.GetList)
-        self.controllers['settingswDevices'].btn_AnemometerConnect_sig.connect(self.chronoHard.weather.anemometer.Connect)
+        self.controllers['settingswDevices'].btn_AnemometerGetList_sig.connect(
+            self.chronoHard.weather.anemometer.GetList)
+        self.controllers['settingswDevices'].btn_AnemometerConnect_sig.connect(
+            self.chronoHard.weather.anemometer.Connect)
         self.controllers['settingswDevices'].wirelessDevicesSelected_sig.connect(self.chronoHard.weather.setConfig)
-        
+
         self.chronoHard.weather.anemometer.list_sig.connect(self.controllers['settingswDevices'].anemometerSetData)
-        self.chronoHard.weather.anemometer.status_sig.connect(self.controllers['settingswDevices'].view.AnemometerStatus.setText)
-        self.chronoHard.weather.gui_wind_speed_dir_signal.connect(self.controllers['settingswDevices'].weatherStation_display)
+        self.chronoHard.weather.anemometer.status_sig.connect(
+            self.controllers['settingswDevices'].view.AnemometerStatus.setText)
+        self.chronoHard.weather.gui_wind_speed_dir_signal.connect(
+            self.controllers['settingswDevices'].weatherStation_display)
         self.chronoHard.weather.set_minVoltageWindDir(ConfigReader.config.conf['voltage_min_windDir'])
         self.chronoHard.weather.weather_sound_signal.connect(self.vocal.slot_windAlarm)
         self.chronoHard.weather.weather_lowVoltage_signal.connect(self.vocal.slot_weatherStationLowVoltage)
@@ -419,7 +426,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def home_action(self):
         # print event data
-        self.controllers['round'].wChronoCtrl.stoptime()
+        self.chronoHard.timerF3F.stopTime()
         self.vocal.stop_all()
         self.show_config()
         self.set_signal_mode(training=None)
@@ -446,9 +453,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         if self.enableConnectedDisplay:
             if self.__debug:
                 print(current_round.get_summary_as_json(self.event.get_current_round()))
-            #self.udpsend.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
+            # self.udpsend.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
             self.tcp.orderDataSig.emit(current_round.get_summary_as_json(self.event.get_current_round()))
-
 
     def context_valuechanged(self):
         self.getcontextparameters(False)
@@ -498,8 +504,6 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.vocal.signal_pilotname.emit(int(current_competitor.get_bib_number()))
             self.chronoHard.set_mode(training=False)
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
-            self.controllers['round'].wChronoCtrl.settime(self.launch_time, False, False,
-                                                          to_launch=True)
             self.controllers['round'].wChronoCtrl.reset_ui()
             if current_round.group_scoring_enabled():
                 self.controllers['round'].handle_group_scoring_enabled(True)
@@ -514,7 +518,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             if self.enableConnectedDisplay:
                 if self.__debug:
                     print(current_round.get_summary_as_json(self.event.get_current_round()))
-                #self.udpsend.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
+                # self.udpsend.sendOrderData(current_round.get_summary_as_json(self.event.get_current_round()))
                 self.tcp.orderDataSig.emit(current_round.get_summary_as_json(self.event.get_current_round()))
 
 
@@ -551,7 +555,6 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             print("time elapsed")
         if self.chronoHard.get_status() == chronoStatus.WaitLaunch:
             self.vocal.signal_penalty.emit()
-            self.controllers['round'].wChronoCtrl.stoptime()
             self.chronoHard.set_status(chronoStatus.InWait)
 
     def slot_buzzer(self):
@@ -586,14 +589,14 @@ class MainUiCtrl(QtWidgets.QMainWindow):
                                                       self.event.get_current_round())
         self.chronoHard.reset()
         self.chronodata.reset()
-        self.controllers['round'].wChronoCtrl.stoptime()
+        self.chronoHard.timerF3F.stopTime()
         self.controllers['round'].wChronoCtrl.reset_ui()
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
 
     def null_flight(self):
         self.chronoHard.set_status(chronoStatus.Finished)
         self.chronoHard.valid = False
-        self.controllers['round'].wChronoCtrl.stoptime()
+        self.chronoHard.timerF3F.stopTime()
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['round'].wChronoCtrl.set_null_flight(True)
 
@@ -602,7 +605,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.chronoHard.set_status(chronoStatus.Finished)
         self.chronoHard.valid = False
         self.chronoHard.setrefly()
-        self.controllers['round'].wChronoCtrl.stoptime()
+        self.chronoHard.timerF3F.stopTime()
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['round'].wChronoCtrl.set_refly(True)
 
@@ -656,15 +659,14 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         # print ("slot status", status)
         self.controllers['round'].wChronoCtrl.set_status(status)
         if (status == chronoStatus.WaitLaunch):
-            self.controllers['round'].wChronoCtrl.settime(self.launch_time, False, to_launch=True)
+            self.chronoHard.timerF3F.setLaunchTime()
         if (status == chronoStatus.Launched):
             self.vocal.stop_Timing()
-            self.controllers['round'].wChronoCtrl.settime(self.launch_time, False)
+            self.chronoHard.timerF3F.setLaunchedTime()
 
     def slot_run_started(self):
-        self.controllers['round'].wChronoCtrl.settime(0, True)
+        self.chronoHard.timerF3F.setRaceStartedTime()
         self.vocal.stop_Timing()
-
 
     def slot_lap_finished(self, lap, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
@@ -672,7 +674,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def slot_run_finished(self, run_time):
         # print("Main UI Controller slot run finished : ", time.time())
-        self.controllers['round'].wChronoCtrl.stoptime()
+        self.chronoHard.timerF3F.stopTime()
         # print ('final time : ' + str(run_time))
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         self.controllers['round'].widgetBtn.update()
@@ -696,7 +698,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.chronoHard.reset()
         self.chronodata = Chrono()
         self.next_pilot(insert_database=True)
-        self.controllers['round'].wChronoCtrl.settime(self.launch_time, False, False)
+        self.chronoHard.timerF3F.initialize()
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['wind'].setLastRoundTime()
 
@@ -721,7 +723,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         chrono.wind_direction = chronoHard.weather.getWindDir()
         for lap in chronoHard.getLaps():
             chrono.add_lap_time(lap)
-            #print(chrono.to_string())
+            # print(chrono.to_string())
 
     def slot_accu(self, voltage1, voltage2):
         self.controllers['wind'].set_voltage(voltage1, voltage2)

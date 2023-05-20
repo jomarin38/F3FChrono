@@ -25,6 +25,7 @@ from F3FChrono.chrono import ConfigReader
 from F3FChrono.chrono.rs232_arduino import rs232_arduino
 from F3FChrono.chrono.weather import Weather
 
+
 class chronoType():
     wire = 0
     wireless = 1
@@ -43,6 +44,91 @@ class chronoStatus():
     WaitAltitude = 8
     Finished = 9
 
+
+class F3FTimer(QObject):
+    vocalTimeElapsed_sig = pyqtSignal(int, bool)  # Time value, To Launch
+    uiTimeRefresh_sig = pyqtSignal(int)  # time value
+    time_elapsed_sig = pyqtSignal()
+
+    def __init__(self, test):
+        super().__init__()
+        print("F3FTimer test init ", test)
+        self.timerEvent = QTimer()
+        self.timerEvent.timeout.connect(self.timeCount)
+        self.duration = 1000
+        self.timerSoundEvent = QTimer()
+        self.timerSoundEvent.timeout.connect(self.timeSoundCount)
+        self.durationSound = 5000
+        self.durationSoundStart = 4400
+        self.startTime = time.time()
+        self.time = 0
+        self.timeSound = 30
+        self.time_up = True
+        self.to_launch = False
+
+    def initialize(self):
+        self.time = 30000
+        self.timeSound = 30000
+        self.uiTimeRefresh_sig.emit(int(self.time / 1000))
+
+    def setLaunchTime(self):
+        self.to_launch = True
+        self.time = 30000
+        self.timeSound = 30000
+        self.uiTimeRefresh_sig.emit(int(self.time / 1000))
+        self.time_up = False
+        self.startTime = time.time()
+        print("setLaunchTime - time : ", self.time, ", timeSound : ", self.timeSound)
+        self.timerEvent.start(self.duration)
+        self.timerSoundEvent.start(self.durationSoundStart)
+
+    def setLaunchedTime(self):
+        self.to_launch = False
+        self.time = 30000
+        self.timeSound = 30000
+        self.uiTimeRefresh_sig.emit(int(self.time / 1000))
+        self.time_up = False
+        self.startTime = time.time()
+        print("setLaunchedTime - time : ", self.time, ", timeSound : ", self.timeSound)
+        self.timerEvent.start(self.duration)
+        self.timerSoundEvent.start(self.durationSoundStart)
+
+    def setRaceStartedTime(self):
+        self.stopTimerSound()
+        self.to_launch = False
+        self.time = 0
+        self.timeSound = 0
+        self.uiTimeRefresh_sig.emit(int(self.time / 1000))
+        self.time_up = True
+        self.startTime = time.time()
+        self.timerEvent.start(self.duration)
+
+    def stopTime(self):
+        print("stopTime")
+        self.timerEvent.stop()
+        self.stopTimerSound()
+
+    def stopTimerSound(self):
+        self.timerSoundEvent.stop()
+
+    def timeCount(self):
+        if self.time_up:
+            self.uiTimeRefresh_sig.emit(int(time.time() - self.startTime))
+        else:
+            self.uiTimeRefresh_sig.emit(int(self.time / 1000 - (time.time() - self.startTime)))
+
+    def timeSoundCount(self):
+        print("timeSoundCount")
+        timeval = self.timeSound - self.durationSound
+        self.timeSound = timeval
+        self.timerSoundEvent.stop()
+        self.timerSoundEvent.start(self.durationSound)
+        if timeval >= 10000:
+            self.vocalTimeElapsed_sig.emit(int(timeval / 1000), self.to_launch)
+        elif timeval <= 0:
+            self.vocalTimeElapsed_sig.emit(0, self.to_launch)
+            self.time_elapsed_sig.emit()
+            self.stopTime()
 
 
 class ChronoHard(QObject):
@@ -70,6 +156,7 @@ class ChronoHard(QObject):
         self.valid = True
         self.refly = False
         self.__debug = False
+        self.timerF3F = F3FTimer(True)
 
     def addPenalty(self, value):
         self.penalty += value
@@ -175,7 +262,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.timer.start(30000)
         self.reset()
         self.in_start_blackout_enabled = ConfigReader.config.conf['inStartBlackOut']
-        self.in_start_blackout_second = ConfigReader.config.conf['inStartBlackOut_msecond']/1000
+        self.in_start_blackout_second = ConfigReader.config.conf['inStartBlackOut_msecond'] / 1000
         self.competition_mode = ConfigReader.config.conf['competition_mode']
 
     def slot_status(self, status):

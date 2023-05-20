@@ -86,7 +86,6 @@ class chronoQSound(QThread):
     signal_penalty = pyqtSignal()
     signal_base = pyqtSignal(int)
     signal_time = pyqtSignal(float, bool)
-    signal_elapsedTime = pyqtSignal(int, bool)
     signal_start = pyqtSignal(int)
     signal_pilotname = pyqtSignal(int)
 
@@ -101,7 +100,6 @@ class chronoQSound(QThread):
         self.play_sound = playsound
         self.sound_list = []
         self.sound_lowPriority = []
-        self.signal_elapsedTime.connect(self.sound_elapsedTime)
         self.signal_base.connect(self.sound_base)
         self.signal_time.connect(self.sound_time)
         self.signal_penalty.connect(self.sound_penalty)

@@ -57,10 +57,10 @@ class WRoundCtrl(QObject):
     btn_gscoring_sig = pyqtSignal()
     widgetList = []
 
-    def __init__(self, name, parent, vocal_elapsedTime_sig):
+    def __init__(self, name, parent):
         super().__init__()
         self.wPilotCtrl = WPilotCtrl("PilotCtrl", parent)
-        self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent, vocal_elapsedTime_sig)
+        self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent)
         self.wBtnCtrl = Ui_WChronoBtn()
         self.wBtnCancel = Ui_WChronoBtn_Cancel()
         self.wBtnGS = Ui_WChronoGSEnable()
@@ -351,10 +351,9 @@ class WChronoCtrl(QTimer):
     btn_penalty_100_sig = pyqtSignal()
     btn_penalty_1000_sig = pyqtSignal()
     btn_clear_penalty_sig = pyqtSignal()
-    time_elapsed_sig = pyqtSignal()
     btn_refly_sig = pyqtSignal()
 
-    def __init__(self, name, parent, vocal_elapsedTime_sig):
+    def __init__(self, name, parent):
         super().__init__()
 
         self.view = Ui_WChrono()
@@ -375,7 +374,6 @@ class WChronoCtrl(QTimer):
         self.statusText.append(self._translate("chronoStatus_WaitAltitude", "Wait Altitude"))
         self.statusText.append(self._translate("chronoStatus_Finished", "Finished"))
 
-        self.vocal_elapsedTime_sig = vocal_elapsedTime_sig
         # initialize labels for lap time
         self.lap = []
         # initialize labels for status
@@ -397,18 +395,6 @@ class WChronoCtrl(QTimer):
         self.view.reflight.setStyleSheet(refly_btn_stylesheet)
         self.view.nullFlight.setStyleSheet(director_btn_stylesheet)
         self.view.btn_clear_penalty.setStyleSheet(clear_penalty_btn_stylesheet)
-
-        self.timerEvent = QTimer()
-        self.timerEvent.timeout.connect(self.timeCount)
-        self.duration = 1000
-        self.timerSoundEvent = QTimer()
-        self.timerSoundEvent.timeout.connect(self.timeSoundCount)
-        self.durationSound = 5000
-        self.startTime = time.time()
-        self.time = 0
-        self.timeSound = 30
-        self.time_up = True
-        self.to_launch = False
 
     def get_widget(self):
         return (self.widget)
@@ -438,49 +424,13 @@ class WChronoCtrl(QTimer):
         self.view.Time_label.setText("{:0.2f}".format(data_time))
 
     def reset_ui(self):
-        self.stoptime()
         self.current_lap = 0
         self.set_penalty_value(0)
         self.set_null_flight(False)
 
-    def settime(self, settime, count_up, starttimer=True, to_launch=False):
-        self.to_launch = to_launch
-        self.time = settime
-        self.timeSound = settime
-        self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000))
-        self.time_up = count_up
-        self.startTime = time.time()
-        print("settime - time : ", self.time, ", timeSound : ", self.timeSound)
-        if starttimer:
-            self.timerEvent.start(self.duration)
-            self.timerSoundEvent.start(self.durationSound)
-        if self.time == 0:
-            self.stoptimerSound()
+    def timeRefresh(self, timeValue):
+        self.view.Time_label.setText("{:>6.0f}".format(timeValue))
 
-    def stoptime(self):
-        print("stopTime")
-        self.timerEvent.stop()
-        self.timerSoundEvent.stop()
-
-    def stoptimerSound(self):
-        self.timerSoundEvent.stop()
-
-    def timeCount(self):
-        if self.time_up:
-            self.view.Time_label.setText("{:>6.0f}".format(time.time() - self.startTime))
-        else:
-            self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000 - (time.time() - self.startTime)))
-
-    def timeSoundCount(self):
-        print("timeSoundCount")
-        timeval = self.timeSound - self.durationSound
-        self.timeSound = timeval
-        if timeval >= 10000:
-            self.vocal_elapsedTime_sig.emit(int(timeval/1000), self.to_launch)
-        elif timeval <= 0:
-            self.vocal_elapsedTime_sig.emit(0, self.to_launch)
-            self.time_elapsed_sig.emit()
-            self.stoptime()
 
     def btn_refly(self, event):
         self.btn_refly_sig.emit()
