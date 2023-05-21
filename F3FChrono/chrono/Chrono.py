@@ -53,83 +53,70 @@ class F3FTimer(QObject):
     def __init__(self, test):
         super().__init__()
         print("F3FTimer test init ", test)
-        self.timerEvent = QTimer()
-        self.timerEvent.timeout.connect(self.timeCount)
         self.duration = 1000
-        self.timerSoundEvent = QTimer()
-        self.timerSoundEvent.timeout.connect(self.timeSoundCount)
-        self.durationSound = 5000
-        self.durationSoundStart = 4400
+        self.timerEvent = QTimer()
+        self.timerEvent.setTimerType(0)
+        self.timerEvent.setSingleShot(False)
+        self.timerEvent.timeout.connect(self.timeCount)
+        self.timerEvent.setInterval(self.duration)
         self.startTime = time.time()
         self.time = 0
-        self.timeSound = 30
         self.time_up = True
         self.to_launch = False
+        self.ticks_count = 0
 
     def initialize(self):
-        self.time = 30000
-        self.timeSound = 30000
-        self.uiTimeRefresh_sig.emit(int(self.time / 1000))
+        self.stopTime()
+        self.time = 30
+        self.uiTimeRefresh_sig.emit(self.time)
 
     def setLaunchTime(self):
+        self.stopTime()
         self.to_launch = True
-        self.time = 30000
-        self.timeSound = 30000
-        self.uiTimeRefresh_sig.emit(int(self.time / 1000))
+        self.time = 30
+        self.uiTimeRefresh_sig.emit(self.time)
         self.time_up = False
         self.startTime = time.time()
-        print("setLaunchTime - time : ", self.time, ", timeSound : ", self.timeSound)
-        self.timerEvent.start(self.duration)
-        self.timerSoundEvent.start(self.durationSoundStart)
+        print("setLaunchTime - time : ", self.time)
+        self.timerEvent.start()
 
     def setLaunchedTime(self):
+        self.stopTime()
         self.to_launch = False
-        self.time = 30000
-        self.timeSound = 30000
-        self.uiTimeRefresh_sig.emit(int(self.time / 1000))
+        self.time = 30
+        self.uiTimeRefresh_sig.emit(self.time)
         self.time_up = False
         self.startTime = time.time()
-        print("setLaunchedTime - time : ", self.time, ", timeSound : ", self.timeSound)
-        self.timerEvent.start(self.duration)
-        self.timerSoundEvent.start(self.durationSoundStart)
+        print("setLaunchedTime - time : ", self.time)
+        self.timerEvent.start()
 
     def setRaceStartedTime(self):
-        self.stopTimerSound()
+        self.stopTime()
         self.to_launch = False
         self.time = 0
-        self.timeSound = 0
-        self.uiTimeRefresh_sig.emit(int(self.time / 1000))
+        self.uiTimeRefresh_sig.emit(self.time)
         self.time_up = True
         self.startTime = time.time()
-        self.timerEvent.start(self.duration)
+        self.timerEvent.start()
 
     def stopTime(self):
         print("stopTime")
+        self.ticks_count = 0
         self.timerEvent.stop()
-        self.stopTimerSound()
 
-    def stopTimerSound(self):
-        self.timerSoundEvent.stop()
 
     def timeCount(self):
+        self.ticks_count +=1
         if self.time_up:
-            self.uiTimeRefresh_sig.emit(int(time.time() - self.startTime))
+            self.uiTimeRefresh_sig.emit(self.ticks_count)
         else:
-            self.uiTimeRefresh_sig.emit(int(self.time / 1000 - (time.time() - self.startTime)))
-
-    def timeSoundCount(self):
-        print("timeSoundCount")
-        timeval = self.timeSound - self.durationSound
-        self.timeSound = timeval
-        self.timerSoundEvent.stop()
-        self.timerSoundEvent.start(self.durationSound)
-        if timeval >= 10000:
-            self.vocalTimeElapsed_sig.emit(int(timeval / 1000), self.to_launch)
-        elif timeval <= 0:
-            self.vocalTimeElapsed_sig.emit(0, self.to_launch)
-            self.time_elapsed_sig.emit()
-            self.stopTime()
-
+            self.uiTimeRefresh_sig.emit(self.time - self.ticks_count)
+            if self.ticks_count % 5 == 0 and self.ticks_count <=20:
+                self.vocalTimeElapsed_sig.emit(self.time - self.ticks_count, self.to_launch)
+            elif self.ticks_count >=30:
+                self.vocalTimeElapsed_sig.emit(0, self.to_launch)
+                self.time_elapsed_sig.emit()
+                self.stopTime()
 
 class ChronoHard(QObject):
     status_changed = pyqtSignal(int)
@@ -278,6 +265,7 @@ class ChronoArduino(ChronoHard, QTimer):
     def set_status(self, value):
         if (self.status != value):
             self.arduino.set_status(value)
+            self.status = value
 
     def handle_chrono_event(self, caller, data, address):
         ChronoArduino._lock.acquire()
@@ -331,6 +319,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.chronoLap.clear()
         self.weather.reset_weather()
         self.clearPenalty()
+        self.set_status(chronoStatus.InWait)
         self.valid = True
         self.refly = False
 

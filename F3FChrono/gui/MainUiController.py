@@ -503,6 +503,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
                                                           self.event.get_current_round())
             self.vocal.signal_pilotname.emit(int(current_competitor.get_bib_number()))
             self.chronoHard.set_mode(training=False)
+            self.chronoHard.timerF3F.initialize()
             self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
             self.controllers['round'].wChronoCtrl.reset_ui()
             if current_round.group_scoring_enabled():
