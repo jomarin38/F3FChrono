@@ -265,6 +265,7 @@ class ChronoArduino(ChronoHard, QTimer):
     def set_status(self, value):
         if (self.status != value):
             self.arduino.set_status(value)
+            self.status = value
 
     def handle_chrono_event(self, caller, data, address):
         ChronoArduino._lock.acquire()
@@ -318,6 +319,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.chronoLap.clear()
         self.weather.reset_weather()
         self.clearPenalty()
+        self.set_status(chronoStatus.InWait)
         self.valid = True
         self.refly = False
 
