@@ -25,6 +25,7 @@ from F3FChrono.chrono import ConfigReader
 from F3FChrono.chrono.rs232_arduino import rs232_arduino
 from F3FChrono.chrono.weather import Weather
 
+
 class chronoType():
     wire = 0
     wireless = 1
@@ -44,6 +45,78 @@ class chronoStatus():
     Finished = 9
 
 
+class F3FTimer(QObject):
+    vocalTimeElapsed_sig = pyqtSignal(int, bool)  # Time value, To Launch
+    uiTimeRefresh_sig = pyqtSignal(int)  # time value
+    time_elapsed_sig = pyqtSignal()
+
+    def __init__(self, test):
+        super().__init__()
+        print("F3FTimer test init ", test)
+        self.duration = 1000
+        self.timerEvent = QTimer()
+        self.timerEvent.setTimerType(0)
+        self.timerEvent.setSingleShot(False)
+        self.timerEvent.timeout.connect(self.timeCount)
+        self.timerEvent.setInterval(self.duration)
+        self.startTime = time.time()
+        self.time = 0
+        self.time_up = True
+        self.to_launch = False
+        self.ticks_count = 0
+
+    def initialize(self):
+        self.stopTime()
+        self.time = 30
+        self.uiTimeRefresh_sig.emit(self.time)
+
+    def setLaunchTime(self):
+        self.stopTime()
+        self.to_launch = True
+        self.time = 30
+        self.uiTimeRefresh_sig.emit(self.time)
+        self.time_up = False
+        self.startTime = time.time()
+        print("setLaunchTime - time : ", self.time)
+        self.timerEvent.start()
+
+    def setLaunchedTime(self):
+        self.stopTime()
+        self.to_launch = False
+        self.time = 30
+        self.uiTimeRefresh_sig.emit(self.time)
+        self.time_up = False
+        self.startTime = time.time()
+        print("setLaunchedTime - time : ", self.time)
+        self.timerEvent.start()
+
+    def setRaceStartedTime(self):
+        self.stopTime()
+        self.to_launch = False
+        self.time = 0
+        self.uiTimeRefresh_sig.emit(self.time)
+        self.time_up = True
+        self.startTime = time.time()
+        self.timerEvent.start()
+
+    def stopTime(self):
+        print("stopTime")
+        self.ticks_count = 0
+        self.timerEvent.stop()
+
+
+    def timeCount(self):
+        self.ticks_count +=1
+        if self.time_up:
+            self.uiTimeRefresh_sig.emit(self.ticks_count)
+        else:
+            self.uiTimeRefresh_sig.emit(self.time - self.ticks_count)
+            if self.ticks_count % 5 == 0 and self.ticks_count <=20:
+                self.vocalTimeElapsed_sig.emit(self.time - self.ticks_count, self.to_launch)
+            elif self.ticks_count >=30:
+                self.vocalTimeElapsed_sig.emit(0, self.to_launch)
+                self.time_elapsed_sig.emit()
+                self.stopTime()
 
 class ChronoHard(QObject):
     status_changed = pyqtSignal(int)
@@ -70,6 +143,7 @@ class ChronoHard(QObject):
         self.valid = True
         self.refly = False
         self.__debug = False
+        self.timerF3F = F3FTimer(True)
 
     def addPenalty(self, value):
         self.penalty += value
@@ -175,7 +249,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.timer.start(30000)
         self.reset()
         self.in_start_blackout_enabled = ConfigReader.config.conf['inStartBlackOut']
-        self.in_start_blackout_second = ConfigReader.config.conf['inStartBlackOut_msecond']/1000
+        self.in_start_blackout_second = ConfigReader.config.conf['inStartBlackOut_msecond'] / 1000
         self.competition_mode = ConfigReader.config.conf['competition_mode']
 
     def slot_status(self, status):
@@ -191,6 +265,7 @@ class ChronoArduino(ChronoHard, QTimer):
     def set_status(self, value):
         if (self.status != value):
             self.arduino.set_status(value)
+            self.status = value
 
     def handle_chrono_event(self, caller, data, address):
         ChronoArduino._lock.acquire()
@@ -244,6 +319,7 @@ class ChronoArduino(ChronoHard, QTimer):
         self.chronoLap.clear()
         self.weather.reset_weather()
         self.clearPenalty()
+        self.set_status(chronoStatus.InWait)
         self.valid = True
         self.refly = False
 

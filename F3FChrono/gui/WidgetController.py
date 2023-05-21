@@ -57,10 +57,10 @@ class WRoundCtrl(QObject):
     btn_gscoring_sig = pyqtSignal()
     widgetList = []
 
-    def __init__(self, name, parent, vocal_elapsedTime_sig):
+    def __init__(self, name, parent):
         super().__init__()
         self.wPilotCtrl = WPilotCtrl("PilotCtrl", parent)
-        self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent, vocal_elapsedTime_sig)
+        self.wChronoCtrl = WChronoCtrl("ChronoCtrl", parent)
         self.wBtnCtrl = Ui_WChronoBtn()
         self.wBtnCancel = Ui_WChronoBtn_Cancel()
         self.wBtnGS = Ui_WChronoGSEnable()
@@ -351,10 +351,9 @@ class WChronoCtrl(QTimer):
     btn_penalty_100_sig = pyqtSignal()
     btn_penalty_1000_sig = pyqtSignal()
     btn_clear_penalty_sig = pyqtSignal()
-    time_elapsed_sig = pyqtSignal()
     btn_refly_sig = pyqtSignal()
 
-    def __init__(self, name, parent, vocal_elapsedTime_sig):
+    def __init__(self, name, parent):
         super().__init__()
 
         self.view = Ui_WChrono()
@@ -375,7 +374,6 @@ class WChronoCtrl(QTimer):
         self.statusText.append(self._translate("chronoStatus_WaitAltitude", "Wait Altitude"))
         self.statusText.append(self._translate("chronoStatus_Finished", "Finished"))
 
-        self.vocal_elapsedTime_sig = vocal_elapsedTime_sig
         # initialize labels for lap time
         self.lap = []
         # initialize labels for status
@@ -397,14 +395,6 @@ class WChronoCtrl(QTimer):
         self.view.reflight.setStyleSheet(refly_btn_stylesheet)
         self.view.nullFlight.setStyleSheet(director_btn_stylesheet)
         self.view.btn_clear_penalty.setStyleSheet(clear_penalty_btn_stylesheet)
-
-        self.timerEvent = QTimer()
-        self.timerEvent.timeout.connect(self.run)
-        self.duration = 100
-        self.startTime = time.time()
-        self.time = 0
-        self.time_up = True
-        self.to_launch = False
 
     def get_widget(self):
         return (self.widget)
@@ -434,63 +424,13 @@ class WChronoCtrl(QTimer):
         self.view.Time_label.setText("{:0.2f}".format(data_time))
 
     def reset_ui(self):
-        self.stoptime()
         self.current_lap = 0
         self.set_penalty_value(0)
         self.set_null_flight(False)
 
-    def settime(self, settime, count_up, starttimer=True, to_launch=False):
-        self.to_launch = to_launch
-        self.time = settime
-        self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000))
-        self.time_up = count_up
-        self.startTime = time.time()
-        if starttimer:
-            self.timerEvent.start(self.duration)
+    def timeRefresh(self, timeValue):
+        self.view.Time_label.setText("{:>6.0f}".format(timeValue))
 
-    def stoptime(self):
-        self.timerEvent.stop()
-
-    def run(self):
-        if self.time_up:
-            self.view.Time_label.setText("{:>6.0f}".format(time.time() - self.startTime))
-        else:
-            self.view.Time_label.setText("{:>6.0f}".format(self.time / 1000 - (time.time() - self.startTime)))
-            timeval = self.time / 1000 - (time.time() - self.startTime)
-            if timeval >= 29.5:
-                self.vocal_elapsedTime_sig.emit(30, self.to_launch)
-            if 25.5 <= timeval <= 26:
-                self.vocal_elapsedTime_sig.emit(25, self.to_launch)
-            if 20.5 <= timeval <= 21:
-                self.vocal_elapsedTime_sig.emit(20, self.to_launch)
-            if 15.5 <= timeval <= 16:
-                self.vocal_elapsedTime_sig.emit(15, self.to_launch)
-            if 10.5 <= timeval <= 11:
-                self.vocal_elapsedTime_sig.emit(10, self.to_launch)
-            '''
-            if 9 <= timeval <= 10:
-                self.vocal_elapsedTime_sig.emit(9, self.to_launch)
-            if 8.9 <= timeval <= 9:
-                self.vocal_elapsedTime_sig.emit(8, self.to_launch)
-            if 7.9 <= timeval <= 8:
-                self.vocal_elapsedTime_sig.emit(7, self.to_launch)
-            if 6.9 <= timeval <= 7:
-                self.vocal_elapsedTime_sig.emit(6, self.to_launch)
-            if 5.9 <= timeval <= 6:
-                self.vocal_elapsedTime_sig.emit(5, self.to_launch)
-            if 4.9 <= timeval <= 5:
-                self.vocal_elapsedTime_sig.emit(4, self.to_launch)
-            if 3.9 <= timeval <= 4:
-                self.vocal_elapsedTime_sig.emit(3, self.to_launch)
-            if 2.9 <= timeval <= 3:
-                self.vocal_elapsedTime_sig.emit(2, self.to_launch)
-            if 1.9 <= timeval <= 2:
-                self.vocal_elapsedTime_sig.emit(1, self.to_launch)
-            '''
-            if timeval < 0:
-                self.vocal_elapsedTime_sig.emit(0, self.to_launch)
-                self.time_elapsed_sig.emit()
-                self.stoptime()
 
     def btn_refly(self, event):
         self.btn_refly_sig.emit()
