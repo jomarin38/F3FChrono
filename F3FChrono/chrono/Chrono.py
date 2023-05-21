@@ -61,42 +61,40 @@ class F3FTimer(QObject):
         self.timerEvent.setInterval(self.duration)
         self.startTime = time.time()
         self.time = 0
-        self.timeSound = 30
         self.time_up = True
         self.to_launch = False
         self.ticks_count = 0
 
     def initialize(self):
         self.stopTime()
-        self.time = 30000
-        self.uiTimeRefresh_sig.emit(int(self.time / 1000))
+        self.time = 30
+        self.uiTimeRefresh_sig.emit(self.time)
 
     def setLaunchTime(self):
         self.stopTime()
         self.to_launch = True
-        self.time = 30000
-        self.uiTimeRefresh_sig.emit(int(self.time / 1000))
+        self.time = 30
+        self.uiTimeRefresh_sig.emit(self.time)
         self.time_up = False
         self.startTime = time.time()
-        print("setLaunchTime - time : ", self.time, ", timeSound : ", self.timeSound)
+        print("setLaunchTime - time : ", self.time)
         self.timerEvent.start()
 
     def setLaunchedTime(self):
         self.stopTime()
         self.to_launch = False
-        self.time = 30000
-        self.uiTimeRefresh_sig.emit(int(self.time / 1000))
+        self.time = 30
+        self.uiTimeRefresh_sig.emit(self.time)
         self.time_up = False
         self.startTime = time.time()
-        print("setLaunchedTime - time : ", self.time, ", timeSound : ", self.timeSound)
+        print("setLaunchedTime - time : ", self.time)
         self.timerEvent.start()
 
     def setRaceStartedTime(self):
         self.stopTime()
         self.to_launch = False
         self.time = 0
-        self.timeSound = 0
-        self.uiTimeRefresh_sig.emit(int(self.time / 1000))
+        self.uiTimeRefresh_sig.emit(self.time)
         self.time_up = True
         self.startTime = time.time()
         self.timerEvent.start()
@@ -110,11 +108,11 @@ class F3FTimer(QObject):
     def timeCount(self):
         self.ticks_count +=1
         if self.time_up:
-            self.uiTimeRefresh_sig.emit(int(time.time() - self.startTime))
+            self.uiTimeRefresh_sig.emit(self.ticks_count)
         else:
-            self.uiTimeRefresh_sig.emit(int(self.time / 1000) - self.ticks_count)
+            self.uiTimeRefresh_sig.emit(self.time - self.ticks_count)
             if self.ticks_count % 5 == 0 and self.ticks_count <=20:
-                self.vocalTimeElapsed_sig.emit(int(self.time / 1000) - self.ticks_count, self.to_launch)
+                self.vocalTimeElapsed_sig.emit(self.time - self.ticks_count, self.to_launch)
             elif self.ticks_count >=30:
                 self.vocalTimeElapsed_sig.emit(0, self.to_launch)
                 self.time_elapsed_sig.emit()
