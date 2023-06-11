@@ -498,7 +498,8 @@ class Round:
                     row = [str(fetched_competitor.bib_number), fetched_competitor.get_pilot().name]
                     row.append('{:0.2f}'.format(valid_run.get_flight_time()))
                     row.append(str(int(group.get_penalty(competitor))))
-                    for i in range(0, 10):
+                    '''for i in range(0, 10):
                         row.append(str(valid_run.chrono.get_lap_time(i)))
+                    '''
                     result_dict['roundtime'].append(row)
         return json.dumps(result_dict)
