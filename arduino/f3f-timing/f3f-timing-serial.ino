@@ -78,7 +78,8 @@ void serial_run(void) {
         baseA.rebundBtn_time = baseA.rebundBtn_time*10+(int)(serial.data_read[i]-'0');
       }
       baseB.rebundBtn_time = baseA.rebundBtn_time;
-      printbase();
+      printbaseA();
+      printbaseB();
     }else if (tmp=='v'){  //Send voltage
       printvoltage();
     }else if (tmp=='r'){  //Reset chrono
@@ -140,7 +141,8 @@ void printdebug(void){
   printmode();
   printstatus();
   printchrono();
-  printbase();
+  printbaseA();
+  printbaseB();
   printvoltage();
   printoutput();
 }
