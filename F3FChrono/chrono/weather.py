@@ -21,6 +21,7 @@ from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from F3FChrono.chrono.UDPSend import *
 from F3FChrono.chrono import ConfigReader
 from F3FChrono.Utils import get_ip
+from F3FChrono.chrono import Chrono
 
 class alarm():
     Release = 0,
@@ -65,6 +66,7 @@ class Weather(QTimer):
     beep_signal = pyqtSignal(str, int, int)
 
     weather_sound_signal = pyqtSignal(str)
+    weather_mc_signal = pyqtSignal(bool)
     weather_lowVoltage_signal = pyqtSignal()
     weather_sensor_lost = pyqtSignal()
 
@@ -93,11 +95,12 @@ class Weather(QTimer):
         self.rules['sensor_voltage_alarm'] = alarm.Release
         self.rules['sensor_lost_alarm'] = alarm.Release
         self.rules['state'] = weatherState.init
+        self.chronostatus = Chrono.chronoStatus.InWait
         self.__rules_enable = False
         self.timeout.connect(self.refresh_gui)
         self.start(2000)
         self.weatherBeep = ConfigReader.config.conf['weather_Beep']
-        self.weatherSound = ConfigReader.config.conf['weather_Sound']
+        self.weatherSound = True
         self.sensorAlarmTimeOut = ConfigReader.config.conf['SensorAlarmTimeout']
         self.weatherTimeOutOkDc = ConfigReader.config.conf['weather_TimeOut_OkDC']
         self.weatherTimeOutMarginalcond = ConfigReader.config.conf['weather_TimeOut_MarginalCond']
@@ -148,7 +151,6 @@ class Weather(QTimer):
                 self.timerRain.stop()
         self.rules['wind_dir_voltage_min'] = ConfigReader.config.conf['voltage_min_windDir']
         self.weatherBeep = ConfigReader.config.conf['weather_Beep']
-        self.weatherSound = ConfigReader.config.conf['weather_Sound']
         self.sensorAlarmTimeOut = ConfigReader.config.conf['SensorAlarmTimeout']
         self.weatherTimeOutOkDc = ConfigReader.config.conf['weather_TimeOut_OkDC']
         self.weatherTimeOutMarginalcond = ConfigReader.config.conf['weather_TimeOut_MarginalCond']
@@ -176,7 +178,7 @@ class Weather(QTimer):
         else:
             self.slot_weatherCondition()
 
-    def enable_rules(self, enable=False):
+    def enable_rules(self, enable=True):
         self.__rules_enable = enable
         if self.__rules_enable:
             self.rules['wind_dir_voltage_alarm'] = alarm.Release
@@ -221,6 +223,9 @@ class Weather(QTimer):
             self.weather['orientation_sum'] += orientation
             self.weather['orientation_nb'] += 1
         self.timerDir.start(self.sensorAlarmTimeOut)
+
+    def setWeatherSound(self, enable=True):
+        self.weatherSound = enable
 
     def setInRun(self, inRun):
         if inRun:
@@ -337,39 +342,13 @@ class Weather(QTimer):
         self.timerOkDC.stop()
         self.rules['state'] = weatherState.Nominal
         self.status = "OKDC"
+        self.weather_mc_signal.emit(False)
         if self.__rules_enable:
             if self.weatherBeep:
                 self.beep_signal.emit("blink", 5, self.weatherBeepOkDc)
-            if self.weatherSound:
+            if self.weatherSound or self.chronostatus == Chrono.chronoStatus.InWait \
+                    or self.chronostatus == Chrono.chronoStatus.Finished:
                 self.weather_sound_signal.emit("windok")
-
-    def slot_Marginal(self):
-        if self.__debug:
-            print("slot_marginal")
-        self.timerMarginal.stop()
-        self.rules['state'] = weatherState.condMarginal
-        self.status = "MC"
-        if self.__rules_enable:
-            if self.weatherBeep:
-                self.beep_signal.emit("permanent", -1, 1000)
-            if self.weatherSound:
-                self.weather_sound_signal.emit("windmarginal")
-
-    def slot_weatherCondition(self):
-        if self.__debug:
-            print("slot weather Condition, state : " + str(self.rules['state']))
-        self.timerMarginal.stop()
-
-        if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.condNok:
-            self.rules['state'] = weatherState.Nominal
-            self.status = "OKDC"
-            if self.__rules_enable and self.weatherSound:
-                self.weather_sound_signal.emit("windok")
-        elif self.rules['state'] == weatherState.condMarginal:
-            self.timerOkDC.start(self.weatherTimeOutOkDc)
-            self.rules['state'] = weatherState.Stabilizing
-            self.beep_signal.emit("stop", 0, 0)
-            self.status = "STAB"
 
     def slot_weatherNotCondition(self):
         if self.__debug:
@@ -382,7 +361,8 @@ class Weather(QTimer):
             if self.__rules_enable:
                 if self.weatherBeep:
                     self.beep_signal.emit("blink", 2, self.weatherBeepNok)
-                if self.weatherSound:
+                if self.weatherSound or self.chronostatus == Chrono.chronoStatus.InWait \
+                    or self.chronostatus == Chrono.chronoStatus.Finished:
                     self.weather_sound_signal.emit("windalert")
 
         if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.Nominal:
@@ -390,5 +370,40 @@ class Weather(QTimer):
             self.rules['state'] = weatherState.condNok
         elif self.rules['state'] == weatherState.Stabilizing:
             self.slot_Marginal()
+
+    def slot_Marginal(self):
+        if self.__debug:
+            print("slot_marginal")
+        self.timerMarginal.stop()
+        self.rules['state'] = weatherState.condMarginal
+        self.status = "MC"
+        self.weather_mc_signal.emit(True)
+        if self.__rules_enable:
+            if self.weatherBeep:
+                self.beep_signal.emit("permanent", -1, 1000)
+            if self.weatherSound or self.chronostatus == Chrono.chronoStatus.InWait \
+                    or self.chronostatus == Chrono.chronoStatus.Finished:
+                self.weather_sound_signal.emit("windmarginal")
+
+    def slot_weatherCondition(self):
+        if self.__debug:
+            print("slot weather Condition, state : " + str(self.rules['state']))
+        self.timerMarginal.stop()
+
+        if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.condNok:
+            self.rules['state'] = weatherState.Nominal
+            self.status = "OKDC"
+            if self.__rules_enable:
+                if self.weatherSound or self.chronostatus == Chrono.chronoStatus.InWait \
+                    or self.chronostatus == Chrono.chronoStatus.Finished:
+                    self.weather_sound_signal.emit("windok")
+        elif self.rules['state'] == weatherState.condMarginal:
+            self.timerOkDC.start(self.weatherTimeOutOkDc)
+            self.rules['state'] = weatherState.Stabilizing
+            self.beep_signal.emit("stop", 0, 0)
+            self.status = "STAB"
+
+    def slot_chronostatus (self, status):
+        self.chronostatus = status
 
 

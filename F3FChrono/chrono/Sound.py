@@ -134,7 +134,7 @@ class chronoQSound(QThread):
         self.entry_sound = False
         self.entry_soundToLate = False
         self.toLateSound = False
-        self.__debug = False
+        self.__debug = True
 
     def loadwav(self, volume):
         self.time = []
@@ -159,7 +159,6 @@ class chronoQSound(QThread):
         if self.play_sound:
             if not self.training and self.marginalConditionFlag:
                 self.__addSound(self.specialsound['marginalCondition'].num)
-                self.marginalConditionFlag = False
             else:
                 # decompose numeric time to find cent, diz, 1/100
                 var_time = Decimal("{:0.2f}".format(self.run_time))
@@ -199,11 +198,12 @@ class chronoQSound(QThread):
             self.__addSound(self.specialsound['windAlert'].num)
         elif type=="windmarginal":
             if self.__debug:
-                print ("sot_windalarm Marginal Condition, chronostatus : ", self.chronoStatus)
+                print("sot_windalarm Marginal Condition, chronostatus : ", self.chronoStatus)
             if self.chronoStatus == chronoStatus.InWait or self.chronoStatus == chronoStatus.Finished:
                 self.__addSound(self.specialsound['marginalCondition'].num)
-            else:
-                self.marginalConditionFlag = True
+
+    def setMarginalCondition(self, mc):
+        self.marginalConditionFlag = mc
 
     def slot_weatherStationLowVoltage(self):
         self.__addSound(self.specialsound['weatherstationlowvoltage'].num, lowpriority=True)

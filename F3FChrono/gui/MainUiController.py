@@ -67,6 +67,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.chronoHard.event_voltage()
         self.chronoHard.udpReceive.switchMode_sig.connect(self.slot_switch_mode)
         self.chronoHard.status_changed.connect(self.vocal.slot_status_changed)
+        self.chronoHard.status_changed.connect(self.chronoHard.weather.slot_chronostatus)
         self.signal_race = None
         self.signal_training = None
         self.low_voltage_ask = False
@@ -168,6 +169,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.controllers['settingswDevices'].weatherStation_display)
         self.chronoHard.weather.set_minVoltageWindDir(ConfigReader.config.conf['voltage_min_windDir'])
         self.chronoHard.weather.weather_sound_signal.connect(self.vocal.slot_windAlarm)
+        self.chronoHard.weather.weather_mc_signal.connect(self.vocal.setMarginalCondition)
         self.chronoHard.weather.weather_lowVoltage_signal.connect(self.vocal.slot_weatherStationLowVoltage)
         self.chronoHard.weather.weather_sensor_lost.connect(self.vocal.slot_weatherStationSensorsLost)
         self.controllers['settingsbase'].set_udp_sig(self.chronoHard.udpReceive.simulate_base_sig,
@@ -513,7 +515,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.chronoHard.weather.set_rules_limit(self.event.min_allowed_wind_speed,
                                                     self.event.max_allowed_wind_speed,
                                                     self.event.max_wind_dir_dev)
-            self.chronoHard.weather.enable_rules(self.controllers['round'].isalarm_enable())
+            self.chronoHard.weather.enable_rules()
             self.set_signal_mode(training=False)
             self.show_chrono()
             if self.enableConnectedDisplay:
@@ -627,9 +629,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
                                                     self.event.max_wind_dir_dev)
 
     def slot_weather_alarm(self):
-        self.chronoHard.weather.enable_rules(self.controllers['round'].isalarm_enable())
+        self.chronoHard.weather.setWeatherSound(self.controllers['round'].isalarm_enable())
         if self.__debug:
-            print("alarm enable : ", self.controllers['round'].isalarm_enable())
+            print("alarm sound enable : ", self.controllers['round'].isalarm_enable())
 
     def slot_switch_mode(self):
         if self.controllers['config'].is_show():
