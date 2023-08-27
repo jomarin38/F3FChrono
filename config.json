@@ -23,7 +23,7 @@
  "language": "French",
  "noisesound": true,
  "noisetempo_msecond": 3500,
- "noisevolume": 30,
+ "noisevolume": 13,
  "rebound_btn_time": 100,
  "run_webserver": true,
  "simulatemode": false,
