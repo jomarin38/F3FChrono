@@ -39,7 +39,6 @@
  "voltage_min_Accu2": 9.9,
  "voltage_min_windDir": 10.0,
  "weather_Beep": false,
- "weather_Sound": true,
  "weather_TimeOut_MarginalCond": 20000,
  "weather_TimeOut_OkDC": 20000,
  "weather_beep_nok": 150,

@@ -1226,13 +1226,13 @@ class WSettingsSound(QObject):
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
         self.view.btn_back.clicked.connect(self.btn_settings_sig.emit)
-        self._translate = QtCore.QCoreApplication.translate
         self.view.btn_cancel.clicked.connect(self.btn_cancel_sig.emit)
         self.view.btn_valid.clicked.connect(self.btn_valid_sig.emit)
         self.view.soundslider.valueChanged.connect(self.soundslider_changed)
         self.view.soundvolume.valueChanged.connect(self.soundvolume_changed)
         self.view.noiseslider.valueChanged.connect(self.noiseslider_changed)
         self.view.noisevolume.valueChanged.connect(self.noisevolume_changed)
+        self._translate = QtCore.QCoreApplication.translate
 
     def get_widget(self):
         return (self.widgetList)
@@ -1265,8 +1265,7 @@ class WSettingsSound(QObject):
         self.view.noiseSound.setChecked(ConfigReader.config.conf['noisesound'])
         self.view.noisevolume.setValue(ConfigReader.config.conf['noisevolume'])
         self.view.WeatherStationAlarmBuzzer.setChecked(ConfigReader.config.conf['weather_Beep'])
-        self.view.WeatherStationAlarmSound.setChecked(ConfigReader.config.conf['weather_Sound'])
-
+        print("btn visible", self.view.btn_valid.isVisible())
 
     def get_data(self):
         ConfigReader.config.conf['sound'] = self.view.sound.isChecked()
@@ -1275,7 +1274,6 @@ class WSettingsSound(QObject):
         ConfigReader.config.conf['noisesound'] = self.view.noiseSound.isChecked()
         ConfigReader.config.conf['noisevolume'] = int(self.view.noisevolume.value())
         ConfigReader.config.conf['weather_Beep'] = self.view.WeatherStationAlarmBuzzer.isChecked()
-        ConfigReader.config.conf['weather_Sound'] = self.view.WeatherStationAlarmSound.isChecked()
 
 class WSettingsWirelessDevices(QObject):
     btn_settingsbase_sig = pyqtSignal()

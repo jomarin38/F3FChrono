@@ -15,11 +15,12 @@ class Ui_WWind(object):
     def setupUi(self, WWind):
         WWind.setObjectName("WWind")
         WWind.resize(389, 26)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(WWind.sizePolicy().hasHeightForWidth())
         WWind.setSizePolicy(sizePolicy)
+        WWind.setMaximumSize(QtCore.QSize(16777215, 26))
         self.gridLayout = QtWidgets.QGridLayout(WWind)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setSpacing(0)
