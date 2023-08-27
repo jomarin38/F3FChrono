@@ -19,7 +19,7 @@ const byte BASEAPIN = 2;
 const byte BASEBPIN = 3;
 const byte BTNNEXTPIN = -1; //Not a real btn
 
-const int REBUNDTIME = 500;
+const int REBUNDTIME = 80;
 
 typedef struct {
   unsigned long old_event;
@@ -30,6 +30,8 @@ typedef struct {
 } baseEventStr;
 
 volatile baseEventStr baseA = {0}, baseB = {0};
+volatile byte baseDebug = false;
+
 
 void base_setup(void){
   memset (&baseA, 0, sizeof(baseA));
@@ -40,101 +42,89 @@ void base_setup(void){
   baseB.rebundBtn_time = REBUNDTIME;
   baseB.Pin = BASEBPIN;
   //Initialize buttons pin in interrupt mode
-  pinMode(baseA.Pin, INPUT_PULLUP);
-  baseAttach(baseA.Pin);
-  pinMode(baseB.Pin, INPUT_PULLUP);
-  baseAttach(baseB.Pin);
+  pinMode(baseA.Pin, INPUT);
+  attachInterrupt(digitalPinToInterrupt(baseA.Pin), baseA_Interrupt, FALLING);
+  baseA.Attach=true;
+  pinMode(baseB.Pin, INPUT);
+  attachInterrupt(digitalPinToInterrupt(baseB.Pin), baseB_Interrupt, FALLING);    
+  baseB.Attach=true;
 }
 
 void baseA_Interrupt(void) {
-  //Serial.println("interrupt");
-  if ((baseA.old_event + baseA.rebundBtn_time) < millis()) {
-    if (digitalRead(baseA.Pin)==LOW){
-      //Serial.println("LOW");
-      baseCheck(baseA.Pin);
-      baseA.old_event=millis();
-      baseA.nbInterrupt++;
-      baseDetach(baseA.Pin);
-    }
+  baseA.old_event=millis();
+  if (baseA.Attach==true){
+    baseCheck(baseA.Pin);
   }
+  baseA.Attach=false;
+  baseA.nbInterrupt++;
 }
 
 void baseA_check(void){
   if (baseA.Attach==false){
     if (digitalRead(baseA.Pin)==LOW){
-      baseA.old_event=millis();
-      //Serial.println("LOW"); 
+      baseA.old_event=millis(); 
     }else{
-      //Serial.println("HIGH");
       if ((baseA.old_event + baseA.rebundBtn_time) < millis()){
-        baseAttach(baseA.Pin);
+        baseA.Attach=true;
+        if (baseDebug==true){
+          printbaseA();
+        }
       }
     }
   }
 }
 
 void baseB_Interrupt(void) {
-  if ((baseB.old_event + baseB.rebundBtn_time) < millis()) {
-    if (digitalRead(baseB.Pin)==LOW){
-      baseCheck(baseB.Pin);
-      baseB.old_event=millis();
-      baseB.nbInterrupt++;
-      baseDetach(baseB.Pin);
-    }
+  if (baseB.Attach==true){
+    baseCheck(baseB.Pin);
   }
+  baseB.Attach=false;
+  baseB.old_event=millis();
+  baseB.nbInterrupt++;
 }
 
 void baseB_check(void){
   if (baseB.Attach==false){
     if (digitalRead(baseB.Pin)==LOW){
-      baseA.old_event=millis();
-      //Serial.println("LOW"); 
+      baseB.old_event=millis();
     }else{
-      //Serial.println("HIGH");
       if ((baseB.old_event + baseB.rebundBtn_time) < millis()){
-        baseAttach(baseB.Pin);
+        baseB.Attach=true;
+        if (baseDebug==true){
+          printbaseB();  
+        }
       }
     }
   }
 }
 
-void baseAttach(int pin){
-  //Serial.println("AttachInterrupt");
-  if (pin==baseA.Pin){
-    attachInterrupt(digitalPinToInterrupt(baseA.Pin), baseA_Interrupt, FALLING);
-    baseA.Attach=true;
-  }
-  if (pin==baseB.Pin){
-    attachInterrupt(digitalPinToInterrupt(baseB.Pin), baseB_Interrupt, FALLING);    
-    baseB.Attach=true;
-  }
-}
 
-void baseDetach(int pin){
-  //Serial.println("DetachInterrupt");
-  
-  if (pin==baseA.Pin){
-    detachInterrupt(digitalPinToInterrupt(baseA.Pin));
-    baseA.Attach=false;
-  }
-  if (pin==baseB.Pin){
-    detachInterrupt(digitalPinToInterrupt(baseB.Pin));
-    baseB.Attach=false;
-  }
-
-}
-
-void printbase(void){
+void printbaseA(void){
   Serial.print("baseA,");
   Serial.print("rebundtime,");
   Serial.print(baseA.rebundBtn_time);
   Serial.print(",nbinterrrupt,");
   Serial.print(baseA.nbInterrupt);
-  Serial.print(",baseB");
+  Serial.print(",attach?");
+  Serial.print(baseA.Attach);
+  Serial.print(",calcrebound:");
+  Serial.print(baseA.old_event + baseA.rebundBtn_time);
+  Serial.print(",millis():");
+  Serial.print(millis());
+  Serial.println(",");
+}
+void printbaseB(void){
+  Serial.print("baseB");
   Serial.print(",rebundtime,");
-  Serial.print(baseA.rebundBtn_time);
+  Serial.print(baseB.rebundBtn_time);
   Serial.print(",nbinterrrupt,");
   Serial.print(baseB.nbInterrupt);
+  Serial.print(",attach?");
+  Serial.print(baseB.Attach);
+  Serial.print(",calc rebound:");
+  Serial.print(baseB.old_event + baseB.rebundBtn_time);
+  Serial.print(",millis()");
+  Serial.print(millis());
   Serial.println(",");
 }
 

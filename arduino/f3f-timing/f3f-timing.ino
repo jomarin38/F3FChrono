@@ -21,12 +21,13 @@
 */
 #include <Wire.h>
 
-const float VERSION = 0.92;
+const float VERSION = 0.93;
 const byte LOOPDELAY = 5;
 
 const byte BUZZERPIN = 12;
 const int BUZZERTIME = 300;
 const int LEDTIME = 300;
+const byte TESTENABLE = false;
 
 typedef struct {
   byte state;
@@ -47,9 +48,7 @@ volatile unsigned int i = 0;
 volatile byte temp = 0;
 volatile byte reset = true;
 
-
 void(* resetFunc) (void) = 0;
-
 void buzzerRun(buzzerStr *data);
 void buzzerSet(buzzerStr *data, byte nb);
 void chrono_setup(void);
@@ -68,6 +67,9 @@ void setup() {
   output_setup();
   analog_setup();
   base_setup();
+  if (TESTENABLE){
+    test_setup();
+  }
 }
 
 // the loop function runs over and over again forever
@@ -78,10 +80,16 @@ void loop() {
   analogRun();
   buzzerRun();
   chrono_run();
+  if (TESTENABLE){
+    test_run(LOOPDELAY);
+  }
   delay (LOOPDELAY);
-  
 }
 
 void printreset(void){
-  Serial.println("resetµc,F3F,Chrono,available,");
+  if (TESTENABLE){
+    Serial.println("resetµc,F3F,Chrono,Test Mode,");
+  }else{
+    Serial.println("resetµc,F3F,Chrono,available,");
+  }
 }
