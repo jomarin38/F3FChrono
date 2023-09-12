@@ -249,6 +249,9 @@ class Round:
     def get_current_competitor(self):
         return self.groups[self._current_group_index].get_current_competitor()
 
+    def force_current_competitor(self, competitor):
+        self.groups[self._current_group_index].force_current_competitor(competitor)
+
     def next_pilot(self, insert_database=False, visited_competitors=[]):
 
         current_competitor = self.groups[self._current_group_index].next_pilot()
