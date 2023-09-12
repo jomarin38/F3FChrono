@@ -204,6 +204,10 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.chronoHard.weather.gui_weather_signal.connect(self.controllers['round'].wChronoCtrl.display_wind_info)
         self.controllers['wind'].lowVoltage_sig.connect(self.vocal.slot_lowVoltage)
 
+    def handle_pilot_changed(self):
+        print('hey ! Pilot changed :'+self.controllers['round'].wPilotCtrl.get_selected_competitor().to_string())
+        self.event.get_current_round().force_current_competitor(self.controllers['round'].wPilotCtrl.get_selected_competitor())
+
     def show_config(self):
         self.controllers['round'].hide()
         self.controllers['training'].hide()
@@ -434,6 +438,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.set_signal_mode(training=None)
         self.chronoHard.weather.enable_rules(enable=False)
         self.noise.stop()
+        self.controllers['round'].pilot_change_sig.disconnect(self.handle_pilot_changed)
 
     def home_training(self):
         self.show_config()
@@ -501,8 +506,10 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             if not current_competitor.present:
                 current_round.set_null_flight(current_competitor)
                 current_competitor = current_round.next_pilot()
+            self.controllers['round'].wPilotCtrl.set_pilots(list(self.event.competitors.values()))
             self.controllers['round'].wPilotCtrl.set_data(current_competitor,
                                                           self.event.get_current_round())
+            self.controllers['round'].pilot_change_sig.connect(self.handle_pilot_changed)
             self.vocal.signal_pilotname.emit(int(current_competitor.get_bib_number()))
             self.chronoHard.set_mode(training=False)
             self.chronoHard.timerF3F.initialize()
