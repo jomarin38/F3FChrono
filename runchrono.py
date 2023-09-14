@@ -39,16 +39,8 @@ if not is_running_on_pi():
     # by default it prints everything to std.error
     toggle_print(False)  # turn on/off printing
 
-from F3FChrono.chrono import ConfigReader
-from F3FChrono.gui.MainUiController import MainUiCtrl
-from F3FChrono.data.Chrono import Chrono
-from F3FChrono.data.dao.EventDAO import EventDAO
-from F3FChrono.gui.Simulate_base import SimulateBase
-from F3FChrono.data.web.Utils import Utils
 
-
-
-def main():
+def main(webservice_only=False):
 
     #logging.basicConfig (filename="runchrono.log", level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     if is_running_on_pi():
@@ -73,42 +65,57 @@ def main():
 
     print("...start")
 
-    dao = EventDAO()
-    chronodata = Chrono()
+    if not webservice_only:
+
+        dao = EventDAO()
+        chronodata = Chrono()
+
+        app = QtWidgets.QApplication(sys.argv)
+        ui = MainUiCtrl(dao, chronodata, rpi=is_running_on_pi(), webserver_process=webserver_process)
+
+        if not os.path.isfile('voltage_log.txt'):
+            MainUiCtrl.startup_time = time.time()
+        else:
+            with open("voltage_log.txt", "r") as file:
+                first_line = file.readline()
+                MainUiCtrl.startup_time = float(first_line.split(',')[0])
 
 
-    app = QtWidgets.QApplication(sys.argv)
-    ui = MainUiCtrl(dao, chronodata, rpi=is_running_on_pi(), webserver_process=webserver_process)
+        #launched simulate mode
+        if (ConfigReader.config.conf['simulatemode']):
+            ui_simulate=SimulateBase()
+            ui_simulate.close_signal.connect(ui.MainWindow.close)
+            ui.close_signal.connect(ui_simulate.MainWindow.close)
 
-    if not os.path.isfile('voltage_log.txt'):
-        MainUiCtrl.startup_time = time.time()
+        try:
+            sys.exit(app.exec_())
+
+        except KeyboardInterrupt:
+            pass
+        finally:
+            pass
     else:
-        with open("voltage_log.txt", "r") as file:
-            first_line = file.readline()
-            MainUiCtrl.startup_time = float(first_line.split(',')[0])
-
-
-    #launched simulate mode
-    if (ConfigReader.config.conf['simulatemode']):
-        ui_simulate=SimulateBase()
-        ui_simulate.close_signal.connect(ui.MainWindow.close)
-        ui.close_signal.connect(ui_simulate.MainWindow.close)
-
-    try:
-        sys.exit(app.exec_())
-
-    except KeyboardInterrupt:
-        pass
-    finally:
-        pass
+        webserver_process.communicate()
 
 
 if __name__ == '__main__':
     parser = ArgumentParser(prog='chrono')
-    #parser.add_argument('show=false')
+    parser.add_argument('--webservice-only', action="store_true")
+    parser.add_argument('--external-webserver')
     args = parser.parse_args()
+
+    from F3FChrono.chrono import ConfigReader
 
     ConfigReader.init()
     ConfigReader.config = ConfigReader.Configuration('config.json')
 
-    main()
+    from F3FChrono.gui.MainUiController import MainUiCtrl
+    from F3FChrono.data.Chrono import Chrono
+    from F3FChrono.data.dao.EventDAO import EventDAO
+    from F3FChrono.gui.Simulate_base import SimulateBase
+    from F3FChrono.data.web.Utils import Utils
+
+    if args.external_webserver is not None:
+        Utils.set_external_webserver_IP(args.external_webserver)
+
+    main(args.webservice_only)
