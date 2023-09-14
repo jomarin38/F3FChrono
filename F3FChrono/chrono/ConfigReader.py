@@ -88,7 +88,8 @@ default_config = \
     "weather_TimeOut_OkDC": 20000,
     "weather_Beep": False,
     "weather_Sound": False,
-    "auto_send_f3xvault": False
+    "auto_send_f3xvault": False,
+    "mysql_server_IP": "localhost"
 }
 
 def init():
