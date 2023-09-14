@@ -24,6 +24,18 @@ class Utils:
 
     _port_number = 8000
     _protocol = 'http://'
+    _webserver_IP = None
+
+    @staticmethod
+    def set_external_webserver_IP(ip):
+        Utils._webserver_IP = ip
+
+    @staticmethod
+    def get_webserver_ip():
+        if Utils._webserver_IP is not None:
+            return Utils._webserver_IP
+        else:
+            return Utils.get_ip()
 
     @staticmethod
     def get_ip():
@@ -54,15 +66,16 @@ class Utils:
 
     @staticmethod
     def get_base_url():
-        return Utils._protocol + Utils.get_ip() + ':' + str(Utils.get_port_number()) + '/f3franking'
+
+        return Utils._protocol + Utils.get_webserver_ip() + ':' + str(Utils.get_port_number()) + '/f3franking'
 
     @staticmethod
     def get_logout_url():
-        return Utils._protocol + Utils.get_ip() + ':' + str(Utils.get_port_number()) + '/administrator/logout_f3f_admin'
+        return Utils._protocol + Utils.get_webserver_ip() + ':' + str(Utils.get_port_number()) + '/administrator/logout_f3f_admin'
 
     @staticmethod
     def get_administrator_url():
-        return Utils._protocol + Utils.get_ip() + ':' + str(Utils.get_port_number()) + '/administrator'
+        return Utils._protocol + Utils.get_webserver_ip() + ':' + str(Utils.get_port_number()) + '/administrator'
 
     @staticmethod
     def server_alive():
