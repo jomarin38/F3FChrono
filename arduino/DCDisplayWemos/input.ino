@@ -1,5 +1,5 @@
  /** 
- # This file is part of the F3FDCDisplay distribution (https://github.com/ADU).
+ # This file is part of the F3FDCDisplay distribution (https://github.com/jomarin38/F3FChrono).
  # Copyright (c) 2024 Sylvain DAVIET, Joel MARIN.
  # 
  # This program is free software: you can redistribute it and/or modify  
@@ -21,7 +21,7 @@ int btnStateLast[6] = {0};
 
 void BP_Start(void)
 {
-  Serial.println("BP_Start");
+  DebugStr(DEBUG_START, DEBUG_LN, "BP Module Start");
   int i=0;
   for (i=0; i<sizeof(btnState)/sizeof(int); i++){
     pinMode(BP_Pin[i], INPUT_PULLUP);
@@ -35,7 +35,7 @@ void BP_Start(void)
 void BP_CheckChanged (void)
 {
   int i;
-  //Serial.println("BP_CheckChanged");
+
   for (i=0; i<sizeof(btnState)/sizeof(int); i++){
     btnState[i] = digitalRead (BP_Pin[i]);
     /*Serial.print(btnState[i]);  
@@ -45,8 +45,8 @@ void BP_CheckChanged (void)
     */
     if (btnState[i] != btnStateLast[i]){
       if (btnState[i] == LOW){
-        Serial.print("BP Detection : ");
-        Serial.println(i);
+        sprintf(tmpStr, "BP Detection:%i", i);
+        DebugStr(DEBUG_START, DEBUG_LN, tmpStr);
         TcpClient_SendBP (i);
       }
     }

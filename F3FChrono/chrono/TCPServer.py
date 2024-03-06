@@ -118,7 +118,7 @@ class tcpF3FDCDisplayWorker(QThread):
 
     def initCurrentData(self):
         self.currentData["round"] = 0
-        self.currentData["pilot"] = ""
+        self.currentData["pilot"] = "pilotTest"
         self.currentData["bib"] = 0
         self.currentData["weatherdir"] = 0
         self.currentData["weatherspeed"] = 10
@@ -165,10 +165,12 @@ class tcpF3FDCDisplayWorker(QThread):
                     self.connection.sendall(bytes("F3FDCDisplayServerStarted", "utf-8"))
                 except socket.error as e:
                     print(str(e))
+                line = self.displayCreateLines()
                 try:
-                    msgdisplay = ("line1:RND:5 BIB:3 DUPONT\n" + "line2:Dir:-3   Speed:13\n" +
-                                "line3:Started    Base:07\n" + "line4:Time:55.66   VALID\n")
-                    self.connection.sendall(bytes(msgdisplay, "utf-8"))
+                    self.connection.sendall(bytes("line:0:" + line[0] + "\n", "utf-8"))
+                    self.connection.sendall(bytes("line:1:" + line[1] + "\n", "utf-8"))
+                    self.connection.sendall(bytes("line:2:" + line[2] + "\n", "utf-8"))
+                    self.connection.sendall(bytes("line:3:" + line[3] + "\n", "utf-8"))
                 except socket.error as e:
                     print(str(e))
                 self.status = displayStatus.InProgress
@@ -217,6 +219,20 @@ class tcpF3FDCDisplayWorker(QThread):
                 print("DCDisplay - Accu : " + m[2] + "V")
         else:
             print(data)
+
+    def displayCreateLines(self):
+        line = ["", "", "", ""]
+        line[0] = ("RND:" + "{:02d}".format(self.currentData["round"]) +
+                   " BIB:" + "{:02d}".format(self.currentData["bib"]) +
+                   " " + self.currentData["pilot"])
+        line[1] = ("Dir:" + "{:02d}".format(self.currentData["weatherdir"]) +
+                   " Speed:" + "{:0>.1f}".format(self.currentData["weatherdir"]))
+        line[2] = self.getStatusString() + "Base:" + "{:0>02d}".format(self.currentData["runbasenb"])
+        line[3] = "Time:" + "{:0>.2f}".format(self.currentData["runtime"]) + "     " + self.currentData["runAcceptance"]
+        return line
+
+    def getStatusString(self):
+        return "Started     "
 
 class tcpServer(QThread):
     contestRunning = pyqtSignal()
