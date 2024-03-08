@@ -117,9 +117,11 @@ class tcpF3FDCDisplayWorker(QThread):
         self.initCurrentData()
 
     def initCurrentData(self):
-        self.currentData["round"] = 0
+        self.currentData["contestInProgress"] = False
+        self.currentData["round"] = "0"
         self.currentData["pilot"] = "pilotTest"
-        self.currentData["bib"] = 0
+        self.currentData["bib"] = "0"
+        self.currentData["group"] = "1"
         self.currentData["weatherdir"] = 0
         self.currentData["weatherspeed"] = 10
         self.currentData["runstatus"] = chronoStatus.InWait
@@ -165,15 +167,8 @@ class tcpF3FDCDisplayWorker(QThread):
                     self.connection.sendall(bytes("F3FDCDisplayServerStarted", "utf-8"))
                 except socket.error as e:
                     print(str(e))
-                line = self.displayCreateLines()
-                try:
-                    self.connection.sendall(bytes("line:0:" + line[0] + "\n", "utf-8"))
-                    self.connection.sendall(bytes("line:1:" + line[1] + "\n", "utf-8"))
-                    self.connection.sendall(bytes("line:2:" + line[2] + "\n", "utf-8"))
-                    self.connection.sendall(bytes("line:3:" + line[3] + "\n", "utf-8"))
-                except socket.error as e:
-                    print(str(e))
                 self.status = displayStatus.InProgress
+                self.displayCreateLines()
             else:
                 try:
                     data = self.connection.recv(1024)
@@ -221,18 +216,72 @@ class tcpF3FDCDisplayWorker(QThread):
             print(data)
 
     def displayCreateLines(self):
-        line = ["", "", "", ""]
-        line[0] = ("RND:" + "{:02d}".format(self.currentData["round"]) +
-                   " BIB:" + "{:02d}".format(self.currentData["bib"]) +
-                   " " + self.currentData["pilot"])
-        line[1] = ("Dir:" + "{:02d}".format(self.currentData["weatherdir"]) +
-                   " Speed:" + "{:0>.1f}".format(self.currentData["weatherdir"]))
-        line[2] = self.getStatusString() + "Base:" + "{:0>02d}".format(self.currentData["runbasenb"])
-        line[3] = "Time:" + "{:0>.2f}".format(self.currentData["runtime"]) + "     " + self.currentData["runAcceptance"]
-        return line
+        lines = ["", "", "", ""]
+        if self.connection is not None and self.status == displayStatus.InProgress:
+            if self.currentData["contestInProgress"]:
+                lines[0] = self.displayCreateLineRoundInfo()
+                lines[1] = self.displayCreateLineWeatherInfo()
+                lines[2] = self.displayCreateLineRunInfo()
+                lines[3] = self.displayCreateLineRunStatus()
+                try:
+                    self.connection.sendall(bytes("line:0:" + lines[0] + "\n", "utf-8"))
+                    self.connection.sendall(bytes("line:1:" + lines[1] + "\n", "utf-8"))
+                    self.connection.sendall(bytes("line:2:" + lines[2] + "\n", "utf-8"))
+                    self.connection.sendall(bytes("line:3:" + lines[3] + "\n", "utf-8"))
+                except socket.error as e:
+                    print(str(e))
+            else:
+                try:
+                    self.connection.sendall(bytes("CLEAR:\n", "utf-8"))
+                    self.connection.sendall(bytes("line:0:" + "AWAITING CONTEST" + "\n", "utf-8"))
+                    self.connection.sendall(bytes("line:1:" + self.displayCreateLineWeatherInfo() + "\n", "utf-8"))
 
+                except socket.error as e:
+                    print(str(e))
+
+    def displayCreateLineRoundInfo(self):
+        return ("R" + self.currentData["round"] +
+                " G" + self.currentData["group"] +
+                " B" + self.currentData["bib"] +
+                    " " + self.currentData["pilot"])
+    def displayCreateLineWeatherInfo(self):
+        return ("Dir:" + "{:.0f}".format(self.currentData["weatherdir"]) +
+                   " Speed:" + "{:0>.1f}".format(self.currentData["weatherspeed"]))
+    def displayCreateLineRunInfo(self):
+        return (self.getStatusString() + "Base:" + "{:0>02d}".format(self.currentData["runbasenb"]))
+    def displayCreateLineRunStatus(self):
+        return("Time:" + "{:0>.2f}".format(self.currentData["runtime"]) + "     " + self.currentData["runAcceptance"])
     def getStatusString(self):
         return "Started     "
+
+    def slot_roundInfo(self, contestInProgress, competitor, round):
+        self.currentData["contestInProgress"] = contestInProgress
+        if contestInProgress:
+            self.currentData["round"] = str(len(round.event.valid_rounds) + 1)
+            self.currentData["bib"] = str(competitor.get_bib_number())
+            self.currentData["pilot"] = competitor.display_name()
+            self.currentData["group"] = str(round.find_group(competitor).group_number)
+            if self.connection is not None and self.status == displayStatus.InProgress:
+                line = self.displayCreateLineRoundInfo()
+
+                try:
+                    self.connection.sendall(bytes("line:0:" + line + "\n", "utf-8"))
+                except socket.error as e:
+                    print(str(e))
+        else:
+            self.displayCreateLines()
+
+    def slot_weatherInfo(self, speed, dir, rain, alarm):
+        self.currentData["weatherdir"] = dir
+        self.currentData["weatherspeed"] = speed
+        if self.connection is not None and self.status == displayStatus.InProgress:
+            line = self.displayCreateLineWeatherInfo()
+
+            try:
+                self.connection.sendall(bytes("line:1:" + line + "\n", "utf-8"))
+            except socket.error as e:
+                print(str(e))
+
 
 class tcpServer(QThread):
     contestRunning = pyqtSignal()
@@ -245,6 +294,7 @@ class tcpServer(QThread):
     bp_NullFlightSig  = pyqtSignal()
     bp_ValidSig  = pyqtSignal()
     bp_CancelSig  = pyqtSignal()
+    newDCDisplaySig = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -261,12 +311,19 @@ class tcpServer(QThread):
     def slot_contestInRun(self, status):
         for i in F3FDisplayList:
             i[1].slot_contestInRun(status)
-        for i in F3FDCDisplayList:
-            i[1].slot_contestInRun(status)
 
     def slot_orderData(self, data):
         for i in F3FDisplayList:
             i[1].slot_orderData(data)
+
+    def slot_roundInfo(self, contestInProgress, competitor, round):
+        for i in F3FDCDisplayList:
+            i[1].slot_roundInfo(contestInProgress, competitor, round)
+
+    def slot_weatherInfo(self, wind_speed, wind_speed_unit,  wind_dir, rain, alarm):
+        for i in F3FDCDisplayList:
+            i[1].slot_weatherInfo(wind_speed, wind_dir, rain, alarm)
+
 
     def run(self):
         while not self.isFinished():
@@ -317,6 +374,7 @@ class tcpServer(QThread):
                         DCdisplayHandle.setConnectionhandle(self.connection, DCdisplayHandle)
                         DCdisplayHandle.setSignal(self.bp_P100Sig, self.bp_P1000Sig, self.bp_ValidSig, self.bp_CancelSig,
                                                   self.bp_NullFlightSig, self.bp_ReflySig)
+                        #self.newDCDisplaySig.emit()
                         DCdisplayHandle.start()
                         print("F3FDC_Display tcp client thread start")
 

@@ -81,6 +81,8 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.tcp = tcpServer()
         self.tcp.contestRunning.connect(self.slot_contestRunning)
         self.tcp.pilotRequestSig.connect(self.slotPilotListRequest)
+        self.tcp.newDCDisplaySig.connect(self.slotNewDCDisplay)
+        self.chronoHard.weather.gui_weather_signal.connect(self.tcp.slot_weatherInfo)
         if ConfigReader.config.conf['inStartBlackOut'] and ConfigReader.config.conf['competition_mode']:
             ConfigReader.config.conf['inStartBlackOut'] = False
 
@@ -439,6 +441,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.set_signal_mode(training=None)
         self.chronoHard.weather.enable_rules(enable=False)
         self.noise.stop()
+        self.tcp.slot_roundInfo(False, None, None)
         self.controllers['round'].pilot_change_sig.disconnect(self.handle_pilot_changed)
 
     def home_training(self):
@@ -449,9 +452,10 @@ class MainUiCtrl(QtWidgets.QMainWindow):
     def next_pilot(self, insert_database=False):
         current_round = self.event.get_current_round()
         self.controllers['round'].wPilotCtrl.blockSignals(True)
-        self.controllers['round'].wPilotCtrl.set_data(current_round.next_pilot(insert_database, visited_competitors=[]),
-                                                      current_round)
+        competitor = current_round.next_pilot(insert_database, visited_competitors=[])
+        self.controllers['round'].wPilotCtrl.set_data(competitor, current_round)
         self.controllers['round'].wPilotCtrl.blockSignals(False)
+        self.tcp.slot_roundInfo(True, competitor, current_round)
         self.controllers['round'].wChronoCtrl.reset_ui()
         self.vocal.signal_pilotname.emit(int(self.event.get_current_round().get_current_competitor().get_bib_number()))
         # Can't use current_group because it has changed
@@ -510,9 +514,9 @@ class MainUiCtrl(QtWidgets.QMainWindow):
                 current_round.set_null_flight(current_competitor)
                 current_competitor = current_round.next_pilot()
             self.controllers['round'].wPilotCtrl.set_pilots(list(self.event.competitors.values()))
-            self.controllers['round'].wPilotCtrl.set_data(current_competitor,
-                                                          self.event.get_current_round())
+            self.controllers['round'].wPilotCtrl.set_data(current_competitor, current_round)
             self.controllers['round'].pilot_change_sig.connect(self.handle_pilot_changed)
+            self.tcp.slot_roundInfo(True, current_competitor, current_round)
             self.vocal.signal_pilotname.emit(int(current_competitor.get_bib_number()))
             self.chronoHard.set_mode(training=False)
             self.chronoHard.timerF3F.initialize()
@@ -598,8 +602,11 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def cancel_round(self):
         self.event.get_current_round().cancel_current_group()
-        self.controllers['round'].wPilotCtrl.set_data(self.event.get_current_round().get_current_competitor(),
-                                                      self.event.get_current_round())
+        current_competitor = self.event.get_current_round().get_current_competitor()
+        current_round = self.event.get_current_round()
+        self.controllers['round'].wPilotCtrl.set_data(current_competitor, current_round)
+        self.tcp.slot_roundInfo(True, current_competitor, current_round)
+
         self.chronoHard.reset()
         self.chronodata.reset()
         self.chronoHard.timerF3F.stopTime()
@@ -723,6 +730,16 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         print("PilotList Request")
         current_round = self.event.get_current_round()
         self.tcp.orderDataSig.emit(current_round.get_summary_as_json(self.event.get_current_round()))
+
+    def slotNewDCDisplay(self):
+        print("NewDCDisplay request")
+
+        if (self.controllers['round'].is_show()):
+            current_competitor = self.event.get_current_round().get_current_competitor()
+            current_round = self.event.get_current_round()
+            self.tcp.slot_roundInfo(True, current_competitor, current_round)
+        else:
+            self.tcp.slot_roundInfo(False, None, None)
 
     @staticmethod
     def chronoHard_to_chrono(chronoHard, chrono):
