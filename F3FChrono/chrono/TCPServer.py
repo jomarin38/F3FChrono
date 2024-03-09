@@ -124,10 +124,16 @@ class tcpF3FDCDisplayWorker(QThread):
         self.currentData["group"] = "1"
         self.currentData["weatherdir"] = 0
         self.currentData["weatherspeed"] = 10
+        self.clearRunData()
+    def clearRunData(self):
         self.currentData["runstatus"] = chronoStatus.InWait
         self.currentData["runbasenb"] = 0
-        self.currentData["runtime"] = 00.00
-        self.currentData["runAcceptance"] = "refly"
+        self.currentData["basetime"] = 0.00
+        self.currentData["runtime"] = 0.00
+        self.currentData["penalty"] = 0
+        self.currentData["refly"] = False
+        self.currentData["nullflight"] = False
+        self.currentData["runvalidated"] = False
 
     def setConnectionhandle(self, connection, display):
         self.connection = connection
@@ -219,40 +225,89 @@ class tcpF3FDCDisplayWorker(QThread):
         lines = ["", "", "", ""]
         if self.connection is not None and self.status == displayStatus.InProgress:
             if self.currentData["contestInProgress"]:
-                lines[0] = self.displayCreateLineRoundInfo()
-                lines[1] = self.displayCreateLineWeatherInfo()
-                lines[2] = self.displayCreateLineRunInfo()
-                lines[3] = self.displayCreateLineRunStatus()
-                try:
-                    self.connection.sendall(bytes("line:0:" + lines[0] + "\n", "utf-8"))
-                    self.connection.sendall(bytes("line:1:" + lines[1] + "\n", "utf-8"))
-                    self.connection.sendall(bytes("line:2:" + lines[2] + "\n", "utf-8"))
-                    self.connection.sendall(bytes("line:3:" + lines[3] + "\n", "utf-8"))
-                except socket.error as e:
-                    print(str(e))
+                self.displayCreateLineRoundInfo(send=True)
+                self.displayCreateLineWeatherInfo(send=True)
+                self.displayCreateLineRunInfo(send=True)
+                self.displayCreateLineRunStatus(send=True)
+
             else:
-                try:
-                    self.connection.sendall(bytes("CLEAR:\n", "utf-8"))
-                    self.connection.sendall(bytes("line:0:" + "AWAITING CONTEST" + "\n", "utf-8"))
-                    self.connection.sendall(bytes("line:1:" + self.displayCreateLineWeatherInfo() + "\n", "utf-8"))
+                self.displayCreateLineAwaitingContest(send=True)
 
-                except socket.error as e:
-                    print(str(e))
+    def displayCreateLineAwaitingContest(self, send=False):
+        if self.connection is not None and self.status == displayStatus.InProgress and send:
+            try:
+                self.connection.sendall(bytes("CLEAR:\n", "utf-8"))
+                self.connection.sendall(bytes("line:0:" + "AWAITING CONTEST" + "\n", "utf-8"))
+            except socket.error as e:
+                print(str(e))
+            self.displayCreateLineWeatherInfo(send=True)
 
-    def displayCreateLineRoundInfo(self):
-        return ("R" + self.currentData["round"] +
-                " G" + self.currentData["group"] +
-                " B" + self.currentData["bib"] +
-                    " " + self.currentData["pilot"])
-    def displayCreateLineWeatherInfo(self):
-        return ("Dir:" + "{:.0f}".format(self.currentData["weatherdir"]) +
-                   " Speed:" + "{:0>.1f}".format(self.currentData["weatherspeed"]))
-    def displayCreateLineRunInfo(self):
-        return (self.getStatusString() + "Base:" + "{:0>02d}".format(self.currentData["runbasenb"]))
-    def displayCreateLineRunStatus(self):
-        return("Time:" + "{:0>.2f}".format(self.currentData["runtime"]) + "     " + self.currentData["runAcceptance"])
+    def displayCreateLineRoundInfo(self, send=False):
+        line = ("R" + self.currentData["round"] + " G" + self.currentData["group"] + " B" + self.currentData["bib"] +
+                " " + self.currentData["pilot"])
+        if self.connection is not None and self.status == displayStatus.InProgress and send:
+            try:
+                self.connection.sendall(bytes("line:0:" + line + "\n", "utf-8"))
+            except socket.error as e:
+                print(str(e))
+        return line
+    def displayCreateLineWeatherInfo(self, send=False):
+        line = ("Dir:" + "{:.0f}".format(self.currentData["weatherdir"]) +
+                " Speed:" + "{:0>.1f}".format(self.currentData["weatherspeed"]))
+        if self.connection is not None and self.status == displayStatus.InProgress and send:
+            try:
+                self.connection.sendall(bytes("line:1:" + line + "\n", "utf-8"))
+            except socket.error as e:
+                print(str(e))
+        return line
+    def displayCreateLineRunInfo(self, send=False):
+        line = self.getStatusString() + "  "
+        if (self.currentData["runstatus"] == chronoStatus.InProgressA or
+            self.currentData["runstatus"] == chronoStatus.InProgressB or
+            self.currentData["runstatus"] == chronoStatus.WaitAltitude):
+            line = line + "{:0>.2f}".format(self.currentData["basetime"]) + " B:" + str(self.currentData["runbasenb"])
+
+        if self.connection is not None and self.status == displayStatus.InProgress and send:
+            try:
+                self.connection.sendall(bytes("line:2:" + line + "\n", "utf-8"))
+            except socket.error as e:
+                print(str(e))
+        return line
+    def displayCreateLineRunStatus(self, send=False):
+        acceptanceStr = ""
+        if self.currentData["nullflight"]:
+            acceptanceStr = "NULLFLIGHT"
+        if self.currentData["refly"]:
+            acceptanceStr = "REFLY"
+
+        line = ("Time:" + "{:0>.2f}".format(self.currentData["runtime"]) + " P:" + str(self.currentData["penalty"])
+                + " " + acceptanceStr)
+        if self.connection is not None and self.status == displayStatus.InProgress and send:
+            try:
+                self.connection.sendall(bytes("line:3:" + line + "\n", "utf-8"))
+            except socket.error as e:
+                print(str(e))
+        return line
     def getStatusString(self):
-        return "Started     "
+        if self.currentData["runstatus"] == chronoStatus.InWait:
+           return "InWait"
+        if self.currentData["runstatus"] == chronoStatus.WaitLaunch:
+            return "WaitLaunch"
+        if self.currentData["runstatus"] == chronoStatus.Launched:
+            return "Launched"
+        if self.currentData["runstatus"] == chronoStatus.Late:
+            return ""
+        if self.currentData["runstatus"] == chronoStatus.InStart:
+            return "InStart"
+        if self.currentData["runstatus"] == chronoStatus.InStartLate:
+            return "InStartLate"
+        if (self.currentData["runstatus"] == chronoStatus.InProgressA or
+                self.currentData["runstatus"] == chronoStatus.InProgressB):
+            return "InProgress"
+        if self.currentData["runstatus"] == chronoStatus.WaitAltitude:
+            return "WaitAltitude"
+        if self.currentData["runstatus"] == chronoStatus.Finished:
+            return "Finished"
 
     def slot_roundInfo(self, contestInProgress, competitor, round):
         self.currentData["contestInProgress"] = contestInProgress
@@ -261,27 +316,49 @@ class tcpF3FDCDisplayWorker(QThread):
             self.currentData["bib"] = str(competitor.get_bib_number())
             self.currentData["pilot"] = competitor.display_name()
             self.currentData["group"] = str(round.find_group(competitor).group_number)
-            if self.connection is not None and self.status == displayStatus.InProgress:
-                line = self.displayCreateLineRoundInfo()
-
-                try:
-                    self.connection.sendall(bytes("line:0:" + line + "\n", "utf-8"))
-                except socket.error as e:
-                    print(str(e))
+            self.clearRunData()
+            self.displayCreateLineRoundInfo(send=True)
+            self.displayCreateLineRunStatus(send=True)
+            self.displayCreateLineRunInfo(send=True)
         else:
             self.displayCreateLines()
 
     def slot_weatherInfo(self, speed, dir, rain, alarm):
         self.currentData["weatherdir"] = dir
         self.currentData["weatherspeed"] = speed
-        if self.connection is not None and self.status == displayStatus.InProgress:
-            line = self.displayCreateLineWeatherInfo()
+        self.displayCreateLineWeatherInfo(send=True)
 
-            try:
-                self.connection.sendall(bytes("line:1:" + line + "\n", "utf-8"))
-            except socket.error as e:
-                print(str(e))
+    def slot_runStatus(self, status):
+        self.currentData["runstatus"] = status
+        if (self.currentData["runstatus"] != chronoStatus.InProgressA and
+                self.currentData["runstatus"] != chronoStatus.InProgressB and
+                self.currentData["runstatus"] != chronoStatus.WaitAltitude):
+            self.displayCreateLineRunInfo(send=True)
 
+    def slot_runLap(self, lap, laptime):
+        self.currentData["runbasenb"] = lap
+        self.currentData["basetime"] = self.currentData["basetime"] + laptime
+        self.displayCreateLineRunInfo(send=True)
+
+    def slot_penalty(self, penalty):
+        self.currentData["penalty"] = self.currentData["penalty"] + penalty
+        self.displayCreateLineRunStatus(send=True)
+
+    def slot_runtime(self, runtime):
+        self.currentData["runtime"] = runtime
+        self.displayCreateLineRunStatus(send=True)
+    def slot_clearPenalty(self):
+        self.currentData["penalty"] = 0
+        self.displayCreateLineRunStatus(send=True)
+    def slot_refly(self):
+        self.currentData["refly"] = True
+        self.displayCreateLineRunStatus(send=True)
+    def slot_nullflight(self):
+        self.currentData["nullflight"] = True
+        self.displayCreateLineRunStatus(send=True)
+    def slot_runvalidated(self):
+        self.currentData["runvalidated"] = True
+        self.displayCreateLineRunStatus(send=True)
 
 class tcpServer(QThread):
     contestRunning = pyqtSignal()
@@ -324,6 +401,32 @@ class tcpServer(QThread):
         for i in F3FDCDisplayList:
             i[1].slot_weatherInfo(wind_speed, wind_dir, rain, alarm)
 
+    def slot_runStatus(self, status):
+        for i in F3FDCDisplayList:
+            i[1].slot_runStatus(status)
+
+    def slot_runLap(self, lap, laptime):
+        for i in F3FDCDisplayList:
+            i[1].slot_runLap(lap, laptime)
+    def slot_runtime(self, runtime):
+        for i in F3FDCDisplayList:
+            i[1].slot_runtime(runtime)
+    def slot_penalty(self, penalty):
+        for i in F3FDCDisplayList:
+            i[1].slot_penalty(penalty)
+    def slot_clearPenalty(self):
+        for i in F3FDCDisplayList:
+            i[1].slot_clearPenalty()
+
+    def slot_refly(self):
+        for i in F3FDCDisplayList:
+            i[1].slot_refly()
+    def slot_nullflight(self):
+        for i in F3FDCDisplayList:
+            i[1].slot_nullflight()
+    def slot_runvalidated(self):
+        for i in F3FDCDisplayList:
+            i[1].slot_runvalidated()
 
     def run(self):
         while not self.isFinished():
