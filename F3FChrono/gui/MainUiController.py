@@ -582,14 +582,17 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.vocal.signal_penalty.emit()
         self.chronoHard.addPenalty(100)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
+        self.tcp.slot_penalty(100)
 
     def penalty_1000(self):
         self.vocal.signal_penalty.emit()
         self.chronoHard.addPenalty(1000)
+        self.tcp.slot_penalty(1000)
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
     def clear_penalty(self):
         self.chronoHard.clearPenalty()
+        self.tcp.slot_clearPenalty()
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
     def display_cancel_round(self):
@@ -619,6 +622,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.chronoHard.timerF3F.stopTime()
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['round'].wChronoCtrl.set_null_flight(True)
+        self.tcp.slot_nullflight()
 
     def refly(self):
         # TODO : get penalty value if any
@@ -628,6 +632,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.chronoHard.timerF3F.stopTime()
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['round'].wChronoCtrl.set_refly(True)
+        self.tcp.slot_refly()
 
     def contest_changed(self):
         if self.event is not None:
@@ -683,6 +688,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         if (status == chronoStatus.Launched):
             self.vocal.stop_Timing()
             self.chronoHard.timerF3F.setLaunchedTime()
+        self.tcp.slot_runStatus(status)
 
     def slot_run_started(self):
         self.chronoHard.timerF3F.setRaceStartedTime()
@@ -691,6 +697,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
     def slot_lap_finished(self, lap, last_lap_time):
         self.controllers['round'].wChronoCtrl.set_laptime(last_lap_time)
         self.vocal.signal_base.emit(lap)
+        self.tcp.slot_runLap(lap, last_lap_time)
 
     def slot_run_finished(self, run_time):
         # print("Main UI Controller slot run finished : ", time.time())
@@ -700,6 +707,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['round'].widgetBtn.update()
         if self.configSound:
             self.vocal.signal_time.emit(run_time, False)
+        self.tcp.slot_runtime(run_time)
 
     def slot_altitude_finished(self, run_time):
         if self.__debug:
@@ -721,6 +729,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.chronoHard.timerF3F.initialize()
         self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
         self.controllers['wind'].setLastRoundTime()
+        self.tcp.slot_runvalidated()
 
     def slot_contestRunning(self):
         print("slot contest Running : ", str(self.controllers['round'].is_show()))
@@ -733,7 +742,6 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def slotNewDCDisplay(self):
         print("NewDCDisplay request")
-
         if (self.controllers['round'].is_show()):
             current_competitor = self.event.get_current_round().get_current_competitor()
             current_round = self.event.get_current_round()
