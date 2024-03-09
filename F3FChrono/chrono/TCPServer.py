@@ -494,10 +494,6 @@ class tcpServer(QThread):
                         displayHandle.setConnectionhandle(self.connection, displayHandle)
                         displayHandle.setSignal(self.contestRunning, self.pilotRequestSig)
                         displayHandle.start()
-                        if len(F3FDisplayList)==1:
-                            displayHandle.slot_setDCDisplay(True)
-                        else:
-                            displayHandle.slot_setDCDisplay(False)
                         print("F3FDisplay tcp client thread start")
                     if data == "F3FDCDisplay":
                         DCdisplayHandle = tcpF3FDCDisplayWorker()
@@ -512,6 +508,10 @@ class tcpServer(QThread):
                                                   self.bp_NullFlightSig, self.bp_ReflySig)
                         DCdisplayHandle.start()
                         print("F3FDC_Display tcp client thread start")
+                        if len(F3FDCDisplayList) == 1:
+                            DCdisplayHandle.slot_setDCDisplay(True)
+                        else:
+                            DCdisplayHandle.slot_setDCDisplay(False)
                         self.newDCDisplaySig.emit()
 
                 except socket.error as e:
