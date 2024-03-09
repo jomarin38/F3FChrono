@@ -82,6 +82,12 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.tcp.contestRunning.connect(self.slot_contestRunning)
         self.tcp.pilotRequestSig.connect(self.slotPilotListRequest)
         self.tcp.newDCDisplaySig.connect(self.slotNewDCDisplay)
+        self.tcp.bp_ValidSig.connect(self.next_action)
+        self.tcp.bp_CancelSig.connect(self.clear_penalty)
+        self.tcp.bp_P100Sig.connect(self.penalty_100)
+        self.tcp.bp_P1000Sig.connect(self.penalty_1000)
+        self.tcp.bp_ReflySig.connect(self.refly)
+        self.tcp.bp_NullFlightSig.connect(self.null_flight)
         self.chronoHard.weather.gui_weather_signal.connect(self.tcp.slot_weatherInfo)
         if ConfigReader.config.conf['inStartBlackOut'] and ConfigReader.config.conf['competition_mode']:
             ConfigReader.config.conf['inStartBlackOut'] = False
