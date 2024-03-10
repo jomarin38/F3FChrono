@@ -129,6 +129,8 @@ class tcpF3FDCDisplayWorker(QThread):
         self.currentData["group"] = "1"
         self.currentData["weatherdir"] = -1
         self.currentData["weatherspeed"] = -1
+        self.currentData["weatherrain"] = False
+        self.currentData["weatherstatus"] = ""
         self.clearRunData()
 
     def clearRunData(self):
@@ -266,8 +268,9 @@ class tcpF3FDCDisplayWorker(QThread):
         return line
 
     def displayCreateLineWeatherInfo(self, send=False):
-        line = ("Dir:" + "{:.0f}".format(self.currentData["weatherdir"]) +
-                " Speed:" + "{:0>.1f}".format(self.currentData["weatherspeed"]))
+        line = ("{:+3.0f}".format(self.currentData["weatherdir"]) + " - " +
+                "{:+5.1f}".format(self.currentData["weatherspeed"]) + "m/s " +
+                self.currentData["weatherstatus"])
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
                 self.connection.sendall(bytes("line:1:" + line + "\n", "utf-8"))
@@ -340,9 +343,11 @@ class tcpF3FDCDisplayWorker(QThread):
         else:
             self.displayCreateLines()
 
-    def slot_weatherInfo(self, speed, dir, rain, alarm):
+    def slot_weatherInfo(self, speed, dir, rain, status):
         self.currentData["weatherdir"] = dir
         self.currentData["weatherspeed"] = speed
+        self.currentData["weatherrain"] = rain
+        self.currentData["weatherstatus"] = status
         self.displayCreateLineWeatherInfo(send=True)
 
     def slot_runStatus(self, status):
@@ -422,9 +427,9 @@ class tcpServer(QThread):
         for i in F3FDCDisplayList:
             i[1].slot_roundInfo(contestInProgress, competitor, round)
 
-    def slot_weatherInfo(self, wind_speed, wind_speed_unit, wind_dir, rain, alarm):
+    def slot_weatherInfo(self, wind_speed, wind_speed_unit, wind_dir, rain, alarm, status):
         for i in F3FDCDisplayList:
-            i[1].slot_weatherInfo(wind_speed, wind_dir, rain, alarm)
+            i[1].slot_weatherInfo(wind_speed, wind_dir, rain, status)
 
     def slot_runStatus(self, status):
         for i in F3FDCDisplayList:
