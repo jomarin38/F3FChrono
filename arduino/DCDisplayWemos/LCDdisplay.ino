@@ -26,7 +26,7 @@ void display_Start(void)
 
 void displaySendClear(void)
 {
-  Serial.println("DISPLAY:CLEAR");
+  Serial.println("DISPLAY:CLEAR:");
 }
 
 void displaySendDCJudgeDisplay(void)
@@ -75,7 +75,7 @@ void displaySendDataFromServer(const char *str)
           if (strcmp(ptrcmd, "CLEAR")==0){
             displaySendClear();
           }
-          if (strcmp(ptrcmd, "line")==0){
+          if (strcmp(ptrcmd, "line")==0 and ptrnbline!=NULL and ptrdata!=NULL){
             displaySendLine(ptrnbline, ptrdata);
           }
       }
@@ -95,6 +95,10 @@ int getLineInfo(char *initialStr, char **ptrcmd, char **ptrlinenb, char **ptrdat
   int status = -1;
   char *ptrsearch;
   char *ptrline;
+
+  *ptrcmd = NULL;
+  *ptrlinenb = NULL;
+  *ptrdata = NULL;
   
   ptrsearch = strchr (initialStr,':');
   if (ptrsearch!=NULL){
