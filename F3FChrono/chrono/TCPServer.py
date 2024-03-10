@@ -40,9 +40,10 @@ F3FDCDisplayList = list()
 
 class tcpF3FDisplayWorker(QThread):
     finished = pyqtSignal()
-    status = displayStatus.Init
+
 
     def init(self):
+        self.status = displayStatus.Init
         self.connection = None
         self.contestRunningSig = None
         self.pilotRequestSig = None
@@ -107,10 +108,9 @@ class tcpF3FDisplayWorker(QThread):
 
 class tcpF3FDCDisplayWorker(QThread):
     finished = pyqtSignal()
-    status = displayStatus.Init
-    currentData = collections.OrderedDict()
-
     def init(self):
+        self.status = displayStatus.Init
+        self.currentData = collections.OrderedDict()
         self.connection = None
         self.bp_p100Sig = None
         self.bp_p1000Sig = None

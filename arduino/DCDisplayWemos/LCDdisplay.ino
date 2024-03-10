@@ -20,7 +20,7 @@ void display_Start(void)
 {
   DebugStr(DEBUG_START, DEBUG_LN, "display Module Start");
   displaySendClear();
-  displaySendDCDisplay();
+  displaySendDCJudgeDisplay();
   displaySendAwaitingWifi();
 }
 
@@ -29,9 +29,9 @@ void displaySendClear(void)
   Serial.println("DISPLAY:CLEAR");
 }
 
-void displaySendDCDisplay(void)
+void displaySendDCJudgeDisplay(void)
 {
-  displaySendLine("1", "DC DISPLAY");
+  displaySendLine("1", "DC&JUDGE DISPLAY");
 }
 
 void displaySendAwaitingWifi(void)

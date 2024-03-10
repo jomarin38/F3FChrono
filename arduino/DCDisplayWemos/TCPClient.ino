@@ -1,5 +1,5 @@
  /** 
- # This file is part of the F3FDCDisplay distribution (https://github.com/jomarin38/F3FChrono).
+ # This file is part of the F3F distribution (https://github.com/jomarin38/F3FChrono).
  # Copyright (c) 2024 Sylvain DAVIET, Joel MARIN.
  # 
  # This program is free software: you can redistribute it and/or modify  
@@ -107,7 +107,7 @@ void TCPClient_Run(void)
 
   if (TcpClientStatus==Connected){
     // This will send a string to the server
-    DebugStr(DEBUG_START, DEBUG_LN, "Status Connected - sending \"F3FDCDisplay\" to server");
+    DebugStr(DEBUG_START, DEBUG_LN, "Status Connected - sending \"F3F\" to server");
     if (client.connected()) { 
       client.println("F3FDCDisplay");
       
@@ -153,7 +153,7 @@ void TCPClient_Run(void)
     TcpClientStatus = WaitBeforeRestart;
 
     displaySendClear();
-    displaySendDCDisplay();
+    displaySendDCJudgeDisplay();
     TcpClient_GetlocalIpToString();    
     display_sendWifiConnected (tmpStr);
   }
