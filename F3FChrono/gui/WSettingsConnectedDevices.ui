@@ -39,7 +39,7 @@
     <number>1</number>
    </property>
    <item row="1" column="3" colspan="3">
-    <widget class="QPushButton" name="btn_AnemometerConnect">
+    <widget class="QPushButton" name="btn_SetDcDisplay">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -48,7 +48,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Connect</string>
+      <string>DC Display</string>
      </property>
     </widget>
    </item>
@@ -189,7 +189,7 @@
     </widget>
    </item>
    <item row="2" column="0" colspan="3">
-    <widget class="QComboBox" name="AnemometerComboBox">
+    <widget class="QComboBox" name="DcDisplayComboBox">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -197,25 +197,13 @@
        <bold>true</bold>
       </font>
      </property>
-     <item>
-      <property name="text">
-       <string>SDA</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>PRO</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>JMA</string>
-      </property>
-     </item>
+     <property name="currentText">
+      <string/>
+     </property>
     </widget>
    </item>
    <item row="1" column="0" colspan="3">
-    <widget class="QPushButton" name="btn_AnemometerGetList">
+    <widget class="QPushButton" name="btn_DcDisplayGetList">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -224,7 +212,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Get Anemometer List</string>
+      <string>Get Display List</string>
      </property>
     </widget>
    </item>
@@ -299,7 +287,7 @@
     </widget>
    </item>
    <item row="2" column="3" colspan="3">
-    <widget class="QLabel" name="AnemometerStatus">
+    <widget class="QLabel" name="DcDisplayStatus">
      <property name="font">
       <font>
        <pointsize>14</pointsize>
@@ -308,7 +296,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Not connected</string>
+      <string>Dc or Judge</string>
      </property>
     </widget>
    </item>

@@ -122,11 +122,12 @@ void TCPClient_Run(void)
       }
         
       
-      TcpClientGetResponse();
-      DebugStr(DEBUG_START, DEBUG_LN, responseString);
-      if (strcmp(responseString, "F3FDCDisplayServerStarted")==0){
-        TcpClientStatus = InProgress;
-        DebugStr(DEBUG_START, DEBUG_LN, "Status InProgress - Waiting data from server");
+      if (TcpClientGetResponse()>0){
+        DebugStr(DEBUG_START, DEBUG_LN, responseString);
+        if (strcmp(responseString, "F3FDCDisplayServerStarted")==0){
+          TcpClientStatus = InProgress;
+          DebugStr(DEBUG_START, DEBUG_LN, "Status InProgress - Waiting data from server");
+        }
       }
     }else{
       TcpClientStatus = Close;

@@ -31,7 +31,7 @@ void displaySendClear(void)
 
 void displaySendDCJudgeDisplay(void)
 {
-  displaySendLine("1", "DC&JUDGE DISPLAY");
+  displaySendLine("0", "DC&JUDGE DISPLAY");
 }
 
 void displaySendAwaitingWifi(void)
@@ -41,7 +41,8 @@ void displaySendAwaitingWifi(void)
 
 void display_sendWifiConnected(const char *str)
 {
-  displaySendLine("2", str);
+  displaySendLine("2", "AWAITING F3FChrono");
+  displaySendLine("3", str);
 }
 
 void displaySendLine(const char* linenb, const char *str)
