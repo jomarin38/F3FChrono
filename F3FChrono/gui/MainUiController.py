@@ -57,6 +57,16 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.vocal = chronoQSound(os.getcwd(), ConfigReader.config.conf['language'],
                                   ConfigReader.config.conf['sound'], ConfigReader.config.conf['soundvolume'])
         self.noise = noiseGenerator(ConfigReader.config.conf['noisesound'], ConfigReader.config.conf['noisevolume'])
+        self.tcp = tcpServer()
+        self.tcp.contestRunning.connect(self.slot_contestRunning)
+        self.tcp.pilotRequestSig.connect(self.slotPilotListRequest)
+        self.tcp.newDCDisplaySig.connect(self.slotNewDCDisplay)
+        self.tcp.bp_ValidSig.connect(self.next_action)
+        self.tcp.bp_CancelSig.connect(self.clear_penalty)
+        self.tcp.bp_P100Sig.connect(self.penalty_100)
+        self.tcp.bp_P1000Sig.connect(self.penalty_1000)
+        self.tcp.bp_ReflySig.connect(self.refly)
+        self.tcp.bp_NullFlightSig.connect(self.null_flight)
 
         self.initUI()
 
@@ -78,16 +88,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.configSound = ConfigReader.config.conf["sound"]
         self.chronoHard.weather.set_rules_limit(self.event.min_allowed_wind_speed, self.event.max_allowed_wind_speed,
                                                 self.event.max_wind_dir_dev)
-        self.tcp = tcpServer()
-        self.tcp.contestRunning.connect(self.slot_contestRunning)
-        self.tcp.pilotRequestSig.connect(self.slotPilotListRequest)
-        self.tcp.newDCDisplaySig.connect(self.slotNewDCDisplay)
-        self.tcp.bp_ValidSig.connect(self.next_action)
-        self.tcp.bp_CancelSig.connect(self.clear_penalty)
-        self.tcp.bp_P100Sig.connect(self.penalty_100)
-        self.tcp.bp_P1000Sig.connect(self.penalty_1000)
-        self.tcp.bp_ReflySig.connect(self.refly)
-        self.tcp.bp_NullFlightSig.connect(self.null_flight)
+
         self.chronoHard.weather.gui_weather_signal.connect(self.tcp.slot_weatherInfo)
         if ConfigReader.config.conf['inStartBlackOut'] and ConfigReader.config.conf['competition_mode']:
             ConfigReader.config.conf['inStartBlackOut'] = False
@@ -164,15 +165,12 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['settingswDevices'].btn_valid_sig.connect(self.settings_valid)
         self.controllers['settingswDevices'].btn_settingsbase_sig.connect(self.show_settingsbase)
         self.controllers['settingswDevices'].btn_settingswBtn_sig.connect(self.show_settingswBtn)
-        self.controllers['settingswDevices'].btn_AnemometerGetList_sig.connect(
-            self.chronoHard.weather.anemometer.GetList)
-        self.controllers['settingswDevices'].btn_AnemometerConnect_sig.connect(
-            self.chronoHard.weather.anemometer.Connect)
+        self.controllers['settingswDevices'].btn_DcDisplayGetList_sig.connect(
+            self.tcp.getDcDisplayList)
+        self.controllers['settingswDevices'].btn_SetDcDisplay_sig.connect(self.tcp.setDcDisplayAsDc)
         self.controllers['settingswDevices'].wirelessDevicesSelected_sig.connect(self.chronoHard.weather.setConfig)
 
-        self.chronoHard.weather.anemometer.list_sig.connect(self.controllers['settingswDevices'].anemometerSetData)
-        self.chronoHard.weather.anemometer.status_sig.connect(
-            self.controllers['settingswDevices'].view.AnemometerStatus.setText)
+        self.tcp.dcDisplayListSig.connect(self.controllers['settingswDevices'].dcDisplaySetData)
         self.chronoHard.weather.gui_wind_speed_dir_signal.connect(
             self.controllers['settingswDevices'].weatherStation_display)
         self.chronoHard.weather.set_minVoltageWindDir(ConfigReader.config.conf['voltage_min_windDir'])

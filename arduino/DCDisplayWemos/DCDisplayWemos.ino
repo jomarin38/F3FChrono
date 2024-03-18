@@ -45,8 +45,8 @@ char tmpStr[100]="";
 
 
 void setup() {
-  Serial.begin(57600);
   delay(500);
+  Serial.begin(57600);
   display_Start();
   BP_Start();
   Analog_Start();
