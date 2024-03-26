@@ -18,8 +18,8 @@
 #include <ESP8266WiFi.h>
 
 #ifndef STASSID
-  #define STASSID "SDHomeServ"
-  #define STAPSK "19762018"
+  #define STASSID "YOURSSID"
+  #define STAPSK "YOURPWD"
 #endif
 
 const char* ssid = STASSID;
