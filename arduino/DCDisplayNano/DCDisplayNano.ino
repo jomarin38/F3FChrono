@@ -14,8 +14,8 @@
  # You should have received a copy of the GNU General Public License 
  # along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-//#define _DEBUG_
+#define VERSION "0.1"
+#define _DEBUG_
 #define DEBUG_LN true
 #define DEBUG_NOLN false
 #define DEBUG_START true
@@ -42,27 +42,20 @@
 #endif
 
 char tmpStr[100]="";
-
+bool d2state=true;
 
 void setup() {
-  delay(10);
-  BP_Start();
-/*  while(nanoDisplayIsReady()==LOW){
-    delay(500);
-  }
-*/
-  Serial.begin(57600);
   delay(500);
-  Serial.println("");
-  
-  display_Start();
-  Analog_Start();
-  TCPClient_StartWifi();
+  serial_setup();
+  displayStart();
+  d2_init();
 }
 
 void loop() {
-  TCPClient_Run();
-  BP_CheckChanged();
-  Analog_Read();
-  delay(50);
+  serial_run();
+  delay(500);
+}
+void d2_init(){
+  pinMode(2, OUTPUT);
+  digitalWrite(2, HIGH);
 }
