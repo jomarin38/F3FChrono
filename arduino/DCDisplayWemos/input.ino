@@ -16,6 +16,7 @@
  */
 
 const int BP_Pin[6] = {D0, D1, D2, D3, D4, D5};
+const int nanoDisplayReady = D6;
 int btnState[6] = {0};
 int btnStateLast[6] = {0};
 
@@ -27,10 +28,15 @@ void BP_Start(void)
     pinMode(BP_Pin[i], INPUT_PULLUP);
     //digitalWrite(BP_Pin[i], HIGH); don't work to activate pull_up at each pin ;)
   }
+  pinMode(nanoDisplayReady, INPUT_PULLUP);
   memset (btnState, 0, sizeof(btnState)/sizeof(int));
   memset (btnStateLast, 0, sizeof(btnStateLast)/sizeof(int));
 }
 
+int nanoDisplayIsReady(void)
+{
+  return (digitalRead(nanoDisplayReady));
+}
 
 void BP_CheckChanged (void)
 {
