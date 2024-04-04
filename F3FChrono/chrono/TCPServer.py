@@ -230,14 +230,14 @@ class tcpF3FDCDisplayWorker(QThread):
     def displayCreateLineAwaitingContest(self, send=False):
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
-                self.connection.sendall(bytes("CLEAR:\n", "utf-8"))
+                self.connection.sendall(bytes("DISPLAY:CLEAR:\n", "utf-8"))
                 if self.DCDisplay:
-                    self.connection.sendall(bytes("line:0:" + "DC Display" + "\n", "utf-8"))
+                    self.connection.sendall(bytes("DISPLAY:line:0:" + "DC Display" + "\n", "utf-8"))
                 else:
-                    self.connection.sendall(bytes("line:0:" + "JUDGE Display" + "\n", "utf-8"))
+                    self.connection.sendall(bytes("DISPLAY:line:0:" + "JUDGE Display" + "\n", "utf-8"))
 
-                self.connection.sendall(bytes("line:2:" + "AWAITING CONTEST" + "\n", "utf-8"))
-                self.connection.sendall(bytes("line:3:" + self.client_address[0] + "\n", "utf-8"))
+                self.connection.sendall(bytes("DISPLAY:line:2:" + "AWAITING CONTEST" + "\n", "utf-8"))
+                self.connection.sendall(bytes("DISPLAY:line:3:" + self.client_address[0] + "\n", "utf-8"))
             except socket.error as e:
                 print(str(e))
             self.displayCreateLineWeatherInfo(send=True)
@@ -247,18 +247,19 @@ class tcpF3FDCDisplayWorker(QThread):
                 " " + self.currentData["pilot"])
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
-                self.connection.sendall(bytes("line:0:" + line + "\n", "utf-8"))
+                self.connection.sendall(bytes("DISPLAY:line:0:" + line + "\n", "utf-8"))
             except socket.error as e:
                 print(str(e))
         return line
 
     def displayCreateLineWeatherInfo(self, send=False):
-        line = ("{:+3.0f}".format(self.currentData["weatherdir"]) + " - " +
+        line = ("{:+3.0f}".format(self.currentData["weatherdir"]) + " " +
                 "{:+5.1f}".format(self.currentData["weatherspeed"]) + "m/s " +
                 self.currentData["weatherstatus"])
+        print("weather status : " + self.currentData["weatherstatus"])
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
-                self.connection.sendall(bytes("line:1:" + line + "\n", "utf-8"))
+                self.connection.sendall(bytes("DISPLAY:line:1:" + line + "\n", "utf-8"))
             except socket.error as e:
                 print(str(e))
         return line
@@ -272,7 +273,7 @@ class tcpF3FDCDisplayWorker(QThread):
 
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
-                self.connection.sendall(bytes("line:2:" + line + "\n", "utf-8"))
+                self.connection.sendall(bytes("DISPLAY:line:2:" + line + "\n", "utf-8"))
             except socket.error as e:
                 print(str(e))
         return line
@@ -289,7 +290,7 @@ class tcpF3FDCDisplayWorker(QThread):
         print(line)
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
-                self.connection.sendall(bytes("line:3:" + line + "\n", "utf-8"))
+                self.connection.sendall(bytes("DISPLAY:line:3:" + line + "\n", "utf-8"))
             except socket.error as e:
                 print(str(e))
         return line

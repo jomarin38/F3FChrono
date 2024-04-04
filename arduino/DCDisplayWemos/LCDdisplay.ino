@@ -50,15 +50,17 @@ void displaySendLine(const char* linenb, const char *str)
   Serial.print("DISPLAY:LINE:");
   Serial.print(linenb);
   Serial.print(":");
-  Serial.println(str);
+  Serial.print(str);
+  Serial.println(":");
 }
 
 void displaySendDataFromServer(const char *str)
 {
-  char initialStr[200];
+  char initialStr[1024];
   char *ptrline;
   char *ptrinprocess;
   char *ptrsearch;
+  char *ptrtarget;
   char *ptrcmd;
   char *ptrnbline;
   char *ptrdata;
@@ -69,14 +71,23 @@ void displaySendDataFromServer(const char *str)
   ptrinprocess = initialStr;
   while(ptrline!=NULL){
       *ptrline='\0';
-      tmp = getLineInfo(ptrinprocess, &ptrcmd, &ptrnbline, &ptrdata);
+      tmp = getLineInfo(ptrinprocess, &ptrtarget, &ptrcmd, &ptrnbline, &ptrdata);
       if (tmp==0){
-          //printf("cmd : %s, nbline : %s, data : %s\n\n", ptrcmd, ptrnbline, ptrdata);    
+          /*Serial.print(ptrtarget);
+          Serial.print(", cmd:");
+          Serial.print(ptrcmd);
+          Serial.print(", nbline:");
+          Serial.print(ptrnbline);
+          Serial.print(" data:");
+          Serial.print(ptrdata);
+          Serial.print(" cmpresult:");
+          Serial.println((strcmp(ptrtarget, "DISPLAY")==0));// and strcmp(ptrcmd, "line")==0 and ptrnbline!=NULL and ptrdata!=NULL));
+          */
           //Process command
-          if (strcmp(ptrcmd, "CLEAR")==0){
+          if (strcmp(ptrtarget, "DISPLAY")==0 and strcmp(ptrcmd, "CLEAR")==0){
             displaySendClear();
           }
-          if (strcmp(ptrcmd, "line")==0 and ptrnbline!=NULL and ptrdata!=NULL){
+          if (strcmp(ptrtarget, "DISPLAY")==0 and strcmp(ptrcmd, "line")==0 and ptrnbline!=NULL and ptrdata!=NULL){
             displaySendLine(ptrnbline, ptrdata);
           }
       }
@@ -84,6 +95,7 @@ void displaySendDataFromServer(const char *str)
       getLineInString(ptrinprocess, &ptrline);
       //ptr = NULL;
   }  
+  //DebugStr(DEBUG_START, DEBUG_LN, "end displaySendDataFromServer");
 }
 
 void getLineInString(char *initialStr, char **ptrfind)
@@ -91,28 +103,36 @@ void getLineInString(char *initialStr, char **ptrfind)
   *ptrfind = strchr(initialStr, '\n');
 }
 
-int getLineInfo(char *initialStr, char **ptrcmd, char **ptrlinenb, char **ptrdata)
+int getLineInfo(char *initialStr, char **ptrtarget, char **ptrcmd, char **ptrlinenb, char **ptrdata)
 {
   int status = -1;
+  char *ptrstr;
   char *ptrsearch;
   char *ptrline;
 
   *ptrcmd = NULL;
   *ptrlinenb = NULL;
   *ptrdata = NULL;
-  
-  ptrsearch = strchr (initialStr,':');
+
+  ptrstr=initialStr;
+  ptrsearch = strchr (ptrstr,':');
   if (ptrsearch!=NULL){
       *ptrsearch='\0';
-      *ptrcmd = initialStr;
-      ptrline = &initialStr[ptrsearch-initialStr+1];
-      ptrsearch = strchr (ptrline,':');
+      *ptrtarget = ptrstr;
+      ptrstr = ptrsearch+1;
+      ptrsearch = strchr (ptrstr,':');
       if (ptrsearch!=NULL){
+          *ptrcmd = ptrstr;
           *ptrsearch='\0';
-          *ptrlinenb = ptrline;
-          *ptrdata = &initialStr[ptrsearch-initialStr+1];
+          ptrline = &ptrstr[ptrsearch-ptrstr+1];
+          ptrsearch = strchr (ptrline,':');
+          if (ptrsearch!=NULL){
+              *ptrsearch='\0';
+              *ptrlinenb = ptrline;
+              *ptrdata = ptrsearch+1;
+          }
+          status = 0;
       }
-      status = 0;
   }
   //printf("cmd : %s, nbline : %s, data : %s\n\n", *ptrcmd, *ptrlinenb, *ptrdata);
   return status;
