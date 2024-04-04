@@ -17,11 +17,12 @@
 
 #include <ESP8266WiFi.h>
 
-#ifndef STASSID
+
+/*#ifndef STASSID
   #define STASSID "YOURSSID"
   #define STAPSK "YOURPWD"
 #endif
-
+*/
 const char* ssid = STASSID;
 const char* password = STAPSK;
 #ifndef F3FSERVER_HOST
@@ -123,7 +124,7 @@ void TCPClient_Run(void)
         
       
       if (TcpClientGetResponse()>0){
-        DebugStr(DEBUG_START, DEBUG_LN, responseString);
+        //DebugStr(DEBUG_START, DEBUG_LN, responseString);
         if (strcmp(responseString, "F3FDCDisplayServerStarted")==0){
           TcpClientStatus = InProgress;
           DebugStr(DEBUG_START, DEBUG_LN, "Status InProgress - Waiting data from server");

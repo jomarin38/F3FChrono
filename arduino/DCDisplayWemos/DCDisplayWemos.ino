@@ -54,6 +54,8 @@ void setup() {
   Serial.begin(57600);
   delay(500);
   Serial.println("");
+  Serial.println("");
+  Serial.println("");
   
   display_Start();
   Analog_Start();
