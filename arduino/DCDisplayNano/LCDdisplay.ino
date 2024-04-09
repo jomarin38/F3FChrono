@@ -17,6 +17,7 @@
 
 #include <LiquidCrystal.h>
 
+
   LiquidCrystal lcd(3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13); 
 
 void displayStart(void)
@@ -24,10 +25,10 @@ void displayStart(void)
   DebugStr(DEBUG_START, DEBUG_LN, "display Module Start");
   lcd.begin(20, 4);
   displayClear();
-  displayPrintLine(0, "DC Display");
-  displayPrintLine(1, "Test line 1");
-  displayPrintLine(2, "Test line 2");
-  displayPrintLine(3, "Test line 3");
+  displayPrintLine(0, "DC Display&JUDGE");
+  displayPrintLine(1, "    START TEST");
+  displayPrintLine(2, "01234567890123456789");
+  displayPrintLine(3, "01234567890123456789");
 }
 
 void displayClear(void)
@@ -37,6 +38,15 @@ void displayClear(void)
 
 void displayPrintLine(int line, char *str)
 {
+  char strtmp[21]={0};
+  int i;
+
   lcd.setCursor(0, line);
-  lcd.print(str);
+  strcpy(strtmp, str);
+  //Add space char for the end of line
+  for (i=strlen(strtmp); i<20; i++)
+  {
+    strtmp[i]=' ';
+  }
+  lcd.print(strtmp);
 }

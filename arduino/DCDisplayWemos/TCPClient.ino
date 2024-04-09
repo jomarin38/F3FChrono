@@ -68,6 +68,7 @@ void TCPClient_StartWifi(void)
   DebugStr(DEBUG_START, DEBUG_LN, "");
   DebugStr(DEBUG_START, DEBUG_NOLN, "Connecting to ");
   DebugStr(DEBUG_NOSTART, DEBUG_LN, ssid);
+  displaySendLine("2", "Awaiting wifi");
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
