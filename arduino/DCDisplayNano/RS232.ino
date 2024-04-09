@@ -15,7 +15,11 @@
  # along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define MAX_DATA 256
+#define DISPLAY_SEP "DISP:"
+#define DISPLAY     "DISP"
+#define CLEAR       "CLEAR"
+#define LINE        "L"
+#define MAX_DATA    256
 
 typedef struct{
   char data_read[MAX_DATA];
@@ -53,24 +57,24 @@ void serial_run(void) {
   if (serial.data_available) {
     Serial.println("Processing Data");
     ptrdisplay = &serial.data_read[0];
-    ptrfind = strstr(ptrdisplay, "DISPLAY:");
+    ptrfind = strstr(ptrdisplay, DISPLAY_SEP);
     while(ptrfind!=NULL){
-      ptrcmd = ptrfind + strlen("DISPLAY:");
+      ptrcmd = ptrfind + strlen(DISPLAY_SEP);
       *(ptrcmd-1)='\0';
       DebugStr(DEBUG_START, DEBUG_NOLN, "found display ?");
       DebugStr(DEBUG_NOSTART, DEBUG_LN, ptrfind);
       printf ("strcmp (DISPLAY) ? %d\n", strcmp(ptrfind, "DISPLAY"));
-      if (strcmp(ptrfind, "DISPLAY")==0){
+      if (strcmp(ptrfind, DISPLAY)==0){
         ptrfind = strstr(ptrcmd, ":");
         *ptrfind='\0';
         DebugStr(DEBUG_START, DEBUG_NOLN, "found cmd ?");
         DebugStr(DEBUG_NOSTART, DEBUG_LN, ptrcmd);
-        if (strcmp(ptrcmd, "CLEAR")==0){
+        if (strcmp(ptrcmd, CLEAR)==0){
           DebugStr(DEBUG_START, DEBUG_LN, "DisplayClear()");
-          displayClear();
+          //displayClear();
         }else{
           ptrline = ptrfind +1;
-          if (strcmp(ptrcmd, "LINE")==0){
+          if (strcmp(ptrcmd, LINE)==0){
             ptrfind = strstr(ptrline, ":");
             ptrmsg = ptrfind +1;
             *ptrfind='\0';
@@ -86,7 +90,7 @@ void serial_run(void) {
         }
       }
       ptrdisplay=ptrfind+1;
-      ptrfind = strstr(ptrdisplay, "DISPLAY:");
+      ptrfind = strstr(ptrdisplay, DISPLAY_SEP);
       printf("new string : %s\n\n", ptrdisplay);
     }
     memset(&serial, 0, sizeof(serial));

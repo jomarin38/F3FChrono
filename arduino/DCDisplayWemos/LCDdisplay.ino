@@ -15,7 +15,8 @@
  # along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#define DISPLAY_CLEAR "DISP:CLEAR:"
+#define DISPLAY_LINE  "DISP:L:"
 void display_Start(void)
 {
   DebugStr(DEBUG_START, DEBUG_LN, "display Module Start");
@@ -25,7 +26,7 @@ void display_Start(void)
 
 void displaySendClear(void)
 {
-  Serial.println("DISPLAY:CLEAR:");
+  Serial.println(DISPLAY_CLEAR);
   Serial.flush();
 }
 
@@ -47,7 +48,7 @@ void display_sendWifiConnected(const char *str)
 
 void displaySendLine(const char* linenb, const char *str)
 {
-  Serial.print("DISPLAY:LINE:");
+  Serial.print(DISPLAY_LINE);
   Serial.print(linenb);
   Serial.print(":");
   Serial.print(str);
