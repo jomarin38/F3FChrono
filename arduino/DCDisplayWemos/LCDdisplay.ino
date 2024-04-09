@@ -21,12 +21,12 @@ void display_Start(void)
   DebugStr(DEBUG_START, DEBUG_LN, "display Module Start");
   displaySendClear();
   displaySendDCJudgeDisplay();
-  displaySendAwaitingWifi();
 }
 
 void displaySendClear(void)
 {
   Serial.println("DISPLAY:CLEAR:");
+  Serial.flush();
 }
 
 void displaySendDCJudgeDisplay(void)
@@ -36,12 +36,12 @@ void displaySendDCJudgeDisplay(void)
 
 void displaySendAwaitingWifi(void)
 {
-  displaySendLine("2", "AWAITING WIFI");
+  displaySendLine("2", "WIFI ?");
 }
 
 void display_sendWifiConnected(const char *str)
 {
-  displaySendLine("2", "AWAITING F3FChrono");
+  displaySendLine("2", "F3FChrono awaiting");
   displaySendLine("3", str);
 }
 
@@ -52,6 +52,7 @@ void displaySendLine(const char* linenb, const char *str)
   Serial.print(":");
   Serial.print(str);
   Serial.println(":");
+  Serial.flush();
 }
 
 void displaySendDataFromServer(const char *str)
