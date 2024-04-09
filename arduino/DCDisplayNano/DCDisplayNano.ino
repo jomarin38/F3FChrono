@@ -48,10 +48,10 @@ void setup() {
   delay(500);
   serial_setup();
   displayStart();
-  d2_init();
 }
 
 void loop() {
+  serial_read();
   serial_run();
   delay(500);
 }

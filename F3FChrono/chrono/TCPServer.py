@@ -247,7 +247,7 @@ class tcpF3FDCDisplayWorker(QThread):
                 " " + self.currentData["pilot"])
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
-                self.connection.sendall(bytes("DISPLAY:line:0:" + line + "\n", "utf-8"))
+                self.connection.sendall(bytes("DISPLAY:line:0:" + line[0:19] + "\n", "utf-8"))
             except socket.error as e:
                 print(str(e))
         return line
