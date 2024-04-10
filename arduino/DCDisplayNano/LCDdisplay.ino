@@ -26,7 +26,7 @@ void displayStart(void)
   lcd.begin(20, 4);
   displayClear();
   displayPrintLine(0, "DC Display&JUDGE");
-  displayPrintLine(1, "    START TEST");
+  displayPrintLine(1, "  BOOT START TEST");
   displayPrintLine(2, "01234567890123456789");
   displayPrintLine(3, "01234567890123456789");
 }
