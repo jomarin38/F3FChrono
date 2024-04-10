@@ -49,4 +49,5 @@ void displayPrintLine(int line, char *str)
     strtmp[i]=' ';
   }
   lcd.print(strtmp);
+  DebugStr(DEBUG_START, DEBUG_LN, "DisplayPrintLine()");
 }

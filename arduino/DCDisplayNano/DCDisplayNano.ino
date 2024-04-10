@@ -51,9 +51,8 @@ void setup() {
 }
 
 void loop() {
-  serial_read();
   serial_run();
-  delay(500);
+  delay(50);
 }
 void d2_init(){
   pinMode(2, OUTPUT);
