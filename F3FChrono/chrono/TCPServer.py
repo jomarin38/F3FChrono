@@ -132,6 +132,7 @@ class tcpF3FDCDisplayWorker(QThread):
         self.currentData["weatherrain"] = False
         self.currentData["weatherstatus"] = ""
         self.clearRunData()
+        self.displayCreateLines()
 
     def clearRunData(self):
         self.currentData["runstatus"] = chronoStatus.InWait
@@ -223,7 +224,6 @@ class tcpF3FDCDisplayWorker(QThread):
                 self.displayCreateLineWeatherInfo(send=True)
                 self.displayCreateLineRunInfo(send=True)
                 self.displayCreateLineRunStatus(send=True)
-
             else:
                 self.displayCreateLineAwaitingContest(send=True)
 
@@ -265,7 +265,7 @@ class tcpF3FDCDisplayWorker(QThread):
         return line
 
     def displayCreateLineRunInfo(self, send=False):
-        line = self.getStatusString() + "  "
+        line = self.getStatusString() + " "
         if (self.currentData["runstatus"] == chronoStatus.InProgressA or
                 self.currentData["runstatus"] == chronoStatus.InProgressB or
                 self.currentData["runstatus"] == chronoStatus.WaitAltitude):
@@ -285,8 +285,12 @@ class tcpF3FDCDisplayWorker(QThread):
         if self.currentData["refly"]:
             acceptanceStr = "REFLY"
 
-        line = ("Time " + "{:0>.2f}".format(self.currentData["runtime"]) + " P" + str(self.currentData["penalty"])
-                + " " + acceptanceStr)
+        if acceptanceStr=="":
+            line = ("Time " + "{:0>.2f}".format(self.currentData["runtime"]) + " P" + str(self.currentData["penalty"])
+                + " ")
+        else:
+            line = (acceptanceStr + " P" + str(self.currentData["penalty"])
+                    + " ")
         print(line)
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
@@ -303,7 +307,7 @@ class tcpF3FDCDisplayWorker(QThread):
         if self.currentData["runstatus"] == chronoStatus.Launched:
             return "Launched"
         if self.currentData["runstatus"] == chronoStatus.Late:
-            return ""
+            return "Late"
         if self.currentData["runstatus"] == chronoStatus.InStart:
             return "InStart"
         if self.currentData["runstatus"] == chronoStatus.InStartLate:
@@ -312,7 +316,7 @@ class tcpF3FDCDisplayWorker(QThread):
                 self.currentData["runstatus"] == chronoStatus.InProgressB):
             return "InProgress"
         if self.currentData["runstatus"] == chronoStatus.WaitAltitude:
-            return "WaitAltitude"
+            return "Wait Alt"
         if self.currentData["runstatus"] == chronoStatus.Finished:
             return "Finished"
 

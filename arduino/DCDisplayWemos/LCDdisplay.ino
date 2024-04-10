@@ -15,13 +15,15 @@
  # along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define DISPLAY_CLEAR "DISP:CLEAR:"
-#define DISPLAY_LINE  "DISP:L:"
+#define DISPLAY_CLEAR "D:C:"
+#define DISPLAY_LINE  "D:L:"
 void display_Start(void)
 {
   DebugStr(DEBUG_START, DEBUG_LN, "display Module Start");
   displaySendClear();
+  delay(100);
   displaySendDCJudgeDisplay();
+  delay(100);
 }
 
 void displaySendClear(void)
@@ -61,7 +63,6 @@ void displaySendDataFromServer(const char *str)
   char initialStr[1024];
   char *ptrline;
   char *ptrinprocess;
-  char *ptrsearch;
   char *ptrtarget;
   char *ptrcmd;
   char *ptrnbline;
@@ -80,7 +81,7 @@ void displaySendDataFromServer(const char *str)
           Serial.print(ptrcmd);
           Serial.print(", nbline:");
           Serial.print(ptrnbline);
-          Serial.print(" data:");
+          Serial.print(", data:");
           Serial.print(ptrdata);
           Serial.print(" cmpresult:");
           Serial.println((strcmp(ptrtarget, "DISPLAY")==0));// and strcmp(ptrcmd, "line")==0 and ptrnbline!=NULL and ptrdata!=NULL));
