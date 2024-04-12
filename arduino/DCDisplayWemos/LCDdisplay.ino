@@ -37,9 +37,14 @@ void displaySendDCJudgeDisplay(void)
   displaySendLine("0", "DC&JUDGE DISPLAY");
 }
 
-void displaySendAwaitingWifi(void)
+void displaySendAwaitingWifi(char * str)
 {
-  displaySendLine("2", "WIFI ?");
+  char msg[20];
+  strcpy(msg, "WIFI ");
+  strcat(msg, str);
+  strcat(msg, " ?");
+  
+  displaySendLine("2", msg);
 }
 
 void display_sendWifiConnected(const char *str)

@@ -41,7 +41,6 @@ F3FDCDisplayList = list()
 class tcpF3FDisplayWorker(QThread):
     finished = pyqtSignal()
 
-
     def init(self):
         self.status = displayStatus.Init
         self.connection = None
@@ -108,6 +107,7 @@ class tcpF3FDisplayWorker(QThread):
 
 class tcpF3FDCDisplayWorker(QThread):
     finished = pyqtSignal()
+
     def init(self):
         self.status = displayStatus.Init
         self.currentData = collections.OrderedDict()
@@ -156,7 +156,6 @@ class tcpF3FDCDisplayWorker(QThread):
         self.bp_reflySig = refly
         self.bp_validSig = valid
         self.bp_cancelSig = cancel
-
 
     def run(self):
         print("DCDisplay worker running")
@@ -247,7 +246,7 @@ class tcpF3FDCDisplayWorker(QThread):
                 " " + self.currentData["pilot"])
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
-                self.connection.sendall(bytes("DISPLAY:line:0:" + line[0:19] + "\n", "utf-8"))
+                self.connection.sendall(bytes("DISPLAY:line:0:" + line[0:20] + "\n", "utf-8"))
             except socket.error as e:
                 print(str(e))
         return line
@@ -259,7 +258,7 @@ class tcpF3FDCDisplayWorker(QThread):
         print("weather status : " + self.currentData["weatherstatus"])
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
-                self.connection.sendall(bytes("DISPLAY:line:1:" + line + "\n", "utf-8"))
+                self.connection.sendall(bytes("DISPLAY:line:1:" + line[0:20] + "\n", "utf-8"))
             except socket.error as e:
                 print(str(e))
         return line
@@ -273,7 +272,7 @@ class tcpF3FDCDisplayWorker(QThread):
 
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
-                self.connection.sendall(bytes("DISPLAY:line:2:" + line + "\n", "utf-8"))
+                self.connection.sendall(bytes("DISPLAY:line:2:" + line[0:20] + "\n", "utf-8"))
             except socket.error as e:
                 print(str(e))
         return line
@@ -285,16 +284,21 @@ class tcpF3FDCDisplayWorker(QThread):
         if self.currentData["refly"]:
             acceptanceStr = "REFLY"
 
-        if acceptanceStr=="":
-            line = ("Time " + "{:0>.2f}".format(self.currentData["runtime"]) + " P" + str(self.currentData["penalty"])
-                + " ")
+        if acceptanceStr == "":
+            if self.currentData["runtime"]>0:
+                line = ("Time " + "{:0>.2f}".format(self.currentData["runtime"]) + " P" + str(self.currentData["penalty"])
+                        + " ")
+            else:
+                line = ("Time " + "XX.XX" + " P" + str(
+                    self.currentData["penalty"])
+                        + " ")
         else:
             line = (acceptanceStr + " P" + str(self.currentData["penalty"])
                     + " ")
         print(line)
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
-                self.connection.sendall(bytes("DISPLAY:line:3:" + line + "\n", "utf-8"))
+                self.connection.sendall(bytes("DISPLAY:line:3:" + line[0:20] + "\n", "utf-8"))
             except socket.error as e:
                 print(str(e))
         return line
@@ -378,10 +382,12 @@ class tcpF3FDCDisplayWorker(QThread):
         self.displayCreateLineRunStatus(send=True)
 
     def slot_setDCDisplay(self, dc):
-        self.DCDisplay=dc
+        self.DCDisplay = dc
         self.slot_roundInfo(False, 0, 0)
+
     def isDCDisplay(self):
         return self.DCDisplay
+
 
 class tcpServer(QThread):
     contestRunning = pyqtSignal()
@@ -461,7 +467,7 @@ class tcpServer(QThread):
     def getDcDisplayList(self):
         temp = list()
         for i in F3FDCDisplayList:
-             temp.append((i[2], i[1].isDCDisplay()))
+            temp.append((i[2], i[1].isDCDisplay()))
         self.dcDisplayListSig.emit(temp)
 
     def setDcDisplayAsDc(self, data):
@@ -471,6 +477,7 @@ class tcpServer(QThread):
             else:
                 i[1].slot_setDCDisplay(False)
         self.getDcDisplayList()
+
     def run(self):
         while not self.isFinished():
             if self.status == serverStatus.Init:

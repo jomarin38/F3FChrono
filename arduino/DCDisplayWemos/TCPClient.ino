@@ -23,13 +23,9 @@
   #define STAPSK "YOURPWD"
 #endif
 */
-const char* ssid = STASSID;
-const char* password = STAPSK;
-#ifndef F3FSERVER_HOST
-  #define F3FSERVER_HOST "192.168.0.11"
-  #define F3FSERVER_PORT 10000
 
-#endif
+
+
 
 #define REQUESTIMEOUT 1000
 
@@ -52,8 +48,13 @@ enum BtnEnum{
   P1000
 };
 
-const char* host = F3FSERVER_HOST;
-const uint16_t port = F3FSERVER_PORT;
+char ssid[2][20] = {"F3FCtrl", STASSID};
+char password[2][20] = {"F3FPassword", STAPSK};
+char f3fserver_host[2][20] = {"192.168.1.251", "192.168.0.11"};
+int   f3fserver_port[2] = {10000, 10000};
+
+char wifiindex = 0;
+bool connected = false;
 TcpClientStatusEnum TcpClientStatus = Init;
 unsigned long timeout = millis();
 WiFiClient client;
@@ -66,16 +67,27 @@ void TCPClient_StartWifi(void)
   // We start by connecting to a WiFi network
   DebugStr(DEBUG_START, DEBUG_LN, "");
   DebugStr(DEBUG_START, DEBUG_LN, "");
-  DebugStr(DEBUG_START, DEBUG_NOLN, "Connecting to ");
-  DebugStr(DEBUG_NOSTART, DEBUG_LN, ssid);
-  displaySendAwaitingWifi();
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ".");;
-  }
 
+  wifiindex=0;
+  while(!connected)
+  {
+    DebugStr(DEBUG_START, DEBUG_NOLN, "Connecting to ");
+    DebugStr(DEBUG_NOSTART, DEBUG_LN, ssid[wifiindex]);
+    displaySendAwaitingWifi(ssid[wifiindex]);
+    timeout = 0;
+    WiFi.begin(ssid[wifiindex], password[wifiindex]);
+    while (WiFi.status() != WL_CONNECTED & timeout<10000) {
+      delay(500);
+      timeout+=500;
+      DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ".");;
+    }
+    if (WiFi.status() == WL_CONNECTED){
+      connected = true;
+    }else{
+      wifiindex = (wifiindex+1)%2;
+    }
+  }
   DebugStr(DEBUG_START, DEBUG_LN, "");
   DebugStr(DEBUG_START, DEBUG_LN, "WiFi connected");
   DebugStr(DEBUG_START, DEBUG_NOLN, "IP address: ");
@@ -90,15 +102,15 @@ void TCPClient_Run(void)
   int dataReceived=0;
   if (TcpClientStatus==Init){
     DebugStr(DEBUG_START, DEBUG_NOLN, "connecting to ");
-    DebugStr(DEBUG_NOSTART, DEBUG_NOLN, host);
+    DebugStr(DEBUG_NOSTART, DEBUG_NOLN, f3fserver_host[wifiindex]);
     DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ":");
-    sprintf(tmpStr, "%i", port);
+    sprintf(tmpStr, "%i", f3fserver_port[wifiindex]);
     DebugStr(DEBUG_NOSTART, DEBUG_LN, tmpStr);
 
   
     // Use WiFiClient class to create TCP connections
 
-    if (!client.connect(host, port)) {
+    if (!client.connect(f3fserver_host[wifiindex], f3fserver_port[wifiindex])) {
       DebugStr(DEBUG_START, DEBUG_LN, "connection failed");
       timeout = millis();
       TcpClientStatus = WaitBeforeRestart;
@@ -162,7 +174,7 @@ void TCPClient_Run(void)
   }
   
   if (TcpClientStatus==WaitBeforeRestart){
-    if (millis() - timeout > 30000) { //Wait a moment
+    if (millis() - timeout > 5000) { //Wait a moment
       TcpClientStatus = Init;
     }
   }

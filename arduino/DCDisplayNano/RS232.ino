@@ -69,14 +69,14 @@ void serial_run(void) {
       ptrinprocess = localmsg;
       tmp = getLineInfo(ptrinprocess, &ptrtarget, &ptrcmd, &ptrnbline, &ptrdata);
       if (tmp==0){
-          Serial.print(ptrtarget);
-          Serial.print(", cmd:");
-          Serial.print(ptrcmd);
-          Serial.print(", nbline:");
-          Serial.print(ptrnbline);
-          Serial.print(", data:");
-          Serial.print(ptrdata);
-          Serial.print(" cmpresult:");          
+          DebugStr(DEBUG_START, DEBUG_NOLN, ptrtarget);
+          DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ", cmd:");
+          DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ptrcmd);
+          DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ", nbline:");
+          DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ptrnbline);
+          DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ", data:");
+          DebugStr(DEBUG_NOSTART, DEBUG_LN, ptrdata);
+
         //Process command
         if (strcmp(ptrtarget, DISPLAY)==0 and strcmp(ptrcmd, CLEAR)==0){
           displayClear();
@@ -131,7 +131,7 @@ int msgWrite(char *data){
       sprintf(localstr, "%d", msgbuffer.id_write);
       DebugStr(DEBUG_NOSTART, DEBUG_LN, localstr);
     }else{
-      Serial.println("buffer len is too high for msg buffer");
+      DebugStr(DEBUG_START, DEBUG_LN,"buffer len is too high for msg buffer");
     }
   }
 }
@@ -143,7 +143,7 @@ void serialEvent(){
   char *ptrfind;
   
   if ((Serial.available()+serial.nb_data)>SERIAL_MAX_DATA){
-    Serial.println("RAZ serial data buffer full no end caracter found");
+    DebugStr(DEBUG_START, DEBUG_LN,"RAZ serial data buffer full no end caracter found");
     memset(&serial, 0, sizeof(serial));
   }
   nbdata = Serial.readBytes((char*)localstr, Serial.available());
@@ -202,10 +202,10 @@ int getLineInfo(char *initialStr, char **ptrtarget, char **ptrcmd, char **ptrlin
         *ptrlinenb = ptrstr;
         ptrstr = ptrsearch+1;
         ptrsearch = strchr (ptrstr,':');
-        Serial.print("getlineinfo ptrmsg : ");
-        Serial.print(ptrstr);
-        Serial.print(", find : ");
-        Serial.println(ptrsearch);
+        DebugStr(DEBUG_START, DEBUG_NOLN,"getlineinfo ptrmsg : ");
+        DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ptrstr);
+        DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ", find : ");
+        DebugStr(DEBUG_NOSTART, DEBUG_LN, ptrsearch);
         if (ptrsearch!=NULL){
           *ptrsearch=0x0;
           *ptrdata = ptrstr;
