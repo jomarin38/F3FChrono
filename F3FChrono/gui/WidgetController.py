@@ -341,7 +341,7 @@ class WPilotCtrl(QObject):
     def set_pilots(self, competitors):
         counter=0
         self.view.pilotName.clear()
-        for competitor in competitors:
+        for competitor in sorted(competitors):
             self.view.pilotName.addItem(competitor.display_name(), userData=competitor)
             self.bibs_index_map[competitor.get_bib_number()]=counter
             counter+=1
