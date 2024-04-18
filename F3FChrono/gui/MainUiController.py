@@ -447,8 +447,10 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def next_pilot(self, insert_database=False):
         current_round = self.event.get_current_round()
+        self.controllers['round'].wPilotCtrl.blockSignals(True)
         self.controllers['round'].wPilotCtrl.set_data(current_round.next_pilot(insert_database, visited_competitors=[]),
                                                       current_round)
+        self.controllers['round'].wPilotCtrl.blockSignals(False)
         self.controllers['round'].wChronoCtrl.reset_ui()
         self.vocal.signal_pilotname.emit(int(self.event.get_current_round().get_current_competitor().get_bib_number()))
         # Can't use current_group because it has changed
