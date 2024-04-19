@@ -356,6 +356,11 @@ class WPilotCtrl(QObject):
         self.view.group.setText(self._translate("Group : ", "Group : ") +
                                 str(round.find_group(competitor).group_number))
 
+
+    def set_bib(self, bib_number):
+        self.view.bib.setText(self._translate("BIB : ", "BIB : ")
+                              + str(bib_number))
+
     def get_selected_competitor(self):
         return self.view.pilotName.currentData()
 

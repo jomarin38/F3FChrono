@@ -207,6 +207,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
     def handle_pilot_changed(self):
         print('hey ! Pilot changed :'+self.controllers['round'].wPilotCtrl.get_selected_competitor().to_string())
         self.event.get_current_round().force_current_competitor(self.controllers['round'].wPilotCtrl.get_selected_competitor())
+        self.controllers['round'].wPilotCtrl.set_bib(self.controllers['round'].wPilotCtrl.get_selected_competitor().get_bib_number())
 
     def show_config(self):
         self.controllers['round'].hide()
