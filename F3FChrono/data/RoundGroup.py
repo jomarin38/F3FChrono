@@ -119,6 +119,14 @@ class RoundGroup:
     def remove_from_flight_order(self, competitor):
         self._flight_order = list(filter(lambda bib: bib != competitor.bib_number, self._flight_order))
 
+    def force_current_competitor(self, competitor):
+        if self._flight_order[self._current_competitor_index]!=competitor.get_bib_number():
+            self._flight_order.insert(self._current_competitor_index, competitor.get_bib_number())
+            #remove the competitor of the flight order
+            self._flight_order = (self._flight_order[0:self._current_competitor_index+1] +
+                                  [x for x in self._flight_order[self._current_competitor_index+1:]
+                                   if x!=competitor.get_bib_number()])
+
     def has_competitor(self, competitor):
         return (competitor.bib_number in self._flight_order) or (self.get_valid_run(competitor) is not None)
 

@@ -55,6 +55,7 @@ class WRoundCtrl(QObject):
     cancel_round_sig = pyqtSignal()
     btn_home_sig = pyqtSignal()
     btn_gscoring_sig = pyqtSignal()
+    pilot_change_sig = pyqtSignal()
     widgetList = []
 
     def __init__(self, name, parent):
@@ -89,6 +90,10 @@ class WRoundCtrl(QObject):
         self.wBtnCancel.Btn_Home.clicked.connect(self.cancel_home)
         self.wBtnGS.Btn_Next.clicked.connect(self.gs_next)
         self.wBtnGS.Btn_Home.clicked.connect(self.gs_cancel)
+        self.wPilotCtrl.pilot_change_sig.connect(self.handle_pilot_changed)
+
+    def handle_pilot_changed(self):
+        self.pilot_change_sig.emit()
 
     def get_widget(self):
         return (self.widgetList)
@@ -284,6 +289,7 @@ class WWindCtrl(QObject):
 class WPilotCtrl(QObject):
     btn_cancel_flight_sig = pyqtSignal()
     btn_alarm_sig = pyqtSignal()
+    pilot_change_sig = pyqtSignal()
 
     def __init__(self, name, parent):
         super().__init__()
@@ -302,7 +308,9 @@ class WPilotCtrl(QObject):
         self.str_alarm_enable = self._translate("Enable Alarm", "Enable Alarm")
         self.str_alarm_disable = self._translate("Disable Alarm", "Disable Alarm")
         self.view.Btn_Alarm.setText(self.str_alarm_disable)
+
         self.alarm_enable = True
+        self.bibs_index_map = {}
 
     def get_widget(self):
         return (self.widget)
@@ -330,14 +338,31 @@ class WPilotCtrl(QObject):
     def btn_cancel_flight(self, event):
         self.btn_cancel_flight_sig.emit()
 
+    def set_pilots(self, competitors):
+        counter=0
+        self.view.pilotName.clear()
+        for competitor in sorted(competitors):
+            self.view.pilotName.addItem(competitor.display_name(), userData=competitor)
+            self.bibs_index_map[competitor.get_bib_number()]=counter
+            counter+=1
+
     def set_data(self, competitor, round):
-        self.view.pilotName.setText(competitor.display_name())
+        self.view.pilotName.setCurrentIndex(self.bibs_index_map[competitor.get_bib_number()])
+        self.view.pilotName.currentIndexChanged.connect(self.pilot_change_sig.emit)
         self.view.bib.setText(self._translate("BIB : ", "BIB : ")
                               + str(competitor.get_bib_number()))
         self.view.round.setText(self._translate("Round : ", "Round : ")
                                 + str(len(round.event.valid_rounds) + 1))
         self.view.group.setText(self._translate("Group : ", "Group : ") +
                                 str(round.find_group(competitor).group_number))
+
+
+    def set_bib(self, bib_number):
+        self.view.bib.setText(self._translate("BIB : ", "BIB : ")
+                              + str(bib_number))
+
+    def get_selected_competitor(self):
+        return self.view.pilotName.currentData()
 
     def handle_group_scoring_enabled(self, enabled):
         if enabled:
