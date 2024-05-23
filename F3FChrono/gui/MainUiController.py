@@ -615,12 +615,17 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def refly(self):
         # TODO : get penalty value if any
-        self.chronoHard.set_status(chronoStatus.Finished)
-        self.chronoHard.valid = False
-        self.chronoHard.setrefly()
-        self.chronoHard.timerF3F.stopTime()
-        self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
-        self.controllers['round'].wChronoCtrl.set_refly(True)
+        try :
+            self.chronoHard.set_status(chronoStatus.Finished)
+            self.chronoHard.valid = False
+            self.chronoHard.setrefly()
+            self.chronoHard.timerF3F.stopTime()
+            self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
+            self.controllers['round'].wChronoCtrl.set_refly(True)
+        except Exception as e:
+            import traceback
+            with open("refly-error-log.txt", "a") as myfile:
+                myfile.write(traceback.format_exc())
 
     def contest_changed(self):
         if self.event is not None:
@@ -700,20 +705,25 @@ class MainUiCtrl(QtWidgets.QMainWindow):
 
     def slot_run_validated(self):
         # print("run validated")
-        if self.chronoHard.isRefly():
-            self.event.get_current_round().handle_refly(0, insert_database=True)
-        else:
-            self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
-            self.event.get_current_round().handle_terminated_flight(
-                self.event.get_current_round().get_current_competitor(),
-                self.chronodata, self.chronoHard.getPenalty(), self.chronoHard.valid, insert_database=True)
+        try:
+            if self.chronoHard.isRefly():
+                self.event.get_current_round().handle_refly(0, insert_database=True)
+            else:
+                self.chronoHard_to_chrono(self.chronoHard, self.chronodata)
+                self.event.get_current_round().handle_terminated_flight(
+                    self.event.get_current_round().get_current_competitor(),
+                    self.chronodata, self.chronoHard.getPenalty(), self.chronoHard.valid, insert_database=True)
 
-        self.chronoHard.reset()
-        self.chronodata = Chrono()
-        self.next_pilot(insert_database=True)
-        self.chronoHard.timerF3F.initialize()
-        self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
-        self.controllers['wind'].setLastRoundTime()
+            self.chronoHard.reset()
+            self.chronodata = Chrono()
+            self.next_pilot(insert_database=True)
+            self.chronoHard.timerF3F.initialize()
+            self.controllers['round'].wChronoCtrl.set_status(self.chronoHard.get_status())
+            self.controllers['wind'].setLastRoundTime()
+        except Exception as e:
+            import traceback
+            with open("refly-error-log.txt", "a") as myfile:
+                myfile.write(traceback.format_exc())
 
     def slot_contestRunning(self):
         print("slot contest Running : ", str(self.controllers['round'].is_show()))
