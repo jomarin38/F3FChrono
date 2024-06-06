@@ -45,9 +45,10 @@ char tmpStr[100]="";
 
 
 void setup() {
-  delay(10);
+  delay(100);
   serial_setup();
   BP_Start();
+  delay(2000);
 
   display_Start();
   Analog_Start();
