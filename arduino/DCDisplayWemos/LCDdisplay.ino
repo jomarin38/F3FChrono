@@ -21,20 +21,22 @@ void display_Start(void)
 {
   DebugStr(DEBUG_START, DEBUG_LN, "display Module Start");
   displaySendClear();
-  delay(100);
   displaySendDCJudgeDisplay();
-  delay(100);
 }
 
 void displaySendClear(void)
 {
-  Serial.println(DISPLAY_CLEAR);
-  Serial.flush();
+  char localstr[60];
+  
+  strcpy(localstr, DISPLAY_CLEAR);
+//  msgWrite(localstr);  
+  Serial.println(localstr);
 }
 
 void displaySendDCJudgeDisplay(void)
 {
   displaySendLine("0", "DC&JUDGE DISPLAY");
+  serial_run();
 }
 
 void displaySendAwaitingWifi(char * str)
@@ -44,7 +46,14 @@ void displaySendAwaitingWifi(char * str)
   strcat(msg, str);
   strcat(msg, " ?");
   
-  displaySendLine("2", msg);
+
+  Serial.print(DISPLAY_LINE);
+  Serial.print("2");
+  Serial.print(":");
+  Serial.print(msg);
+  Serial.println(":");
+//  displaySendLine("2", msg);
+//  serial_run();
 }
 
 void display_sendWifiConnected(const char *str)
@@ -55,12 +64,14 @@ void display_sendWifiConnected(const char *str)
 
 void displaySendLine(const char* linenb, const char *str)
 {
-  Serial.print(DISPLAY_LINE);
-  Serial.print(linenb);
-  Serial.print(":");
-  Serial.print(str);
-  Serial.println(":");
-  Serial.flush();
+  char localstr[60];
+  
+  strcpy(localstr, DISPLAY_LINE);
+  strcat(localstr, linenb);
+  strcat(localstr, ":");
+  strcat(localstr, str);
+  strcat(localstr, ":");
+  msgWrite(localstr);  
 }
 
 void displaySendDataFromServer(const char *str)

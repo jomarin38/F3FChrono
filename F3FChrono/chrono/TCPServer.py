@@ -132,7 +132,7 @@ class tcpF3FDCDisplayWorker(QThread):
         self.currentData["weatherrain"] = False
         self.currentData["weatherstatus"] = ""
         self.clearRunData()
-        self.displayCreateLines()
+        #self.displayCreateLines()
 
     def clearRunData(self):
         self.currentData["runstatus"] = chronoStatus.InWait
@@ -279,10 +279,10 @@ class tcpF3FDCDisplayWorker(QThread):
 
     def displayCreateLineRunStatus(self, send=False):
         acceptanceStr = ""
-        if self.currentData["nullflight"]:
-            acceptanceStr = "NULLFLIGHT"
         if self.currentData["refly"]:
             acceptanceStr = "REFLY"
+        if self.currentData["nullflight"]:
+            acceptanceStr = "NULLFLIGHT"
 
         if acceptanceStr == "":
             if self.currentData["runtime"]>0:
@@ -371,10 +371,12 @@ class tcpF3FDCDisplayWorker(QThread):
 
     def slot_refly(self):
         self.currentData["refly"] = True
+        self.currentData["nullflight"] = False
         self.displayCreateLineRunStatus(send=True)
 
     def slot_nullflight(self):
         self.currentData["nullflight"] = True
+        self.currentData["refly"] = False
         self.displayCreateLineRunStatus(send=True)
 
     def slot_runvalidated(self):

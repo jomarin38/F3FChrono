@@ -14,7 +14,7 @@
  # You should have received a copy of the GNU General Public License 
  # along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+#define VERSION "0.1"
 //#define _DEBUG_
 #define DEBUG_LN true
 #define DEBUG_NOLN false
@@ -46,20 +46,12 @@ char tmpStr[100]="";
 
 void setup() {
   delay(10);
+  serial_setup();
   BP_Start();
-/*  while(nanoDisplayIsReady()==LOW){
-    delay(500);
-  }
-*/
-  //Serial.begin(57600);
-  Serial.begin(19200);
-  delay(500);
-  Serial.println("");
-  Serial.println("");
-  Serial.println("");
-  
+
   display_Start();
   Analog_Start();
+  serial_run();
   TCPClient_StartWifi();
 }
 
@@ -67,5 +59,6 @@ void loop() {
   TCPClient_Run();
   BP_CheckChanged();
   Analog_Read();
+  serial_run();
   delay(50);
 }

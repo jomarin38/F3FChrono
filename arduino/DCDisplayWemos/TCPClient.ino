@@ -26,7 +26,7 @@
 
 
 
-
+#define NB_SSID       3
 #define REQUESTIMEOUT 1000
 
 enum TcpClientStatusEnum{
@@ -48,10 +48,10 @@ enum BtnEnum{
   P1000
 };
 
-char ssid[2][20] = {"F3FCtrl", STASSID};
-char password[2][20] = {"F3FPassword", STAPSK};
-char f3fserver_host[2][20] = {"192.168.1.251", "192.168.0.11"};
-int   f3fserver_port[2] = {10000, 10000};
+char ssid[NB_SSID][20] = {"F3FCtrl", STASSID1, STASSID2};
+char password[NB_SSID][20] = {"F3FPassword", STAPSK1, STAPSK2};
+char f3fserver_host[NB_SSID][20] = {"192.168.1.251", "192.168.0.250", "192.168.100.13"};
+int   f3fserver_port[NB_SSID] = {10000, 10000, 10000};
 
 char wifiindex = 0;
 bool connected = false;
@@ -68,7 +68,6 @@ void TCPClient_StartWifi(void)
   DebugStr(DEBUG_START, DEBUG_LN, "");
   DebugStr(DEBUG_START, DEBUG_LN, "");
   WiFi.mode(WIFI_STA);
-
   wifiindex=0;
   while(!connected)
   {
@@ -80,12 +79,12 @@ void TCPClient_StartWifi(void)
     while (WiFi.status() != WL_CONNECTED & timeout<10000) {
       delay(500);
       timeout+=500;
-      DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ".");;
+      DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ".");
     }
     if (WiFi.status() == WL_CONNECTED){
       connected = true;
     }else{
-      wifiindex = (wifiindex+1)%2;
+      wifiindex = (wifiindex+1)%NB_SSID;
     }
   }
   DebugStr(DEBUG_START, DEBUG_LN, "");
