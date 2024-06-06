@@ -164,6 +164,7 @@ void serialEvent(){
         Serial.println((char*)serial.data_read);
         */
         msgWrite(serial.data_read);
+        Serial.println("1");
         memset(&serial, 0, sizeof(serial));
       }  
     }
