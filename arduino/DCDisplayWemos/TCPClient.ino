@@ -80,6 +80,7 @@ void TCPClient_StartWifi(void)
       delay(500);
       timeout+=500;
       DebugStr(DEBUG_NOSTART, DEBUG_NOLN, ".");
+      serial_run();
     }
     if (WiFi.status() == WL_CONNECTED){
       connected = true;

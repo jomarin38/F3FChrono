@@ -29,8 +29,9 @@ void displaySendClear(void)
   char localstr[60];
   
   strcpy(localstr, DISPLAY_CLEAR);
-//  msgWrite(localstr);  
-  Serial.println(localstr);
+  msgWrite(localstr);  
+  serial_run();
+  //Serial.println(localstr);
 }
 
 void displaySendDCJudgeDisplay(void)
@@ -47,13 +48,14 @@ void displaySendAwaitingWifi(char * str)
   strcat(msg, " ?");
   
 
-  Serial.print(DISPLAY_LINE);
+  /*Serial.print(DISPLAY_LINE);
   Serial.print("2");
   Serial.print(":");
   Serial.print(msg);
   Serial.println(":");
-//  displaySendLine("2", msg);
-//  serial_run();
+  */
+  displaySendLine("2", msg);
+  serial_run();
 }
 
 void display_sendWifiConnected(const char *str)
