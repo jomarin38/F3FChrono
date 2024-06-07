@@ -59,6 +59,10 @@ void serial_run(void) {
 
 
   //Process serial request
+  serialCheck();
+  if (serial.state != readytosend){
+    Serial.println("");
+  }
   if (serial.state == readytosend & msgAvailable()>0) {
     DebugStr(DEBUG_START, DEBUG_LN, "msgAvailable()?true");
     if (msgRead(localmsg)>=0){
@@ -89,6 +93,8 @@ int msgRead(char *ptrmsg)
     DebugStr(DEBUG_START, DEBUG_NOLN, "msgRead(), index read : ");
     sprintf(localstr, "%d", msgbuffer.id_read);
     DebugStr(DEBUG_NOSTART, DEBUG_LN, localstr);
+    //Serial.print("r");
+    //Serial.print(localstr);
   }else{
     ret=-1;
   }
@@ -106,13 +112,16 @@ int msgWrite(char *data){
     DebugStr(DEBUG_START, DEBUG_NOLN, "msgWrite(), id_write : ");
     sprintf(localstr, "%d", msgbuffer.id_write);
     DebugStr(DEBUG_NOSTART, DEBUG_LN, localstr);
+    //Serial.print("w");
+    //Serial.print(localstr);
   }else{
     DebugStr(DEBUG_START, DEBUG_LN,"buffer len is too high for msg buffer");
   }
   return ret;
 }
 
-void serialEvent(){
+//void serialEvent(){
+void serialCheck(){
   int i;
   int nbdata;
   char localstr[100];
