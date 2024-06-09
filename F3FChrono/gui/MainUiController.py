@@ -586,6 +586,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
 
     def clear_penalty(self):
+        self.vocal.signal_time.emit(35.35, False)
         self.chronoHard.clearPenalty()
         self.tcp.slot_clearPenalty()
         self.controllers['round'].wChronoCtrl.set_penalty_value(self.chronoHard.getPenalty())
