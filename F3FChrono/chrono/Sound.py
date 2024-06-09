@@ -355,9 +355,9 @@ if __name__ == '__main__':
 
     Vocal = chronoQSound(os.path.dirname(os.path.dirname(os.getcwd())), "French", 1, 100)
     Vocal.sound_toLate()
-    Vocal.signal_elapsedTime.emit(30, False)
+    Vocal.sound_elapsedTime(30, False)
     time.sleep(5)
-    Vocal.sound_time(12.11)
+    Vocal.sound_time(45.45)
     time.sleep(5)
     try:
         sys.exit(app.exec_())
