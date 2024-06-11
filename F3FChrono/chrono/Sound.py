@@ -134,7 +134,7 @@ class chronoQSound(QThread):
         self.entry_sound = False
         self.entry_soundToLate = False
         self.toLateSound = False
-        self.__debug = True
+        self.__debug = False
 
     def loadwav(self, volume):
         self.time = []
@@ -180,6 +180,7 @@ class chronoQSound(QThread):
                         self.__addSound(x)
                     else:
                         self.__addSound(x)
+                        print("sound .XX : " + str(x))
 
 
     def sound_pilot(self, bib):
@@ -283,13 +284,13 @@ class chronoQSound(QThread):
                 self.sound_lowPriority.append(num)
                 self.checklowPrioritySound()
             else:
-                if not self.time[num].isPlaying():
-                    if self.__debug:
-                        print("add sound", str(num))
+                #if not self.time[num].isPlaying(): #fix issue for time like 45.45
+                if self.__debug:
+                    print("add sound", str(num))
 
-                    self.sound_list.append(self.time[num])
-                    if play and len (self.sound_list) == 1:
-                        self.sound_list[0].playSound()
+                self.sound_list.append(self.time[num])
+                if play and len (self.sound_list) == 1:
+                    self.sound_list[0].playSound()
 
     def checklowPrioritySound(self):
         if self.chronoStatus == chronoStatus.InWait or self.chronoStatus == chronoStatus.Finished:
@@ -357,7 +358,8 @@ if __name__ == '__main__':
     Vocal.sound_toLate()
     Vocal.sound_elapsedTime(30, False)
     time.sleep(5)
-    Vocal.sound_time(45.45)
+    #Vocal.sound_time(45.45)
+    Vocal.signal_time.emit(45.45, False)
     time.sleep(5)
     try:
         sys.exit(app.exec_())
