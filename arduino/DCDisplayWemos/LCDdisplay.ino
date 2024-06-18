@@ -43,11 +43,12 @@ void displaySendDCJudgeDisplay(void)
 void displaySendAwaitingWifi(char * str)
 {
   char msg[20];
+  float accu;
+  
   strcpy(msg, "WIFI ");
   strcat(msg, str);
   strcat(msg, " ?");
   
-
   /*Serial.print(DISPLAY_LINE);
   Serial.print("2");
   Serial.print(":");
@@ -55,6 +56,11 @@ void displaySendAwaitingWifi(char * str)
   Serial.println(":");
   */
   displaySendLine("2", msg);
+  serial_run();
+
+  Analog_getVoltage(&accu);
+  sprintf(msg, "%0.1fV", accu);
+  displaySendLine("3", msg);
   serial_run();
 }
 
