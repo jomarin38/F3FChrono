@@ -66,8 +66,13 @@ void displaySendAwaitingWifi(char * str)
 
 void display_sendWifiConnected(const char *str)
 {
+  char msg[20];
+  float accu;
+
   displaySendLine("2", "F3FChrono awaiting");
-  displaySendLine("3", str);
+  Analog_getVoltage(&accu);
+  sprintf(msg, "%s %0.1fV", str, accu);
+  displaySendLine("3", msg);
 }
 
 void displaySendLine(const char* linenb, const char *str)
