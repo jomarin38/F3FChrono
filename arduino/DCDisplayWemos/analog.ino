@@ -27,14 +27,15 @@ void Analog_Start(void){
   analogValue = 0;
   voltage= 0;
   firstvoltage=true;
+  Analog_Read();
 }
 
 void Analog_Read(void){
   if ((millis()-analogTimeOut)>ANALOG_TIMEOUT or firstvoltage){
     analogValue = analogRead(A0);
-    voltage = analogValue/1024*1.28;
-    sprintf(tmpStr, "analog value:%i, %.1fV", analogValue, voltage);
-    Serial.println(tmpStr);
+    voltage = ((float)analogValue)*0.01440367+0.3;//0.003045872;
+    sprintf(tmpStr, "analog value:%i, %.2fV", analogValue, voltage);
+    //Serial.println(tmpStr);
     DebugStr(DEBUG_START, DEBUG_LN, tmpStr);
     //TcpClient_SendAnalog(voltage);
     firstvoltage = false;
@@ -44,5 +45,5 @@ void Analog_Read(void){
 
 void Analog_getVoltage(float *data)
 {
-  *data = float (analogValue);
+  *data = float (voltage);
 }
