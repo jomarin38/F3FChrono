@@ -16,23 +16,33 @@
  */
 
 #define ANALOG_TIMEOUT 300000
-unsigned long analogTimeOut;
+unsigned long analogTimeOut=0;
 int analogValue;
 float voltage;
+bool firstvoltage;
 
 void Analog_Start(void){
   DebugStr(DEBUG_START, DEBUG_LN, "Analog Module Start");
   analogTimeOut = 0;
+  analogValue = 0;
+  voltage= 0;
+  firstvoltage=true;
 }
 
 void Analog_Read(void){
-  if ((millis()-analogTimeOut)>ANALOG_TIMEOUT){
+  if ((millis()-analogTimeOut)>ANALOG_TIMEOUT or firstvoltage){
     analogValue = analogRead(A0);
-    voltage = analogValue*15/1024;
+    voltage = analogValue/1024*1.28;
     sprintf(tmpStr, "analog value:%i, %.1fV", analogValue, voltage);
+    Serial.println(tmpStr);
     DebugStr(DEBUG_START, DEBUG_LN, tmpStr);
-    TcpClient_SendAnalog(voltage);
-
+    //TcpClient_SendAnalog(voltage);
+    firstvoltage = false;
     analogTimeOut = millis();
   }
+}
+
+void Analog_getVoltage(float *data)
+{
+  *data = float (analogValue);
 }
