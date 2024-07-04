@@ -15,7 +15,7 @@
  # along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #define VERSION "0.1"
-//#define _DEBUG_
+#define _DEBUG_
 #define DEBUG_LN true
 #define DEBUG_NOLN false
 #define DEBUG_START true
