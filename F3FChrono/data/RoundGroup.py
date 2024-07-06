@@ -23,7 +23,6 @@ from F3FChrono.data.dao.RunDAO import RunDAO
 import sys
 
 class RoundGroup:
-    rundao=RunDAO()
 
     def __init__(self, f3f_round, group_number):
         self.round = f3f_round
@@ -36,6 +35,7 @@ class RoundGroup:
         self.runs = {}
         self.cancelled = False
         self.group_id = None
+        self.rundao=RunDAO()
 
     def set_flight_order_index(self, index):
         self._current_competitor_index = index
@@ -148,7 +148,7 @@ class RoundGroup:
         else:
             self.runs[run.competitor] = [run]
         if insert_database:
-            run_id, chrono_id = RoundGroup.rundao.insert(run)
+            run_id, chrono_id = self.rundao.insert(run)
             run.id = run_id
             if run.chrono is not None:
                 run.chrono.id = chrono_id

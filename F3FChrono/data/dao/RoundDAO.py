@@ -152,7 +152,7 @@ class RoundDAO(Dao):
                 valid_run = group.get_valid_run(competitor)
                 if valid_run is not None:
                     from F3FChrono.data.RoundGroup import RoundGroup
-                    RoundGroup.rundao.insert(valid_run)
+                    group.rundao.insert(valid_run)
 
     def get_not_cancelled_group_id(self, event_id, round_number, group_number):
         from F3FChrono.data.Round import Round
