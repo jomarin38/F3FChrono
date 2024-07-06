@@ -190,11 +190,11 @@ class Weather(QTimer):
         
     def refresh_gui(self):
         self.gui_weather_signal.emit(self.weather['speed'], self.weather['unit'], self.weather['orientation'],
-                                     self.weather['rain'], self.rules['state']==weatherState.condNok or \
+                                     self.weather['rain'], self.rules['state'] == weatherState.condNok or \
                                      self.rules['state'] == weatherState.condMarginal, self.status)
         self.gui_wind_speed_dir_signal.emit(self.weather['speed'], self.weather['unit'], self.windSpeed_isPresent,
                                             self.weather['orientation'], self.windDirVoltage,
-                                            self.rules['wind_dir_voltage_alarm']==alarm.Alarm,
+                                            self.rules['wind_dir_voltage_alarm'] == alarm.Alarm,
                                             self.windDir_isPresent, int(self.weather['rain']), self.rain_isPresent)
 
     def slot_wind_speed(self, speed, unit):

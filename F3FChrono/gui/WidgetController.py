@@ -1303,8 +1303,8 @@ class WSettingsSound(QObject):
 class WSettingsWirelessDevices(QObject):
     btn_settingsbase_sig = pyqtSignal()
     btn_settingswBtn_sig = pyqtSignal()
-    btn_AnemometerGetList_sig = pyqtSignal()
-    btn_AnemometerConnect_sig = pyqtSignal(str)
+    btn_DcDisplayGetList_sig = pyqtSignal()
+    btn_SetDcDisplay_sig = pyqtSignal(str)
     btn_settingsback_sig = pyqtSignal()
     btn_cancel_sig = pyqtSignal()
     btn_valid_sig = pyqtSignal()
@@ -1320,9 +1320,11 @@ class WSettingsWirelessDevices(QObject):
         self._translate = QtCore.QCoreApplication.translate
         self.view.setupUi(self.widget)
         self.widgetList.append(self.widget)
+        self.dcDisplayList = list()
         self.set_data()
-        self.view.btn_AnemometerConnect.clicked.connect(self.anemometerconnect)
-        self.view.btn_AnemometerGetList.clicked.connect(self.btn_AnemometerGetList_sig.emit)
+        self.view.btn_SetDcDisplay.clicked.connect(self.setDcDisplay)
+        self.view.btn_DcDisplayGetList.clicked.connect(self.btn_DcDisplayGetList_sig.emit)
+        self.view.DcDisplayComboBox.currentIndexChanged.connect(self.dcDisplayChangeEvent)
         self.view.btn_base_settings.clicked.connect(self.btn_settingsbase_sig.emit)
         self.view.wbtn_settings.clicked.connect(self.btn_settingswBtn_sig.emit)
         self.view.btn_back.clicked.connect(self.btn_settingsback_sig.emit)
@@ -1336,7 +1338,7 @@ class WSettingsWirelessDevices(QObject):
         self.TextRainYes = self._translate("WSettingsConnectedDevices", "Rain : Yes")
         self.TextRainNo = self._translate("WSettingsConnectedDevices", "Rain : No")
         self.TextDir = self._translate("WSettingsConnectedDevices", "Angle")
-        self.view.AnemometerComboBox.clear()
+        self.view.DcDisplayComboBox.clear()
 
 
     def get_widget(self):
@@ -1364,13 +1366,31 @@ class WSettingsWirelessDevices(QObject):
         ConfigReader.config.conf['enableSensorRain'] = self.view.checkBox_Rain.isChecked()
         self.wirelessDevicesSelected_sig.emit()
 
-    def anemometerSetData(self, datalist):
-        self.view.AnemometerComboBox.clear()
-        for i in datalist:
-            self.view.AnemometerComboBox.addItem(i)
+    def dcDisplaySetData(self, datalist):
+        if len(datalist)>0:
+            self.view.DcDisplayComboBox.clear()
+            self.dcDisplayList.clear()
 
-    def anemometerconnect(self):
-        self.btn_AnemometerConnect_sig.emit(self.view.AnemometerComboBox.currentText())
+            for i in datalist:
+                self.dcDisplayList.append(i)
+                self.view.DcDisplayComboBox.addItem(i[0][0])
+                #self.setDcDisplayStatus(i)
+            #self.view.DcDisplayComboBox.setCurrentIndex(0)
+            #self.setDcDisplayStatus(datalist[0])
+    def dcDisplayChangeEvent(self, index):
+        print("dc display change event", index)
+        if index >= 0:
+            self.setDcDisplayStatus(self.dcDisplayList[index])
+        else:
+            self.view.DcDisplayStatus.setText("")
+    def setDcDisplayStatus(self, i):
+        if i[1]:
+            self.view.DcDisplayStatus.setText("DC Display")
+        else:
+            self.view.DcDisplayStatus.setText("Judge Display")
+
+    def setDcDisplay(self):
+        self.btn_SetDcDisplay_sig.emit(self.view.DcDisplayComboBox.currentText())
 
     def weatherStation_display(self, wind_speed, wind_speed_unit, wind_speed_ispresent,
                                wind_dir, wind_dir_voltage, wind_dir_voltage_alarm, wind_dir_ispresent,
