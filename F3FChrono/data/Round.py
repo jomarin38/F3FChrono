@@ -33,7 +33,6 @@ import requests
 class Round:
 
     valid_round_counters = {}
-    round_dao = RoundDAO()
 
     def __init__(self):
         self.event = None
@@ -42,6 +41,7 @@ class Round:
         self.groups = []
         self.valid = False
         self._current_group_index = 0
+        self.round_dao = RoundDAO()
 
     @staticmethod
     def new_round(event, add_initial_group=True):
@@ -151,14 +151,14 @@ class Round:
             self.groups += new_groups[1:]
             #Add new groups in database
             for group in new_groups[1:]:
-                Round.round_dao.add_group(group, populate_runs=True)
-                group.group_id = Round.round_dao.get_not_cancelled_group_id(self.event.id, self.round_number,
+                self.round_dao.add_group(group, populate_runs=True)
+                group.group_id = self.round_dao.get_not_cancelled_group_id(self.event.id, self.round_number,
                                                                             group.group_number)
 
             while (self.groups[self._current_group_index].valid):
                 self._current_group_index += 1
 
-            Round.round_dao.update(self)
+            self.round_dao.update(self)
 
     def cancel_current_group(self):
         if self.group_scoring_enabled():
@@ -166,9 +166,9 @@ class Round:
             new_group = RoundGroup(self, current_group.group_number)
             new_group.set_flight_order(current_group.get_flight_order())
             current_group.cancelled = True
-            Round.round_dao.update(self)
-            Round.round_dao.add_group(new_group)
-            new_group.group_id = Round.round_dao.get_not_cancelled_group_id(self.event.id, self.round_number,
+            self.round_dao.update(self)
+            self.round_dao.add_group(new_group)
+            new_group.group_id = self.round_dao.get_not_cancelled_group_id(self.event.id, self.round_number,
                                                                             new_group.group_number)
             self.groups[self._current_group_index] = new_group
             return self.get_current_competitor()
@@ -264,7 +264,7 @@ class Round:
                 self.groups[self._current_group_index].validate_group()
                 self._current_group_index += 1
                 if insert_database:
-                    Round.round_dao.update(self)
+                    self.round_dao.update(self)
                 current_competitor = self.groups[self._current_group_index].get_current_competitor()
             else:
                 #All groups are finished ... need to create a new round
@@ -314,7 +314,7 @@ class Round:
         self.valid_round_number = None
         for group in self.groups:
             group.valid = False
-        Round.round_dao.update(self)
+        self.round_dao.update(self)
 
     def validate_round(self, insert_database=False):
         self.valid = True
@@ -328,7 +328,7 @@ class Round:
         Round.valid_round_counters[self.event] = self.valid_round_number
         self.event.valid_rounds.append(self)
         if insert_database:
-            Round.round_dao.update(self)
+            self.round_dao.update(self)
             if ConfigReader.config.conf['auto_send_f3xvault']:
                 request_url = Utils.get_administrator_url() + \
                               '/auto_export_round_f3x_vault?event_id=' + str(self.event.id) + \

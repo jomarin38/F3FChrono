@@ -512,7 +512,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             current_round = self.event.get_current_round()
             if not current_round.has_run() and not current_round.group_scoring_enabled():
                 current_round.set_flight_order_from_scratch()
-                Round.round_dao.update(current_round)
+                current_round.round_dao.update(current_round)
             current_competitor = current_round.get_current_competitor()
             if not current_competitor.present:
                 current_round.set_null_flight(current_competitor)

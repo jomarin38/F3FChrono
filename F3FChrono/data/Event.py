@@ -240,9 +240,9 @@ class Event:
         f3f_round = Round.new_round(self)
         f3f_round.set_flight_order_from_scratch()
         if insert_database:
-            Round.round_dao.insert(f3f_round)
+            f3f_round.round_dao.insert(f3f_round)
             #Get round from database to get group ids
-            fully_fetched_round = Round.round_dao.get(f3f_round)
+            fully_fetched_round = f3f_round.round_dao.get(f3f_round)
         else:
             fully_fetched_round = f3f_round
         self.add_existing_round(fully_fetched_round)
