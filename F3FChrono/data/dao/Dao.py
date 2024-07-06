@@ -17,6 +17,7 @@
 
 import pymysql
 import threading
+import os
 from F3FChrono.chrono import ConfigReader
 
 
@@ -26,7 +27,7 @@ class Dao:
 
     def __init__(self):
         Dao._lock.acquire()
-        host = ConfigReader.config.conf['mysql_server_IP']
+        host = os.getenv('MYSQL_IP', 'localhost')
         Dao._db = pymysql.connect(host=host,
                           user="f3f_ctrl",
                           password="F3FCtrl",

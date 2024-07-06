@@ -18,10 +18,15 @@ from django.urls import include,path
 import os
 
 public_only = os.getenv('PUBLIC_ONLY', 'False').lower() in ('true', '1', 't')
+private_only = os.getenv('PRIVATE_ONLY', 'False').lower() in ('true', '1', 't')
 
 print('public_only={}'.format(public_only))
+print('private_only={}'.format(private_only))
 
-urlpatterns = [
+urlpatterns = []
+
+if not private_only :
+    urlpatterns += [
         path('f3franking/', include('F3FChrono.web.f3franking.urls'))
     ]
 
