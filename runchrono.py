@@ -59,7 +59,7 @@ def main(webservice_only=False, public_only=False, private_only=False):
             ws_env = os.environ.copy()
             if public_only:
                 ws_env['PUBLIC_ONLY'] = 'True'
-            if public_only:
+            if private_only:
                 ws_env['PRIVATE_ONLY'] = 'True'
             webserver_process = \
                 subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:'
