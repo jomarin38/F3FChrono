@@ -40,7 +40,7 @@ if not is_running_on_pi():
     toggle_print(False)  # turn on/off printing
 
 
-def main(webservice_only=False):
+def main(webservice_only=False, public_only=False):
 
     #logging.basicConfig (filename="runchrono.log", level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     if is_running_on_pi():
@@ -56,12 +56,16 @@ def main(webservice_only=False):
         else:
             print("Starting webserver ...")
             manage_py_path = os.path.realpath('F3FChrono/web')
+            ws_env = os.environ.copy()
+            if public_only:
+                ws_env['PUBLIC_ONLY'] = 'True'
             webserver_process = \
                 subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:'
                                   +str(ConfigReader.config.conf['webserver_port'])],
-                                 shell=False)
+                                 shell=False, env=ws_env)
 
-            subprocess.Popen(['celery', '-A', 'administrator',  'worker', '-l', 'info'], cwd=manage_py_path, shell=False)
+            if not public_only:
+                subprocess.Popen(['celery', '-A', 'administrator',  'worker', '-l', 'info'], cwd=manage_py_path, shell=False)
 
     print("...start")
 
@@ -101,6 +105,7 @@ def main(webservice_only=False):
 if __name__ == '__main__':
     parser = ArgumentParser(prog='chrono')
     parser.add_argument('--webservice-only', action="store_true")
+    parser.add_argument('--public-only', action="store_true")
     parser.add_argument('--external-webserver')
     args = parser.parse_args()
 
@@ -118,4 +123,4 @@ if __name__ == '__main__':
     if args.external_webserver is not None:
         Utils.set_external_webserver_IP(args.external_webserver)
 
-    main(args.webservice_only)
+    main(args.webservice_only, args.public_only)
