@@ -23,6 +23,7 @@ class RoundDAO(Dao):
 
     def __init__(self):
         self.run_dao = RunDAO()
+        super().__init__()
 
     def get_list(self, event):
         from F3FChrono.data.Round import Round
