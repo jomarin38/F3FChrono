@@ -21,7 +21,8 @@ from F3FChrono.data.dao.RunDAO import RunDAO
 
 class RoundDAO(Dao):
 
-    run_dao = RunDAO()
+    def __init__(self):
+        self.run_dao = RunDAO()
 
     def get_list(self, event):
         from F3FChrono.data.Round import Round
@@ -127,7 +128,7 @@ class RoundDAO(Dao):
 
             for competitor, runs in group.runs.items():
                 for run in runs:
-                    RoundDAO.run_dao.insert(run)
+                    self.run_dao.insert(run)
 
     def add_group(self, group, populate_runs=False):
         sql = 'INSERT INTO roundgroup ' \
@@ -173,7 +174,7 @@ class RoundDAO(Dao):
                                  group.valid, group.cancelled, group.group_id)
             for competitor, runs in group.runs.items():
                 for run in runs:
-                    RoundDAO.run_dao.update(run)
+                    self.run_dao.update(run)
 
     def delete(self, f3f_round):
         #Delete is intentionally not using group_id to directly delete all cancelled groups
@@ -181,7 +182,7 @@ class RoundDAO(Dao):
         for group in f3f_round.groups:
             for competitor, runs in group.runs.items():
                 for run in runs:
-                    RoundDAO.run_dao.delete(run)
+                    self.run_dao.delete(run)
             self._execute_delete(sql, f3f_round.event.id, f3f_round.round_number, group.group_number)
         sql = 'DELETE FROM round WHERE event_id=%s AND round_number=%s'
         self._execute_delete(sql, f3f_round.event.id, f3f_round.round_number)
