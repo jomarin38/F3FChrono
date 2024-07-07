@@ -40,7 +40,7 @@ if not is_running_on_pi():
     toggle_print(False)  # turn on/off printing
 
 
-def main(webservice_only=False, public_only=False, private_only=False, external_mysql=None):
+def main(webservice_only=False, public_only=False, private_only=False, external_mysql=None, webserver_ports=None):
 
     #logging.basicConfig (filename="runchrono.log", level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     if is_running_on_pi():
@@ -63,10 +63,17 @@ def main(webservice_only=False, public_only=False, private_only=False, external_
                 ws_env['PRIVATE_ONLY'] = 'True'
             if external_mysql is not None:
                 ws_env['MYSQL_IP'] = external_mysql
-            webserver_process = \
-                subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:'
-                                  +str(ConfigReader.config.conf['webserver_port'])],
-                                 shell=False, env=ws_env)
+
+            if webserver_ports is None:
+                django_ports = [ConfigReader.config.conf['webserver_port']]
+            else:
+                django_ports = webserver_ports
+
+            for django_port in django_ports:
+                webserver_process = \
+                    subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:'
+                                      +str(django_port)],
+                                     shell=False, env=ws_env)
 
             if not public_only:
                 subprocess.Popen(['celery', '-A', 'administrator',  'worker', '-l', 'info'], cwd=manage_py_path, shell=False)
@@ -113,6 +120,7 @@ if __name__ == '__main__':
     parser.add_argument('--private-only', action="store_true")
     parser.add_argument('--external-webserver')
     parser.add_argument('--external-mysql')
+    parser.add_argument('--webserver-ports', action='append')
     args = parser.parse_args()
 
     from F3FChrono.chrono import ConfigReader
@@ -129,4 +137,4 @@ if __name__ == '__main__':
     if args.external_webserver is not None:
         Utils.set_external_webserver_IP(args.external_webserver)
 
-    main(args.webservice_only, args.public_only, args.private_only, args.external_mysql)
+    main(args.webservice_only, args.public_only, args.private_only, args.external_mysql, args.webserver_ports)
