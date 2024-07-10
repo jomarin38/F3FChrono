@@ -17,15 +17,21 @@
 
 import pymysql
 import threading
+import os
+from F3FChrono.chrono import ConfigReader
 
 
 class Dao:
 
-    _db = pymysql.connect(host="localhost", user="f3f_ctrl", password="F3FCtrl", db="f3f_chrono")
     _lock = threading.Lock()
 
     def __init__(self):
         Dao._lock.acquire()
+        host = os.getenv('MYSQL_IP', 'localhost')
+        Dao._db = pymysql.connect(host=host,
+                          user="f3f_ctrl",
+                          password="F3FCtrl",
+                          db="f3f_chrono")
         self._cursor = Dao._db.cursor()
         Dao._lock.release()
 
