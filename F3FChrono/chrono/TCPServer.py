@@ -345,14 +345,22 @@ class tcpF3FDCDisplayWorker(QThread):
 
     def displayCreateLineRunInfo(self, send=False):
         line = self.getStatusString() + " "
+        timestr = ""
         if (self.currentData["runstatus"] == chronoStatus.InProgressA or
                 self.currentData["runstatus"] == chronoStatus.InProgressB or
                 self.currentData["runstatus"] == chronoStatus.WaitAltitude):
             line = line + "{:0>.2f}".format(self.currentData["basetime"]) + " B" + str(self.currentData["runbasenb"])
+            if (self.currentData["basetime"])>0:
+                timestr = "DISPLAY:TIME:" + "{:0>05.2f}".format(self.currentData["basetime"]) + ":\n"
+        if (self.currentData["runstatus"] == chronoStatus.InWait):
+            timestr = "DISPLAY:CLEAR:\n"
 
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
                 self.connection.sendall(bytes("DISPLAY:line:2:" + line[0:20] + "\n", "utf-8"))
+                if (len(timestr)>0):
+                    self.connection.sendall(bytes(timestr, "utf-8"))
+                    print(timestr)
             except socket.error as e:
                 print(str(e))
         return line
