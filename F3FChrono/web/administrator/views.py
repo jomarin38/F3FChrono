@@ -28,6 +28,7 @@ from F3FChrono.data.Run import Run
 from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
 from F3FChrono.data.dao.EventDAO import EventDAO
 from F3FChrono.data.dao.RoundDAO import RoundDAO
+from F3FChrono.data.dao.FlyOrderDAO import FlyOrderDAO
 from F3FChrono.data.web.ResultPage import ResultPage
 from F3FChrono.data.web.ResultTable import ResultTable
 from F3FChrono.data.web.Header import Header
@@ -315,6 +316,13 @@ def manage_event(request):
 
     page.add_table(table)
 
+    table = ResultTable(title='', css_id='ranking')
+
+    header = Header(name=Link('Define fly order', 'define_fly_order?event_id='+event_id))
+    table.set_header(header)
+
+    page.add_table(table)
+
     table = ResultTable(title='Pilots', css_id="ranking")
     header = Header(name=Cell('Bib'))
     header.add_cell(Cell('Name'))
@@ -406,6 +414,38 @@ def do_define_bibs(request):
 
         if len(f3x_username)>0 and len(f3x_password)>0:
             event.export_bibs_to_f3xvault(f3x_username, f3x_password)
+
+    return HttpResponseRedirect('manage_event?event_id=' + event_id)
+
+def define_fly_order(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    return render(request, 'define_fly_order_template.html', {'event_id': request.GET.get('event_id')})
+
+def do_define_fly_order(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % ('sign_in', request.path))
+
+    Utils.set_port_number(request.META['SERVER_PORT'])
+
+    event_id = request.GET.get('event_id')
+
+    csv_file = request.FILES["csv_file"]
+
+    event = EventDAO().get(event_id, fetch_competitors=True, fetch_rounds=False, fetch_runs=False)
+
+    file_data = csv_file.read().decode("utf-8")
+
+    lines = file_data.split("\n")
+
+    for line in lines:
+        splitted_line = line.split(',')
+        if len(splitted_line)>=2:
+            FlyOrderDAO().delete_round(event, int(splitted_line[0]))
+            FlyOrderDAO().set_order(event, int(splitted_line[0]), splitted_line[1].split())
 
     return HttpResponseRedirect('manage_event?event_id=' + event_id)
 
