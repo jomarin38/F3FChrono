@@ -135,6 +135,8 @@ class udpreceive(QThread):
                         del(m[0])
 
                 if m[0] == 'wind_speed':
+                    with open('wind_speed.log', 'a') as f:
+                        f.write(str(address[0]) + ',' + str(dt) + ',' + m[1] + '\n')
                     self.event_wind_speed.emit(float(m[1]), str(m[2]))
                 elif m[0] == 'wind_dir':
                     self.event_wind_dir.emit(float(m[1]), float(m[2]))
