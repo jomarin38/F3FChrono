@@ -20,7 +20,7 @@ import socket
 import collections
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 from F3FChrono.chrono.Chrono import chronoStatus
-
+from unidecode import unidecode
 
 class displayStatus():
     Init = 0
@@ -220,7 +220,7 @@ class tcpF3FDCDisplayWorker(QThread):
         if self.connection is not None and self.status == displayStatus.InProgress:
             if self.currentData["contestInProgress"]:
                 self.displayCreateLineRoundInfo(send=True)
-                self.displayCreateLineWeatherInfo(send=True)
+                #self.displayCreateLineWeatherInfo(send=True)
                 self.displayCreateLineRunInfo(send=True)
                 self.displayCreateLineRunStatus(send=True)
             else:
@@ -239,10 +239,10 @@ class tcpF3FDCDisplayWorker(QThread):
                 self.connection.sendall(bytes("DISPLAY:line:3:" + self.client_address[0] + "\n", "utf-8"))
             except socket.error as e:
                 print(str(e))
-            self.displayCreateLineWeatherInfo(send=True)
+            #self.displayCreateLineWeatherInfo(send=True)
 
     def displayCreateLineRoundInfo(self, send=False):
-        line = ("R" + self.currentData["round"] + " G" + self.currentData["group"] + " B" + self.currentData["bib"] +
+        line = unidecode("R" + self.currentData["round"] + " G" + self.currentData["group"] + " B" + self.currentData["bib"] +
                 " " + self.currentData["pilot"])
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:

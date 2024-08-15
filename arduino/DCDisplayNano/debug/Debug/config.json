@@ -5,21 +5,20 @@
     "testl1":"D:L:1:Test ligne 1:\n",
   	"testl2":"D:L:2:Test ligne 2:\n",
     "testl3":"D:L:3:Test ligne 3:\n",
-  	"fctl0":"D:L:0:G0 R1 B2 Herve\n",
-    "fctl1":"D:L:1:10° 20m/s OKDC:\n",
-  	"fctl2":"D:L:2:InRun B10:25.03:\n",
+  	"fctl0":"D:L:0:G0 R1 B2 Hervé ë:\n",
+    "fctl1":"D:L:1:A-10 V-20m/s OKDC\n",
+  	"fctl2":"D:L:2:InRun B10-25.03 1234:\n",
     "fctl3":"D:L:3:InRun P100:\n"
   },
   "sequencer":[
-    {"msg":"clear","timer":500},
-    {"msg":"testl0","timer":500},
-    {"msg":"testl1","timer":500},
-    {"msg":"testl2","timer":500},
-    {"msg":"testl3","timer":500},
-    {"msg":"clear","timer":500},
-    {"msg":"fctl0","timer":500},
-    {"msg":"fctl1","timer":500},
-    {"msg":"fctl2","timer":500},
+    {"msg":"clear","timer":1000},
+    {"msg":"testl0","timer":1000},
+    {"msg":"testl1","timer":1000},
+    {"msg":"testl2","timer":1000},
+    {"msg":"testl3","timer":1000},
+    {"msg":"fctl0","timer":10},
+    {"msg":"fctl1","timer":10},
+    {"msg":"fctl2","timer":10},
     {"msg":"fctl3","timer":500}
   ]
 }

@@ -32,7 +32,7 @@ from F3FChrono.chrono.TCPServer import tcpServer
 import os
 
 
-class MainUiCtrl(QtWidgets.QMainWindow):
+class MainUiCtrl(QObject):
     close_signal = pyqtSignal()
     startup_time = None
 

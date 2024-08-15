@@ -50,7 +50,7 @@ enum BtnEnum{
 
 char ssid[NB_SSID][20] = {"F3FCtrl", STASSID1, STASSID2};
 char password[NB_SSID][20] = {"F3FPassword", STAPSK1, STAPSK2};
-char f3fserver_host[NB_SSID][20] = {"192.168.1.251", "192.168.0.25", "192.168.100.13"};
+char f3fserver_host[NB_SSID][20] = {"192.168.1.251", "192.168.0.250", "192.168.100.13"};
 int   f3fserver_port[NB_SSID] = {10000, 10000, 10000};
 
 char wifiindex = 0;
