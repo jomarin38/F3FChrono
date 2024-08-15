@@ -123,7 +123,7 @@ void TCPClient_Run(void)
     // This will send a string to the server
     DebugStr(DEBUG_START, DEBUG_LN, "Status Connected - sending \"F3F\" to server");
     if (client.connected()) { 
-      client.println("F3FDCDisplay");
+      client.println("pikametre");
       
       // wait for data to be available
       timeout = millis();
@@ -138,7 +138,7 @@ void TCPClient_Run(void)
       
       if (TcpClientGetResponse()>0){
         //DebugStr(DEBUG_START, DEBUG_LN, responseString);
-        if (strcmp(responseString, "F3FDCDisplayServerStarted")==0){
+        if (strcmp(responseString, "pikametreServerStarted")==0){
           TcpClientStatus = InProgress;
           DebugStr(DEBUG_START, DEBUG_LN, "Status InProgress - Waiting data from server");
         }
