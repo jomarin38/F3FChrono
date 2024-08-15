@@ -36,12 +36,15 @@ class serverStatus():
 tcpPort = 10000
 F3FDisplayList = list()
 F3FDCDisplayList = list()
+pikametreList = list()
+dashcamList = list()
 
 
 class tcpF3FDisplayWorker(QThread):
     finished = pyqtSignal()
 
-    def init(self):
+    def __init__(self):
+        super().__init__()
         self.status = displayStatus.Init
         self.connection = None
         self.contestRunningSig = None
@@ -105,10 +108,85 @@ class tcpF3FDisplayWorker(QThread):
             print(data)
 
 
+class pikametreWorker(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.status = displayStatus.Init
+        self.currentData = collections.OrderedDict()
+        self.connection = None
+        self.displayHandle = None
+        self.client_address = None
+        self.initCurrentData()
+
+    def initCurrentData(self):
+        self.currentData["contestInProgress"] = False
+        self.currentData["round"] = "0"
+        self.currentData["pilot"] = "pilotTest"
+        self.currentData["bib"] = "0"
+        self.currentData["group"] = "1"
+        self.clearRunData()
+
+    def setConnectionhandle(self, connection, display, client_address):
+        self.connection = connection
+        self.displayHandle = display
+        self.client_address = client_address
+
+    def run(self):
+        print("pikametre worker running")
+        while self.status != displayStatus.Close and self.connection is not None:
+            if self.status == displayStatus.Init:
+                print("pikametre - status init")
+                try:
+                    self.connection.sendall(bytes("pikametreServerStarted", "utf-8"))
+                except socket.error as e:
+                    print(str(e))
+                self.status = displayStatus.InProgress
+                self.displayCreateLines()
+            else:
+                try:
+                    data = self.connection.recv(1024)
+                except socket.error as e:
+                    print(str(e))
+                if data == b'':
+                    try:
+                        self.connection.sendall(bytes("Test", "utf-8"))
+                    except socket.error as e:
+                        print(str(e))
+                        self.connection.close()
+                        self.status = displayStatus.Close
+                        pikametreList.remove((self.connection, self.displayHandle, self.client_address))
+                else:
+                    self.datareceived(data)
+
+        self.finished.emit()
+        del self.displayHandle
+
+    def datareceived(self, data):
+        print(data)
+        m = data.decode("utf-8").split()
+        if len(m) > 0:
+            print(data)
+        else:
+            print(data)
+
+
+    def slot_runLap(self, lap, laptime):
+        self.currentData["runbasenb"] = lap
+        self.currentData["basetime"] = self.currentData["basetime"] + laptime
+        self.displayCreateLineRunInfo(send=True)
+
+    def slot_runtime(self, runtime):
+        self.currentData["runtime"] = runtime
+        self.displayCreateLineRunStatus(send=True)
+
+
 class tcpF3FDCDisplayWorker(QThread):
     finished = pyqtSignal()
 
-    def init(self):
+    def __init__(self):
+        super().__init__()
         self.status = displayStatus.Init
         self.currentData = collections.OrderedDict()
         self.connection = None
@@ -244,6 +322,8 @@ class tcpF3FDCDisplayWorker(QThread):
     def displayCreateLineRoundInfo(self, send=False):
         line = unidecode("R" + self.currentData["round"] + " G" + self.currentData["group"] + " B" + self.currentData["bib"] +
                 " " + self.currentData["pilot"])
+        print (self.currentData["pilot"])
+        print (line)
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
                 self.connection.sendall(bytes("DISPLAY:line:0:" + line[0:20] + "\n", "utf-8"))
@@ -255,7 +335,7 @@ class tcpF3FDCDisplayWorker(QThread):
         line = ("{:+3.0f}".format(self.currentData["weatherdir"]) + " " +
                 "{:+5.1f}".format(self.currentData["weatherspeed"]) + "m/s " +
                 self.currentData["weatherstatus"])
-        print("weather status : " + self.currentData["weatherstatus"])
+
         if self.connection is not None and self.status == displayStatus.InProgress and send:
             try:
                 self.connection.sendall(bytes("DISPLAY:line:1:" + line[0:20] + "\n", "utf-8"))
@@ -390,7 +470,6 @@ class tcpF3FDCDisplayWorker(QThread):
     def isDCDisplay(self):
         return self.DCDisplay
 
-
 class tcpServer(QThread):
     contestRunning = pyqtSignal()
     contestInRunSig = pyqtSignal(bool)
@@ -521,9 +600,7 @@ class tcpServer(QThread):
                         print("F3FDisplay tcp client thread start")
                     if data == "F3FDCDisplay":
                         DCdisplayHandle = tcpF3FDCDisplayWorker()
-                        DCdisplayHandle.init()
                         F3FDCDisplayList.append((self.connection, DCdisplayHandle, self.client_address))
-
                         DCdisplayHandle.finished.connect(DCdisplayHandle.quit)
                         DCdisplayHandle.finished.connect(DCdisplayHandle.deleteLater)
                         DCdisplayHandle.setConnectionhandle(self.connection, DCdisplayHandle, self.client_address)
@@ -544,6 +621,16 @@ class tcpServer(QThread):
                             print("Judge Display : ", self.connection, self.client_address)
                             DCdisplayHandle.slot_setDCDisplay(False)
                         self.newDCDisplaySig.emit()
+                    if data == "pikametre":
+                        pikametreHandle = pikametreWorker()
+                        pikametreList.append((self.connection, pikametreHandle))
+
+                        pikametreHandle.finished.connect(pikametreHandle.quit)
+                        pikametreHandle.finished.connect(pikametreHandle.deleteLater)
+                        pikametreHandle.setConnectionhandle(self.connection, pikametreHandle)
+                        pikametreHandle.setSignal(self.contestRunning, self.pilotRequestSig)
+                        pikametreHandle.start()
+                        print("F3FDisplay tcp client thread start")
 
                 except socket.error as e:
                     del self.ServerSocket
