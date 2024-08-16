@@ -209,6 +209,7 @@ class pikametreWorker(QThread):
         self.currentData["runstatus"] = chronoStatus.InWait
         self.currentData["runbasenb"] = 0
         self.currentData["basetime"] = 0.00
+        self.currentData["runtime"] = 0.00
 
     def setConnectionhandle(self, connection, display, client_address):
         self.connection = connection
@@ -220,9 +221,11 @@ class pikametreWorker(QThread):
         if (self.currentData["runstatus"] == chronoStatus.InProgressA or
                 self.currentData["runstatus"] == chronoStatus.InProgressB or
                 self.currentData["runstatus"] == chronoStatus.WaitAltitude):
-            if (self.currentData["basetime"]) > 0:
+            if self.currentData["runbasenb"] > 0 and self.currentData["runbasenb"]<10:
                 timestr = "DISPLAY:TIME:" + "{:0>05.2f}".format(self.currentData["basetime"]) + ":\n"
-        if (self.currentData["runstatus"] == chronoStatus.InWait):
+            elif self.currentData["runbasenb"] == 10:
+                timestr = "DISPLAY:TIME:" + "{:0>05.2f}".format(self.currentData["runtime"]) + ":\n"
+        elif self.currentData["runstatus"] == chronoStatus.InWait:
             timestr = "DISPLAY:CLEAR:\n"
 
         if self.connection is not None and self.status == displayStatus.InProgress and send:
@@ -276,10 +279,19 @@ class pikametreWorker(QThread):
     def slot_runLap(self, lap, laptime):
         self.currentData["runbasenb"] = lap
         self.currentData["basetime"] = self.currentData["basetime"] + laptime
+        if lap<10:
+            self.displayCreateLineRunInfo(send=True)
+
+    def slot_runtime(self, runtime):
+        self.currentData["runtime"] = runtime
         self.displayCreateLineRunInfo(send=True)
 
     def slot_runStatus(self, status):
         self.currentData["runstatus"] = status
+        if status == chronoStatus.InWait:
+            self.currentData["runbasenb"] = 0
+            self.currentData["basetime"] = 0.00
+            self.currentData["runtime"] = 0.00
         self.displayCreateLineRunInfo(send=True)
 
 
@@ -635,6 +647,8 @@ class tcpServer(QThread):
     def slot_runtime(self, runtime):
         for i in F3FDCDisplayList:
             i[1].slot_runtime(runtime)
+        for i in pikametreList:
+            i[1].slot_runtime(runtime)
 
     def slot_penalty(self, penalty):
         for i in F3FDCDisplayList:
@@ -700,7 +714,6 @@ class tcpServer(QThread):
 
                     if data == "F3FDisplay":
                         displayHandle = tcpF3FDisplayWorker()
-                        displayHandle.init()
                         F3FDisplayList.append((self.connection, displayHandle))
 
                         displayHandle.finished.connect(displayHandle.quit)
