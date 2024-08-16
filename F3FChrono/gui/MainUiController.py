@@ -536,6 +536,7 @@ class MainUiCtrl(QObject):
             self.chronoHard.weather.enable_rules()
             self.set_signal_mode(training=False)
             self.show_chrono()
+            self.slot_contestRunning()
             if self.enableConnectedDisplay:
                 if self.__debug:
                     print(current_round.get_summary_as_json(self.event.get_current_round()))

@@ -153,9 +153,10 @@ class dashcamWorker(QThread):
                         self.connection.sendall(bytes("Test", "utf-8"))
                     except socket.error as e:
                         print(str(e))
+                        dashcamList.remove((self.connection, self.displayHandle))
                         self.connection.close()
                         self.status = displayStatus.Close
-                        dashcamList.remove((self.connection, self.displayHandle, self.client_address))
+
                 else:
                     self.datareceived(data)
 
@@ -183,6 +184,11 @@ class dashcamWorker(QThread):
             self.currentData["bib"] = competitor.get_bib_number()
             self.currentData["pilot"] = competitor.display_name()
             self.currentData["group"] = round.find_group(competitor).group_number
+        else:
+            self.currentData["round"] = 0
+            self.currentData["bib"] = 0
+            self.currentData["pilot"] = ""
+            self.currentData["group"] = 0
         self.sendRunInfo(send=True)
 
 
