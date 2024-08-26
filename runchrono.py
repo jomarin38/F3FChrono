@@ -39,16 +39,8 @@ if not is_running_on_pi():
     # by default it prints everything to std.error
     toggle_print(False)  # turn on/off printing
 
-from F3FChrono.chrono import ConfigReader
-from F3FChrono.gui.MainUiController import MainUiCtrl
-from F3FChrono.data.Chrono import Chrono
-from F3FChrono.data.dao.EventDAO import EventDAO
-from F3FChrono.gui.Simulate_base import SimulateBase
-from F3FChrono.data.web.Utils import Utils
 
-
-
-def main():
+def main(webservice_only=False, public_only=False, private_only=False, external_mysql=None, webserver_ports=None):
 
     #logging.basicConfig (filename="runchrono.log", level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
     if is_running_on_pi():
@@ -64,51 +56,85 @@ def main():
         else:
             print("Starting webserver ...")
             manage_py_path = os.path.realpath('F3FChrono/web')
-            webserver_process = \
-                subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:'
-                                  +str(ConfigReader.config.conf['webserver_port'])],
-                                 shell=False)
+            ws_env = os.environ.copy()
+            if public_only:
+                ws_env['PUBLIC_ONLY'] = 'True'
+            if private_only:
+                ws_env['PRIVATE_ONLY'] = 'True'
+            if external_mysql is not None:
+                ws_env['MYSQL_IP'] = external_mysql
 
-            subprocess.Popen(['celery', '-A', 'administrator',  'worker', '-l', 'info'], cwd=manage_py_path, shell=False)
+            if webserver_ports is None:
+                django_ports = [ConfigReader.config.conf['webserver_port']]
+            else:
+                django_ports = webserver_ports
+
+            for django_port in django_ports:
+                webserver_process = \
+                    subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:'
+                                      +str(django_port)],
+                                     shell=False, env=ws_env)
+
+            if not public_only:
+                subprocess.Popen(['celery', '-A', 'administrator',  'worker', '-l', 'info'], cwd=manage_py_path, shell=False)
 
     print("...start")
 
-    dao = EventDAO()
-    chronodata = Chrono()
+    if not webservice_only:
+
+        dao = EventDAO()
+        chronodata = Chrono()
+
+        app = QtWidgets.QApplication(sys.argv)
+        ui = MainUiCtrl(dao, chronodata, rpi=is_running_on_pi(), webserver_process=webserver_process)
+
+        if not os.path.isfile('voltage_log.txt'):
+            MainUiCtrl.startup_time = time.time()
+        else:
+            with open("voltage_log.txt", "r") as file:
+                first_line = file.readline()
+                MainUiCtrl.startup_time = float(first_line.split(',')[0])
 
 
-    app = QtWidgets.QApplication(sys.argv)
-    ui = MainUiCtrl(dao, chronodata, rpi=is_running_on_pi(), webserver_process=webserver_process)
+        #launched simulate mode
+        if (ConfigReader.config.conf['simulatemode']):
+            ui_simulate=SimulateBase()
+            ui_simulate.close_signal.connect(ui.MainWindow.close)
+            ui.close_signal.connect(ui_simulate.MainWindow.close)
 
-    if not os.path.isfile('voltage_log.txt'):
-        MainUiCtrl.startup_time = time.time()
+        try:
+            sys.exit(app.exec_())
+
+        except KeyboardInterrupt:
+            pass
+        finally:
+            pass
     else:
-        with open("voltage_log.txt", "r") as file:
-            first_line = file.readline()
-            MainUiCtrl.startup_time = float(first_line.split(',')[0])
-
-
-    #launched simulate mode
-    if (ConfigReader.config.conf['simulatemode']):
-        ui_simulate=SimulateBase()
-        ui_simulate.close_signal.connect(ui.MainWindow.close)
-        ui.close_signal.connect(ui_simulate.MainWindow.close)
-
-    try:
-        sys.exit(app.exec_())
-
-    except KeyboardInterrupt:
-        pass
-    finally:
-        pass
+        webserver_process.communicate()
 
 
 if __name__ == '__main__':
     parser = ArgumentParser(prog='chrono')
-    #parser.add_argument('show=false')
+    parser.add_argument('--webservice-only', action="store_true")
+    parser.add_argument('--public-only', action="store_true")
+    parser.add_argument('--private-only', action="store_true")
+    parser.add_argument('--external-webserver')
+    parser.add_argument('--external-mysql')
+    parser.add_argument('--webserver-ports', action='append')
     args = parser.parse_args()
+
+    from F3FChrono.chrono import ConfigReader
 
     ConfigReader.init()
     ConfigReader.config = ConfigReader.Configuration('config.json')
 
-    main()
+    from F3FChrono.gui.MainUiController import MainUiCtrl
+    from F3FChrono.data.Chrono import Chrono
+    from F3FChrono.data.dao.EventDAO import EventDAO
+    from F3FChrono.gui.Simulate_base import SimulateBase
+    from F3FChrono.data.web.Utils import Utils
+
+    if args.external_webserver is not None:
+        Utils.set_external_webserver_IP(args.external_webserver)
+
+    main(args.webservice_only, args.public_only, args.private_only, args.external_mysql, args.webserver_ports)

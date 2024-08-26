@@ -32,7 +32,7 @@ from F3FChrono.chrono.TCPServer import tcpServer
 import os
 
 
-class MainUiCtrl(QtWidgets.QMainWindow):
+class MainUiCtrl(QObject):
     close_signal = pyqtSignal()
     startup_time = None
 
@@ -536,6 +536,7 @@ class MainUiCtrl(QtWidgets.QMainWindow):
             self.chronoHard.weather.enable_rules()
             self.set_signal_mode(training=False)
             self.show_chrono()
+            self.slot_contestRunning()
             if self.enableConnectedDisplay:
                 if self.__debug:
                     print(current_round.get_summary_as_json(self.event.get_current_round()))

@@ -1,5 +1,5 @@
  /** 
- # This file is part of the F3FDCDisplay distribution (https://github.com/jomarin38/F3FChrono).
+ # This file is part of the F3FPicametre distribution (https://github.com/jomarin38/F3FChrono).
  # Copyright (c) 2024 Sylvain DAVIET, Joel MARIN.
  # 
  # This program is free software: you can redistribute it and/or modify  
@@ -47,7 +47,7 @@ char tmpStr[100]="";
 void setup() {
   delay(100);
   serial_setup();
-  BP_Start();
+  //BP_Start();
   delay(2000);
 
   display_Start();
@@ -58,7 +58,7 @@ void setup() {
 
 void loop() {
   TCPClient_Run();
-  BP_CheckChanged();
+  //BP_CheckChanged();
   Analog_Read();
   serial_run();
   delay(50);

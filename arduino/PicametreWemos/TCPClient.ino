@@ -1,5 +1,5 @@
  /** 
- # This file is part of the F3F distribution (https://github.com/jomarin38/F3FChrono).
+ # This file is part of the F3FPicametre distribution (https://github.com/jomarin38/F3FChrono).
  # Copyright (c) 2024 Sylvain DAVIET, Joel MARIN.
  # 
  # This program is free software: you can redistribute it and/or modify  
@@ -123,7 +123,7 @@ void TCPClient_Run(void)
     // This will send a string to the server
     DebugStr(DEBUG_START, DEBUG_LN, "Status Connected - sending \"F3F\" to server");
     if (client.connected()) { 
-      client.println("F3FDCDisplay");
+      client.println("pikametre");
       
       // wait for data to be available
       timeout = millis();
@@ -138,7 +138,7 @@ void TCPClient_Run(void)
       
       if (TcpClientGetResponse()>0){
         //DebugStr(DEBUG_START, DEBUG_LN, responseString);
-        if (strcmp(responseString, "F3FDCDisplayServerStarted")==0){
+        if (strcmp(responseString, "pikametreServerStarted")==0){
           TcpClientStatus = InProgress;
           DebugStr(DEBUG_START, DEBUG_LN, "Status InProgress - Waiting data from server");
         }
@@ -168,7 +168,6 @@ void TCPClient_Run(void)
     TcpClientStatus = WaitBeforeRestart;
 
     displaySendClear();
-    displaySendDCJudgeDisplay();
     TcpClient_GetlocalIpToString();    
     display_sendWifiConnected (tmpStr);
   }
@@ -244,5 +243,7 @@ void TcpClient_SendAnalog(float value)
 void TcpClient_GetlocalIpToString(void)
 {
   IPAddress ipAddress = WiFi.localIP();
-  sprintf(tmpStr, "%i.%i.%i.%i", ipAddress[0], ipAddress[1], ipAddress[2], ipAddress[3]);
+  //sprintf(tmpStr, "%i.%i.%i.%i", ipAddress[0], ipAddress[1], ipAddress[2], ipAddress[3]);
+  //For Picametre timing display, we display only the last ip number
+  sprintf(tmpStr, "%05.2f", ((float)ipAddress[3])/100);
 }

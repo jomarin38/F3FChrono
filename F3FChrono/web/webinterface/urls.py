@@ -15,9 +15,23 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include,path
+import os
 
-urlpatterns = [
-    path('f3franking/', include('F3FChrono.web.f3franking.urls')),
-    path('administrator/', include('F3FChrono.web.administrator.urls')),
-    path('admin/', admin.site.urls),
-]
+public_only = os.getenv('PUBLIC_ONLY', 'False').lower() in ('true', '1', 't')
+private_only = os.getenv('PRIVATE_ONLY', 'False').lower() in ('true', '1', 't')
+
+print('public_only={}'.format(public_only))
+print('private_only={}'.format(private_only))
+
+urlpatterns = []
+
+if not private_only :
+    urlpatterns += [
+        path('f3franking/', include('F3FChrono.web.f3franking.urls'))
+    ]
+
+if not public_only :
+    urlpatterns += [
+        path('administrator/', include('F3FChrono.web.administrator.urls')),
+        path('admin/', admin.site.urls),
+    ]
