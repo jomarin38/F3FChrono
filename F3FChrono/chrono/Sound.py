@@ -21,6 +21,9 @@ import sys
 from decimal import Decimal
 import platform
 import collections
+from getopt import error
+from wave import Error
+
 from F3FChrono.chrono import ConfigReader
 from PyQt5.QtCore import pyqtSignal, QObject, QThread, QCoreApplication, QUrl
 from PyQt5 import QtCore
@@ -167,22 +170,24 @@ class chronoQSound(QThread):
                 x = int(var_time % 1 * 100)
 
                 # create sequence sound
-                if int(cent) > 0:
-                    self.__addSound(int(cent * 100))
-                    if int(diz) > 0:
-                        self.__addSound(int(diz))
-                else:
-                    self.__addSound(int(diz))
-
-                if x < 100:
-                    self.__addSound(self.specialsound['index_dot'].num)  # add dot wav
-                    if x > 0 and x < 10:
-                        self.__addSound(0)
-                        self.__addSound(x)
+                try:
+                    if int(cent) > 0:
+                        self.__addSound(int(cent * 100))
+                        if int(diz) > 0:
+                            self.__addSound(int(diz))
                     else:
-                        self.__addSound(x)
-                        print("sound .XX : " + str(x))
+                        self.__addSound(int(diz))
 
+                    if x < 100:
+                        self.__addSound(self.specialsound['index_dot'].num)  # add dot wav
+                        if x > 0 and x < 10:
+                            self.__addSound(0)
+                            self.__addSound(x)
+                        else:
+                            self.__addSound(x)
+                            print("sound .XX : " + str(x))
+                except Exception as e:
+                    print (e)
 
     def sound_pilot(self, bib):
         self.__addSound(self.specialsound['index_pilot'].num)
@@ -290,6 +295,8 @@ class chronoQSound(QThread):
                 if play and len (self.sound_list) == 1:
                     self.sound_list[0].playSound()
 
+
+
     def checklowPrioritySound(self):
         if self.chronoStatus == chronoStatus.InWait or self.chronoStatus == chronoStatus.Finished:
             play = len(self.sound_list)==0
@@ -357,7 +364,10 @@ if __name__ == '__main__':
     Vocal.sound_elapsedTime(30, False)
     time.sleep(5)
     #Vocal.sound_time(45.45)
-    Vocal.signal_time.emit(45.45, False)
+    #Vocal.signal_time.emit(199.99, False, False)
+
+    #check if crash with this sound time not exist
+    Vocal.signal_time.emit(200.20, False, False)
     time.sleep(5)
     try:
         sys.exit(app.exec_())
