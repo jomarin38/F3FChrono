@@ -124,7 +124,7 @@ class chronoQSound(QThread):
         self.specialsound['seconds_twenty'] = specialSound(109)
         self.specialsound['seconds_fifteen'] = specialSound(110)
         self.specialsound['seconds_ten'] = specialSound(111)
-        self.specialsound['to_launch'] = specialSound(112)
+        self.specialsound['launch'] = specialSound(112)
         self.specialsound['windok'] = specialSound(113)
         self.specialsound['windAlert'] = specialSound(114)
         self.specialsound['marginalCondition'] = specialSound(115)
@@ -132,6 +132,7 @@ class chronoQSound(QThread):
         self.specialsound['weatherstationsensorslost'] = specialSound(117)
         self.specialsound['tolate'] = specialSound(118)
         self.specialsound['tolate_Entry'] = specialSound(118)
+        self.specialsound['tolaunch'] = specialSound(119)
         self.loadwav(volume)
         self.volume = volume
         self.entry_sound = False
@@ -141,7 +142,7 @@ class chronoQSound(QThread):
 
     def loadwav(self, volume):
         self.time = []
-        for i in range(0, 119):
+        for i in range(0, 120):
             if i==self.specialsound['index_entry'].num:
                 self.time.append(chronoSound(i, os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav'), \
                                              self.slot_sound_entry, volume))
@@ -237,6 +238,7 @@ class chronoQSound(QThread):
             if cmd == 30 and to_launch and not self.specialsound['seconds_thirty'].alreadyPlay:
                 self.specialsound['seconds_thirty'].alreadyPlay = True
                 self.__addSound(self.specialsound['seconds_thirty'].num)
+                self.__addSound(self.specialsound['tolaunch'].num)
             elif cmd == 30 and not to_launch:
                 if self.time[self.specialsound['seconds_ten'].num].isPlaying():
                     if self.__debug:
@@ -359,15 +361,15 @@ class chronoQSound(QThread):
 if __name__ == '__main__':
     app = QCoreApplication(sys.argv)
 
-    Vocal = chronoQSound(os.path.dirname(os.path.dirname(os.getcwd())), "French", 1, 100)
-    Vocal.sound_toLate()
-    Vocal.sound_elapsedTime(30, False)
+    Vocal = chronoQSound(os.path.dirname(os.path.dirname(os.getcwd())), "English", 1, 100)
+    #Vocal.sound_toLate()
+    Vocal.sound_elapsedTime(30, True)
     time.sleep(5)
     #Vocal.sound_time(45.45)
     #Vocal.signal_time.emit(199.99, False, False)
 
     #check if crash with this sound time not exist
-    Vocal.signal_time.emit(200.20, False, False)
+    #Vocal.signal_time.emit(200.20, False, False)
     time.sleep(5)
     try:
         sys.exit(app.exec_())
