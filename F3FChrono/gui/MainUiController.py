@@ -22,6 +22,7 @@ from F3FChrono.gui.WidgetController import *
 from F3FChrono.gui.Simulate_base import SimulateBase
 from F3FChrono.chrono.Chrono import *
 from F3FChrono.data.dao.EventDAO import EventDAO, RoundDAO
+from F3FChrono.data.dao.FlyOrderDAO import FlyOrderDAO
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.chrono.Sound import *
 from F3FChrono.chrono.GPIOPort import rpi_gpio
@@ -511,7 +512,11 @@ class MainUiCtrl(QObject):
                                            fetch_runs_lastround=True)
             current_round = self.event.get_current_round()
             if not current_round.has_run() and not current_round.group_scoring_enabled():
-                current_round.set_flight_order_from_scratch()
+                imposed_fly_order = FlyOrderDAO().get_order(self.event, len(self.event.valid_rounds) + 1)
+                if imposed_fly_order is None:
+                    current_round.set_flight_order_from_scratch()
+                else:
+                    current_round.set_imposed_flight_order(imposed_fly_order)
                 Round.round_dao.update(current_round)
             current_competitor = current_round.get_current_competitor()
             if not current_competitor.present:

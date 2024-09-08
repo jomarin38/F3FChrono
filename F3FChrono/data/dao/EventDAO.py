@@ -147,5 +147,8 @@ class EventDAO(Dao):
         sql = 'DELETE FROM f3f_chrono.competitor WHERE event_id=%s'
         self._execute_delete(sql, event.id)
 
+        sql = 'DELETE FROM f3f_chrono.imposed_fly_order WHERE event_id=%s'
+        self._execute_delete(sql, event.id)
+
         sql = 'DELETE FROM event WHERE event_id=%s'
         self._execute_delete(sql, event.id)

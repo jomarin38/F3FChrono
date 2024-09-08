@@ -58,6 +58,11 @@ class Round:
         self.groups = self.get_groups_from_scratch(1)
         self.groups[0].group_id = group_id
 
+    def set_imposed_flight_order(self, fly_order):
+        group_id = self.groups[0].group_id
+        self.groups = self.get_groups_with_imposed_fly_order(1, fly_order)
+        self.groups[0].group_id = group_id
+
     def get_current_group_index(self):
         return self._current_group_index
 
@@ -65,25 +70,20 @@ class Round:
         self._current_group_index = group_index
 
     def get_groups_from_scratch(self, number_of_groups):
+        fly_order = ([bib_number for bib_number in sorted(self.event.competitors)
+                    if bib_number >= self.event.bib_start]
+                    + [bib_number for bib_number in sorted(self.event.competitors)
+                    if bib_number < self.event.bib_start])
+        return self.get_groups_with_imposed_fly_order(number_of_groups, fly_order)
+
+    def get_groups_with_imposed_fly_order(self, number_of_groups, fly_order):
         groups = [RoundGroup(self, 1)]
         pilots_per_group = int(len(self.event.competitors) / number_of_groups)
         counter = 0
         current_group_index = 0
 
         flight_order = []
-        for bib in [bib_number for bib_number in sorted(self.event.competitors)
-                    if bib_number >= self.event.bib_start]:
-            if counter < pilots_per_group:
-                flight_order += [bib]
-                counter += 1
-            else:
-                groups[current_group_index].set_flight_order(flight_order)
-                flight_order = [bib]
-                counter = 1
-                groups.append(RoundGroup(self, len(groups) + 1))
-                current_group_index += 1
-        for bib in [bib_number for bib_number in sorted(self.event.competitors)
-                    if bib_number < self.event.bib_start]:
+        for bib in fly_order:
             if counter < pilots_per_group:
                 flight_order += [bib]
                 counter += 1

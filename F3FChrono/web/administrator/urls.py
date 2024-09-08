@@ -53,5 +53,7 @@ urlpatterns = [
          name='login_to_export_event_f3x_vault'),
     path('define_bibs', views.define_bibs, name='define_bibs'),
     path('do_define_bibs', views.do_define_bibs, name='define_bibs'),
+    path('define_fly_order', views.define_fly_order, name='define_fly_order'),
+    path('do_define_fly_order', views.do_define_fly_order, name='define_fly_order'),
     re_path(r'^celery-progress/', include('celery_progress.urls', namespace="celery_progress")),
 ]

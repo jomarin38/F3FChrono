@@ -29,6 +29,7 @@ from F3FChrono.data.Round import Round
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
 from F3FChrono.data.dao.RoundDAO import RoundDAO
+from F3FChrono.data.dao.FlyOrderDAO import FlyOrderDAO
 
 
 class Event:
@@ -238,7 +239,12 @@ class Event:
 
     def create_new_round(self, insert_database=False):
         f3f_round = Round.new_round(self)
-        f3f_round.set_flight_order_from_scratch()
+        #Try to get predefined fly order from database
+        imposed_fly_order = FlyOrderDAO().get_order(self, len(self.valid_rounds) + 1)
+        if imposed_fly_order is None:
+            f3f_round.set_flight_order_from_scratch()
+        else:
+            f3f_round.set_imposed_flight_order(imposed_fly_order)
         if insert_database:
             Round.round_dao.insert(f3f_round)
             #Get round from database to get group ids
