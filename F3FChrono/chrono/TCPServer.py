@@ -611,6 +611,9 @@ class tcpServer(QThread):
         self.orderDataSig.connect(self.slot_orderData)
         self.ServerSocket = None
         self.status = serverStatus.Init
+        self.lastcontestInProgress = None
+        self.lastcompetitor = None
+        self.lastround = None
         self.start()
 
     def slot_contestInRun(self, status):
@@ -622,6 +625,10 @@ class tcpServer(QThread):
             i[1].slot_orderData(data)
 
     def slot_roundInfo(self, contestInProgress, competitor, round):
+        self.lastcontestInProgress = contestInProgress
+        self.lastcompetitor = competitor
+        self.lastround = round
+
         for i in F3FDCDisplayList:
             i[1].slot_roundInfo(contestInProgress, competitor, round)
         for i in dashcamList:
@@ -745,6 +752,8 @@ class tcpServer(QThread):
                             print("Judge Display : ", self.connection, self.client_address)
                             DCdisplayHandle.slot_setDCDisplay(False)
                         self.newDCDisplaySig.emit()
+
+                        DCdisplayHandle.slot_roundInfo(self.lastcontestInProgress, self.lastcompetitor, self.lastround)
                     if data == "pikametre":
                         pikametreHandle = pikametreWorker()
                         pikametreList.append((self.connection, pikametreHandle))
@@ -762,6 +771,7 @@ class tcpServer(QThread):
                         Handle.finished.connect(Handle.deleteLater)
                         Handle.setConnectionhandle(self.connection, Handle, self.client_address)
                         Handle.start()
+                        Handle.slot_roundInfo(self.lastcontestInProgress, self.lastcompetitor, self.lastround)
                         print("F3Fdashcam tcp client thread start")
 
                 except socket.error as e:
