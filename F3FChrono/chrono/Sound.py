@@ -21,6 +21,9 @@ import sys
 from decimal import Decimal
 import platform
 import collections
+from getopt import error
+from wave import Error
+
 from F3FChrono.chrono import ConfigReader
 from PyQt5.QtCore import pyqtSignal, QObject, QThread, QCoreApplication, QUrl
 from PyQt5 import QtCore
@@ -85,7 +88,7 @@ class chronoSound(QSoundEffect):
 class chronoQSound(QThread):
     signal_penalty = pyqtSignal()
     signal_base = pyqtSignal(int)
-    signal_time = pyqtSignal(float, bool)
+    signal_time = pyqtSignal(float, bool, bool)
     signal_start = pyqtSignal(int)
     signal_pilotname = pyqtSignal(int)
 
@@ -121,7 +124,7 @@ class chronoQSound(QThread):
         self.specialsound['seconds_twenty'] = specialSound(109)
         self.specialsound['seconds_fifteen'] = specialSound(110)
         self.specialsound['seconds_ten'] = specialSound(111)
-        self.specialsound['to_launch'] = specialSound(112)
+        self.specialsound['launch'] = specialSound(112)
         self.specialsound['windok'] = specialSound(113)
         self.specialsound['windAlert'] = specialSound(114)
         self.specialsound['marginalCondition'] = specialSound(115)
@@ -129,6 +132,7 @@ class chronoQSound(QThread):
         self.specialsound['weatherstationsensorslost'] = specialSound(117)
         self.specialsound['tolate'] = specialSound(118)
         self.specialsound['tolate_Entry'] = specialSound(118)
+        self.specialsound['tolaunch'] = specialSound(119)
         self.loadwav(volume)
         self.volume = volume
         self.entry_sound = False
@@ -138,7 +142,7 @@ class chronoQSound(QThread):
 
     def loadwav(self, volume):
         self.time = []
-        for i in range(0, 119):
+        for i in range(0, 120):
             if i==self.specialsound['index_entry'].num:
                 self.time.append(chronoSound(i, os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav'), \
                                              self.slot_sound_entry, volume))
@@ -146,9 +150,10 @@ class chronoQSound(QThread):
                 self.time.append(chronoSound(i, os.path.join(self.pathname, 'Languages', self.langage, str(i) + '.wav'),\
                                          self.slot_sound_playing_changed, volume))
 
-    def sound_time(self, run_time, training=False):
+    def sound_time(self, run_time, training=False, MCFlag=False):
         self.run_time = run_time
         self.training = training
+        self.MCFlag = MCFlag
         if not training:
             self.finaltime_timer.start(2000)
         else:
@@ -157,7 +162,7 @@ class chronoQSound(QThread):
     def __final_time(self):
         self.finaltime_timer.stop()
         if self.play_sound:
-            if not self.training and self.marginalConditionFlag:
+            if not self.training and self.MCFlag:
                 self.__addSound(self.specialsound['marginalCondition'].num)
             else:
                 # decompose numeric time to find cent, diz, 1/100
@@ -166,22 +171,24 @@ class chronoQSound(QThread):
                 x = int(var_time % 1 * 100)
 
                 # create sequence sound
-                if int(cent) > 0:
-                    self.__addSound(int(cent * 100))
-                    if int(diz) > 0:
-                        self.__addSound(int(diz))
-                else:
-                    self.__addSound(int(diz))
-
-                if x < 100:
-                    self.__addSound(self.specialsound['index_dot'].num)  # add dot wav
-                    if x > 0 and x < 10:
-                        self.__addSound(0)
-                        self.__addSound(x)
+                try:
+                    if int(cent) > 0:
+                        self.__addSound(int(cent * 100))
+                        if int(diz) > 0:
+                            self.__addSound(int(diz))
                     else:
-                        self.__addSound(x)
-                        print("sound .XX : " + str(x))
+                        self.__addSound(int(diz))
 
+                    if x < 100:
+                        self.__addSound(self.specialsound['index_dot'].num)  # add dot wav
+                        if x > 0 and x < 10:
+                            self.__addSound(0)
+                            self.__addSound(x)
+                        else:
+                            self.__addSound(x)
+                            print("sound .XX : " + str(x))
+                except Exception as e:
+                    print (e)
 
     def sound_pilot(self, bib):
         self.__addSound(self.specialsound['index_pilot'].num)
@@ -202,9 +209,6 @@ class chronoQSound(QThread):
                 print("sot_windalarm Marginal Condition, chronostatus : ", self.chronoStatus)
             if self.chronoStatus == chronoStatus.InWait or self.chronoStatus == chronoStatus.Finished:
                 self.__addSound(self.specialsound['marginalCondition'].num)
-
-    def setMarginalCondition(self, mc):
-        self.marginalConditionFlag = mc
 
     def slot_weatherStationLowVoltage(self):
         self.__addSound(self.specialsound['weatherstationlowvoltage'].num, lowpriority=True)
@@ -234,6 +238,7 @@ class chronoQSound(QThread):
             if cmd == 30 and to_launch and not self.specialsound['seconds_thirty'].alreadyPlay:
                 self.specialsound['seconds_thirty'].alreadyPlay = True
                 self.__addSound(self.specialsound['seconds_thirty'].num)
+                self.__addSound(self.specialsound['tolaunch'].num)
             elif cmd == 30 and not to_launch:
                 if self.time[self.specialsound['seconds_ten'].num].isPlaying():
                     if self.__debug:
@@ -291,6 +296,8 @@ class chronoQSound(QThread):
                 self.sound_list.append(self.time[num])
                 if play and len (self.sound_list) == 1:
                     self.sound_list[0].playSound()
+
+
 
     def checklowPrioritySound(self):
         if self.chronoStatus == chronoStatus.InWait or self.chronoStatus == chronoStatus.Finished:
@@ -354,12 +361,15 @@ class chronoQSound(QThread):
 if __name__ == '__main__':
     app = QCoreApplication(sys.argv)
 
-    Vocal = chronoQSound(os.path.dirname(os.path.dirname(os.getcwd())), "French", 1, 100)
-    Vocal.sound_toLate()
-    Vocal.sound_elapsedTime(30, False)
+    Vocal = chronoQSound(os.path.dirname(os.path.dirname(os.getcwd())), "English", 1, 100)
+    #Vocal.sound_toLate()
+    Vocal.sound_elapsedTime(30, True)
     time.sleep(5)
     #Vocal.sound_time(45.45)
-    Vocal.signal_time.emit(45.45, False)
+    #Vocal.signal_time.emit(199.99, False, False)
+
+    #check if crash with this sound time not exist
+    #Vocal.signal_time.emit(200.20, False, False)
     time.sleep(5)
     try:
         sys.exit(app.exec_())

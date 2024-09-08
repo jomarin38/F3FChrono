@@ -66,7 +66,7 @@ class Weather(QTimer):
     beep_signal = pyqtSignal(str, int, int)
 
     weather_sound_signal = pyqtSignal(str)
-    weather_mc_signal = pyqtSignal(bool)
+
     weather_lowVoltage_signal = pyqtSignal()
     weather_sensor_lost = pyqtSignal()
 
@@ -95,6 +95,7 @@ class Weather(QTimer):
         self.rules['sensor_voltage_alarm'] = alarm.Release
         self.rules['sensor_lost_alarm'] = alarm.Release
         self.rules['state'] = weatherState.init
+        self.rules['MCInRun'] = False
         self.chronostatus = Chrono.chronoStatus.InWait
         self.__rules_enable = False
         self.timeout.connect(self.refresh_gui)
@@ -237,6 +238,7 @@ class Weather(QTimer):
             self.weather['orientation_sum'] = 0.0
             self.weather['orientation_nb'] = 0.0
             self.enable_rules(self.__rules_enable)
+            self.rules['MCInRun'] = (self.rules['state'] == weatherState.condMarginal)
             if self.__debug:
                 print("Wind InRun")
         else:
@@ -342,7 +344,6 @@ class Weather(QTimer):
         self.timerOkDC.stop()
         self.rules['state'] = weatherState.Nominal
         self.status = "OKDC"
-        self.weather_mc_signal.emit(False)
         if self.__rules_enable:
             if self.weatherBeep:
                 self.beep_signal.emit("blink", 5, self.weatherBeepOkDc)
@@ -377,7 +378,8 @@ class Weather(QTimer):
         self.timerMarginal.stop()
         self.rules['state'] = weatherState.condMarginal
         self.status = "MC"
-        self.weather_mc_signal.emit(True)
+        if self.inRun:
+            self.rules['MCInRun'] = True
         if self.__rules_enable:
             if self.weatherBeep:
                 self.beep_signal.emit("permanent", -1, 1000)
@@ -405,5 +407,8 @@ class Weather(QTimer):
 
     def slot_chronostatus (self, status):
         self.chronostatus = status
+
+    def getMCinRun(self):
+        return (self.rules['MCInRun'])
 
 

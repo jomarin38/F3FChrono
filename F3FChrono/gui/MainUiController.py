@@ -176,7 +176,6 @@ class MainUiCtrl(QObject):
             self.controllers['settingswDevices'].weatherStation_display)
         self.chronoHard.weather.set_minVoltageWindDir(ConfigReader.config.conf['voltage_min_windDir'])
         self.chronoHard.weather.weather_sound_signal.connect(self.vocal.slot_windAlarm)
-        self.chronoHard.weather.weather_mc_signal.connect(self.vocal.setMarginalCondition)
         self.chronoHard.weather.weather_lowVoltage_signal.connect(self.vocal.slot_weatherStationLowVoltage)
         self.chronoHard.weather.weather_sensor_lost.connect(self.vocal.slot_weatherStationSensorsLost)
         self.controllers['settingsbase'].set_udp_sig(self.chronoHard.udpReceive.simulate_base_sig,
@@ -716,7 +715,7 @@ class MainUiCtrl(QObject):
         self.controllers['round'].wChronoCtrl.set_finaltime(run_time)
         self.controllers['round'].widgetBtn.update()
         if self.configSound:
-            self.vocal.signal_time.emit(run_time, False)
+            self.vocal.signal_time.emit(run_time, False, self.chronoHard.weather.getMCinRun())
         self.tcp.slot_runtime(run_time)
 
     def slot_altitude_finished(self, run_time):
