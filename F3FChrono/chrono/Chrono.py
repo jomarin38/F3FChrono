@@ -75,6 +75,7 @@ class F3FTimer(QObject):
         self.to_launch = True
         self.time = 30
         self.uiTimeRefresh_sig.emit(self.time)
+        self.vocalTimeElapsed_sig.emit(30, self.to_launch)
         self.time_up = False
         self.startTime = time.time()
         print("setLaunchTime - time : ", self.time)

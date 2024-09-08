@@ -238,7 +238,7 @@ class chronoQSound(QThread):
             if cmd == 30 and to_launch and not self.specialsound['seconds_thirty'].alreadyPlay:
                 self.specialsound['seconds_thirty'].alreadyPlay = True
                 self.__addSound(self.specialsound['seconds_thirty'].num)
-                self.__addSound(self.specialsound['tolaunch'].num)
+                #self.__addSound(self.specialsound['tolaunch'].num)
             elif cmd == 30 and not to_launch:
                 if self.time[self.specialsound['seconds_ten'].num].isPlaying():
                     if self.__debug:
