@@ -608,9 +608,11 @@ class MainUiCtrl(QObject):
         self.controllers['round'].set_cancelmode(True)
 
     def enable_group_scoring(self):
+        self.controllers['round'].wPilotCtrl.blockSignals(True)
         self.event.get_current_round().enable_group_scoring()
         self.start()
         self.controllers['round'].handle_group_scoring_enabled(True)
+        self.controllers['round'].wPilotCtrl.blockSignals(False)
 
     def cancel_round(self):
         self.event.get_current_round().cancel_current_group()

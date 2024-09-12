@@ -78,7 +78,7 @@ class Round:
 
     def get_groups_with_imposed_fly_order(self, number_of_groups, fly_order):
         groups = [RoundGroup(self, 1)]
-        pilots_per_group = int(len(self.event.competitors) / number_of_groups)
+        pilots_per_group = int(len(self.event.competitors) / number_of_groups) + 1
         counter = 0
         current_group_index = 0
 
