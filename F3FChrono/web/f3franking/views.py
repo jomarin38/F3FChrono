@@ -26,8 +26,11 @@ from F3FChrono.data.web.Line import Line
 from F3FChrono.data.web.Cell import Cell
 from F3FChrono.data.web.Link import Link
 from F3FChrono.data.web.Utils import Utils
+from F3FChrono.data.web.picture import picture
 from django.views.decorators.cache import never_cache
 import datetime
+from pathlib import Path
+import os.path
 
 @never_cache
 def is_alive(request):
@@ -91,6 +94,16 @@ def event_view_html(event_id):
     event = EventDAO().get(event_id=event_id, fetch_competitors=True, fetch_rounds=True, fetch_runs=True)
 
     page = ResultPage(title=event.name)
+
+    weatherGraph = picture(os.path.join(Path.home(), "Pictures/weathergraph.png"))
+    if weatherGraph.IsPresent():
+        table = ResultTable(title='Weather Graph')
+        header = Header(name=Cell('Weather Graph'))
+        table.set_header(header)
+        table.add_picture(weatherGraph)
+        page.add_table(table)
+
+
 
     if event.current_round is not None:
         table = ResultTable('Ongoing round :', css_id='ranking')
@@ -179,6 +192,7 @@ def event_view_html(event_id):
 
     result = page.to_html()
 
+
     return result
 
 
@@ -249,7 +263,8 @@ def round_view_html(event_id, round_number):
 
 if __name__ == "__main__":
     # execute only if run as a script
-    event_view_html(1)
+    html = event_view_html(1)
+    print(html)
     #round_view_html(1, 21)
 
 
