@@ -26,10 +26,11 @@ from F3FChrono.data.web.Line import Line
 from F3FChrono.data.web.Cell import Cell
 from F3FChrono.data.web.Link import Link
 from F3FChrono.data.web.Utils import Utils
-from F3FChrono.data.web.picture import picture
+from F3FChrono.data.web.Picture import Picture
 from django.views.decorators.cache import never_cache
 import datetime
 from pathlib import Path
+import os
 import os.path
 
 @never_cache
@@ -95,8 +96,9 @@ def event_view_html(event_id):
 
     page = ResultPage(title=event.name)
 
-    weatherGraph = picture(os.path.join(Path.home(), "Pictures/weathergraph.png"))
-    if weatherGraph.IsPresent():
+    weather_image_path = os.environ.get('WEATHER_GRAPH_PATH', 'weathergraph.png')
+    weatherGraph = Picture(weather_image_path)
+    if weatherGraph.is_present():
         table = ResultTable(title='Weather Graph')
         header = Header(name=Cell('Weather Graph'))
         table.set_header(header)

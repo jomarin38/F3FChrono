@@ -15,16 +15,18 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 import os.path
+import base64
 
-class picture:
+class Picture:
     def __init__(self, file=None):
         self.file = file
 
-    def IsPresent(self):
+    def is_present(self):
         if self.file is not None:
             return os.path.isfile(self.file)
 
     def to_html(self):
-        res = '<tr>' + '<td><img src=".'+str(self.file)+'" width="400" height="195"></img></td></tr>'
-        print (res)
+        image_data = base64.b64encode(open(self.file, 'rb').read()).decode('utf-8')
+        res = ('<tr>' + '<td><img src="data:image/png;base64,{0}" width="400" height="195"></img></td></tr>'
+               .format(image_data))
         return res
