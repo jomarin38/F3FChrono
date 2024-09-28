@@ -67,22 +67,24 @@ void loop() {
   unsigned long currentMillis = millis();
   dt = currentMillis - previousMillis;
 
+  if (dt > interval) {
   noInterrupts();
-  nDetections_copy = nDetections;
-  nDetections = 0;
-  interrupts();
-
-  previousMillis = millis();
-
-  if (nDetections_copy>0) {
-    windSpeed = nDetections_copy * 0.9 * 0.447 *2.4;
+    nDetections_copy = nDetections;
+    nDetections = 0;
+    interrupts();
+  
+    previousMillis = millis();
+  
+    if (nDetections_copy>0) {
+      windSpeed = nDetections_copy * 0.9 * 0.447 * 2.4 * dt / 1000.0;
+    }
+    else {
+      windSpeed = 0.0;
+    }
+    sendUDP(windSpeed, 12.0);
+    delay(1000);
+    sendUDPDir(windDirection, 12.0);
   }
-  else {
-    windSpeed = 0.0;
-  }
-  sendUDP(windSpeed, 12.0);
-  delay(interval);
-  sendUDPDir(windDirection, 12.0);
 }
 
 ICACHE_RAM_ATTR void anemo(void)
@@ -127,16 +129,16 @@ int getWindDirection() {
 
   int vaneValue = analogRead(A0); 
   float vout = 5.0 * float(vaneValue) / 1023.0;
-  if (vout<1.53) {
-    windDirection = 183.6 - 120.0 * vout; 
+
+  if (vout>1.642) {
+    vout = vout -3.873;
   }
-  else {
-    windDirection = 149.6739 - 97.8261 * vout; 
-  }
+
+  windDirection = -3.84288 * vout * vout * vout * vout - 0.672727 * vout * vout * vout + 27.88521 * vout * vout + 90.35899 * vout - 5.0;
   
   if(windDirection > 180) windDirection = windDirection - 360; 
   if(windDirection < -180) windDirection = windDirection + 360;  
 
-  return vout*1000;
+  return windDirection;
 
 } 

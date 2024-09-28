@@ -18,7 +18,7 @@ unsigned long dt = 0;
 float windSpeed = 0.0;
 int windDirection = 0;
 
-const long interval = 1000;
+const long interval = 5000;
 unsigned long previousMillis = 0;  
 #define VANE_OFFSET 0; // define the anemometer offset from magnetic north 
 
@@ -67,22 +67,24 @@ void loop() {
   unsigned long currentMillis = millis();
   dt = currentMillis - previousMillis;
 
-  noInterrupts();
-  nDetections_copy = nDetections;
-  nDetections = 0;
-  interrupts();
-
-  previousMillis = millis();
-
-  if (nDetections_copy>0) {
-    windSpeed = 2250.0 * float(nDetections_copy)/float(dt) * 0.44 / 1.8;
+  if (dt > interval) {
+    noInterrupts();
+    nDetections_copy = nDetections;
+    nDetections = 0;
+    interrupts();
+  
+    previousMillis = millis();
+  
+    if (nDetections_copy>0) {
+      windSpeed = 2250.0 * float(nDetections_copy)/float(dt) * 0.44 / 1.8;
+    }
+    else {
+      windSpeed = 0.0;
+    }
+    sendUDP(windSpeed, 12.0);
+    delay(1000);
+    sendUDPDir(windDirection, 12.0);
   }
-  else {
-    windSpeed = 0.0;
-  }
-  sendUDP(windSpeed, 12.0);
-  delay(interval);
-  sendUDPDir(windDirection, 12.0);
 }
 
 ICACHE_RAM_ATTR void anemo(void)
@@ -120,6 +122,7 @@ void sendUDPDir(int wind_dir, float batVoltage) {
   Serial.println(message);
 }
 
+
 // Get Wind Direction 
 int getWindDirection() { 
   int windDirection;
@@ -127,12 +130,12 @@ int getWindDirection() {
 
   int vaneValue = analogRead(A0); 
   float vout = 5.0 * float(vaneValue) / 1023.0;
-
-  if (vout>1.642) {
-    vout = vout -3.873;
+  if (vout<1.53) {
+    windDirection = 183.6 - 120.0 * vout; 
   }
-
-  windDirection = -3.84288 * vout * vout * vout * vout - 0.672727 * vout * vout * vout + 27.88521 * vout * vout + 90.35899 * vout - 5.0;
+  else {
+    windDirection = 149.6739 - 97.8261 * vout; 
+  }
   
   if(windDirection > 180) windDirection = windDirection - 360; 
   if(windDirection < -180) windDirection = windDirection + 360;  
