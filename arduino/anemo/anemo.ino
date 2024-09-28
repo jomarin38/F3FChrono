@@ -22,7 +22,7 @@ float period;
 float freq =0;
 float windSpeed = 0.0;
 
-const long interval = 1000;
+const long interval = 5000;
 unsigned long previousMillis = 0;  
 
 
@@ -39,9 +39,9 @@ void setup() {
   Serial.begin(115200);
   // put your setup code here, to run once:
   // installation interruption D6 pour anemo
-  pinMode(D7, INPUT_PULLUP);
+  pinMode(D6, INPUT_PULLUP);
   // pinMode(LED_BUILTIN, OUTPUT); 
-  attachInterrupt(digitalPinToInterrupt(D7), anemo, RISING);
+  attachInterrupt(digitalPinToInterrupt(D6), anemo, RISING);
 
   // Begin WiFi
   
@@ -88,14 +88,17 @@ void loop() {
   
     // put your main code here, to run repeatedly:
     if (nDetections_copy>0) {
-      period = float(dt)/float(nDetections_copy);
-      freq = 1000.0/period/3.0;
-      windSpeed = 2.4 * freq * 0.277778;
+      windSpeed = nDetections_copy * 0.9 * 0.447 * 2.4 * dt / 1000.0;
+      //period = float(dt)/float(nDetections_copy);
+      //freq = 1000.0/period/3.0;
+      //windSpeed = 2.4 * freq * 0.277778;
     }
     else {
       windSpeed = 0.0;
     }
-    sendUDP(windSpeed, batVoltage);
+    sendUDP(windSpeed, 11.3);
+    delay(1000);
+    sendWindDir(0,11.3);
     
   }
 }
@@ -110,6 +113,19 @@ void sendUDP(float wind_speed, float batVoltage) {
   dtostrf(batVoltage,5,2,voltage);
   
   sprintf(message,"wind_speed %s m/s %s\r\n",speed_str,voltage);
+  //sprintf(message,"wind_speed %d  %s\r\n",int(wind_speed),voltage);
+  
+  udp.beginPacket(remoteIP, remotePort);
+  udp.write(message);
+  udp.endPacket();
+
+  //Serial.println(message);
+}
+
+void sendWindDir(int angle, float batVoltage) {
+  dtostrf(batVoltage,5,2,voltage);
+  
+  sprintf(message,"wind_dir %d %s\r\n",angle,voltage);
   //sprintf(message,"wind_speed %d  %s\r\n",int(wind_speed),voltage);
   
   udp.beginPacket(remoteIP, remotePort);
