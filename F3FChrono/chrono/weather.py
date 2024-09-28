@@ -65,8 +65,6 @@ class Weather(QTimer):
     gui_wind_speed_dir_signal = pyqtSignal(float, str, bool, float, float, bool, bool, bool, bool)
     beep_signal = pyqtSignal(str, int, int)
 
-    weather_sound_signal = pyqtSignal(str)
-
     weather_lowVoltage_signal = pyqtSignal()
     weather_sensor_lost = pyqtSignal()
 
@@ -119,6 +117,7 @@ class Weather(QTimer):
         self.timerRain.timeout.connect(self.timeoutRain)
         self.setConfig()
         self.status = "Init"
+        self.vocal = weatherVocal(ConfigReader.config.conf['weather_vocal_blank_ms'])
 
     def setConfig(self):
         self.windDir_enable = ConfigReader.config.conf['enableSensorDir']
@@ -349,7 +348,8 @@ class Weather(QTimer):
                 self.beep_signal.emit("blink", 5, self.weatherBeepOkDc)
             if self.weatherSound or self.chronostatus == Chrono.chronoStatus.InWait \
                     or self.chronostatus == Chrono.chronoStatus.Finished:
-                self.weather_sound_signal.emit("windok")
+                self.vocal.append("windok")
+                #self.weather_sound_signal.emit("windok")
 
     def slot_weatherNotCondition(self):
         if self.__debug:
@@ -364,7 +364,8 @@ class Weather(QTimer):
                     self.beep_signal.emit("blink", 2, self.weatherBeepNok)
                 if self.weatherSound or self.chronostatus == Chrono.chronoStatus.InWait \
                     or self.chronostatus == Chrono.chronoStatus.Finished:
-                    self.weather_sound_signal.emit("windalert")
+                    self.vocal.append("windalert")
+                    #self.weather_sound_signal.emit("windalert")
 
         if self.rules['state'] == weatherState.init or self.rules['state'] == weatherState.Nominal:
             self.timerMarginal.start(self.weatherTimeOutMarginalcond)
@@ -385,7 +386,8 @@ class Weather(QTimer):
                 self.beep_signal.emit("permanent", -1, 1000)
             if self.weatherSound or self.chronostatus == Chrono.chronoStatus.InWait \
                     or self.chronostatus == Chrono.chronoStatus.Finished:
-                self.weather_sound_signal.emit("windmarginal")
+                self.vocal.append("windmarginal")
+                #self.weather_sound_signal.emit("windmarginal")
 
     def slot_weatherCondition(self):
         if self.__debug:
@@ -398,7 +400,8 @@ class Weather(QTimer):
             if self.__rules_enable:
                 if self.weatherSound or self.chronostatus == Chrono.chronoStatus.InWait \
                     or self.chronostatus == Chrono.chronoStatus.Finished:
-                    self.weather_sound_signal.emit("windok")
+                    self.vocal.append("windok")
+                    #self.weather_sound_signal.emit("windok")
         elif self.rules['state'] == weatherState.condMarginal:
             self.timerOkDC.start(self.weatherTimeOutOkDc)
             self.rules['state'] = weatherState.Stabilizing
@@ -411,4 +414,39 @@ class Weather(QTimer):
     def getMCinRun(self):
         return (self.rules['MCInRun'])
 
+    def getVocalSignal(self):
+        return self.vocal.sound_signal
 
+
+class weatherVocal(QTimer):
+    sound_signal = pyqtSignal(str)
+
+    def __init__(self, timeout):
+        super().__init__()
+        self.__debug = False
+        self.timems = timeout
+        self.timeout.connect(self.process)
+        self.list = []
+
+    def process(self):
+        if self.__debug:
+            print ('weathervocal len(list) : '+str(len(self.list)))
+        if len(self.list)!=0:
+            if self.__debug:
+                print('weathervocal last msg : ' + self.list[-1])
+            self.sound_signal.emit(self.list[-1])
+            self.list.clear()
+        else:
+            self.stop()
+
+    def append(self, msg):
+        if self.isActive():
+            if self.__debug:
+                print('weathervocal timer actif, append : ' + msg)
+            self.list.append(msg)
+        else:
+            if self.__debug:
+                print('weathervocal timer inactif, play : ' + msg)
+            self.sound_signal.emit(msg)
+            #self.singleShot(self.timems, self.process)
+            self.start(self.timems)
