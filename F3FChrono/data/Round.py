@@ -78,7 +78,7 @@ class Round:
 
     def get_groups_with_imposed_fly_order(self, number_of_groups, fly_order):
         groups = [RoundGroup(self, 1)]
-        pilots_per_group = int(len(self.event.competitors) / number_of_groups)
+        pilots_per_group = int(len(self.event.competitors) / number_of_groups) + 1
         counter = 0
         current_group_index = 0
 
@@ -452,25 +452,27 @@ class Round:
         response = requests.post(request_url)
 
     def export_to_csv(self, csv_writer):
-        csv_writer.writerow(['bib_number', 'pilot_name', 'pilot_firstname', 'round', 'seconds', 'penalty',
+        csv_writer.writerow(['bib_number', 'pilot_name', 'pilot_firstname', 'round', 'group', 'seconds', 'penalty',
                             'sub1', 'sub2', 'sub3', 'sub4', 'sub5', 'sub6', 'sub7', 'sub8', 'sub9', 'sub10'])
         for group in self.groups:
             for bib_number in sorted(self.event.competitors):
                 competitor = self.event.competitors[bib_number]
-                fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
-                valid_run = group.get_valid_run(fetched_competitor)
+                if group.has_competitor(competitor):
+                    fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
+                    valid_run = group.get_valid_run(fetched_competitor)
 
-                row = [str(fetched_competitor.bib_number), fetched_competitor.get_pilot().name,
-                        fetched_competitor.get_pilot().first_name, str(self.valid_round_number)]
-                if valid_run is not None:
-                    row.append(str(valid_run.get_flight_time()))
-                else:
-                    row.append('DNF')
-                row.append(str(group.get_penalty(competitor)))
-                if valid_run is not None:
-                    for i in range(0, 10):
-                        row.append(str(valid_run.chrono.get_lap_time(i)))
-                csv_writer.writerow(row)
+                    row = [str(fetched_competitor.bib_number), fetched_competitor.get_pilot().name,
+                            fetched_competitor.get_pilot().first_name, str(self.valid_round_number),
+                           str(group.group_number)]
+                    if valid_run is not None:
+                        row.append(str(valid_run.get_flight_time()))
+                    else:
+                        row.append('DNF')
+                    row.append(str(group.get_penalty(competitor)))
+                    if valid_run is not None:
+                        for i in range(0, 10):
+                            row.append(str(valid_run.chrono.get_lap_time(i)))
+                    csv_writer.writerow(row)
 
     def get_summary_as_json(self, current_round):
         result_dict = {}
