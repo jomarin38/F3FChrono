@@ -21,6 +21,7 @@ class ResultTable:
         self.title = title
         self.header = None
         self.lines = []
+        self.pictures = []
         self.css_id = css_id
 
     def set_title(self, title):
@@ -32,6 +33,9 @@ class ResultTable:
     def add_line(self, line):
         self.lines.append(line)
 
+    def add_picture(self, picture):
+        self.pictures.append(picture)
+
     def to_html(self):
         res = '<h2>' + self.title + '</h2>'
         if self.css_id is None:
@@ -42,6 +46,8 @@ class ResultTable:
         res += '<tbody>'
         for line in self.lines:
             res += line.to_html()
+        for picture in self.pictures:
+            res+= picture.to_html()
         res += '</tbody>'
         res += '</table>'
         return res

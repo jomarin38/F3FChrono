@@ -1,7 +1,7 @@
 {
  "Launch_time": 30000,
  "Launched_time": 30000,
- "SensorAlarmTimeout": 5000,
+ "SensorAlarmTimeout": 15000,
  "auto_send_f3xvault": false,
  "btn_baseA": 5,
  "btn_baseB": 6,
@@ -43,5 +43,6 @@
  "weather_TimeOut_OkDC": 20000,
  "weather_beep_nok": 150,
  "weather_beep_okDC": 250,
+ "weather_vocal_blank_ms": 10000,
  "webserver_port": 8000
 }

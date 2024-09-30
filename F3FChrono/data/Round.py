@@ -21,6 +21,7 @@ from F3FChrono.data.Run import Run
 from F3FChrono.data.RoundGroup import RoundGroup
 from F3FChrono.data.Chrono import Chrono
 from F3FChrono.data.dao.CompetitorDAO import CompetitorDAO
+from F3FChrono.data.dao.FlyOrderDAO import FlyOrderDAO
 from F3FChrono.data.dao.RoundDAO import RoundDAO
 from celery_progress.backend import ProgressRecorder
 from F3FChrono.chrono import ConfigReader
@@ -96,6 +97,26 @@ class Round:
         groups[current_group_index].set_flight_order(flight_order)
         return groups
 
+    def get_groups_with_imposed_fly_order_and_groups(self, fly_order, imposed_groups):
+        current_group = 1
+        groups = [RoundGroup(self, 1)]
+        current_group_index = 0
+        flight_order = []
+        counter = 0
+        for index, bib in enumerate(fly_order):
+            if imposed_groups[index] == current_group:
+                flight_order += [bib]
+                counter += 1
+            else:
+                groups[current_group_index].set_flight_order(flight_order)
+                flight_order = [bib]
+                counter = 1
+                groups.append(RoundGroup(self, len(groups) + 1))
+                current_group_index += 1
+                current_group = imposed_groups[index]
+        groups[current_group_index].set_flight_order(flight_order)
+        return groups
+
     def add_group(self, round_group):
         self.groups.append(round_group)
 
@@ -106,9 +127,16 @@ class Round:
         if len(self.groups) == 1:
             group = self.groups[0]
 
-            new_groups = self.get_groups_from_scratch(self.event.groups_number)
-            #Temporary groups to find valid groups
-            new_groups2 = self.get_groups_from_scratch(self.event.groups_number)
+            imposed_groups = FlyOrderDAO().get_groups(self.event, self.round_number)
+            if imposed_groups is None:
+                new_groups = self.get_groups_from_scratch(self.event.groups_number)
+                #Temporary groups to find valid groups
+                new_groups2 = self.get_groups_from_scratch(self.event.groups_number)
+            else:
+                imposed_fly_order = FlyOrderDAO().get_order(self.event, self.round_number)
+                new_groups = self.get_groups_with_imposed_fly_order_and_groups(imposed_fly_order, imposed_groups)
+                # Temporary groups to find valid groups
+                new_groups2 = self.get_groups_with_imposed_fly_order_and_groups(imposed_fly_order, imposed_groups)
 
             #Get runs from base group
             for new_group in new_groups2:

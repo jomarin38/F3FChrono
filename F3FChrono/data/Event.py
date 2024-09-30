@@ -157,6 +157,8 @@ class Event:
         #Skip pilots definition header
         splitted_response.pop(0)
 
+        counter = 1
+
         for line in splitted_response:
             splitted_line = line.split(',')
             if len(splitted_line) > 2:
@@ -166,8 +168,14 @@ class Event:
                               national_id=splitted_line[7].strip('\"'),
                               fai_id=splitted_line[6].strip('\"')
                               )
-                bib_number = int(splitted_line[1].strip('\"'))
+                try:
+                    bib_number = int(splitted_line[1].strip('\"'))
+                except:
+                    bib_number = 0
 
+                if bib_number==0:
+                    bib_number=counter
+                    counter+=1
                 event.register_pilot(pilot, bib_number)
 
         if max_rounds is not None:
