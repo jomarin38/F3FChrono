@@ -82,8 +82,9 @@ void loop() {
       windSpeed = 0.0;
     }
     sendUDP(windSpeed, 12.0);
-    delay(1000);
+    delay(800);
     sendUDPDir(windDirection, 12.0);
+    delay(200);
   }
 }
 

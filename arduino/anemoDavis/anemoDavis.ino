@@ -18,7 +18,7 @@ unsigned long dt = 0;
 float windSpeed = 0.0;
 int windDirection = 0;
 
-const long interval = 5000;
+const long interval = 1000;
 unsigned long previousMillis = 0;  
 #define VANE_OFFSET 0; // define the anemometer offset from magnetic north 
 
@@ -82,8 +82,9 @@ void loop() {
       windSpeed = 0.0;
     }
     sendUDP(windSpeed, 12.0);
-    delay(1000);
+    delay(800);
     sendUDPDir(windDirection, 12.0);
+    delay(200);
   }
 }
 
