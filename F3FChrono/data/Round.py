@@ -461,8 +461,6 @@ class Round:
                     fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
                     valid_run = group.get_valid_run(fetched_competitor)
 
-                    str(group.get_flight_order().index(fetched_competitor.bib_number))
-
                     row = [str(fetched_competitor.bib_number),
                            str(group.get_flight_order().index(fetched_competitor.bib_number) + 1),
                            fetched_competitor.get_pilot().name, fetched_competitor.get_pilot().first_name,
