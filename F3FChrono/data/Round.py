@@ -452,7 +452,7 @@ class Round:
         response = requests.post(request_url)
 
     def export_to_csv(self, csv_writer):
-        csv_writer.writerow(['bib_number', 'pilot_name', 'pilot_firstname', 'round', 'group', 'seconds', 'penalty',
+        csv_writer.writerow(['bib_number', 'fly_order', 'pilot_name', 'pilot_firstname', 'round', 'group', 'seconds', 'penalty',
                             'sub1', 'sub2', 'sub3', 'sub4', 'sub5', 'sub6', 'sub7', 'sub8', 'sub9', 'sub10'])
         for group in self.groups:
             for bib_number in sorted(self.event.competitors):
@@ -461,9 +461,12 @@ class Round:
                     fetched_competitor = CompetitorDAO().get(self.event, competitor.get_bib_number())
                     valid_run = group.get_valid_run(fetched_competitor)
 
-                    row = [str(fetched_competitor.bib_number), fetched_competitor.get_pilot().name,
-                            fetched_competitor.get_pilot().first_name, str(self.valid_round_number),
-                           str(group.group_number)]
+                    str(group.get_flight_order().index(fetched_competitor.bib_number))
+
+                    row = [str(fetched_competitor.bib_number),
+                           str(group.get_flight_order().index(fetched_competitor.bib_number) + 1),
+                           fetched_competitor.get_pilot().name, fetched_competitor.get_pilot().first_name,
+                           str(self.valid_round_number), str(group.group_number)]
                     if valid_run is not None:
                         row.append(str(valid_run.get_flight_time()))
                     else:
