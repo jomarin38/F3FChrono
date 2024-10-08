@@ -126,14 +126,14 @@ class Round:
     def enable_group_scoring(self):
         if len(self.groups) == 1:
             group = self.groups[0]
-
-            imposed_groups = FlyOrderDAO().get_groups(self.event, self.round_number)
+            valid_round_number = len(self.event.valid_rounds) + 1
+            imposed_groups = FlyOrderDAO().get_groups(self.event, valid_round_number)
             if imposed_groups is None:
                 new_groups = self.get_groups_from_scratch(self.event.groups_number)
                 #Temporary groups to find valid groups
                 new_groups2 = self.get_groups_from_scratch(self.event.groups_number)
             else:
-                imposed_fly_order = FlyOrderDAO().get_order(self.event, self.round_number)
+                imposed_fly_order = FlyOrderDAO().get_order(self.event, valid_round_number)
                 new_groups = self.get_groups_with_imposed_fly_order_and_groups(imposed_fly_order, imposed_groups)
                 # Temporary groups to find valid groups
                 new_groups2 = self.get_groups_with_imposed_fly_order_and_groups(imposed_fly_order, imposed_groups)
