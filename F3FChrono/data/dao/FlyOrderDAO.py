@@ -29,10 +29,18 @@ class FlyOrderDAO(Dao):
             fly_order = list(map(int,row[0].strip('\'').split(',')))
         return fly_order
 
-    def set_order(self, event, round_number, fly_order):
-        sql = 'INSERT INTO imposed_fly_order (event_id, round_number, flight_order) ' \
-              'VALUES (%s, %s, %s)'
-        self._execute_insert(sql, event.id, round_number, ','.join(map(str,fly_order)))
+    def get_groups(self, event, round_number):
+        sql = 'SELECT groups FROM imposed_fly_order WHERE event_id=%s AND round_number=%s'
+        query_result = self._execute_query(sql, event.id, round_number)
+        groups = None
+        for row in query_result: #should return only one result
+            groups = list(map(int,row[0].strip('\'').split(',')))
+        return groups
+
+    def set_order(self, event, round_number, fly_order, groups):
+        sql = 'INSERT INTO imposed_fly_order (event_id, round_number, flight_order, groups) ' \
+              'VALUES (%s, %s, %s, %s)'
+        self._execute_insert(sql, event.id, round_number, ','.join(map(str,fly_order)), ','.join(map(str,groups)))
 
     def delete_round(self, event, round_number):
         #Delete is intentionally not using group_id to directly delete all cancelled groups
