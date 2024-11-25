@@ -445,7 +445,7 @@ def do_define_fly_order(request):
         splitted_line = line.split(',')
         if len(splitted_line)>=2:
             FlyOrderDAO().delete_round(event, int(splitted_line[0]))
-            FlyOrderDAO().set_order(event, int(splitted_line[0]), splitted_line[1].split())
+            FlyOrderDAO().set_order(event, int(splitted_line[0]), splitted_line[1].split(), splitted_line[2].split())
 
     return HttpResponseRedirect('manage_event?event_id=' + event_id)
 
