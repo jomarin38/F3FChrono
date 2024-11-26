@@ -90,11 +90,8 @@ void loop() {
 
 ICACHE_RAM_ATTR void anemo(void)
 {
- if((millis() - contactBounceTime)>15) {
     nDetections++;
     contactBounceTime = millis();
- }
- 
 }
 
 void sendUDP(float wind_speed, float batVoltage) {
