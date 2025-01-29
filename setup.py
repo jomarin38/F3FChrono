@@ -24,11 +24,12 @@ with open("README.md", "r") as fh:
 
 install_requires = [
        'pandas', 'requests', 'pymysql', 'Django', 'pyserial', 'scipy', 'pyttsx3', 'netifaces',
-       'pyqrcode', 'qrcode', 'pypng', 'celery', 'celery-progress', 'python-decouple', 'redis'
+       'pyqrcode', 'qrcode', 'pypng', 'celery', 'celery-progress', 'python-decouple', 'redis', 'PyQt5', 'unidecode'
     ]
 
 if not is_running_on_pi():
     install_requires.append('fake_rpi')
+    install_requires.append('gpiozero')
 
 setuptools.setup(
     name='F3FChrono',
