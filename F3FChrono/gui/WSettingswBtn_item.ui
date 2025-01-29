@@ -138,6 +138,16 @@
      </item>
      <item>
       <property name="text">
+       <string>ReFlight</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Nullflight</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>Penalty</string>
       </property>
      </item>
@@ -192,6 +202,16 @@
      </item>
      <item>
       <property name="text">
+       <string>ReFlight</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>NullFlight</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>Penalty</string>
       </property>
      </item>
@@ -227,6 +247,16 @@
      <item>
       <property name="text">
        <string>Switch Mode</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>ReFlight</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>NullFlight</string>
       </property>
      </item>
      <item>
