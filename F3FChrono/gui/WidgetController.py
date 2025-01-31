@@ -1139,7 +1139,7 @@ class WSettingswBtn(QObject):
         self.__release_detect()
         if self.ipset_sig is not None:
             ip = self.get_ipwBtn()
-            self.ipset_sig.emit(ip[0], ip[1], ip[2], ip[3], ip[4])
+            self.ipset_sig.emit(ip[0], ip[1], ip[2], ip[3], ip[4], ip[5], ip[6])
 
     def __release_detect(self):
         if self.wBtnInProgress:
@@ -1196,6 +1196,8 @@ class WSettingswBtn(QObject):
         baseB = [[], [], []]
         btn_next = [[], [], []]
         switchMode = [[], [], []]
+        reflight = [[], [], []]
+        nullflight = [[], [], []]
         penalty = [[], [], []]
         for i in list:
             index = i['ui_widget'].comboBox_LP.currentIndex()
@@ -1208,6 +1210,10 @@ class WSettingswBtn(QObject):
             elif index == 4:
                 switchMode[0].append(i['ui_widget'].ipAddress.text())
             elif index == 5:
+                reflight[0].append(i['ui_widget'].ipAddress.text())
+            elif index == 6:
+                nullflight[0].append(i['ui_widget'].ipAddress.text())
+            elif index == 7:
                 penalty[0].append(i['ui_widget'].ipAddress.text())
 
             index = i['ui_widget'].comboBox_SP.currentIndex()
@@ -1220,6 +1226,10 @@ class WSettingswBtn(QObject):
             elif index == 4:
                 switchMode[1].append(i['ui_widget'].ipAddress.text())
             elif index == 5:
+                reflight[1].append(i['ui_widget'].ipAddress.text())
+            elif index == 6:
+                nullflight[1].append(i['ui_widget'].ipAddress.text())
+            elif index == 7:
                 penalty[1].append(i['ui_widget'].ipAddress.text())
 
             index = i['ui_widget'].comboBox_CL.currentIndex()
@@ -1232,9 +1242,13 @@ class WSettingswBtn(QObject):
             elif index == 4:
                 switchMode[2].append(i['ui_widget'].ipAddress.text())
             elif index == 5:
+                reflight[2].append(i['ui_widget'].ipAddress.text())
+            elif index == 6:
+                nullflight[2].append(i['ui_widget'].ipAddress.text())
+            elif index == 7:
                 penalty[2].append(i['ui_widget'].ipAddress.text())
 
-        return baseA, baseB, btn_next, switchMode, penalty
+        return baseA, baseB, btn_next, switchMode, reflight, nullflight, penalty
 
 class WSettingsSound(QObject):
     btn_settings_sig = pyqtSignal()

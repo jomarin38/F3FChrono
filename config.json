@@ -28,7 +28,7 @@
  "run_webserver": true,
  "simulatemode": false,
  "sound": true,
- "soundvolume": 98,
+ "soundvolume": 100,
  "training_speech_interval": 2,
  "udpport": 4445,
  "voice": true,

@@ -36,16 +36,18 @@ class udpreceive(QThread):
     ipbase_invert_sig = pyqtSignal(list)
     ipbase_set_sig = pyqtSignal(list, list)
     ipwBtn_clear_sig = pyqtSignal()
-    ipwBtn_set_sig = pyqtSignal(list, list, list, list, list)
+    ipwBtn_set_sig = pyqtSignal(list, list, list, list, list, list, list)
     simulate_base_sig = pyqtSignal(str)
     simulate_wbtn_sig = pyqtSignal(str)
     switchMode_sig = pyqtSignal()
+    reflight_sig = pyqtSignal()
+    nullflight_sig = pyqtSignal()
     penalty_sig = pyqtSignal()
 
     def __init__(self, udpport, signal_chrono, signal_btnnext, signal_windspeed, signal_winddir, signal_rain, \
                  weatherList_sig, weatherStatus_sig):
         super().__init__()
-        self.__debug = False
+        self.__debug = True
         self.port = udpport
         self.event_chrono = signal_chrono
         self.event_btn_next = signal_btnnext
@@ -88,21 +90,25 @@ class udpreceive(QThread):
         self.ipbaseB = self.ipbaseA
         self.ipbaseA = tmp
 
-    def set_ipwBtn(self, baseA, baseB, btnNext, switchMode, penalty):
+    def set_ipwBtn(self, baseA, baseB, btnNext, switchMode, reflight, nullflight, penalty):
         self.ipwBtn_baseA = baseA
         self.ipwBtn_baseB = baseB
         self.ipwBtn_btnNext = btnNext
         self.ipwBtn_SwitchMode = switchMode
+        self.ipwBtn_reflight = reflight
+        self.ipwBtn_nullflight = nullflight
         self.ipwBtn_penalty = penalty
         if self.__debug:
             print("baseA : ", baseA, "\nbaseB : ", baseB, "\nBtn Next : ", btnNext, "\nSwitchMode : ", switchMode,
-                  "\nPenalty : ", penalty)
+                  "\nreflight : ", reflight, "\nnullflight : ", nullflight, "\nPenalty : ", penalty)
 
     def clear_ipwBtn(self):
         self.ipwBtn_baseA = [[], [], []]
         self.ipwBtn_baseB = [[], [], []]
         self.ipwBtn_btnNext = [[], [], []]
         self.ipwBtn_SwitchMode = [[], [], []]
+        self.ipwBtn_reflight = [[], [], []]
+        self.ipwBtn_nullflight = [[], [], []]
         self.ipwBtn_penalty = [[], [], []]
 
     def run(self):
@@ -173,6 +179,10 @@ class udpreceive(QThread):
             self.event_btn_next.emit()
         elif find and base == "switch_mode":
             self.switchMode_sig.emit()
+        elif find and base == "reflight":
+            self.reflight_sig.emit()
+        elif find and base == "nulllight":
+            self.nullflight_sig.emit()
         elif find and base == "penalty":
             self.penalty_sig.emit()
         else:
@@ -198,6 +208,14 @@ class udpreceive(QThread):
                 if self.__debug:
                     print("switch mode")
                 return True, "switch_mode"
+            elif ip in self.ipwBtn_reflight[shortpush]:
+                if self.__debug:
+                    print("reflight")
+                return True, "reflight"
+            elif ip in self.ipwBtn_nullflight[shortpush]:
+                if self.__debug:
+                    print("nullflight")
+                return True, "nulllight"
             elif ip in self.ipwBtn_penalty[shortpush]:
                 if self.__debug:
                     print("Penalty")
