@@ -64,6 +64,13 @@ def main(webservice_only=False, public_only=False, private_only=False, external_
             if external_mysql is not None:
                 ws_env['MYSQL_IP'] = external_mysql
 
+            python3 = 'python3'
+            celery = 'celery'
+            if 'F3FCHRONO_ENV' in ws_env:
+                python3 = os.path.join(ws_env['F3FCHRONO_ENV'], python3)
+                celery = os.path.join(ws_env['F3FCHRONO_ENV'], celery)
+
+
             if webserver_ports is None:
                 django_ports = [ConfigReader.config.conf['webserver_port']]
             else:
@@ -71,12 +78,12 @@ def main(webservice_only=False, public_only=False, private_only=False, external_
 
             for django_port in django_ports:
                 webserver_process = \
-                    subprocess.Popen(['python3', os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:'
+                    subprocess.Popen([python3, os.path.join(manage_py_path, 'manage.py'), 'runserver', '0.0.0.0:'
                                       +str(django_port)],
                                      shell=False, env=ws_env)
 
             if not public_only:
-                subprocess.Popen(['celery', '-A', 'administrator',  'worker', '-l', 'info'], cwd=manage_py_path, shell=False)
+                subprocess.Popen([celery, '-A', 'administrator',  'worker', '-l', 'info'], cwd=manage_py_path, shell=False)
 
     print("...start")
 
