@@ -40,12 +40,14 @@ class Utils:
     @staticmethod
     def get_ip():
 
-        interfaces = ['wlan1', 'wlan0'] + [i for i in ni.interfaces() if i not in ('wlan1', 'wlan0', 'lo')]
+        available_interfaces = ni.interfaces()
+
+        interfaces = ([i for i in ['wlan1', 'wlan0'] if i in available_interfaces] +
+                      [i for i in available_interfaces if i not in ('wlan1', 'wlan0', 'lo')])
 
         for interface in interfaces:
-            if interface != 'lo':
-                if AF_INET in ni.ifaddresses(interface):
-                    return ni.ifaddresses(interface)[AF_INET][0]['addr']
+            if AF_INET in ni.ifaddresses(interface):
+                return ni.ifaddresses(interface)[AF_INET][0]['addr']
 
         #return the loopback address if we did not find anything better
         return '127.0.0.1'
