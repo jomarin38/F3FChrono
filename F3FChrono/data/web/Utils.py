@@ -40,18 +40,14 @@ class Utils:
     @staticmethod
     def get_ip():
 
-        interfaces = ni.interfaces()
+        available_interfaces = ni.interfaces()
 
-        if 'wlan1' in interfaces:
-            return ni.ifaddresses('wlan1')[AF_INET][0]['addr']
-        elif 'wlan0' in interfaces:
-            return ni.ifaddresses('wlan0')[AF_INET][0]['addr']
-        else:
-            #Probably not running on raspberry pi ... try to find working interface
-            for interface in interfaces:
-                if interface != 'lo':
-                    if AF_INET in ni.ifaddresses(interface):
-                        return ni.ifaddresses(interface)[AF_INET][0]['addr']
+        interfaces = ([i for i in ['wlan1', 'wlan0'] if i in available_interfaces] +
+                      [i for i in available_interfaces if i not in ('wlan1', 'wlan0', 'lo')])
+
+        for interface in interfaces:
+            if AF_INET in ni.ifaddresses(interface):
+                return ni.ifaddresses(interface)[AF_INET][0]['addr']
 
         #return the loopback address if we did not find anything better
         return '127.0.0.1'
